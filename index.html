@@ -221,7 +221,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 </style>
 </head>
 <body>
-  <div id="app">
+<div id="app">
 
 <!-- ADMIN MODAL -->
 <div id="admin-modal" class="modal-overlay hidden">
@@ -313,6 +313,15 @@ const HEME_FOLDER_GROUPS = [
   {label:'Non-Malignant Disorders / Morphologic',keys:['non_malignant']}
 ];
 
+const MICRO_FOLDERS = [
+  {key:'gram_positive',name:'Gram Positive',icon:'🟣'},
+  {key:'gram_negative',name:'Gram Negative',icon:'🔴'}
+];
+
+const MICRO_FOLDER_GROUPS = [
+  {label:'By Gram Stain',keys:['gram_positive','gram_negative']}
+];
+
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let sb = null;
 let isAdmin = false;
@@ -333,7 +342,15 @@ let appState = {
   bbAnswers:{}, // blood bank MC answers: {caseId: {qIdx: letter}}
   hemeCaseAnswers:{}, // hematology case answers
   hemeCaseCollapsed:{}, // hematology case collapse state
-  bbCollapsed:{} // blood bank case collapse state
+  bbCollapsed:{}, // blood bank case collapse state
+  microCaseAnswers:{}, // micro case MC answers
+  microCaseCollapsed:{}, // micro case collapse state
+  // microbiology images
+  microImgPage:null, microImgMode:'browse',
+  microQuizItems:[], microQuizIdx:0, microQuizAns:[], microQuizDone:false,
+  // urinalysis images
+  uaImgMode:'browse',
+  uaQuizItems:[], uaQuizIdx:0, uaQuizAns:[], uaQuizDone:false
 };
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -424,7 +441,7 @@ async function seedIfEmpty(){
     };
     for(const [subject,qs] of Object.entries(samples)){
       for(const q of qs){
-        await sb.from('mlsboc_questions').insert({subject,...q}).catch(()=>{});
+        try{await sb.from('mlsboc_questions').insert({subject,...q});}catch(e){}
       }
     }
   }catch(e){console.warn('Seed error',e);}
@@ -513,27 +530,25 @@ function renderHome(v){
 }
 
 async function loadInteractiveLinks(){
-  // Links stored in localStorage as JSON array [{title, url, description}]
-  const raw = localStorage.getItem('mlsboc_interactive_links');
-  const links = raw ? JSON.parse(raw) : [];
+  const {data:links} = await sb.from('mlsboc_interactive_links').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
   const grid = document.getElementById('interactive-links-grid');
   const adminDiv = document.getElementById('interactive-admin');
 
   if(grid){
-    if(!links.length){
+    if(!links||!links.length){
       grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.' + (isAdmin?' Use the form below to add one.':'') + '</div>';
     } else {
       grid.innerHTML = '<div class="subject-grid">' + links.map((lnk,i) =>
-        '<div class="subject-card" style="position:relative;cursor:pointer" onclick="window.location.href=\'' + lnk.url + '\'">' 
-        + (lnk.image ? '<div style="width:100%;height:130px;overflow:hidden"><img src="'+lnk.image+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>'
+        '<div class="subject-card" style="position:relative;cursor:pointer" onclick="window.open(\'' + lnk.url + '\',\'_blank\')">'
+        + (lnk.image_url ? '<div style="width:100%;height:130px;overflow:hidden"><img src="'+lnk.image_url+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>'
           : '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px">🔗</div>')
         + '<div style="padding:10px 12px 12px">'
         + '<div class="subject-name" style="color:var(--accent)">' + lnk.title + '</div>'
         + (lnk.description ? '<div class="subject-count">' + lnk.description + '</div>' : '')
         + '</div>'
         + (isAdmin ? '<div style="display:flex;gap:6px;padding:4px 10px 8px" onclick="event.stopPropagation()">'
-          + '<button onclick="editInteractiveLink('+i+')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">✏️ Edit</button>'
-          + '<button onclick="removeInteractiveLink('+i+')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">✕ Remove</button>'
+          + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">✏️ Edit</button>'
+          + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">✕ Remove</button>'
           + '</div>' : '')
         + '</div>'
       ).join('') + '</div>';
@@ -546,8 +561,10 @@ async function loadInteractiveLinks(){
       + '<div class="form-group"><label>Title</label><input type="text" id="il-title" placeholder="e.g. Blood Cell Identifier"></div>'
       + '<div class="form-group"><label>URL</label><input type="text" id="il-url" placeholder="https://..."></div>'
       + '<div class="form-group" style="margin-bottom:12px"><label>Description (optional)</label><input type="text" id="il-desc" placeholder="Short note about this tool"></div>'
-      + '<div class="form-group" style="margin-bottom:12px"><label>Image (drag & drop or click)</label>'
-      + '<div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px" id="il-img-dz" ondrop="handleILImgDrop(event)" ondragover="event.preventDefault();this.style.borderColor=\'var(--accent)\'" ondragleave="this.style.borderColor=\'var(--border2)\'" onclick="document.getElementById(\'il-img-file\').click()">📷 Drop image or click'
+      + '<div class="form-group" style="margin-bottom:12px"><label>Image URL (optional — paste a GitHub raw URL or any image link)</label>'
+      + '<input type="text" id="il-img-url" placeholder="https://raw.githubusercontent.com/...">'
+      + '<div style="font-size:11px;color:var(--text3);margin-top:4px">Or drag & drop / click to upload a local image</div>'
+      + '<div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px" id="il-img-dz" ondrop="handleILImgDrop(event)" ondragover="event.preventDefault();this.style.borderColor=\'var(--accent)\'" ondragleave="this.style.borderColor=\'var(--border2)\'" onclick="document.getElementById(\'il-img-file\').click()">📷 Drop image or click to upload'
       + '<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">'
       + '</div>'
       + '<input type="hidden" id="il-img-data" value="">'
@@ -557,64 +574,106 @@ async function loadInteractiveLinks(){
   }
 }
 
-function addInteractiveLink(){
+async function addInteractiveLink(){
   const title = document.getElementById('il-title')?.value.trim();
   const url   = document.getElementById('il-url')?.value.trim();
   const desc  = document.getElementById('il-desc')?.value.trim();
   if(!title || !url){ alert('Title and URL are required.'); return; }
-  const raw = localStorage.getItem('mlsboc_interactive_links');
-  const links = raw ? JSON.parse(raw) : [];
-  const img=document.getElementById('il-img-data')?.value||''; links.push({title, url, description: desc||'', image:img});
-  localStorage.setItem('mlsboc_interactive_links', JSON.stringify(links));
-  loadInteractiveLinks();
+  // Prefer typed image URL, fall back to uploaded base64
+  const imgUrl = document.getElementById('il-img-url')?.value.trim()
+    || document.getElementById('il-img-data')?.value || '';
+  const {error} = await sb.from('mlsboc_interactive_links').insert({title, url, description:desc||'', image_url:imgUrl});
+  if(error){alert('Error saving: '+error.message);return;}
   document.getElementById('il-title').value='';
   document.getElementById('il-url').value='';
   document.getElementById('il-desc').value='';
-  const dz=document.getElementById('il-img-dz');if(dz)dz.innerHTML='📷 Drop image or click<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">';
+  const iurl=document.getElementById('il-img-url');if(iurl)iurl.value='';
+  const dz=document.getElementById('il-img-dz');if(dz)dz.innerHTML='📷 Drop image or click to upload<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">';
   const hid=document.getElementById('il-img-data');if(hid)hid.value='';
+  loadInteractiveLinks();
 }
 
-function editInteractiveLink(i){
-  const raw=localStorage.getItem('mlsboc_interactive_links');
-  const links=raw?JSON.parse(raw):[];
-  const lnk=links[i];if(!lnk)return;
-  const title=prompt('Title:',lnk.title);if(title===null)return;
-  const url=prompt('URL:',lnk.url);if(url===null)return;
-  const desc=prompt('Description:',lnk.description||'');if(desc===null)return;
-  const changeImg=confirm('Change image? OK = pick new file, Cancel = keep current');
-  if(changeImg){
-    const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-    inp.onchange=ev=>{
-      const file=ev.target.files[0];if(!file)return;
-      const rdr=new FileReader();
-      rdr.onload=e2=>{
-        const t=new Image();
-        t.onload=()=>{
-          const M=600;let w=t.width,ht=t.height;
-          if(w>M){ht=Math.round(ht*M/w);w=M;}
-          const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
-          cv.getContext('2d').drawImage(t,0,0,w,ht);
-          links[i]={title:title.trim(),url:url.trim(),description:desc,image:cv.toDataURL('image/jpeg',0.75)};
-          try{localStorage.setItem('mlsboc_interactive_links',JSON.stringify(links));}catch(err){alert('Image too large.');}
-          loadInteractiveLinks();
-        };
-        t.src=e2.target.result;
-      };
-      rdr.readAsDataURL(file);
-    };
-    inp.click();
-  }else{
-    links[i]={...lnk,title:title.trim(),url:url.trim(),description:desc};
-    localStorage.setItem('mlsboc_interactive_links',JSON.stringify(links));
-    loadInteractiveLinks();
-  }
+async function editInteractiveLink(id){
+  const {data:lnk}=await sb.from('mlsboc_interactive_links').select('*').eq('id',id).single();
+  if(!lnk)return;
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Edit Link</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="form-group"><label>Title</label><input type="text" id="eil-title" value="${esc(lnk.title||'')}"></div>
+    <div class="form-group"><label>URL</label><input type="text" id="eil-url" value="${esc(lnk.url||'')}"></div>
+    <div class="form-group"><label>Description</label><input type="text" id="eil-desc" value="${esc(lnk.description||'')}"></div>
+    <div class="form-group">
+      <label>Image URL (GitHub raw or any direct image link)</label>
+      <input type="text" id="eil-img-url" value="${esc(lnk.image_url&&!lnk.image_url.startsWith('data:')?lnk.image_url:'')}" placeholder="https://raw.githubusercontent.com/...">
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Or drag & drop / click below to upload</div>
+      <div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column;margin-top:6px"
+        id="eil-img-dz"
+        ondrop="handleEILImgDrop(event,'${id}')"
+        ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+        ondragleave="this.style.borderColor='var(--border2)'"
+        onclick="document.getElementById('eil-img-file').click()">
+        ${lnk.image_url?`<img src="${lnk.image_url}" style="max-height:80px;border-radius:4px;max-width:100%">`:'<div style="font-size:28px">📷</div><div>Drop image or click to change</div>'}
+        <input type="file" id="eil-img-file" accept="image/*" style="display:none" onchange="handleEILImgFile(event,'${id}')">
+      </div>
+    </div>
+    <input type="hidden" id="eil-img-data" value="${esc(lnk.image_url||'')}">
+    <div class="flex gap-8 mt-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInteractiveLink('${id}')">Save</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
 }
-function removeInteractiveLink(i){
+
+function handleEILImgFile(e,id){
+  const file=e.target.files[0];if(!file)return;
+  const rdr=new FileReader();
+  rdr.onload=ev=>{
+    const t=new Image();
+    t.onload=()=>{
+      const M=600;let w=t.width,ht=t.height;
+      if(w>M){ht=Math.round(ht*M/w);w=M;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
+      cv.getContext('2d').drawImage(t,0,0,w,ht);
+      const url=cv.toDataURL('image/jpeg',0.75);
+      const hid=document.getElementById('eil-img-data');if(hid)hid.value=url;
+      // Clear the URL field so uploaded base64 takes priority
+      const iurl=document.getElementById('eil-img-url');if(iurl)iurl.value='';
+      const dz=document.getElementById('eil-img-dz');
+      if(dz)dz.innerHTML=`<img src="${url}" style="max-height:80px;border-radius:4px;max-width:100%"><input type="file" id="eil-img-file" accept="image/*" style="display:none" onchange="handleEILImgFile(event,'${id}')">`;
+    };
+    t.src=ev.target.result;
+  };
+  rdr.readAsDataURL(file);
+}
+
+function handleEILImgDrop(e,id){
+  e.preventDefault();e.currentTarget.style.borderColor='var(--border2)';
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const inp=document.createElement('input');inp.type='file';
+  const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;
+  handleEILImgFile({target:inp},id);
+}
+
+async function saveInteractiveLink(id){
+  const title=document.getElementById('eil-title')?.value.trim();
+  const url=document.getElementById('eil-url')?.value.trim();
+  const desc=document.getElementById('eil-desc')?.value.trim();
+  // Typed URL takes priority; fall back to uploaded base64
+  const imgUrl=document.getElementById('eil-img-url')?.value.trim()
+    || document.getElementById('eil-img-data')?.value || '';
+  if(!title||!url){alert('Title and URL required.');return;}
+  const {error}=await sb.from('mlsboc_interactive_links').update({title,url,description:desc||'',image_url:imgUrl}).eq('id',id);
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  loadInteractiveLinks();
+}
+
+async function removeInteractiveLink(id){
   if(!confirm('Remove this link?'))return;
-  const raw = localStorage.getItem('mlsboc_interactive_links');
-  const links = raw ? JSON.parse(raw) : [];
-  links.splice(i,1);
-  localStorage.setItem('mlsboc_interactive_links', JSON.stringify(links));
+  await sb.from('mlsboc_interactive_links').delete().eq('id',id);
   loadInteractiveLinks();
 }
 
@@ -680,6 +739,11 @@ function switchTab(tab){
   appState.bbAnswers={};
   appState.hemeCaseAnswers={};
   appState.hemeCaseCollapsed={};
+  appState.microImgPage=null;appState.microImgMode='browse';
+  appState.microQuizItems=[];appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+  appState.microCaseAnswers={};appState.microCaseCollapsed={};
+  appState.uaImgMode='browse';
+  appState.uaQuizItems=[];appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
   renderTab();
 }
 
@@ -784,6 +848,10 @@ function renderQuizResults(el,isAll){
 async function renderImagesTab(el){
   if(appState.subject==='hematology'){
     await renderHemeImages(el);
+  }else if(appState.subject==='microbiology'){
+    await renderMicroImages(el);
+  }else if(appState.subject==='urinalysis'){
+    await renderUAImages(el);
   }else{
     await renderGenericImages(el);
   }
@@ -813,6 +881,280 @@ async function renderGenericImages(el){
     </div>
   `;
 }
+
+// ─── URINALYSIS IMAGES — flat list with bulk upload + quiz (no folders) ───────
+async function renderUAImages(el){
+  if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
+  const {data}=await sb.from('mlsboc_ua_images').select('*').order('name');
+  el.innerHTML=`
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="startUAQuiz()">Image Quiz Mode</button>
+      ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddUAImageModal()">+ Add Image</button>`:''}
+    </div>
+    ${!data||!data.length?'<div class="empty">No urinalysis images yet. Use Admin mode to add some.</div>':''}
+    <div class="condition-grid">
+      ${(data||[]).map(img=>`
+        <div class="condition-card" onclick="openUAImage('${img.id}')">
+          <div class="condition-imgs">
+            ${buildUAThumbs(img)}
+          </div>
+          <div class="condition-body">
+            <div class="condition-name">${img.name}</div>
+            ${img.key_features?`<div class="condition-features">${(img.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+            ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+              <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
+            </div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+    ${isAdmin?`<div class="mt-16">${adminUAImageControls()}</div>`:''}
+  `;
+}
+
+function buildUAThumbs(img){
+  const imgs=img.images||[];
+  const slots=4;let html='';
+  for(let i=0;i<slots;i++){
+    if(imgs[i])html+=`<img src="${imgs[i]}" alt="" onerror="this.style.display='none'">`;
+    else html+=`<div class="img-ph">${i===0?'🧪':''}</div>`;
+  }
+  return html;
+}
+
+function openUAImage(id){
+  sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=data.images||[];
+    const features=data.key_features||[];
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div class="section-title" style="font-size:16px">${data.name}</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      ${imgs.length?`
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
+          ${imgs.map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+        </div>`:''}
+      ${features.length?`
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
+        </div>`:''}
+      ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
+      ${isAdmin?`
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images (drag & drop or click)</div>
+        ${buildUAImageEditor(data)}
+      `:''}
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+function buildUAImageEditor(item){
+  const imgs=item.images||[];
+  return `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      ${[0,1,2,3].map(i=>`
+        <div class="drop-zone" id="uadz-${item.id}-${i}"
+          ondrop="handleUAImgDrop(event,'${item.id}',${i})"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('uaimg-${item.id}-${i}').click()"
+        >
+          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          <input type="file" accept="image/*" id="uaimg-${item.id}-${i}" style="display:none" onchange="handleUAImgFile(event,'${item.id}',${i})">
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
+  `;
+}
+
+async function handleUAImgFile(e,itemId,slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const {data}=await sb.from('mlsboc_ua_images').select('images').eq('id',itemId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=ev.target.result;
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);
+    openUAImage(itemId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleUAImgDrop(e,itemId,slot){
+  e.preventDefault();e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const {data}=await sb.from('mlsboc_ua_images').select('images').eq('id',itemId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=ev.target.result;
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);
+    openUAImage(itemId);
+  };
+  reader.readAsDataURL(file);
+}
+
+function adminUAImageControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Add UA Image Entry</div>
+      <div class="form-group"><label>Name</label><input type="text" id="ua-name" placeholder="e.g. RBC Cast"></div>
+      <div class="form-group"><label>Key Features (one per line)</label><textarea id="ua-features" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome"></textarea></div>
+      <div class="form-group"><label>Notes (optional)</label><textarea id="ua-notes" style="min-height:60px"></textarea></div>
+      <div class="form-group">
+        <label>Bulk Image Drop — drag multiple images at once</label>
+        <div class="drop-zone" id="ua-bulk-dz"
+          ondrop="handleUABulkDrop(event)"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('ua-bulk-file').click()"
+          style="min-height:80px">
+          <div style="font-size:28px;margin-bottom:4px">📁</div>
+          <div>Drop multiple images here — each becomes a new entry</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Filename becomes the name. Edit title/features after.</div>
+          <input type="file" id="ua-bulk-file" accept="image/*" multiple style="display:none" onchange="handleUABulkFile(event)">
+        </div>
+      </div>
+      <div id="ua-bulk-queue" style="margin-bottom:12px"></div>
+      <div class="flex gap-8 flex-wrap">
+        <button class="btn btn-primary btn-sm" onclick="adminAddUAImage()">Add Single Entry</button>
+      </div>
+    </div>`;
+}
+
+function showAddUAImageModal(){
+  const el=document.getElementById('ua-bulk-queue');if(el)el.innerHTML='';
+  renderTab();
+}
+
+async function adminAddUAImage(){
+  const name=document.getElementById('ua-name')?.value.trim();
+  const featText=document.getElementById('ua-features')?.value||'';
+  const notes=document.getElementById('ua-notes')?.value.trim();
+  if(!name){alert('Name required.');return;}
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:notes||'',images:[]});
+  if(error){alert('Error: '+error.message);return;}
+  document.getElementById('ua-name').value='';
+  document.getElementById('ua-features').value='';
+  document.getElementById('ua-notes').value='';
+  renderTab();
+}
+
+async function handleUABulkFile(e){
+  const files=Array.from(e.target.files);
+  await processUABulkFiles(files);
+}
+
+async function handleUABulkDrop(e){
+  e.preventDefault();e.currentTarget.classList.remove('dragover');
+  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  if(!files.length)return;
+  await processUABulkFiles(files);
+}
+
+async function processUABulkFiles(files){
+  const queueEl=document.getElementById('ua-bulk-queue');
+  if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:8px">Adding ${files.length} image(s)...</div>`;
+  let done=0;
+  for(const file of files){
+    const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+    const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:'',images:[dataUrl]});
+    if(!error)done++;
+  }
+  if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--success)">✓ Added ${done} of ${files.length} images. You can edit names/features by clicking each card.</div>`;
+  renderTab();
+}
+
+async function deleteUAImage(id){
+  if(!confirm('Delete this image entry?'))return;
+  await sb.from('mlsboc_ua_images').delete().eq('id',id);
+  renderTab();
+}
+
+async function startUAQuiz(){
+  const {data}=await sb.from('mlsboc_ua_images').select('*').not('images','is',null);
+  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No images to quiz on yet.');return;}
+  appState.uaImgMode='quiz';
+  appState.uaQuizItems=shuffle(valid);
+  appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
+  renderTab();
+}
+
+function renderUAImageQuiz(el){
+  const items=appState.uaQuizItems;
+  if(appState.uaQuizDone){
+    const ans=appState.uaQuizAns;
+    let correct=0;
+    items.forEach((o,i)=>{if(ans[i]===o.id)correct++;});
+    let reviewHtml='';
+    items.forEach((o,i)=>{
+      const wasCorrect=ans[i]===o.id;
+      const chosen=items.find(x=>x.id===ans[i]);
+      reviewHtml+='<div class="missed-item"><div class="missed-q">'+o.name+'</div>'
+        +(wasCorrect?'<div class="missed-a">✓ Correct</div>':'<div class="missed-wrong">Your answer: '+(chosen?chosen.name:'(none)')+'</div><div class="missed-a">Correct: '+o.name+'</div>')
+        +'</div>';
+    });
+    el.innerHTML='<div class="result-grid">'
+      +'<div class="stat-card"><div class="stat-num" style="color:'+(correct/items.length>=0.6?'var(--success)':'var(--danger)')+'">'+Math.round(correct/items.length*100)+'%</div><div class="stat-label">Score</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
+      +'</div><div class="flex gap-8 mb-16">'
+      +'<button class="btn btn-primary" onclick="startUAQuiz()">Retry</button>'
+      +'<button class="btn btn-ghost" onclick="appState.uaImgMode=\'browse\';appState.uaQuizDone=false;renderTab()">Back to Browse</button>'
+      +'</div>'+reviewHtml;
+    return;
+  }
+  const item=items[appState.uaQuizIdx];
+  const answered=appState.uaQuizAns[appState.uaQuizIdx]!==undefined;
+  const chosen=appState.uaQuizAns[appState.uaQuizIdx];
+  const imgs=(item.images||[]).filter(Boolean);
+  const pct=Math.round((appState.uaQuizIdx+1)/items.length*100);
+  const pool=items.filter(x=>x.id!==item.id);
+  const wrong=shuffle(pool).slice(0,Math.min(3,pool.length));
+  const opts=shuffle([item,...wrong]);
+  let imgsHtml='<div class="image-placeholder" style="height:180px;margin-bottom:16px;border-radius:var(--r2)">🧪</div>';
+  if(imgs.length){
+    const cols=imgs.length===1?'1fr':'1fr 1fr';
+    imgsHtml='<div style="display:grid;grid-template-columns:'+cols+';gap:6px;margin-bottom:16px">'
+      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')
+      +'</div>';
+  }
+  let optHtml='';
+  opts.forEach(o=>{
+    let cls='option';
+    if(answered){if(o.id===item.id)cls+=' correct';else if(o.id===chosen&&chosen!==item.id)cls+=' wrong';}
+    optHtml+='<button class="'+cls+'" onclick="answerUAImgQ(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
+      +'<span class="option-letter" style="min-width:12px"></span><span>'+o.name+'</span></button>';
+  });
+  let afterHtml='';
+  if(answered){
+    afterHtml='<div class="case-feedback '+(chosen===item.id?'correct':'wrong')+'" style="margin-top:14px">'
+      +(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>';
+    if(item.key_features&&item.key_features.length)
+      afterHtml+='<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>';
+    afterHtml+='<div class="flex gap-8 mt-16">'
+      +(appState.uaQuizIdx<items.length-1
+        ?'<button class="btn btn-primary" onclick="uaQuizNext()">Next →</button>'
+        :'<button class="btn btn-success" onclick="appState.uaQuizDone=true;renderTab()">View Results</button>')
+      +'</div>';
+  }
+  el.innerHTML='<div class="quiz-header"><span class="question-num">Image '+(appState.uaQuizIdx+1)+' of '+items.length+'</span>'
+    +'<button class="btn btn-ghost btn-sm" onclick="appState.uaImgMode=\'browse\';renderTab()">Exit Quiz</button></div>'
+    +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+    +'<p class="text-muted mb-12" style="font-size:13px">What is this urinalysis finding?</p>'
+    +imgsHtml+'<div class="options">'+optHtml+'</div>'+afterHtml;
+}
+
+function answerUAImgQ(id){appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();}
+function uaQuizNext(){appState.uaQuizIdx++;renderTab();}
 
 // Hematology images — folder system
 async function renderHemeImages(el){
@@ -1083,7 +1425,323 @@ function answerHemeImgQ(id){
 
 function hemeQuizNext(){appState.hemeQuizIdx++;renderTab();}
 
-// ─── CASES TAB ────────────────────────────────────────────────────────────────
+// ─── MICROBIOLOGY IMAGES — folder system (mirrors hematology) ─────────────────
+async function renderMicroImages(el){
+  if(appState.microImgMode==='quiz'){renderMicroImageQuiz(el);return;}
+  if(!appState.microImgPage){
+    // Folder landing
+    const counts={};
+    for(const f of MICRO_FOLDERS){
+      const {count}=await sb.from('mlsboc_micro_organisms').select('id',{count:'exact',head:true}).eq('folder',f.key);
+      counts[f.key]=count||0;
+    }
+    el.innerHTML=`
+      <div class="flex-center gap-8 mb-16 flex-wrap">
+        <button class="btn btn-primary btn-sm" onclick="startMicroQuiz()">Image Quiz Mode</button>
+        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddOrganismModal(null)">+ Add Organism</button>`:''}
+      </div>
+      ${MICRO_FOLDER_GROUPS.map(g=>`
+        <div class="mb-24">
+          <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${g.label}</div>
+          <div class="folder-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+            ${g.keys.map(k=>{
+              const f=MICRO_FOLDERS.find(x=>x.key===k);
+              if(!f)return '';
+              return `<button class="folder-card" onclick="openMicroFolder('${f.key}')">
+                <div class="folder-icon">${f.icon}</div>
+                <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3">${f.name}</div>
+                <div class="folder-count">${counts[f.key]||0} organisms</div>
+              </button>`;
+            }).join('')}
+          </div>
+        </div>`).join('')}
+      ${isAdmin?`<div class="mt-16">${adminMicroImageControls()}</div>`:''}
+    `;
+    return;
+  }
+  // Inside a folder
+  const f=MICRO_FOLDERS.find(x=>x.key===appState.microImgPage);
+  const {data:organisms}=await sb.from('mlsboc_micro_organisms').select('*').eq('folder',appState.microImgPage).order('name');
+  el.innerHTML=`
+    <div class="breadcrumb mb-16">
+      <span class="breadcrumb-link" onclick="appState.microImgPage=null;renderTab()">Images</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-cur">${f?f.name:appState.microImgPage}</span>
+      <div class="ml-auto flex gap-8">
+        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddOrganismModal('${appState.microImgPage}')">+ Add Organism</button>`:''}
+        <button class="btn btn-primary btn-sm" onclick="startMicroQuizFolder('${appState.microImgPage}')">Quiz This Folder</button>
+      </div>
+    </div>
+    ${!organisms||!organisms.length?'<div class="empty">No organisms yet in this folder.</div>':''}
+    <div class="condition-grid">
+      ${(organisms||[]).map(o=>`
+        <div class="condition-card" onclick="openOrganism('${o.id}')">
+          <div class="condition-imgs">
+            ${buildOrganismThumbs(o)}
+          </div>
+          <div class="condition-body">
+            <div class="condition-name">${o.name}</div>
+            ${o.key_features?`<div class="condition-features">${(o.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+            ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+              <button class="btn btn-danger btn-xs" onclick="deleteOrganism('${o.id}')">Delete</button>
+            </div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function buildOrganismThumbs(o){
+  const imgs=o.images||[];
+  const slots=4;let html='';
+  for(let i=0;i<slots;i++){
+    if(imgs[i])html+=`<img src="${imgs[i]}" alt="" onerror="this.style.display='none'">`;
+    else html+=`<div class="img-ph">${i===0?'🔬':''}</div>`;
+  }
+  return html;
+}
+
+function openMicroFolder(key){appState.microImgPage=key;renderTab();}
+
+function openOrganism(id){
+  sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=data.images||[];
+    const features=data.key_features||[];
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div class="section-title" style="font-size:16px">${data.name}</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      ${imgs.length?`
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
+          ${imgs.map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+        </div>`:''}
+      ${features.length?`
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
+        </div>`:''}
+      ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
+      ${isAdmin?`
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images (drag & drop or click)</div>
+        ${buildOrganismImageEditor(data)}
+      `:''}
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+function buildOrganismImageEditor(organism){
+  const imgs=organism.images||[];
+  return `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      ${[0,1,2,3].map(i=>`
+        <div class="drop-zone" id="odz-${organism.id}-${i}"
+          ondrop="handleOrganismImgDrop(event,'${organism.id}',${i})"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('oimg-${organism.id}-${i}').click()"
+        >
+          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          <input type="file" accept="image/*" id="oimg-${organism.id}-${i}" style="display:none" onchange="handleOrganismImgFile(event,'${organism.id}',${i})">
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
+  `;
+}
+
+async function handleOrganismImgFile(e,orgId,slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_micro_organisms').select('images').eq('id',orgId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
+    openOrganism(orgId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleOrganismImgDrop(e,orgId,slot){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_micro_organisms').select('images').eq('id',orgId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
+    openOrganism(orgId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function startMicroQuiz(){
+  const {data}=await sb.from('mlsboc_micro_organisms').select('*').not('images','is',null);
+  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No organisms with images to quiz on yet.');return;}
+  appState.microImgMode='quiz';
+  appState.microQuizItems=shuffle(valid);
+  appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+  renderTab();
+}
+
+async function startMicroQuizFolder(folder){
+  const {data}=await sb.from('mlsboc_micro_organisms').select('*').eq('folder',folder);
+  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No organisms with images in this folder yet.');return;}
+  appState.microImgMode='quiz';
+  appState.microQuizItems=shuffle(valid);
+  appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+  appState.microImgPage=folder;
+  renderTab();
+}
+
+function renderMicroImageQuiz(el){
+  const items=appState.microQuizItems;
+  if(appState.microQuizDone){
+    const ans=appState.microQuizAns;
+    let correct=0;
+    items.forEach((o,i)=>{if(ans[i]===o.id)correct++;});
+    let reviewHtml='';
+    items.forEach((o,i)=>{
+      const wasCorrect=ans[i]===o.id;
+      const chosen=items.find(x=>x.id===ans[i]);
+      reviewHtml+='<div class="missed-item"><div class="missed-q">'+o.name+'</div>'
+        +(wasCorrect?'<div class="missed-a">✓ Correct</div>':'<div class="missed-wrong">Your answer: '+(chosen?chosen.name:'(none)')+'</div><div class="missed-a">Correct: '+o.name+'</div>')
+        +'</div>';
+    });
+    el.innerHTML='<div class="result-grid">'
+      +'<div class="stat-card"><div class="stat-num" style="color:'+(correct/items.length>=0.6?'var(--success)':'var(--danger)')+'">'+Math.round(correct/items.length*100)+'%</div><div class="stat-label">Score</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
+      +'</div><div class="flex gap-8 mb-16">'
+      +'<button class="btn btn-primary" onclick="startMicroQuiz()">Retry All</button>'
+      +'<button class="btn btn-ghost" onclick="appState.microImgMode=\'browse\';appState.microImgPage=null;appState.microQuizDone=false;renderTab()">Back to Browse</button>'
+      +'</div>'+reviewHtml;
+    return;
+  }
+  const item=items[appState.microQuizIdx];
+  const answered=appState.microQuizAns[appState.microQuizIdx]!==undefined;
+  const chosen=appState.microQuizAns[appState.microQuizIdx];
+  const imgs=(item.images||[]).filter(Boolean);
+  const pct=Math.round((appState.microQuizIdx+1)/items.length*100);
+
+  const pool=items.filter(x=>x.id!==item.id);
+  const wrong=shuffle(pool).slice(0,Math.min(3,pool.length));
+  const opts=shuffle([item,...wrong]);
+
+  let imgsHtml='<div class="image-placeholder" style="height:180px;margin-bottom:16px;border-radius:var(--r2)">🔬</div>';
+  if(imgs.length){
+    const cols=imgs.length===1?'1fr':'1fr 1fr';
+    imgsHtml='<div style="display:grid;grid-template-columns:'+cols+';gap:6px;margin-bottom:16px">'
+      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')
+      +'</div>';
+  }
+
+  let optHtml='';
+  opts.forEach(o=>{
+    let cls='option';
+    if(answered){
+      if(o.id===item.id)cls+=' correct';
+      else if(o.id===chosen&&chosen!==item.id)cls+=' wrong';
+    }
+    optHtml+='<button class="'+cls+'" onclick="answerMicroImgQ(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
+      +'<span class="option-letter" style="min-width:12px"></span><span>'+o.name+'</span></button>';
+  });
+
+  let afterHtml='';
+  if(answered){
+    afterHtml='<div class="case-feedback '+(chosen===item.id?'correct':'wrong')+'" style="margin-top:14px">'
+      +(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>';
+    if(item.key_features&&item.key_features.length)
+      afterHtml+='<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>';
+    afterHtml+='<div class="flex gap-8 mt-16">'
+      +(appState.microQuizIdx<items.length-1
+        ?'<button class="btn btn-primary" onclick="microQuizNext()">Next →</button>'
+        :'<button class="btn btn-success" onclick="appState.microQuizDone=true;renderTab()">View Results</button>')
+      +'</div>';
+  }
+
+  el.innerHTML='<div class="quiz-header"><span class="question-num">Image '+(appState.microQuizIdx+1)+' of '+items.length+'</span>'
+    +'<button class="btn btn-ghost btn-sm" onclick="appState.microImgMode=\'browse\';renderTab()">Exit Quiz</button></div>'
+    +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+    +'<p class="text-muted mb-12" style="font-size:13px">Identify this organism.</p>'
+    +imgsHtml+'<div class="options">'+optHtml+'</div>'+afterHtml;
+}
+
+function answerMicroImgQ(id){appState.microQuizAns[appState.microQuizIdx]=id;renderTab();}
+function microQuizNext(){appState.microQuizIdx++;renderTab();}
+
+function adminMicroImageControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Organism</div>
+      <button class="btn btn-primary" onclick="showAddOrganismModal(null)">+ Add New Organism</button>
+      <div class="divider"></div>
+      <label class="btn btn-ghost" style="cursor:pointer;display:inline-flex">Bulk CSV Upload
+        <input type="file" accept=".csv" style="display:none" onchange="adminBulkOrganisms(event)">
+      </label>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="dlCSV([['name','folder','key_features','notes'],['Staphylococcus aureus','gpc_clusters','Coagulase positive; Beta-hemolytic; Catalase positive','Golden colonies on BAP']],'organisms_template.csv')">Download Template</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: name, folder (gpc_clusters/gnr_enteric/etc.), key_features (semicolon-separated), notes. Images added separately via drag & drop.</div>
+    </div>`;
+}
+
+function showAddOrganismModal(folder){
+  const modal=document.getElementById('condition-modal');
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="modal-title">Add Organism</div>
+    <div class="form-group"><label>Name</label><input type="text" id="org-name"></div>
+    <div class="form-group"><label>Folder</label>
+      <select id="org-folder">
+        ${MICRO_FOLDERS.map(f=>`<option value="${f.key}" ${folder===f.key?'selected':''}>${f.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Key Features (one per line)</label><textarea id="org-features" placeholder="Coagulase positive&#10;Beta-hemolytic&#10;Catalase positive"></textarea></div>
+    <div class="form-group"><label>Notes</label><textarea id="org-notes"></textarea></div>
+    <div class="flex gap-8 mt-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="adminAddOrganism()">Add Organism</button>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+async function adminAddOrganism(){
+  const name=document.getElementById('org-name')?.value.trim();
+  const folder=document.getElementById('org-folder')?.value;
+  const featText=document.getElementById('org-features')?.value||'';
+  const notes=document.getElementById('org-notes')?.value.trim();
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!name||!folder){alert('Name and folder required.');return;}
+  const {error}=await sb.from('mlsboc_micro_organisms').insert({name,folder,key_features:features,notes:notes||'',images:[]});
+  if(error)alert('Error: '+error.message);
+  else{document.getElementById('condition-modal').classList.add('hidden');renderTab();}
+}
+
+async function adminBulkOrganisms(e){
+  const rows=parseCSV(await e.target.files[0].text());
+  for(const r of rows){
+    if(!r[0])continue;
+    const features=(r[2]||'').split(';').map(x=>x.trim()).filter(Boolean);
+    try{await sb.from('mlsboc_micro_organisms').insert({name:r[0],folder:r[1]||'misc',key_features:features,notes:r[3]||'',images:[]});}catch(e){}
+  }
+  renderTab();
+}
+
+async function deleteOrganism(id){
+  if(!confirm('Delete this organism?'))return;
+  await sb.from('mlsboc_micro_organisms').delete().eq('id',id);
+  renderTab();
+}
 async function renderCasesTab(el){
   if(appState.subject==='microbiology'){
     await renderMicroCases(el);
@@ -1455,74 +2113,283 @@ function submitGenericCase(caseId,answer){
 
 // ─── MICROBIOLOGY CASES ───────────────────────────────────────────────────────
 async function renderMicroCases(el){
-  if(!appState.microCasesPage){
-    // Landing — choose gram +/-
-    const {count:posCount}=await sb.from('mlsboc_cases').select('id',{count:'exact',head:true}).eq('subject','microbiology').eq('group_label','gram_positive');
-    const {count:negCount}=await sb.from('mlsboc_cases').select('id',{count:'exact',head:true}).eq('subject','microbiology').eq('group_label','gram_negative');
-    el.innerHTML=`
-      ${isAdmin?`<div class="mb-16">${adminMicroCaseControls()}</div>`:''}
-      <div class="section-title" style="font-size:15px;margin-bottom:8px">Microbiology Cases</div>
-      <p class="text-muted mb-20" style="font-size:13px">Work through identification cases step by step based on test results.</p>
-      <div class="gram-nav">
-        <button class="gram-btn gram-pos" onclick="appState.microCasesPage='gram_positive';renderTab()">
-          <div class="gram-btn-title">🟣 Gram Positive</div>
-          <div class="gram-btn-sub">${posCount||0} cases</div>
-        </button>
-        <button class="gram-btn gram-neg" onclick="appState.microCasesPage='gram_negative';renderTab()">
-          <div class="gram-btn-title">🔴 Gram Negative</div>
-          <div class="gram-btn-sub">${negCount||0} cases</div>
-        </button>
-      </div>
-    `;
-    return;
-  }
-  // Inside gram +/- page
-  const label=appState.microCasesPage==='gram_positive'?'Gram Positive':'Gram Negative';
-  const tagCls=appState.microCasesPage==='gram_positive'?'tag-gram-pos':'tag-gram-neg';
-  const {data}=await sb.from('mlsboc_cases').select('*').eq('subject','microbiology').eq('group_label',appState.microCasesPage).order('created_at');
+  const {data}=await sb.from('mlsboc_micro_cases').select('*').order('created_at');
+  if(!appState.microCaseCollapsed)appState.microCaseCollapsed={};
   el.innerHTML=`
-    <div class="breadcrumb mb-16">
-      <span class="breadcrumb-link" onclick="appState.microCasesPage=null;appState.caseSelections={};renderTab()">Cases</span>
-      <span class="breadcrumb-sep">›</span>
-      <span class="breadcrumb-cur">${label}</span>
-      ${isAdmin?`<div class="ml-auto">${adminMicroCaseControls(appState.microCasesPage)}</div>`:''}
-    </div>
-    ${!data||!data.length?'<div class="empty">No cases yet for '+label+'.</div>':''}
-    ${(data||[]).map((c,i)=>renderMicroCaseCard(c,i,tagCls)).join('')}
+    ${isAdmin?`<div class="mb-16">${adminMicroCaseControls()}</div>`:''}
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Microbiology Cases</div>
+    <p class="text-muted mb-20" style="font-size:13px">Read the scenario and test results, then answer each question.</p>
+    ${!data||!data.length?'<div class="empty">No Microbiology cases yet. Use Admin mode to add one.</div>':''}
+    ${(data||[]).map((c,i)=>renderMicroCase(c,i)).join('')}
   `;
 }
 
-function renderMicroCaseCard(c,idx,tagCls){
-  const steps=parseSteps(c.steps);
-  const fb=appState.caseSelections[c.id]?.feedback;
+function renderMicroCase(c,idx){
+  const qs=c.questions||[];
+  const selState=(appState.microCaseAnswers||{})[c.id]||{};
+  const table=c.test_results||[];
   const imgs=c.images||[];
+  const collapsed=!appState.microCaseCollapsed||appState.microCaseCollapsed[c.id]!==false;
+  const tagCls=c.group_label==='gram_positive'?'tag-gram-pos':c.group_label==='gram_negative'?'tag-gram-neg':'tag-info';
+  const tagLabel=c.group_label==='gram_positive'?'Gram (+)':c.group_label==='gram_negative'?'Gram (-)':'';
   return `
-    <div class="case-card" id="mcard-${c.id}">
-      <div class="flex-center gap-8 mb-8 flex-wrap">
-        <span class="tag ${tagCls}">${appState.microCasesPage==='gram_positive'?'Gram (+)':'Gram (-)'}</span>
-        <span style="font-size:14px;font-weight:600">${c.title}</span>
+    <div class="case-card" id="mccase-${c.id}" style="margin-bottom:12px">
+      <div class="flex-center gap-8 flex-wrap" style="cursor:pointer" onclick="toggleMicroCaseCollapse('${c.id}')">
+        <span class="tag tag-info" style="font-size:13px;font-weight:700;padding:4px 12px">Case ${idx+1}</span>
+        ${tagLabel?`<span class="tag ${tagCls}">${tagLabel}</span>`:''}
+        <span style="font-size:17px;font-weight:700">${c.title||'Untitled Case'}</span>
         ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
+        <span class="ml-auto" style="font-size:18px;color:var(--text3);transition:transform .2s;transform:rotate(${collapsed?'0':'180'}deg)">⌃</span>
+        ${isAdmin?`<div class="flex gap-6" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-xs" onclick="openMicroCaseEditor('${c.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteMicroCase('${c.id}')">Delete</button>
+        </div>`:''}
       </div>
-      <div class="case-scenario">${c.scenario}</div>
-      ${c.case_data?`<div class="case-data">${c.case_data}</div>`:''}
-      ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
-      ${steps.map((step,si)=>renderCaseStep(c.id,step,si,fb)).join('')}
-      ${!fb?`<button class="btn btn-primary btn-sm mt-8" onclick="submitMicroCase('${c.id}','${esc(c.answer)}')">Submit</button>`:''}
-      ${fb?`<div class="case-feedback ${fb.correct?'correct':'wrong'}">${fb.correct?'✓ Correct':'✗ Incorrect'} — ${fb.note}</div>`:''}
-      ${isAdmin?`<div class="flex gap-8 mt-8">
-        ${c.is_draft?`<button class="btn btn-success btn-xs" onclick="publishCase('${c.id}')">Publish</button>`:''}
-        <button class="btn btn-danger btn-xs" onclick="deleteCase('${c.id}')">Delete</button>
-        <button class="btn btn-ghost btn-xs" onclick="openCaseImageEditor('${c.id}')">Edit Image</button>
-      </div>`:''}
+      ${collapsed?'':`
+        <div style="margin-top:16px">
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
+          ${table.length?`
+            <div style="margin-bottom:24px">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Test Results</div>
+              <div style="overflow-x:auto">
+                <table style="border-collapse:collapse;width:100%">
+                  <thead><tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:12px 18px;text-align:center;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+                  <tbody><tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:12px 18px;text-align:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
+                </table>
+              </div>
+            </div>`:''}
+          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
+          ${qs.length?`
+            <div class="divider"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
+              ${mcAllChecked(c.id,qs.length)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllMC('${c.id}',${qs.length})">Check All</button>`}
+              ${mcAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllMC('${c.id}')">Reset All</button>`:''}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
+              ${qs.map((q,qi)=>renderMicroCaseQuestion(c.id,q,qi,selState)).join('')}
+            </div>
+          `:'<div class="empty" style="padding:16px;text-align:left">No questions added yet.</div>'}
+        </div>
+      `}
     </div>
   `;
 }
 
-function submitMicroCase(caseId,answer){
-  if(!appState.caseSelections[caseId])appState.caseSelections[caseId]={steps:{}};
-  const allVals=Object.values(appState.caseSelections[caseId].steps||{}).flat().join(' ').toLowerCase();
-  const correct=answer&&allVals.includes(answer.toLowerCase().split(' ')[0]);
-  appState.caseSelections[caseId].feedback={correct,note:correct?'Correct! '+answer:'Expected: '+answer};
+function renderMicroCaseQuestion(caseId,q,qi,selState){
+  const checked=selState[qi]?.checked===true;
+  const chosen=selState[qi]?.choice;
+  const letters=['a','b','c','d'];
+  const correctIdx=letters.indexOf(q.correct);
+  return `
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono)">Q${qi+1}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${(q.options||[]).map((opt,oi)=>{
+          if(!opt)return '';
+          const letter=letters[oi];
+          let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
+          if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
+          if(checked){
+            if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
+            else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
+          }
+          return `<button onclick="selectMCQ('${caseId}',${qi},'${letter}')" ${checked?'disabled':''} style="display:flex;align-items:flex-start;gap:10px;background:${bg};border:1px solid ${bd};border-radius:var(--r);padding:9px 13px;cursor:${checked?'default':'pointer'};text-align:left;width:100%;transition:all .12s">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:600;color:${color};min-width:20px;margin-top:1px">${letter.toUpperCase()}.</span>
+            <span style="font-size:13px;color:${color};font-weight:${weight};line-height:1.5">${opt}</span>
+          </button>`;
+        }).filter(Boolean).join('')}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
+        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkMCQ('${caseId}',${qi})">Check Answer</button>`:''}
+        ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetMCQ('${caseId}',${qi})">Reset</button>`:''}
+      </div>
+      ${checked?`
+        <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
+          ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
+        </div>
+        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+    </div>
+  `;
+}
+
+function mcAllChecked(caseId,count){
+  const s=(appState.microCaseAnswers||{})[caseId]||{};
+  for(let i=0;i<count;i++){if(!s[i]?.checked)return false;}
+  return count>0;
+}
+function mcAnyAnswered(caseId){
+  return Object.values((appState.microCaseAnswers||{})[caseId]||{}).some(v=>v?.choice);
+}
+function selectMCQ(caseId,qi,letter){
+  if(!appState.microCaseAnswers)appState.microCaseAnswers={};
+  if(!appState.microCaseAnswers[caseId])appState.microCaseAnswers[caseId]={};
+  if(appState.microCaseAnswers[caseId][qi]?.checked)return;
+  appState.microCaseAnswers[caseId][qi]={choice:letter,checked:false};
+  renderTab();
+}
+function checkAllMC(caseId,count){
+  if(!appState.microCaseAnswers)appState.microCaseAnswers={};
+  if(!appState.microCaseAnswers[caseId])appState.microCaseAnswers[caseId]={};
+  for(let i=0;i<count;i++){
+    if(appState.microCaseAnswers[caseId][i]?.choice&&!appState.microCaseAnswers[caseId][i]?.checked)
+      appState.microCaseAnswers[caseId][i].checked=true;
+  }
+  renderTab();
+}
+function resetAllMC(caseId){if(!appState.microCaseAnswers)appState.microCaseAnswers={};appState.microCaseAnswers[caseId]={};renderTab();}
+function checkMCQ(caseId,qi){if(appState.microCaseAnswers?.[caseId]?.[qi])appState.microCaseAnswers[caseId][qi].checked=true;renderTab();}
+function resetMCQ(caseId,qi){if(appState.microCaseAnswers?.[caseId])delete appState.microCaseAnswers[caseId][qi];renderTab();}
+function toggleMicroCaseCollapse(id){
+  if(!appState.microCaseCollapsed)appState.microCaseCollapsed={};
+  appState.microCaseCollapsed[id]=appState.microCaseCollapsed[id]===false?true:false;
+  renderTab();
+}
+
+function adminMicroCaseControls(){
+  return `<div class="card">
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Microbiology Cases</div>
+    <button class="btn btn-primary" onclick="openMicroCaseEditor(null)">+ New Case</button>
+  </div>`;
+}
+
+async function openMicroCaseEditor(caseId){
+  let c={title:'',scenario:'',test_results:[],questions:[],images:[],group_label:'gram_positive',is_draft:false};
+  if(caseId){
+    const {data}=await sb.from('mlsboc_micro_cases').select('*').eq('id',caseId).single();
+    if(data)c=data;
+  }
+  const qs=c.questions||[];
+  const table=c.test_results||[];
+  window._mcQCount=qs.length;
+  window._mcTableCount=table.length;
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">${caseId?'Edit':'New'} Microbiology Case</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="form-group"><label>Case Title</label><input type="text" id="mc-title" value="${esc(c.title||'')}" placeholder="e.g. Unknown GPC Cluster"></div>
+    <div class="form-group"><label>Gram Group</label>
+      <select id="mc-group">
+        <option value="gram_positive" ${(c.group_label||'')==='gram_positive'?'selected':''}>Gram Positive</option>
+        <option value="gram_negative" ${(c.group_label||'')==='gram_negative'?'selected':''}>Gram Negative</option>
+        <option value="" ${!(c.group_label)?'selected':''}>None</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Case Scenario / Patient Info</label><textarea id="mc-scenario" style="min-height:100px">${c.scenario||''}</textarea></div>
+    <div class="form-group">
+      <label>Test Results Table</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Each column = one test. e.g. "Catalase" / "+"</div>
+      <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text3)">Test Name</div>
+        <div style="font-size:11px;color:var(--text3)">Result</div>
+        <div></div>
+      </div>
+      <div id="mc-table-rows">${table.map((col,i)=>mcTableRow(i,col.label,col.value)).join('')}</div>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="addMCTableCol()">+ Add Test</button>
+    </div>
+    <div class="divider"></div>
+    <div class="flex-center gap-8 mb-12">
+      <span style="font-size:13px;font-weight:600">Questions</span>
+      <span style="font-size:11px;color:var(--text3)">(up to 5)</span>
+    </div>
+    <div id="mc-questions-list">${qs.map((q,i)=>mcQuestionEditor(i,q)).join('')}</div>
+    <button class="btn btn-ghost btn-sm mb-16" id="mc-add-q-btn" onclick="addMCQuestion()" ${qs.length>=5?'style="display:none"':''}>+ Add Question</button>
+    <div class="divider"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="mc-draft">
+        <option value="false" ${!c.is_draft?'selected':''}>Published</option>
+        <option value="true" ${c.is_draft?'selected':''}>Draft</option>
+      </select>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMicroCase('${caseId||''}')">Save Case</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function mcTableRow(i,label,value){
+  return `<div class="flex-center gap-8 mb-6" id="mc-tr-${i}">
+    <input type="text" placeholder="e.g. Catalase" value="${esc(label||'')}" id="mc-tl-${i}" style="flex:1">
+    <input type="text" placeholder="e.g. +" value="${esc(value||'')}" id="mc-tv-${i}" style="width:100px">
+    <button class="btn btn-danger btn-xs" onclick="document.getElementById('mc-tr-${i}').remove()">✕</button>
+  </div>`;
+}
+function addMCTableCol(){
+  const i=window._mcTableCount++;
+  const container=document.getElementById('mc-table-rows');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=mcTableRow(i,'','');
+  container.appendChild(div.firstElementChild);
+}
+function mcQuestionEditor(i,q){
+  q=q||{question:'',options:['','','',''],correct:'a',explanation:''};
+  const opts=q.options||['','','',''];
+  return `<div class="card-sm mb-12" id="mc-q-${i}" style="border-left:3px solid var(--accent)">
+    <div class="flex-center gap-8 mb-10">
+      <span style="font-size:12px;font-weight:600;color:var(--accent);font-family:var(--mono)">Q${i+1}</span>
+      <button class="btn btn-danger btn-xs ml-auto" onclick="removeMCQuestion(${i})">Remove</button>
+    </div>
+    <div class="form-group"><label>Question</label><textarea id="mc-qq-${i}" style="min-height:60px">${q.question||''}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      ${['a','b','c','d'].map((l,oi)=>`<div><label>${l.toUpperCase()}.</label><input type="text" id="mc-qo-${i}-${l}" value="${esc(opts[oi]||'')}" placeholder="Option ${l.toUpperCase()}"></div>`).join('')}
+    </div>
+    <div class="form-group"><label>Correct Answer</label>
+      <select id="mc-qc-${i}">${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
+    </div>
+    <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
+      <input type="text" id="mc-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
+    </div>
+  </div>`;
+}
+function addMCQuestion(){
+  if((window._mcQCount||0)>=5){alert('Max 5 questions per case.');return;}
+  const i=window._mcQCount++;
+  const container=document.getElementById('mc-questions-list');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=mcQuestionEditor(i,null);
+  container.appendChild(div.firstElementChild);
+  if(window._mcQCount>=5){const b=document.getElementById('mc-add-q-btn');if(b)b.style.display='none';}
+}
+function removeMCQuestion(i){
+  const el=document.getElementById('mc-q-'+i);if(el)el.remove();
+  window._mcQCount=Math.max(0,(window._mcQCount||1)-1);
+  const b=document.getElementById('mc-add-q-btn');if(b)b.style.display='';
+}
+async function saveMicroCase(caseId){
+  const title=document.getElementById('mc-title')?.value.trim();
+  const scenario=document.getElementById('mc-scenario')?.value.trim();
+  const group_label=document.getElementById('mc-group')?.value||'';
+  const isDraft=document.getElementById('mc-draft')?.value==='true';
+  if(!title){alert('Title required.');return;}
+  const test_results=[];
+  for(let i=0;i<(window._mcTableCount||0);i++){
+    const lbl=document.getElementById('mc-tl-'+i);
+    const val=document.getElementById('mc-tv-'+i);
+    if(lbl&&lbl.isConnected&&lbl.value.trim())test_results.push({label:lbl.value.trim(),value:val?val.value.trim():''});
+  }
+  const questions=[];
+  for(let i=0;i<(window._mcQCount||0);i++){
+    const qEl=document.getElementById('mc-q-'+i);if(!qEl||!qEl.isConnected)continue;
+    const question=document.getElementById('mc-qq-'+i)?.value.trim()||'';if(!question)continue;
+    const options=['a','b','c','d'].map(l=>document.getElementById('mc-qo-'+i+'-'+l)?.value.trim()||'');
+    const correct=document.getElementById('mc-qc-'+i)?.value||'a';
+    const explanation=document.getElementById('mc-qe-'+i)?.value.trim()||'';
+    questions.push({question,options,correct,explanation});
+  }
+  const payload={title,scenario:scenario||'',test_results,questions,group_label,is_draft:isDraft,images:[]};
+  let error;
+  if(caseId){({error}=await sb.from('mlsboc_micro_cases').update(payload).eq('id',caseId));}
+  else{({error}=await sb.from('mlsboc_micro_cases').insert(payload));}
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  if(!appState.microCaseAnswers)appState.microCaseAnswers={};
+  renderTab();
+}
+async function deleteMicroCase(id){
+  if(!confirm('Delete this case?'))return;
+  await sb.from('mlsboc_micro_cases').delete().eq('id',id);
   renderTab();
 }
 
@@ -2155,7 +3022,7 @@ async function adminBulkQ(e){
   const rows=parseCSV(await e.target.files[0].text());
   for(const r of rows){
     if(r.length<6)continue;
-    await sb.from('mlsboc_questions').insert({subject:appState.subject,question:r[0],option_a:r[1],option_b:r[2],option_c:r[3],option_d:r[4],correct_answer:r[5].toLowerCase(),explanation:r[6]||''}).catch(()=>{});
+    try{await sb.from('mlsboc_questions').insert({subject:appState.subject,question:r[0],option_a:r[1],option_b:r[2],option_c:r[3],option_d:r[4],correct_answer:r[5].toLowerCase(),explanation:r[6]||''});}catch(e){}
   }
   renderTab();
 }
@@ -2225,7 +3092,7 @@ async function adminBulkImgs(e){
   const rows=parseCSV(await e.target.files[0].text());
   for(const r of rows){
     if(!r[0])continue;
-    await sb.from('mlsboc_images').insert({subject:appState.subject,title:r[0],description:r[1]||'',image_url:'',is_draft:true}).catch(()=>{});
+    try{await sb.from('mlsboc_images').insert({subject:appState.subject,title:r[0],description:r[1]||'',image_url:'',is_draft:true});}catch(e){}
   }
   renderTab();
 }
@@ -2255,66 +3122,11 @@ function adminCaseControls(){
     </div>`;
 }
 
-function adminMicroCaseControls(group){
-  const grp=group||'gram_positive';
-  return `
-    <div class="card" style="margin-bottom:16px">
-      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Micro Case</div>
-      <div class="form-group"><label>Gram group</label>
-        <select id="micro-group">
-          <option value="gram_positive" ${grp==='gram_positive'?'selected':''}>Gram Positive</option>
-          <option value="gram_negative" ${grp==='gram_negative'?'selected':''}>Gram Negative</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Title</label><input type="text" id="micro-title"></div>
-      <div class="form-group"><label>Scenario</label><textarea id="micro-scenario"></textarea></div>
-      <div class="form-group"><label>Lab Data</label><textarea id="micro-data" style="min-height:60px"></textarea></div>
-      <div class="form-group"><label>Correct Answer (organism name)</label><input type="text" id="micro-ans"></div>
-      <div class="form-group"><label>Steps JSON</label><textarea id="micro-steps" placeholder='[{"label":"Catalase?","type":"select","options":["Positive","Negative"],"key":"catalase"}]'></textarea></div>
-      <div class="flex gap-8 flex-wrap">
-        <button class="btn btn-warn" onclick="adminAddMicroCase(true)">Save as Draft</button>
-        <button class="btn btn-primary" onclick="adminAddMicroCase(false)">Add & Publish</button>
-        <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV
-          <input type="file" accept=".csv" style="display:none" onchange="adminBulkCases(event)">
-        </label>
-        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['title','scenario','case_data','answer','group_label'],['Unknown GPC','Wound culture GPC in clusters','Catalase: +','Staphylococcus aureus','gram_positive']],'micro_cases_template.csv')">Download Template</button>
-      </div>
-    </div>`;
-}
-
-async function adminAddCase(isDraft){
-  const title=document.getElementById('case-title')?.value.trim();
-  const scenario=document.getElementById('case-scenario')?.value.trim();
-  const case_data=document.getElementById('case-data')?.value.trim();
-  const answer=document.getElementById('case-ans')?.value.trim();
-  const group_label=document.getElementById('case-group')?.value.trim();
-  let steps='[]';
-  try{steps=document.getElementById('case-steps')?.value.trim()||'[]';JSON.parse(steps);}catch{alert('Invalid steps JSON');return;}
-  if(!title||!scenario||!answer){alert('Title, scenario, and answer required.');return;}
-  const {error}=await sb.from('mlsboc_cases').insert({subject:appState.subject,title,scenario,case_data:case_data||'',answer,group_label:group_label||'',steps,images:[],is_draft:isDraft});
-  if(error)alert('Error: '+error.message);
-  else renderTab();
-}
-
-async function adminAddMicroCase(isDraft){
-  const group=document.getElementById('micro-group')?.value;
-  const title=document.getElementById('micro-title')?.value.trim();
-  const scenario=document.getElementById('micro-scenario')?.value.trim();
-  const case_data=document.getElementById('micro-data')?.value.trim();
-  const answer=document.getElementById('micro-ans')?.value.trim();
-  let steps='[]';
-  try{steps=document.getElementById('micro-steps')?.value.trim()||'[]';JSON.parse(steps);}catch{alert('Invalid steps JSON');return;}
-  if(!title||!scenario||!answer){alert('Fill in all fields.');return;}
-  const {error}=await sb.from('mlsboc_cases').insert({subject:'microbiology',title,scenario,case_data:case_data||'',answer,group_label:group,steps,images:[],is_draft:isDraft});
-  if(error)alert('Error: '+error.message);
-  else renderTab();
-}
-
 async function adminBulkCases(e){
   const rows=parseCSV(await e.target.files[0].text());
   for(const r of rows){
     if(!r[0])continue;
-    await sb.from('mlsboc_cases').insert({subject:appState.subject,title:r[0],scenario:r[1]||'',case_data:r[2]||'',answer:r[3]||'',group_label:r[4]||'',steps:'[]',images:[],is_draft:true}).catch(()=>{});
+    try{await sb.from('mlsboc_cases').insert({subject:appState.subject,title:r[0],scenario:r[1]||'',case_data:r[2]||'',answer:r[3]||'',group_label:r[4]||'',steps:'[]',images:[],is_draft:true});}catch(e){}
   }
   renderTab();
 }
@@ -2325,12 +3137,61 @@ async function publishCase(id){await sb.from('mlsboc_cases').update({is_draft:fa
 async function openCaseImageEditor(caseId){
   const {data}=await sb.from('mlsboc_cases').select('images').eq('id',caseId).single();
   const imgs=data?.images||[];
-  // Simple prompt-based for one image
-  const url=prompt('Enter image URL or paste base64 data URL:');
-  if(!url)return;
-  const newImgs=[url,...imgs.slice(0,3)].filter(Boolean);
-  await sb.from('mlsboc_cases').update({images:newImgs}).eq('id',caseId);
-  renderTab();
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Edit Case Images</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Drag & drop or click a slot to upload. Up to 4 images.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      ${[0,1,2,3].map(i=>`
+        <div class="drop-zone" id="cadz-${caseId}-${i}"
+          ondrop="handleCaseImgDrop(event,'${caseId}',${i})"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('caimg-${caseId}-${i}').click()"
+        >
+          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          <input type="file" accept="image/*" id="caimg-${caseId}-${i}" style="display:none" onchange="handleCaseImgFile(event,'${caseId}',${i})">
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function handleCaseImgFile(e,caseId,slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_cases').select('images').eq('id',caseId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_cases').update({images:imgs}).eq('id',caseId);
+    openCaseImageEditor(caseId);
+    renderTab();
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleCaseImgDrop(e,caseId,slot){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_cases').select('images').eq('id',caseId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_cases').update({images:imgs}).eq('id',caseId);
+    openCaseImageEditor(caseId);
+    renderTab();
+  };
+  reader.readAsDataURL(file);
 }
 
 // Hematology admin controls
@@ -2385,7 +3246,7 @@ async function adminBulkConditions(e){
   for(const r of rows){
     if(!r[0])continue;
     const features=(r[2]||'').split(';').map(x=>x.trim()).filter(Boolean);
-    await sb.from('mlsboc_heme_conditions').insert({name:r[0],folder:r[1]||'anemias',key_features:features,notes:r[3]||'',images:[]}).catch(()=>{});
+    try{await sb.from('mlsboc_heme_conditions').insert({name:r[0],folder:r[1]||'anemias',key_features:features,notes:r[3]||'',images:[]});}catch(e){}
   }
   renderTab();
 }
