@@ -357,6 +357,7 @@ let appState = {
 window.addEventListener('DOMContentLoaded', async ()=>{
   sb = supabase.createClient(SB_URL, SB_KEY);
   await seedIfEmpty();
+  await loadIconCache();
   renderView();
 });
 
@@ -469,13 +470,21 @@ function renderView(){
 }
 
 // ─── HOME ─────────────────────────────────────────────────────────────────────
+// ─── SUBJECT ICONS (Supabase-backed) ─────────────────────────────────────────
+let iconCache = {}; // key -> base64 data url, populated at startup
+
+async function loadIconCache(){
+  const {data} = await sb.from('mlsboc_subject_icons').select('key,image_url');
+  if(data) data.forEach(row=>{ iconCache[row.key]=row.image_url; });
+}
+
 function getSubjectIcon(key,fallback){
-  const stored=localStorage.getItem('mlsboc_icon_'+key);
+  const stored = iconCache[key];
   if(stored) return '<div style="width:100%;height:130px;overflow:hidden;flex-shrink:0"><img src="'+stored+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>';
   return '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0">'+fallback+'</div>';
 }
 
-function renderHome(v){
+async function renderHome(v){
   const cards = SUBJECTS.map(s=>{
     const uploadBtn = isAdmin
       ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'' + s.key + '\')"></label>'
@@ -3301,19 +3310,20 @@ function handleILImgDrop(e){
     if(dz)dz.innerHTML='<img src="'+url+'" style="max-height:60px;border-radius:4px">';
   });
 }
-function handleSubjectIconFile(e,key){
+async function handleSubjectIconFile(e,key){
   const file=e.target.files[0];if(!file)return;
   const r=new FileReader();
-  r.onload=ev=>{
+  r.onload=async ev=>{
     const t=new Image();
-    t.onload=()=>{
+    t.onload=async ()=>{
       const M=600;let w=t.width,ht=t.height;
       if(w>M){ht=Math.round(ht*M/w);w=M;}
       const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
       cv.getContext('2d').drawImage(t,0,0,w,ht);
       const url=cv.toDataURL('image/jpeg',0.75);
-      try{localStorage.setItem('mlsboc_icon_'+key, url);}
-      catch(err){alert('Image too large, try a smaller one.');return;}
+      const {error}=await sb.from('mlsboc_subject_icons').upsert({key,image_url:url},{onConflict:'key'});
+      if(error){alert('Upload failed: '+error.message);return;}
+      iconCache[key]=url;
       renderHome(document.getElementById('view-main'));
     };
     t.src=ev.target.result;
