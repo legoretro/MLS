@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLS BOC Prep — Student Created · For Studying Purposes Only</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;--bg4:#242840;
+  --border:#2a2f4a;--border2:#3a4060;
+  --accent:#4f8ef7;--accent2:#7fb3ff;
+  --success:#3ddc84;--danger:#f06474;--warn:#f5a623;
+  --text:#e8eaf6;--text2:#9aa0c0;--text3:#5c6380;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:8px;--r2:12px;
+}
+body.light-mode {
+  --bg:#f0f2f8;--bg2:#ffffff;--bg3:#e8eaf2;--bg4:#dde0ee;
+  --border:#c8cce0;--border2:#aab0cc;
+  --accent:#2563d4;--accent2:#1a4eaa;
+  --success:#1a8a4a;--danger:#c0303f;--warn:#b36000;
+  --text:#1a1d2e;--text2:#4a5070;--text3:#8890b0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+button{font-family:var(--sans);cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:var(--sans);outline:none}
+img{display:block}
+
+/* Layout */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.logo{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--accent);letter-spacing:-0.5px;line-height:1.3}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:0.3px}
+main{flex:1;padding:24px;max-width:1100px;margin:0 auto;width:100}
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text);background:var(--bg3)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid #f0647444}
+.btn-danger:hover{background:#f0647422}
+.btn-success{background:#3ddc8422;color:var(--success);border:1px solid #3ddc8444}
+.btn-warn{background:#f5a62322;color:var(--warn);border:1px solid #f5a62344}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r);padding:3px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text2);background:transparent;cursor:pointer;border:none;transition:all .15s}
+.tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px #0004}
+.tab:hover:not(.active){color:var(--text)}
+
+/* Forms */
+.form-group{margin-bottom:16px}
+label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+input[type=text],input[type=password],input[type=number],textarea,select{
+  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--text);padding:9px 12px;font-size:13px;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--bg3)}
+
+/* Subject grid */
+.subject-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px}
+.subject-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s;text-align:left;display:flex;flex-direction:column;gap:0;width:100%;padding:0}
+.subject-card:hover{border-color:#4f8ef766;background:var(--bg3);transform:translateY(-1px)}
+.subject-card.all-subjects{border-color:#4f8ef744;background:linear-gradient(135deg,var(--bg2),var(--bg3))}
+.subject-icon{font-size:22px}
+.subject-name{font-size:14px;font-weight:600;color:var(--text)}
+.subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
+
+/* Quiz */
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+.progress-bar{height:4px;background:var(--bg3);border-radius:2px;margin-bottom:24px}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.question-num{font-family:var(--mono);font-size:12px;color:var(--text3)}
+.question-text{font-size:15px;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.75}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:10px;text-align:left;width:100%;color:var(--text);font-size:14px}
+.option:hover:not(.selected):not(.correct):not(.wrong){border-color:var(--border2);background:var(--bg4)}
+.option.correct{border-color:var(--success);background:#3ddc8415;color:var(--success)}
+.option.wrong{border-color:var(--danger);background:#f0647415;color:var(--danger)}
+.option-letter{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text3);min-width:18px;margin-top:1px}
+.explanation{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;margin-top:16px;font-size:13px;color:var(--text2)}
+
+/* Timer */
+.timer{font-family:var(--mono);font-size:15px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:6px 14px}
+
+/* Results */
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.stat-num{font-size:28px;font-weight:600;font-family:var(--mono)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.missed-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px}
+.missed-q{font-size:13px;color:var(--text);margin-bottom:6px}
+.missed-a{font-size:12px;color:var(--success);font-family:var(--mono)}
+.missed-wrong{font-size:12px;color:var(--danger);font-family:var(--mono)}
+
+/* Attempts */
+.attempt-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.attempt-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px}
+.score-badge{font-family:var(--mono);font-size:14px;font-weight:600}
+.score-pass{color:var(--success)}
+.score-fail{color:var(--danger)}
+
+/* Images */
+.image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.image-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.image-card img{width:100%;height:180px;object-fit:cover;background:var(--bg3)}
+.image-placeholder{width:100%;height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:28px}
+.image-card-body{padding:12px}
+.image-title{font-size:13px;font-weight:500;color:var(--text)}
+.image-desc{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* Hematology folder system */
+.folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.folder-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;cursor:pointer;transition:all .2s;text-align:center;width:100%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.folder-card:hover{border-color:#4f8ef766;background:var(--bg3);transform:translateY(-1px)}
+.folder-icon{font-size:26px}
+.folder-name{font-size:13px;font-weight:600;color:var(--text)}
+.folder-count{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px}
+.condition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.condition-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s}
+.condition-card:hover{border-color:#4f8ef766;transform:translateY(-1px)}
+.condition-imgs{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:130px;background:var(--bg3)}
+.condition-imgs img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+.condition-imgs .img-ph{width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px}
+/* full-screen image viewer */
+body.light-mode .case-card{background:#f8f9fc}
+body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:16px 18px"]{background:#eef0fa!important;border-color:#aab0cc!important}
+#img-viewer{position:fixed;inset:0;background:#000d;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
+#img-viewer img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:var(--r);box-shadow:0 4px 32px #0008}
+#img-viewer-close{position:absolute;top:16px;right:16px;background:#fff2;border:none;border-radius:50%;width:36px;height:36px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.condition-body{padding:12px}
+.condition-name{font-size:12px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.4;overflow-wrap:anywhere}
+.condition-features{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
+
+/* Cases */
+.case-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px}
+.case-scenario{font-size:14px;color:var(--text);line-height:1.8;margin-bottom:16px}
+.case-data{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--text2);white-space:pre-wrap}
+.case-img-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.case-img-row img{width:160px;height:120px;object-fit:cover;border-radius:var(--r);border:1px solid var(--border)}
+.case-img-ph{width:160px;height:120px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px}
+.case-step{margin-bottom:16px}
+.case-step-label{font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:500}
+.case-options{display:flex;flex-wrap:wrap;gap:8px}
+.case-opt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 14px;cursor:pointer;font-size:13px;color:var(--text);transition:all .15s}
+.case-opt:hover{border-color:var(--border2)}
+.case-opt.selected{border-color:var(--accent);color:var(--accent);background:#4f8ef715}
+.case-feedback{margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:13px;font-weight:500}
+.case-feedback.correct{background:#3ddc8415;color:var(--success)}
+.case-feedback.wrong{background:#f0647415;color:var(--danger)}
+
+/* Gram+/- page */
+.gram-nav{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.gram-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;cursor:pointer;transition:all .2s;text-align:left;flex:1;min-width:180px}
+.gram-btn:hover{border-color:#4f8ef766;background:var(--bg3)}
+.gram-btn.gram-pos{border-color:#f5a62344}
+.gram-btn.gram-neg{border-color:#4f8ef744}
+.gram-btn-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.gram-btn-sub{font-size:12px;color:var(--text2)}
+
+/* Blood bank ABO */
+.abo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.abo-cell{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text);transition:all .15s;display:flex;align-items:center;justify-content:space-between}
+.abo-cell:hover{border-color:var(--border2)}
+.abo-cell.pos{border-color:var(--success);background:#3ddc8415;color:var(--success)}
+.abo-cell.neg{border-color:var(--danger);background:#f0647415;color:var(--danger)}
+.abo-badge{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:4px;background:var(--bg4)}
+
+/* Draft badge */
+.draft-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#f5a62322;color:var(--warn);border:1px solid #f5a62344;margin-left:8px;text-transform:uppercase;letter-spacing:.5px}
+.published-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#3ddc8422;color:var(--success);border:1px solid #3ddc8444;margin-left:8px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Drop zone */
+.drop-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text3);font-size:13px}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:#4f8ef710;color:var(--text2)}
+.drop-zone input{display:none}
+
+/* Misc */
+.section-title{font-size:18px;font-weight:600;margin-bottom:4px}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.empty{text-align:center;padding:48px 24px;color:var(--text3);font-size:14px}
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.tag-info{background:#4f8ef722;color:var(--accent2)}
+.tag-success{background:#3ddc8422;color:var(--success)}
+.tag-warn{background:#f5a62322;color:var(--warn)}
+.tag-gram-pos{background:#f5a62322;color:var(--warn)}
+.tag-gram-neg{background:#4f8ef722;color:var(--accent2)}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.flex{display:flex}.flex-center{display:flex;align-items:center}
+.flex-wrap{flex-wrap:wrap}
+.gap-6{gap:6px}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+.ml-auto{margin-left:auto}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.mb-8{margin-bottom:8px}.mb-16{margin-bottom:16px}
+.text-sm{font-size:12px}.text-mono{font-family:var(--mono)}.text-muted{color:var(--text2)}
+.text-danger{color:var(--danger)}.text-success{color:var(--success)}.text-warn{color:var(--warn)}
+.admin-bar{background:#f5a62311;border-bottom:1px solid #f5a62333;padding:6px 24px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--warn)}
+.modal-overlay{position:fixed;inset:0;background:#000a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:20px}
+.hidden{display:none!important}
+.breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.breadcrumb-sep{color:var(--text3)}
+.breadcrumb-link{color:var(--accent);cursor:pointer;font-size:13px}
+.breadcrumb-link:hover{color:var(--accent2)}
+.breadcrumb-cur{font-size:13px;color:var(--text2)}
+.image-quiz-img{width:100%;max-width:500px;height:320px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);margin-bottom:20px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ADMIN MODAL -->
+<div id="admin-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-title">Admin Access</div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="admin-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkAdmin()">
+    </div>
+    <div id="admin-err" class="text-danger text-sm mb-8"></div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="closeAdminModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="checkAdmin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONDITION DETAIL MODAL (Hematology Images) -->
+<div id="condition-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:700px">
+    <div id="condition-modal-body"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+  <div id="admin-bar-el" class="admin-bar hidden">
+    <span>⚠ ADMIN MODE</span>
+    <button class="btn btn-sm btn-ghost" onclick="exitAdmin()" style="margin-left:auto">Exit Admin</button>
+  </div>
+  <header>
+    <div>
+      <div class="logo">MLS<span style="color:var(--text3)">/</span>BOC<span style="color:var(--text3);font-size:12px;margin-left:8px">PREP</span></div>
+      <div class="logo-sub">Student Created · For Studying Purposes Only</div>
+    </div>
+    <div class="flex gap-8 flex-center">
+      <button class="btn btn-ghost btn-sm" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+      <button class="btn btn-ghost btn-sm" onclick="openAdminModal()">Admin</button>
+    </div>
+  </header>
+  <main id="view-main"></main>
+</div>
+</div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const ADMIN_PW = 'cats';
+const SB_URL = 'https://rbdvjwipedbxfbedjgoa.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
+
+// Real ASCP BOC weights from guideline (% of 100)
+const BOC_WEIGHTS = {
+  blood_bank: 19.5,       // 17-22%
+  urinalysis: 7.5,        // 5-10%
+  clinical_chemistry: 19.5, // 17-22%
+  hematology: 19.5,       // 17-22%
+  immunology: 7.5,        // 5-10%
+  microbiology: 19.5,     // 17-22%
+  lab_operations: 7.5     // 5-10%
+};
+
+const SUBJECTS = [
+  {key:'blood_bank',name:'Blood Bank',icon:'🏥'},
+  {key:'clinical_chemistry',name:'Clinical Chemistry',icon:'⚗️'},
+  {key:'hematology',name:'Hematology',icon:'🩸'},
+  {key:'immunology',name:'Immunology',icon:'🔬'},
+  {key:'lab_operations',name:'Lab Operations',icon:'📊'},
+  {key:'microbiology',name:'Microbiology',icon:'🦠'},
+  {key:'mycology',name:'Mycology',icon:'🍄'},
+  {key:'parasitology',name:'Parasitology',icon:'🪱'},
+  {key:'urinalysis',name:'Urinalysis',icon:'🧪'}
+];
+
+const HEME_FOLDERS = [
+  {key:'anemias',name:'Anemias',icon:'💉'},
+  {key:'malignancies_acute',name:'Acute Leukemias',icon:'🔴',parent:'malignancies'},
+  {key:'malignancies_chronic',name:'Chronic Leukemias',icon:'🟠',parent:'malignancies'},
+  {key:'malignancies_other',name:'Other Hematologic Malignancies',icon:'🟡',parent:'malignancies'},
+  {key:'infectious',name:'Infectious',icon:'🦠'},
+  {key:'reactive',name:'Reactive / Physiologic',icon:'⚡'},
+  {key:'non_malignant',name:'Non-Malignant / Morphologic',icon:'🔵'}
+];
+
+const HEME_FOLDER_GROUPS = [
+  {label:'Anemias',keys:['anemias']},
+  {label:'Malignancies',keys:['malignancies_acute','malignancies_chronic','malignancies_other']},
+  {label:'Infectious',keys:['infectious']},
+  {label:'Reactive / Physiologic',keys:['reactive']},
+  {label:'Non-Malignant Disorders / Morphologic',keys:['non_malignant']}
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let sb = null;
+let isAdmin = false;
+let sessionUserId = null;
+let appState = {
+  view:'home', subject:null, subjectTab:'quiz',
+  quizQ:[], quizIdx:0, quizAns:[], quizStarted:false, quizDone:false,
+  allQ:[], allIdx:0, allAns:[], allStarted:false, allDone:false,
+  allTimer:null, allSeconds:0,
+  attempts:[],
+  // microbiology cases
+  microCasesPage:null, // null=landing, 'gram_positive','gram_negative'
+  caseSelections:{},
+  // hematology images
+  hemeImgPage:null, // null=folders, folder key, 'condition:id'
+  hemeImgMode:'browse', // 'browse','quiz'
+  hemeQuizItems:[], hemeQuizIdx:0, hemeQuizAns:[], hemeQuizDone:false,
+  bbAnswers:{}, // blood bank MC answers: {caseId: {qIdx: letter}}
+  hemeCaseAnswers:{}, // hematology case answers
+  hemeCaseCollapsed:{}, // hematology case collapse state
+  bbCollapsed:{} // blood bank case collapse state
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async ()=>{
+  sb = supabase.createClient(SB_URL, SB_KEY);
+  await seedIfEmpty();
+  renderView();
+});
+
+function getUID(){
+  if(!sessionUserId){
+    let id=localStorage.getItem('mlsboc_uid');
+    if(!id){id='u_'+Math.random().toString(36).slice(2,10);localStorage.setItem('mlsboc_uid',id);}
+    sessionUserId=id;
+  }
+  return sessionUserId;
+}
+
+// ─── SEEDING ──────────────────────────────────────────────────────────────────
+async function seedIfEmpty(){
+  try{
+    const {data}=await sb.from('mlsboc_questions').select('id').limit(1);
+    if(data&&data.length>0)return;
+    const samples={
+      hematology:[
+        {question:"Which cell is the precursor to platelets?",option_a:"Megakaryocyte",option_b:"Proerythroblast",option_c:"Myeloblast",option_d:"Lymphoblast",correct_answer:"a",explanation:"Megakaryocytes fragment their cytoplasm to produce platelets."},
+        {question:"A patient has MCV 115 fL and hypersegmented neutrophils. Most likely deficiency?",option_a:"Iron",option_b:"Vitamin B12 or Folate",option_c:"Copper",option_d:"Zinc",correct_answer:"b",explanation:"Megaloblastic anemia indicates B12 or folate deficiency."},
+        {question:"Normal adult hemoglobin is primarily:",option_a:"HbF",option_b:"HbA2",option_c:"HbA",option_d:"HbH",correct_answer:"c",explanation:"HbA (alpha2beta2) comprises ~96% of adult hemoglobin."},
+        {question:"What stain identifies reticulocytes?",option_a:"Wright-Giemsa",option_b:"Prussian blue",option_c:"New methylene blue",option_d:"PAS",correct_answer:"c",explanation:"New methylene blue is a supravital stain for reticulocyte RNA."},
+        {question:"In DIC, which finding is expected?",option_a:"Elevated fibrinogen, decreased D-dimer",option_b:"Decreased fibrinogen, elevated D-dimer",option_c:"Normal PT, decreased aPTT",option_d:"Thrombocytosis",correct_answer:"b",explanation:"DIC causes consumption of fibrinogen with massive D-dimer elevation."}
+      ],
+      microbiology:[
+        {question:"Gram-positive cocci in clusters producing coagulase:",option_a:"Streptococcus pyogenes",option_b:"Staphylococcus aureus",option_c:"Enterococcus faecalis",option_d:"S. epidermidis",correct_answer:"b",explanation:"S. aureus is coagulase-positive, distinguishing it from CoNS."},
+        {question:"Organism producing green metallic sheen on EMB agar:",option_a:"Klebsiella pneumoniae",option_b:"Pseudomonas aeruginosa",option_c:"Escherichia coli",option_d:"Proteus mirabilis",correct_answer:"c",explanation:"E. coli produces a green metallic sheen on EMB from strong acid production."},
+        {question:"CAMP test positive organism:",option_a:"Listeria monocytogenes",option_b:"Streptococcus agalactiae",option_c:"Enterococcus faecalis",option_d:"Clostridium perfringens",correct_answer:"b",explanation:"Group B Strep (S. agalactiae) is CAMP test positive."},
+        {question:"Oxidase positive non-fermenter producing grape-like odor:",option_a:"Acinetobacter baumannii",option_b:"Burkholderia cepacia",option_c:"Pseudomonas aeruginosa",option_d:"Stenotrophomonas maltophilia",correct_answer:"c",explanation:"P. aeruginosa is oxidase positive, non-fermenting, with a fruity grape odor."},
+        {question:"Which media is selective for Salmonella and Shigella?",option_a:"TCBS",option_b:"CNA",option_c:"HE agar",option_d:"CHOC",correct_answer:"c",explanation:"Hektoen Enteric (HE) agar is selective for Salmonella and Shigella."}
+      ],
+      clinical_chemistry:[
+        {question:"Which enzyme is most specific for myocardial infarction?",option_a:"ALT",option_b:"LDH",option_c:"CK-MB",option_d:"AST",correct_answer:"c",explanation:"CK-MB and troponin are most specific for cardiac muscle damage."},
+        {question:"Jaundice with elevated indirect bilirubin suggests:",option_a:"Biliary obstruction",option_b:"Hemolysis",option_c:"Hepatocellular disease",option_d:"Cholestasis",correct_answer:"b",explanation:"Pre-hepatic jaundice from hemolysis elevates unconjugated (indirect) bilirubin."},
+        {question:"Reference range for fasting glucose (mg/dL):",option_a:"40-60",option_b:"74-100",option_c:"110-140",option_d:"150-200",correct_answer:"b",explanation:"Normal fasting glucose is 74-100 mg/dL per ASCP BOC reference ranges."},
+        {question:"Pseudohyponatremia is associated with:",option_a:"SIADH",option_b:"Hyperlipidemia or hyperproteinemia",option_c:"Diabetes insipidus",option_d:"Addison's disease",correct_answer:"b",explanation:"Pseudohyponatremia occurs with hyperlipidemia or hyperproteinemia causing falsely low sodium."},
+        {question:"Which lipoprotein is known as bad cholesterol?",option_a:"HDL",option_b:"VLDL",option_c:"LDL",option_d:"Chylomicron",correct_answer:"c",explanation:"LDL is associated with atherosclerosis risk."}
+      ],
+      blood_bank:[
+        {question:"ABO discrepancy: forward types as B, reverse types as O. Most likely cause?",option_a:"Acquired B phenomenon",option_b:"Weak subgroup of A",option_c:"Cold autoantibody",option_d:"Polyagglutination",correct_answer:"a",explanation:"Acquired B phenomenon occurs in group A patients."},
+        {question:"Rh null phenotype individuals may develop:",option_a:"Anti-D only",option_b:"Anti-Rh17 (anti-total Rh)",option_c:"Anti-C only",option_d:"Anti-e only",correct_answer:"b",explanation:"Rh null individuals lack all Rh antigens and can make anti-Rh17."},
+        {question:"Coombs crossmatch is incompatible when:",option_a:"No agglutination at IS phase",option_b:"Agglutination at AHG phase",option_c:"Rouleaux is present",option_d:"All phases negative",correct_answer:"b",explanation:"Agglutination at AHG phase indicates antibody coating donor cells."},
+        {question:"Which blood product is indicated for multiple factor deficiencies?",option_a:"Packed RBCs",option_b:"Fresh frozen plasma",option_c:"Cryoprecipitate",option_d:"Platelets",correct_answer:"b",explanation:"FFP contains all clotting factors."},
+        {question:"The Kleihauer-Betke test is used to:",option_a:"Detect fetal hemoglobin in maternal blood",option_b:"Identify weak D",option_c:"Screen for antibodies",option_d:"Confirm ABO typing",correct_answer:"a",explanation:"KB stain differentiates fetal RBCs from adult RBCs for RhIG dosing."}
+      ],
+      immunology:[
+        {question:"First immunoglobulin produced in primary immune response:",option_a:"IgG",option_b:"IgA",option_c:"IgM",option_d:"IgE",correct_answer:"c",explanation:"IgM is the first antibody produced and is pentameric."},
+        {question:"ANA pattern associated with drug-induced lupus:",option_a:"Centromere",option_b:"Peripheral/rim",option_c:"Nucleolar",option_d:"Homogeneous",correct_answer:"d",explanation:"Drug-induced lupus typically shows a homogeneous ANA pattern against histones."},
+        {question:"HLA type associated with celiac disease:",option_a:"HLA-B27",option_b:"HLA-DR4",option_c:"HLA-DQ2/DQ8",option_d:"HLA-A3",correct_answer:"c",explanation:"HLA-DQ2 and DQ8 are strongly associated with celiac disease."},
+        {question:"Complement pathway activated by immune complexes:",option_a:"Alternative",option_b:"Lectin",option_c:"Classical",option_d:"Terminal",correct_answer:"c",explanation:"The classical complement pathway is activated by antigen-antibody complexes via C1q."},
+        {question:"Cell type responsible for antibody production:",option_a:"T helper cell",option_b:"Cytotoxic T cell",option_c:"Plasma cell",option_d:"NK cell",correct_answer:"c",explanation:"Plasma cells (differentiated B cells) secrete antibodies."}
+      ],
+      urinalysis:[
+        {question:"Bilirubin in urine indicates:",option_a:"Normal finding",option_b:"Conjugated hyperbilirubinemia",option_c:"Only hemolysis",option_d:"Kidney disease",correct_answer:"b",explanation:"Only conjugated (direct) bilirubin is water-soluble and appears in urine."},
+        {question:"Oval fat bodies in urine are associated with:",option_a:"UTI",option_b:"Nephrotic syndrome",option_c:"Glomerulonephritis",option_d:"Renal tubular acidosis",correct_answer:"b",explanation:"Oval fat bodies are lipid-laden renal tubular cells seen in nephrotic syndrome."},
+        {question:"Which cast indicates severe chronic renal damage?",option_a:"Hyaline cast",option_b:"Granular cast",option_c:"Waxy cast",option_d:"RBC cast",correct_answer:"c",explanation:"Waxy casts indicate very slow urine flow and severe chronic renal disease."},
+        {question:"Specific gravity 1.001 suggests:",option_a:"Concentrated urine",option_b:"Diabetes mellitus",option_c:"Diabetes insipidus or overhydration",option_d:"Renal failure",correct_answer:"c",explanation:"Very low SG suggests dilute urine, as in DI or excess fluid intake."},
+        {question:"Hexagonal crystals in urine are pathognomonic for:",option_a:"Gout",option_b:"Cystinuria",option_c:"Oxalosis",option_d:"RTA",correct_answer:"b",explanation:"Hexagonal cystine crystals are pathognomonic for cystinuria."}
+      ],
+      parasitology:[
+        {question:"Malaria species causing most severe disease:",option_a:"P. vivax",option_b:"P. ovale",option_c:"P. falciparum",option_d:"P. malariae",correct_answer:"c",explanation:"P. falciparum causes cerebral malaria and highest mortality."},
+        {question:"Giardia lamblia cysts have how many nuclei?",option_a:"1",option_b:"2",option_c:"4",option_d:"8",correct_answer:"c",explanation:"Giardia cysts contain 4 nuclei and are the infective stage."},
+        {question:"Eggs with terminal spine are diagnostic for:",option_a:"S. mansoni",option_b:"S. haematobium",option_c:"S. japonicum",option_d:"Fasciolopsis buski",correct_answer:"b",explanation:"S. haematobium eggs have a terminal spine and are found in urine."},
+        {question:"Pinworm diagnosis is best made by:",option_a:"Stool O&P",option_b:"Scotch tape prep",option_c:"Blood smear",option_d:"Serology",correct_answer:"b",explanation:"Scotch tape prep applied perianally in early morning detects E. vermicularis eggs."},
+        {question:"Spaghetti and meatballs on KOH prep indicates:",option_a:"Tinea corporis",option_b:"Malassezia furfur",option_c:"Candidiasis",option_d:"Dermatophytosis",correct_answer:"b",explanation:"Malassezia furfur shows hyphae and round yeast cells on KOH prep."}
+      ],
+      mycology:[
+        {question:"Mold with septate hyphae branching at 45 degrees:",option_a:"Mucor spp.",option_b:"Aspergillus spp.",option_c:"Rhizopus spp.",option_d:"Cunninghamella",correct_answer:"b",explanation:"Aspergillus has septate hyphae with 45-degree dichotomous branching."},
+        {question:"Cryptococcus neoformans is identified by:",option_a:"Germ tube formation",option_b:"Urease positive, India ink capsule",option_c:"Dimorphism at 37C",option_d:"Angular hyphae on KOH",correct_answer:"b",explanation:"Cryptococcus is urease positive and forms a polysaccharide capsule visible with India ink."},
+        {question:"Candida albicans is differentiated from other Candida by:",option_a:"Inability to ferment glucose",option_b:"Germ tube formation",option_c:"Growth at 25C only",option_d:"Lack of pseudohyphae",correct_answer:"b",explanation:"C. albicans produces germ tubes in serum at 37C within 2-3 hours."},
+        {question:"Thermal dimorphism means:",option_a:"Grows only at body temp",option_b:"Mold in environment, yeast in host",option_c:"Changes color with temperature",option_d:"Sporulates at higher temps",correct_answer:"b",explanation:"Thermally dimorphic fungi are molds in environment and yeasts at 37C in host."},
+        {question:"Which stain is used for Pneumocystis jirovecii?",option_a:"Gram stain",option_b:"India ink",option_c:"GMS (Gomori methenamine silver)",option_d:"PAS",correct_answer:"c",explanation:"GMS stains the cyst wall of Pneumocystis jirovecii black."}
+      ],
+      lab_operations:[
+        {question:"Which Westgard rule indicates a systematic error?",option_a:"1-2s",option_b:"1-3s",option_c:"2-2s",option_d:"R-4s",correct_answer:"c",explanation:"The 2-2s rule (two consecutive values >2SD in same direction) indicates systematic error."},
+        {question:"Levey-Jennings chart is used for:",option_a:"Patient result trending",option_b:"QC data plotting",option_c:"Reagent expiration tracking",option_d:"Instrument maintenance",correct_answer:"b",explanation:"Levey-Jennings charts plot QC data to detect shifts, trends, and random errors."},
+        {question:"CLIA requires proficiency testing for waived tests:",option_a:"Monthly",option_b:"Quarterly",option_c:"Annually",option_d:"Not required",correct_answer:"d",explanation:"CLIA waived tests do not require proficiency testing, only moderate and high complexity."},
+        {question:"Coefficient of variation (CV) measures:",option_a:"Systematic error",option_b:"Imprecision relative to the mean",option_c:"Sensitivity of a test",option_d:"Analytical range",correct_answer:"b",explanation:"CV = (SD/mean) x 100. It expresses imprecision as a percentage of the mean."},
+        {question:"Standard deviation index (SDI) in proficiency testing:",option_a:">2 is acceptable",option_b:"Should be close to 0",option_c:"Is calculated monthly",option_d:"Replaces Westgard rules",correct_answer:"b",explanation:"SDI measures how far a lab's PT result is from the peer mean; values close to 0 are ideal."}
+      ]
+    };
+    for(const [subject,qs] of Object.entries(samples)){
+      for(const q of qs){
+        await sb.from('mlsboc_questions').insert({subject,...q}).catch(()=>{});
+      }
+    }
+  }catch(e){console.warn('Seed error',e);}
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+function openAdminModal(){document.getElementById('admin-modal').classList.remove('hidden');}
+function closeAdminModal(){document.getElementById('admin-modal').classList.add('hidden');document.getElementById('admin-err').textContent='';document.getElementById('admin-pw').value='';}
+function checkAdmin(){
+  if(document.getElementById('admin-pw').value===ADMIN_PW){
+    isAdmin=true;
+    document.getElementById('admin-bar-el').classList.remove('hidden');
+    closeAdminModal();renderView();
+  }else{document.getElementById('admin-err').textContent='Wrong password.';}
+}
+function exitAdmin(){isAdmin=false;document.getElementById('admin-bar-el').classList.add('hidden');renderView();}
+
+// ─── ROUTING ──────────────────────────────────────────────────────────────────
+function renderView(){
+  const v=document.getElementById('view-main');
+  if(appState.view==='home')renderHome(v);
+  else if(appState.view==='subject')renderSubjectView(v);
+  else if(appState.view==='all')renderAllView(v);
+  else if(appState.view==='formulas')renderFormulasView(v);
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────────────────
+function getSubjectIcon(key,fallback){
+  const stored=localStorage.getItem('mlsboc_icon_'+key);
+  if(stored) return '<div style="width:100%;height:130px;overflow:hidden;flex-shrink:0"><img src="'+stored+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>';
+  return '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0">'+fallback+'</div>';
+}
+
+function renderHome(v){
+  const cards = SUBJECTS.map(s=>{
+    const uploadBtn = isAdmin
+      ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'' + s.key + '\')"></label>'
+      : '';
+    return '<div style="position:relative">'
+      + '<div class="subject-card" onclick="goSubject(\'' + s.key + '\')">'
+      + '<div id="sicon-' + s.key + '">' + getSubjectIcon(s.key, s.icon) + '</div>'
+      + '<div style="padding:10px 12px 12px">'
+      + '<div class="subject-name">' + s.name + '</div>'
+      + '<div class="subject-count" id="cnt-' + s.key + '">loading...</div>'
+      + '</div></div>'
+      + uploadBtn + '</div>';
+  }).join('');
+
+  const fmlAdminDrop = isAdmin ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'formulas\')"></label>' : '';
+
+  v.innerHTML = '<div class="mb-16"><div class="section-title">BOC Exam Prep</div><div class="section-sub">Medical Laboratory Scientist · ASCP Board of Certification</div></div>'
+    + '<div class="subject-grid">' + cards
+    + '<div style="position:relative">'
+    + '<div class="subject-card all-subjects" onclick="goAll()">'
+    + getSubjectIcon('all','📋')
+    + '<div style="padding:10px 12px 12px"><div class="subject-name">All Subjects</div><div class="subject-count">Practice Exam · 100 questions · Timed</div></div>'
+    + '</div>'
+    + (isAdmin ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'all\')"></label>' : '')
+    + '</div>'
+    + '<div style="position:relative">'
+    + '<div class="subject-card" style="border-color:#f5a62344" onclick="goFormulas()">'
+    + '<div id="sicon-formulas">' + getSubjectIcon('formulas','📐') + '</div>'
+    + '<div style="padding:10px 12px 12px"><div class="subject-name">Formulas / Equations</div><div class="subject-count" id="cnt-formulas">loading...</div></div>'
+    + '</div>'
+    + fmlAdminDrop + '</div>'
+    + '</div>'
+    + '<div class="mt-24">'
+    + '<div class="section-title" style="font-size:16px;margin-bottom:4px">Interactive Learning</div>'
+    + '<div class="section-sub" style="margin-bottom:14px">External tools and simulations</div>'
+    + '<div id="interactive-links-grid"></div>'
+    + (isAdmin ? '<div class="mt-12" id="interactive-admin"></div>' : '')
+    + '</div>'
+    + '<div class="mt-24" id="attempts-home"></div>';
+
+  SUBJECTS.forEach(async s=>{
+    const {count}=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',s.key);
+    const el=document.getElementById('cnt-'+s.key);
+    if(el)el.textContent=(count||0)+' questions';
+  });
+  sb.from('mlsboc_formulas').select('id',{count:'exact',head:true}).then(({count})=>{
+    const el=document.getElementById('cnt-formulas');
+    if(el)el.textContent=(count||0)+' formulas';
+  }).catch(()=>{});
+  loadAttemptsHome();
+  loadInteractiveLinks();
+}
+
+async function loadInteractiveLinks(){
+  // Links stored in localStorage as JSON array [{title, url, description}]
+  const raw = localStorage.getItem('mlsboc_interactive_links');
+  const links = raw ? JSON.parse(raw) : [];
+  const grid = document.getElementById('interactive-links-grid');
+  const adminDiv = document.getElementById('interactive-admin');
+
+  if(grid){
+    if(!links.length){
+      grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.' + (isAdmin?' Use the form below to add one.':'') + '</div>';
+    } else {
+      grid.innerHTML = '<div class="subject-grid">' + links.map((lnk,i) =>
+        '<div class="subject-card" style="position:relative;cursor:pointer" onclick="window.location.href=\'' + lnk.url + '\'">' 
+        + (lnk.image ? '<div style="width:100%;height:130px;overflow:hidden"><img src="'+lnk.image+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>'
+          : '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px">🔗</div>')
+        + '<div style="padding:10px 12px 12px">'
+        + '<div class="subject-name" style="color:var(--accent)">' + lnk.title + '</div>'
+        + (lnk.description ? '<div class="subject-count">' + lnk.description + '</div>' : '')
+        + '</div>'
+        + (isAdmin ? '<div style="display:flex;gap:6px;padding:4px 10px 8px" onclick="event.stopPropagation()">'
+          + '<button onclick="editInteractiveLink('+i+')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">✏️ Edit</button>'
+          + '<button onclick="removeInteractiveLink('+i+')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">✕ Remove</button>'
+          + '</div>' : '')
+        + '</div>'
+      ).join('') + '</div>';
+    }
+  }
+
+  if(isAdmin && adminDiv){
+    adminDiv.innerHTML = '<div class="card">'
+      + '<div style="font-size:13px;font-weight:600;margin-bottom:12px">Admin: Add Link</div>'
+      + '<div class="form-group"><label>Title</label><input type="text" id="il-title" placeholder="e.g. Blood Cell Identifier"></div>'
+      + '<div class="form-group"><label>URL</label><input type="text" id="il-url" placeholder="https://..."></div>'
+      + '<div class="form-group" style="margin-bottom:12px"><label>Description (optional)</label><input type="text" id="il-desc" placeholder="Short note about this tool"></div>'
+      + '<div class="form-group" style="margin-bottom:12px"><label>Image (drag & drop or click)</label>'
+      + '<div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px" id="il-img-dz" ondrop="handleILImgDrop(event)" ondragover="event.preventDefault();this.style.borderColor=\'var(--accent)\'" ondragleave="this.style.borderColor=\'var(--border2)\'" onclick="document.getElementById(\'il-img-file\').click()">📷 Drop image or click'
+      + '<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">'
+      + '</div>'
+      + '<input type="hidden" id="il-img-data" value="">'
+      + '</div>'
+      + '<button class="btn btn-primary btn-sm" onclick="addInteractiveLink()">Add Link</button>'
+      + '</div>';
+  }
+}
+
+function addInteractiveLink(){
+  const title = document.getElementById('il-title')?.value.trim();
+  const url   = document.getElementById('il-url')?.value.trim();
+  const desc  = document.getElementById('il-desc')?.value.trim();
+  if(!title || !url){ alert('Title and URL are required.'); return; }
+  const raw = localStorage.getItem('mlsboc_interactive_links');
+  const links = raw ? JSON.parse(raw) : [];
+  const img=document.getElementById('il-img-data')?.value||''; links.push({title, url, description: desc||'', image:img});
+  localStorage.setItem('mlsboc_interactive_links', JSON.stringify(links));
+  loadInteractiveLinks();
+  document.getElementById('il-title').value='';
+  document.getElementById('il-url').value='';
+  document.getElementById('il-desc').value='';
+  const dz=document.getElementById('il-img-dz');if(dz)dz.innerHTML='📷 Drop image or click<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">';
+  const hid=document.getElementById('il-img-data');if(hid)hid.value='';
+}
+
+function editInteractiveLink(i){
+  const raw=localStorage.getItem('mlsboc_interactive_links');
+  const links=raw?JSON.parse(raw):[];
+  const lnk=links[i];if(!lnk)return;
+  const title=prompt('Title:',lnk.title);if(title===null)return;
+  const url=prompt('URL:',lnk.url);if(url===null)return;
+  const desc=prompt('Description:',lnk.description||'');if(desc===null)return;
+  const changeImg=confirm('Change image? OK = pick new file, Cancel = keep current');
+  if(changeImg){
+    const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+    inp.onchange=ev=>{
+      const file=ev.target.files[0];if(!file)return;
+      const rdr=new FileReader();
+      rdr.onload=e2=>{
+        const t=new Image();
+        t.onload=()=>{
+          const M=600;let w=t.width,ht=t.height;
+          if(w>M){ht=Math.round(ht*M/w);w=M;}
+          const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
+          cv.getContext('2d').drawImage(t,0,0,w,ht);
+          links[i]={title:title.trim(),url:url.trim(),description:desc,image:cv.toDataURL('image/jpeg',0.75)};
+          try{localStorage.setItem('mlsboc_interactive_links',JSON.stringify(links));}catch(err){alert('Image too large.');}
+          loadInteractiveLinks();
+        };
+        t.src=e2.target.result;
+      };
+      rdr.readAsDataURL(file);
+    };
+    inp.click();
+  }else{
+    links[i]={...lnk,title:title.trim(),url:url.trim(),description:desc};
+    localStorage.setItem('mlsboc_interactive_links',JSON.stringify(links));
+    loadInteractiveLinks();
+  }
+}
+function removeInteractiveLink(i){
+  if(!confirm('Remove this link?'))return;
+  const raw = localStorage.getItem('mlsboc_interactive_links');
+  const links = raw ? JSON.parse(raw) : [];
+  links.splice(i,1);
+  localStorage.setItem('mlsboc_interactive_links', JSON.stringify(links));
+  loadInteractiveLinks();
+}
+
+async function loadAttemptsHome(){
+  const {data}=await sb.from('mlsboc_attempts').select('*').eq('user_id',getUID()).order('completed_at',{ascending:false}).limit(3);
+  appState.attempts=data||[];
+  const el=document.getElementById('attempts-home');if(!el)return;
+  if(!appState.attempts.length){el.innerHTML='';return;}
+  el.innerHTML=`
+    <div class="section-title" style="font-size:15px;margin-bottom:12px">Recent Attempts</div>
+    ${appState.attempts.map((a,i)=>`
+      <div class="attempt-card">
+        <div>
+          <div class="flex-center gap-8">
+            <span class="score-badge ${a.score/a.total>=0.6?'score-pass':'score-fail'}">${a.score}/${a.total} (${Math.round(a.score/a.total*100)}%)</span>
+          </div>
+          <div class="attempt-meta">${new Date(a.completed_at).toLocaleDateString()} · ${fmtTime(a.time_seconds)}</div>
+        </div>
+        <div class="flex gap-8 flex-wrap">
+          <button class="btn btn-ghost btn-sm" onclick="exportAttempt('${a.id}')">Export CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="reviewAttempt(${i})">Review</button>
+        </div>
+      </div>`).join('')}
+  `;
+}
+
+// ─── SUBJECT VIEW ─────────────────────────────────────────────────────────────
+function goSubject(key){
+  appState.view='subject';appState.subject=key;appState.subjectTab='quiz';
+  appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;
+  appState.microCasesPage=null;appState.caseSelections={};
+  appState.hemeImgPage=null;appState.hemeImgMode='browse';
+  renderView();
+}
+function goAll(){appState.view='all';appState.allStarted=false;appState.allDone=false;appState.allSeconds=0;renderView();}
+function goFormulas(){appState.view='formulas';renderView();}
+function goHome(){appState.view='home';clearInterval(appState.allTimer);renderView();}
+
+function renderSubjectView(v){
+  const s=SUBJECTS.find(x=>x.key===appState.subject);
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
+      <span class="subject-icon">${s.icon}</span>
+      <div class="section-title">${s.name}</div>
+    </div>
+    <div class="tabs">
+      <button class="tab ${appState.subjectTab==='quiz'?'active':''}" onclick="switchTab('quiz')">Quiz</button>
+      <button class="tab ${appState.subjectTab==='images'?'active':''}" onclick="switchTab('images')">Learn by Images</button>
+      <button class="tab ${appState.subjectTab==='cases'?'active':''}" onclick="switchTab('cases')">Cases</button>
+    </div>
+    <div id="tab-content"></div>
+  `;
+  renderTab();
+}
+
+function switchTab(tab){
+  appState.subjectTab=tab;
+  appState.quizStarted=false;appState.quizDone=false;appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];
+  appState.microCasesPage=null;appState.caseSelections={};
+  appState.hemeImgPage=null;appState.hemeImgMode='browse';
+  appState.hemeQuizItems=[];appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+  appState.bbAnswers={};
+  appState.hemeCaseAnswers={};
+  appState.hemeCaseCollapsed={};
+  renderTab();
+}
+
+async function renderTab(){
+  const el=document.getElementById('tab-content');if(!el)return;
+  if(appState.subjectTab==='quiz')await renderQuizTab(el);
+  else if(appState.subjectTab==='images')await renderImagesTab(el);
+  else if(appState.subjectTab==='cases')await renderCasesTab(el);
+}
+
+// ─── QUIZ TAB ─────────────────────────────────────────────────────────────────
+async function renderQuizTab(el){
+  if(appState.quizDone){renderQuizResults(el,false);return;}
+  if(!appState.quizStarted){
+    const {count}=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',appState.subject);
+    el.innerHTML=`
+      <div class="card" style="max-width:480px">
+        <div class="section-title" style="font-size:15px">Subject Quiz</div>
+        <p class="text-muted mt-8" style="font-size:13px">${count||0} questions available. Practice only — results not saved.</p>
+        <div class="divider"></div>
+        <div class="form-group">
+          <label>Number of questions</label>
+          <input type="number" id="q-count" value="10" min="1" max="${count||50}">
+        </div>
+        <button class="btn btn-primary" onclick="startSubjectQuiz()">Start Quiz</button>
+      </div>
+      ${isAdmin?adminQuizControls():''}
+    `;
+    return;
+  }
+  if(!appState.quizQ.length){el.innerHTML='<div class="empty">No questions found for this subject.</div>';return;}
+  const q=appState.quizQ[appState.quizIdx];
+  const answered=appState.quizAns[appState.quizIdx];
+  const pct=Math.round((appState.quizIdx+1)/appState.quizQ.length*100);
+  el.innerHTML=`
+    <div class="quiz-header">
+      <span class="question-num">Question ${appState.quizIdx+1} of ${appState.quizQ.length}</span>
+      <div class="flex gap-8">
+        ${appState.quizIdx>0?`<button class="btn btn-ghost btn-sm" onclick="qPrev()">← Prev</button>`:''}
+        ${answered&&appState.quizIdx<appState.quizQ.length-1?`<button class="btn btn-primary btn-sm" onclick="qNext()">Next →</button>`:''}
+        ${answered&&appState.quizIdx===appState.quizQ.length-1?`<button class="btn btn-success btn-sm" onclick="()=>{appState.quizDone=true;renderTab()}">Finish</button>`:''}
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="question-text">${q.question}</div>
+    <div class="options">
+      ${['a','b','c','d'].map(opt=>{
+        let cls='option';
+        if(answered){if(opt===q.correct_answer)cls+=' correct';else if(opt===answered&&answered!==q.correct_answer)cls+=' wrong';}
+        return `<button class="${cls}" onclick="answerQ('${opt}')" ${answered?'disabled':''}>
+          <span class="option-letter">${opt.toUpperCase()}.</span>
+          <span>${q['option_'+opt]}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    ${answered&&q.explanation?`<div class="explanation">${q.explanation}</div>`:''}
+  `;
+}
+
+async function startSubjectQuiz(){
+  const cnt=parseInt(document.getElementById('q-count').value)||10;
+  const {data}=await sb.from('mlsboc_questions').select('*').eq('subject',appState.subject);
+  if(!data||!data.length){alert('No questions found.');return;}
+  appState.quizQ=shuffle(data).slice(0,cnt);
+  appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;
+  renderTab();
+}
+
+function answerQ(opt){appState.quizAns[appState.quizIdx]=opt;renderTab();}
+function qNext(){appState.quizIdx++;renderTab();}
+function qPrev(){appState.quizIdx--;renderTab();}
+
+function renderQuizResults(el,isAll){
+  const qs=isAll?appState.allQ:appState.quizQ;
+  const ans=isAll?appState.allAns:appState.quizAns;
+  let correct=0,missed=[];
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;else missed.push({q,given:ans[i]});});
+  const pct=Math.round(correct/qs.length*100);
+  el.innerHTML=`
+    <div class="result-grid">
+      <div class="stat-card"><div class="stat-num" style="color:${pct>=60?'var(--success)':'var(--danger)'}">${pct}%</div><div class="stat-label">Score</div></div>
+      <div class="stat-card"><div class="stat-num text-success">${correct}</div><div class="stat-label">Correct</div></div>
+      <div class="stat-card"><div class="stat-num text-danger">${qs.length-correct}</div><div class="stat-label">Missed</div></div>
+    </div>
+    ${isAll?`<div class="card-sm mb-16 flex-center gap-12"><span class="text-muted" style="font-size:13px">Time used:</span><span class="timer">${fmtTime(appState.allSeconds)}</span></div>`:''}
+    <div class="flex gap-8 mb-16 flex-wrap">
+      ${isAll?`<button class="btn btn-primary" onclick="startAllExam()">Retake Exam</button>`:`<button class="btn btn-primary" onclick="switchTab('quiz')">New Quiz</button>`}
+      ${isAll?`<button class="btn btn-ghost" onclick="exportFromResults()">Export Missed CSV</button>`:''}
+    </div>
+    ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
+    ${missed.map(({q,given})=>`
+      <div class="missed-item">
+        <div class="missed-q">${q.question}</div>
+        <div class="missed-wrong">Your answer: ${given?q['option_'+given]:'(unanswered)'}</div>
+        <div class="missed-a">Correct: ${q['option_'+q.correct_answer]}</div>
+        ${q.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px">${q.explanation}</div>`:''}
+      </div>`).join('')}
+  `;
+}
+
+// ─── IMAGES TAB ───────────────────────────────────────────────────────────────
+async function renderImagesTab(el){
+  if(appState.subject==='hematology'){
+    await renderHemeImages(el);
+  }else{
+    await renderGenericImages(el);
+  }
+}
+
+// Generic images (non-hematology)
+async function renderGenericImages(el){
+  const {data}=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+  el.innerHTML=`
+    ${isAdmin?`<div class="mb-16">${adminImageControls()}</div>`:''}
+    ${!data||!data.length?'<div class="empty">No images yet for this subject.</div>':''}
+    <div class="image-grid">
+      ${(data||[]).map(img=>`
+        <div class="image-card">
+          ${img.image_url?`<img src="${img.image_url}" alt="${esc(img.title)}" onerror="this.parentElement.querySelector('.image-placeholder').style.display='flex';this.style.display='none'">`:''}
+          <div class="image-placeholder" style="${img.image_url?'display:none':''}">🖼️</div>
+          <div class="image-card-body">
+            <div class="image-title">${img.title}</div>
+            ${img.description?`<div class="image-desc">${img.description}</div>`:''}
+            ${img.is_draft?`<span class="draft-badge">Draft</span>`:''}
+            ${isAdmin?`<div class="flex gap-8 mt-8">
+              ${img.is_draft?`<button class="btn btn-success btn-xs" onclick="publishImage('${img.id}')">Publish</button>`:''}
+              <button class="btn btn-danger btn-xs" onclick="deleteImage('${img.id}')">Delete</button>
+            </div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// Hematology images — folder system
+async function renderHemeImages(el){
+  if(appState.hemeImgMode==='quiz'){
+    renderHemeImageQuiz(el);return;
+  }
+  if(!appState.hemeImgPage){
+    // Folder landing
+    const counts={};
+    for(const f of HEME_FOLDERS){
+      const {count}=await sb.from('mlsboc_heme_conditions').select('id',{count:'exact',head:true}).eq('folder',f.key);
+      counts[f.key]=count||0;
+    }
+    el.innerHTML=`
+      <div class="flex-center gap-8 mb-16 flex-wrap">
+        <button class="btn btn-primary btn-sm" onclick="startHemeQuiz()">Image Quiz Mode</button>
+        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddConditionModal(null)">+ Add Condition</button>`:''}
+      </div>
+      ${HEME_FOLDER_GROUPS.map(g=>`
+        <div class="mb-24">
+          <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${g.label}</div>
+          <div class="folder-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+            ${g.keys.map(k=>{
+              const f=HEME_FOLDERS.find(x=>x.key===k);
+              if(!f)return '';
+              return `<button class="folder-card" onclick="openHemeFolder('${f.key}')">
+                <div class="folder-icon">${f.icon}</div>
+                <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3">${f.name}</div>
+                <div class="folder-count">${counts[f.key]||0} conditions</div>
+              </button>`;
+            }).join('')}
+          </div>
+        </div>`).join('')}
+      ${isAdmin?`<div class="mt-16">${adminHemeImageControls()}</div>`:''}
+    `;
+    return;
+  }
+  // Inside a folder — show conditions
+  const f=HEME_FOLDERS.find(x=>x.key===appState.hemeImgPage);
+  const {data:conditions}=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',appState.hemeImgPage).order('name');
+  el.innerHTML=`
+    <div class="breadcrumb mb-16">
+      <span class="breadcrumb-link" onclick="appState.hemeImgPage=null;renderTab()">Images</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-cur">${f?f.name:appState.hemeImgPage}</span>
+      <div class="ml-auto flex gap-8">
+        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddConditionModal('${appState.hemeImgPage}')">+ Add Condition</button>`:''}
+        <button class="btn btn-primary btn-sm" onclick="startHemeQuizFolder('${appState.hemeImgPage}')">Quiz This Folder</button>
+      </div>
+    </div>
+    ${!conditions||!conditions.length?'<div class="empty">No conditions yet in this folder.</div>':''}
+    <div class="condition-grid">
+      ${(conditions||[]).map(c=>`
+        <div class="condition-card" onclick="openCondition('${c.id}')">
+          <div class="condition-imgs">
+            ${buildConditionThumbs(c)}
+          </div>
+          <div class="condition-body">
+            <div class="condition-name">${c.name}</div>
+            ${c.key_features?`<div class="condition-features">${(c.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+            ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+              <button class="btn btn-danger btn-xs" onclick="deleteCondition('${c.id}')">Delete</button>
+            </div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function buildConditionThumbs(c){
+  const imgs=c.images||[];
+  const slots=4;
+  let html='';
+  for(let i=0;i<slots;i++){
+    if(imgs[i]) html+=`<img src="${imgs[i]}" alt="" onerror="this.style.display='none'">`;
+    else html+=`<div class="img-ph">${i===0?'🖼️':''}</div>`;
+  }
+  return html;
+}
+
+function openCondition(id){
+  // Show modal
+  sb.from('mlsboc_heme_conditions').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=data.images||[];
+    const features=data.key_features||[];
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div class="section-title" style="font-size:16px">${data.name}</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      ${imgs.length?`
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
+          ${imgs.map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+        </div>`:''}
+      ${features.length?`
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
+        </div>`:''}
+      ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
+      ${isAdmin?`
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images (drag & drop or click)</div>
+        ${buildConditionImageEditor(data)}
+      `:''}
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+function buildConditionImageEditor(condition){
+  const imgs=condition.images||[];
+  return `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      ${[0,1,2,3].map(i=>`
+        <div class="drop-zone" id="dz-${condition.id}-${i}"
+          ondrop="handleConditionImgDrop(event,'${condition.id}',${i})"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('cimg-${condition.id}-${i}').click()"
+        >
+          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          <input type="file" accept="image/*" id="cimg-${condition.id}-${i}" style="display:none" onchange="handleConditionImgFile(event,'${condition.id}',${i})">
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
+  `;
+}
+
+async function handleConditionImgFile(e, conditionId, slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+    openCondition(conditionId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleConditionImgDrop(e, conditionId, slot){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+    const imgs=[...(data?.images||[])];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+    openCondition(conditionId);
+  };
+  reader.readAsDataURL(file);
+}
+
+function openHemeFolder(key){
+  appState.hemeImgPage=key;
+  renderTab();
+}
+
+// Hematology image quiz
+async function startHemeQuiz(){
+  const {data}=await sb.from('mlsboc_heme_conditions').select('*').not('images','is',null);
+  const valid=(data||[]).filter(c=>c.images&&c.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No conditions with images to quiz on yet.');return;}
+  appState.hemeImgMode='quiz';
+  appState.hemeQuizItems=shuffle(valid);
+  appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+  renderTab();
+}
+
+async function startHemeQuizFolder(folder){
+  const {data}=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',folder);
+  const valid=(data||[]).filter(c=>c.images&&c.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No conditions with images in this folder yet.');return;}
+  appState.hemeImgMode='quiz';
+  appState.hemeQuizItems=shuffle(valid);
+  appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+  appState.hemeImgPage=folder;
+  renderTab();
+}
+
+function renderHemeImageQuiz(el){
+  const items=appState.hemeQuizItems;
+  if(appState.hemeQuizDone){
+    const ans=appState.hemeQuizAns;
+    let correct=0;
+    items.forEach((c,i)=>{if(ans[i]===c.id)correct++;});
+    let reviewHtml='';
+    items.forEach((c,i)=>{
+      const wasCorrect=ans[i]===c.id;
+      const chosen=items.find(x=>x.id===ans[i]);
+      reviewHtml+='<div class="missed-item"><div class="missed-q">'+c.name+'</div>'
+        +(wasCorrect?'<div class="missed-a">\u2713 Correct</div>':'<div class="missed-wrong">Your answer: '+(chosen?chosen.name:'(none)')+'</div><div class="missed-a">Correct: '+c.name+'</div>')
+        +'</div>';
+    });
+    el.innerHTML='<div class="result-grid">'
+      +'<div class="stat-card"><div class="stat-num" style="color:'+(correct/items.length>=0.6?'var(--success)':'var(--danger)')+'">'+Math.round(correct/items.length*100)+'%</div><div class="stat-label">Score</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
+      +'</div><div class="flex gap-8 mb-16">'
+      +'<button class="btn btn-primary" onclick="startHemeQuiz()">Retry All</button>'
+      +'<button class="btn btn-ghost" onclick="appState.hemeImgMode=\'browse\';appState.hemeImgPage=null;appState.hemeQuizDone=false;renderTab()">Back to Browse</button>'
+      +'</div>'+reviewHtml;
+    return;
+  }
+  const item=items[appState.hemeQuizIdx];
+  const answered=appState.hemeQuizAns[appState.hemeQuizIdx]!==undefined;
+  const chosen=appState.hemeQuizAns[appState.hemeQuizIdx];
+  const imgs=(item.images||[]).filter(Boolean);
+  const pct=Math.round((appState.hemeQuizIdx+1)/items.length*100);
+
+  // Build MC: correct + up to 3 random wrong from pool
+  const pool=items.filter(x=>x.id!==item.id);
+  const wrong=shuffle(pool).slice(0,Math.min(3,pool.length));
+  const opts=shuffle([item,...wrong]);
+
+  let imgsHtml='<div class="image-placeholder" style="height:180px;margin-bottom:16px;border-radius:var(--r2)">🖼️</div>';
+  if(imgs.length){
+    const cols=imgs.length===1?'1fr':'1fr 1fr';
+    imgsHtml='<div style="display:grid;grid-template-columns:'+cols+';gap:6px;margin-bottom:16px">'
+      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')
+      +'</div>';
+  }
+
+  let optHtml='';
+  opts.forEach(o=>{
+    let cls='option';
+    if(answered){
+      if(o.id===item.id)cls+=' correct';
+      else if(o.id===chosen&&chosen!==item.id)cls+=' wrong';
+    }
+    optHtml+='<button class="'+cls+'" onclick="answerHemeImgQ(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
+      +'<span class="option-letter" style="min-width:12px"></span><span>'+o.name+'</span></button>';
+  });
+
+  let afterHtml='';
+  if(answered){
+    afterHtml='<div class="case-feedback '+(chosen===item.id?'correct':'wrong')+'" style="margin-top:14px">'
+      +(chosen===item.id?'\u2713 Correct!':'\u2717 Incorrect \u2014 '+item.name)+'</div>';
+    if(item.key_features&&item.key_features.length)
+      afterHtml+='<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>';
+    afterHtml+='<div class="flex gap-8 mt-16">'
+      +(appState.hemeQuizIdx<items.length-1
+        ?'<button class="btn btn-primary" onclick="hemeQuizNext()">Next \u2192</button>'
+        :'<button class="btn btn-success" onclick="appState.hemeQuizDone=true;renderTab()">View Results</button>')
+      +'</div>';
+  }
+
+  el.innerHTML='<div class="quiz-header"><span class="question-num">Image '+(appState.hemeQuizIdx+1)+' of '+items.length+'</span>'
+    +'<button class="btn btn-ghost btn-sm" onclick="appState.hemeImgMode=\'browse\';renderTab()">Exit Quiz</button></div>'
+    +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+    +'<p class="text-muted mb-12" style="font-size:13px">What condition does this represent?</p>'
+    +imgsHtml+'<div class="options">'+optHtml+'</div>'+afterHtml;
+}
+
+function answerHemeImgQ(id){
+  appState.hemeQuizAns[appState.hemeQuizIdx]=id;
+  renderTab();
+}
+
+function hemeQuizNext(){appState.hemeQuizIdx++;renderTab();}
+
+// ─── CASES TAB ────────────────────────────────────────────────────────────────
+async function renderCasesTab(el){
+  if(appState.subject==='microbiology'){
+    await renderMicroCases(el);
+  }else if(appState.subject==='blood_bank'){
+    await renderBloodBankCases(el);
+  }else if(appState.subject==='hematology'){
+    await renderHematologyCases(el);
+  }else{
+    await renderGenericCases(el);
+  }
+}
+
+// ── Hematology Cases: BB-style with results table ───────────────────────────
+async function renderHematologyCases(el){
+  const {data}=await sb.from('mlsboc_heme_cases').select('*').order('created_at');
+  if(!appState.hemeCaseCollapsed)appState.hemeCaseCollapsed={};
+  el.innerHTML=`
+    ${isAdmin?`<div class="mb-16">${adminHemeCaseControls()}</div>`:''}
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Hematology Cases</div>
+    <p class="text-muted mb-20" style="font-size:13px">Read the patient scenario and CBC/smear results, then answer each question.</p>
+    ${!data||!data.length?'<div class="empty">No Hematology cases yet. Use Admin mode to add one.</div>':''}
+    ${(data||[]).map((c,i)=>renderHemeCase(c,i)).join('')}
+  `;
+}
+
+function renderHemeCase(c,idx){
+  const qs=c.questions||[];
+  const selState=appState.hemeCaseAnswers&&appState.hemeCaseAnswers[c.id]||{};
+  const table=c.results_table||[];
+  const imgs=c.images||[];
+  const collapsed=!appState.hemeCaseCollapsed||appState.hemeCaseCollapsed[c.id]!==false;
+  return `
+    <div class="case-card" id="hcase-${c.id}" style="margin-bottom:12px">
+      <div class="flex-center gap-8 flex-wrap" style="cursor:pointer" onclick="toggleHemeCaseCollapse('${c.id}')">
+        <span class="tag tag-info" style="font-size:13px;font-weight:700;padding:4px 12px">Case ${idx+1}</span>
+        <span style="font-size:17px;font-weight:700">${c.title||'Untitled Case'}</span>
+        ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
+        <span class="ml-auto" style="font-size:18px;color:var(--text3);transition:transform .2s;transform:rotate(${collapsed?'0':'180'}deg)">⌃</span>
+        ${isAdmin?`<div class="flex gap-6" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-xs" onclick="openHemeCaseEditor('${c.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteHemeCase('${c.id}')">Delete</button>
+        </div>`:''}
+      </div>
+      ${collapsed?'':`
+        <div style="margin-top:16px">
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
+          ${table.length?`
+            <div style="margin-bottom:24px">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Lab Results</div>
+              <div style="overflow-x:auto">
+                <table style="border-collapse:collapse;width:100%">
+                  <thead><tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;text-align:center;font-weight:600;font-size:14px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+                  <tbody><tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:600;color:${col.flag==='high'?'var(--danger)':col.flag==='low'?'var(--accent2)':'var(--text)'};background:var(--bg3)">${col.value}${col.flag?`<span style="font-size:10px;margin-left:4px;opacity:.7">${col.flag==='high'?'↑':'↓'}</span>`:''}</td>`).join('')}</tr></tbody>
+                </table>
+              </div>
+            </div>`:''}
+          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
+          ${qs.length?`
+            <div class="divider"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
+              ${hcAllChecked(c.id,qs.length)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllHC('${c.id}',${qs.length})">Check All</button>`}
+              ${hcAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllHC('${c.id}')">Reset All</button>`:''}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
+              ${qs.map((q,qi)=>renderHemeCaseQuestion(c.id,q,qi,selState)).join('')}
+            </div>
+          `:'<div class="empty" style="padding:16px;text-align:left">No questions added yet.</div>'}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function renderHemeCaseQuestion(caseId,q,qi,selState){
+  const checked=selState[qi]?.checked===true;
+  const chosen=selState[qi]?.choice;
+  const letters=['a','b','c','d'];
+  const correctIdx=letters.indexOf(q.correct);
+  return `
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono)">Q${qi+1}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${(q.options||[]).map((opt,oi)=>{
+          if(!opt)return '';
+          const letter=letters[oi];
+          let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
+          if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
+          if(checked){
+            if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
+            else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
+          }
+          return `<button onclick="selectHemeCaseQ('${caseId}',${qi},'${letter}')" ${checked?'disabled':''} style="display:flex;align-items:flex-start;gap:10px;background:${bg};border:1px solid ${bd};border-radius:var(--r);padding:9px 13px;cursor:${checked?'default':'pointer'};text-align:left;width:100%;transition:all .12s">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:600;color:${color};min-width:20px;margin-top:1px">${letter.toUpperCase()}.</span>
+            <span style="font-size:13px;color:${color};font-weight:${weight};line-height:1.5">${opt}</span>
+          </button>`;
+        }).filter(Boolean).join('')}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
+        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkHemeCaseQ('${caseId}',${qi})">Check Answer</button>`:''}
+        ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetHemeCaseQ('${caseId}',${qi})">Reset</button>`:''}
+      </div>
+      ${checked?`
+        <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
+          ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
+        </div>
+        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+    </div>
+  `;
+}
+
+function toggleHemeCaseCollapse(id){
+  if(!appState.hemeCaseCollapsed)appState.hemeCaseCollapsed={};
+  appState.hemeCaseCollapsed[id]=appState.hemeCaseCollapsed[id]===false?true:false;
+  renderTab();
+}
+function hcAllChecked(caseId,count){
+  const s=(appState.hemeCaseAnswers||{})[caseId]||{};
+  for(let i=0;i<count;i++){if(!s[i]?.checked)return false;}
+  return count>0;
+}
+function hcAnyAnswered(caseId){
+  return Object.values((appState.hemeCaseAnswers||{})[caseId]||{}).some(v=>v?.choice);
+}
+function selectHemeCaseQ(caseId,qi,letter){
+  if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};
+  if(!appState.hemeCaseAnswers[caseId])appState.hemeCaseAnswers[caseId]={};
+  if(appState.hemeCaseAnswers[caseId][qi]?.checked)return;
+  appState.hemeCaseAnswers[caseId][qi]={choice:letter,checked:false};
+  renderTab();
+}
+function checkAllHC(caseId,count){
+  if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};
+  if(!appState.hemeCaseAnswers[caseId])appState.hemeCaseAnswers[caseId]={};
+  for(let i=0;i<count;i++){
+    if(appState.hemeCaseAnswers[caseId][i]?.choice&&!appState.hemeCaseAnswers[caseId][i]?.checked)
+      appState.hemeCaseAnswers[caseId][i].checked=true;
+  }
+  renderTab();
+}
+function resetAllHC(caseId){if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};appState.hemeCaseAnswers[caseId]={};renderTab();}
+function checkHemeCaseQ(caseId,qi){if(appState.hemeCaseAnswers?.[caseId]?.[qi])appState.hemeCaseAnswers[caseId][qi].checked=true;renderTab();}
+function resetHemeCaseQ(caseId,qi){if(appState.hemeCaseAnswers?.[caseId])delete appState.hemeCaseAnswers[caseId][qi];renderTab();}
+
+function adminHemeCaseControls(){
+  return `<div class="card">
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Hematology Cases</div>
+    <button class="btn btn-primary" onclick="openHemeCaseEditor(null)">+ New Case</button>
+  </div>`;
+}
+
+async function openHemeCaseEditor(caseId){
+  let c={title:'',scenario:'',results_table:[],questions:[],images:[],is_draft:false};
+  if(caseId){
+    const {data}=await sb.from('mlsboc_heme_cases').select('*').eq('id',caseId).single();
+    if(data)c=data;
+  }
+  const qs=c.questions||[];
+  const table=c.results_table||[];
+  window._hemeCaseQCount=qs.length;
+  window._hemeCaseTableCount=table.length;
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">${caseId?'Edit':'New'} Hematology Case</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="form-group"><label>Title</label><input type="text" id="hc-title" value="${esc(c.title||'')}" placeholder="e.g. Microcytic Anemia Case"></div>
+    <div class="form-group"><label>Scenario</label><textarea id="hc-scenario" style="min-height:100px">${c.scenario||''}</textarea></div>
+    <div class="form-group">
+      <label>Lab Results Table Columns</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Each column = one lab value. Optionally flag as high/low.</div>
+      <div style="display:grid;grid-template-columns:1fr 80px 80px auto;gap:6px;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text3)">Label</div>
+        <div style="font-size:11px;color:var(--text3)">Value</div>
+        <div style="font-size:11px;color:var(--text3)">Flag</div>
+        <div></div>
+      </div>
+      <div id="hc-table-rows">${table.map((col,i)=>hemeCaseTableRow(i,col.label,col.value,col.flag||'')).join('')}</div>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="addHemeCaseTableCol()">+ Add Column</button>
+    </div>
+    <div class="divider"></div>
+    <div class="flex-center gap-8 mb-12">
+      <span style="font-size:13px;font-weight:600">Questions</span>
+      <span style="font-size:11px;color:var(--text3)">(up to 5)</span>
+    </div>
+    <div id="hc-questions-list">${qs.map((q,i)=>hemeCaseQuestionEditor(i,q)).join('')}</div>
+    <button class="btn btn-ghost btn-sm mb-16" id="hc-add-q-btn" onclick="addHemeCaseQuestion()" ${qs.length>=5?'style="display:none"':''}>+ Add Question</button>
+    <div class="divider"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="hc-draft">
+        <option value="false" ${!c.is_draft?'selected':''}>Published</option>
+        <option value="true" ${c.is_draft?'selected':''}>Draft</option>
+      </select>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveHemeCase('${caseId||''}')">Save Case</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function hemeCaseTableRow(i,label,value,flag){
+  return `<div class="flex-center gap-6 mb-6" id="hc-tr-${i}">
+    <input type="text" placeholder="e.g. WBC" value="${esc(label||'')}" id="hc-tl-${i}" style="flex:1">
+    <input type="text" placeholder="e.g. 3.2" value="${esc(value||'')}" id="hc-tv-${i}" style="width:80px">
+    <select id="hc-tf-${i}" style="width:80px"><option value="" ${!flag?'selected':''}>Normal</option><option value="high" ${flag==='high'?'selected':''}>↑ High</option><option value="low" ${flag==='low'?'selected':''}>↓ Low</option></select>
+    <button class="btn btn-danger btn-xs" onclick="document.getElementById('hc-tr-${i}').remove()">✕</button>
+  </div>`;
+}
+
+function addHemeCaseTableCol(){
+  const i=window._hemeCaseTableCount++;
+  const container=document.getElementById('hc-table-rows');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=hemeCaseTableRow(i,'','','');
+  container.appendChild(div.firstElementChild);
+}
+
+function hemeCaseQuestionEditor(i,q){
+  q=q||{question:'',options:['','','',''],correct:'a',explanation:''};
+  const opts=q.options||['','','',''];
+  return `<div class="card-sm mb-12" id="hc-q-${i}" style="border-left:3px solid var(--accent)">
+    <div class="flex-center gap-8 mb-10">
+      <span style="font-size:12px;font-weight:600;color:var(--accent);font-family:var(--mono)">Q${i+1}</span>
+      <button class="btn btn-danger btn-xs ml-auto" onclick="removeHemeCaseQuestion(${i})">Remove</button>
+    </div>
+    <div class="form-group"><label>Question</label><textarea id="hc-qq-${i}" style="min-height:60px">${q.question||''}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      ${['a','b','c','d'].map((l,oi)=>`<div><label>${l.toUpperCase()}.</label><input type="text" id="hc-qo-${i}-${l}" value="${esc(opts[oi]||'')}"></div>`).join('')}
+    </div>
+    <div class="form-group"><label>Correct Answer</label>
+      <select id="hc-qc-${i}">${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
+    </div>
+    <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
+      <input type="text" id="hc-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
+    </div>
+  </div>`;
+}
+
+function addHemeCaseQuestion(){
+  if((window._hemeCaseQCount||0)>=5){alert('Max 5 questions per case.');return;}
+  const i=window._hemeCaseQCount++;
+  const container=document.getElementById('hc-questions-list');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=hemeCaseQuestionEditor(i,null);
+  container.appendChild(div.firstElementChild);
+  if(window._hemeCaseQCount>=5){const b=document.getElementById('hc-add-q-btn');if(b)b.style.display='none';}
+}
+function removeHemeCaseQuestion(i){
+  const el=document.getElementById('hc-q-'+i);if(el)el.remove();
+  window._hemeCaseQCount=Math.max(0,(window._hemeCaseQCount||1)-1);
+  const b=document.getElementById('hc-add-q-btn');if(b)b.style.display='';
+}
+
+async function saveHemeCase(caseId){
+  const title=document.getElementById('hc-title')?.value.trim();
+  const scenario=document.getElementById('hc-scenario')?.value.trim();
+  const isDraft=document.getElementById('hc-draft')?.value==='true';
+  if(!title){alert('Title required.');return;}
+  const results_table=[];
+  for(let i=0;i<(window._hemeCaseTableCount||0);i++){
+    const lbl=document.getElementById('hc-tl-'+i);
+    const val=document.getElementById('hc-tv-'+i);
+    const flag=document.getElementById('hc-tf-'+i);
+    if(lbl&&lbl.isConnected&&lbl.value.trim())results_table.push({label:lbl.value.trim(),value:val?val.value.trim():'',flag:flag?flag.value:''});
+  }
+  const questions=[];
+  for(let i=0;i<(window._hemeCaseQCount||0);i++){
+    const qEl=document.getElementById('hc-q-'+i);if(!qEl||!qEl.isConnected)continue;
+    const question=document.getElementById('hc-qq-'+i)?.value.trim()||'';if(!question)continue;
+    const options=['a','b','c','d'].map(l=>document.getElementById('hc-qo-'+i+'-'+l)?.value.trim()||'');
+    const correct=document.getElementById('hc-qc-'+i)?.value||'a';
+    const explanation=document.getElementById('hc-qe-'+i)?.value.trim()||'';
+    questions.push({question,options,correct,explanation});
+  }
+  const payload={title,scenario:scenario||'',results_table,questions,is_draft:isDraft,images:[]};
+  let error;
+  if(caseId){({error}=await sb.from('mlsboc_heme_cases').update(payload).eq('id',caseId));}
+  else{({error}=await sb.from('mlsboc_heme_cases').insert(payload));}
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};
+  renderTab();
+}
+async function deleteHemeCase(id){
+  if(!confirm('Delete this case?'))return;
+  await sb.from('mlsboc_heme_cases').delete().eq('id',id);
+  renderTab();
+}
+
+// Generic cases
+async function renderGenericCases(el){
+  const {data}=await sb.from('mlsboc_cases').select('*').eq('subject',appState.subject).order('created_at');
+  el.innerHTML=`
+    ${isAdmin?`<div class="mb-16">${adminCaseControls()}</div>`:''}
+    ${!data||!data.length?'<div class="empty">No cases yet for this subject.</div>':''}
+    ${(data||[]).map((c,i)=>renderCaseCard(c,i)).join('')}
+  `;
+}
+
+function renderCaseCard(c,idx){
+  const steps=parseSteps(c.steps);
+  const fb=appState.caseSelections[c.id]?.feedback;
+  const imgs=c.images||[];
+  return `
+    <div class="case-card" id="ccard-${c.id}">
+      <div class="flex-center gap-8 mb-8 flex-wrap">
+        <span class="tag tag-info">Case ${idx+1}</span>
+        <span style="font-size:14px;font-weight:600">${c.title}</span>
+        ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
+      </div>
+      <div class="case-scenario">${c.scenario}</div>
+      ${c.case_data?`<div class="case-data">${c.case_data}</div>`:''}
+      ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
+      ${steps.map((step,si)=>renderCaseStep(c.id,step,si,fb)).join('')}
+      ${!fb?`<button class="btn btn-primary btn-sm mt-8" onclick="submitGenericCase('${c.id}','${esc(c.answer)}')">Submit</button>`:''}
+      ${fb?`<div class="case-feedback ${fb.correct?'correct':'wrong'}">${fb.correct?'✓ Correct':'✗ Incorrect'} — ${fb.note||c.answer}</div>`:''}
+      ${isAdmin?`<div class="flex gap-8 mt-8">
+        ${c.is_draft?`<button class="btn btn-success btn-xs" onclick="publishCase('${c.id}')">Publish</button>`:''}
+        <button class="btn btn-danger btn-xs" onclick="deleteCase('${c.id}')">Delete</button>
+        <button class="btn btn-ghost btn-xs" onclick="openCaseImageEditor('${c.id}')">Edit Images</button>
+      </div>`:''}
+    </div>
+  `;
+}
+
+function renderCaseStep(caseId,step,si,fb){
+  const sel=appState.caseSelections[caseId]?.steps||{};
+  const disabled=fb?'disabled':'';
+  if(step.type==='select'){
+    return `<div class="case-step">
+      <div class="case-step-label">${step.label}</div>
+      <div class="case-options">
+        ${step.options.map(o=>`<button class="case-opt ${sel[step.key]===o?'selected':''}" onclick="selectCaseOpt('${caseId}','${step.key}','${esc(o)}','single')" ${disabled}>${o}</button>`).join('')}
+      </div>
+    </div>`;
+  }
+  if(step.type==='multi'){
+    const msel=sel[step.key]||[];
+    return `<div class="case-step">
+      <div class="case-step-label">${step.label} (select all that apply)</div>
+      <div class="case-options">
+        ${step.options.map(o=>`<button class="case-opt ${msel.includes(o)?'selected':''}" onclick="selectCaseOpt('${caseId}','${step.key}','${esc(o)}','multi')" ${disabled}>${o}</button>`).join('')}
+      </div>
+    </div>`;
+  }
+  return '';
+}
+
+function selectCaseOpt(caseId,key,val,type){
+  if(!appState.caseSelections[caseId])appState.caseSelections[caseId]={steps:{}};
+  if(!appState.caseSelections[caseId].steps)appState.caseSelections[caseId].steps={};
+  if(type==='single'){
+    appState.caseSelections[caseId].steps[key]=val;
+  }else{
+    const arr=appState.caseSelections[caseId].steps[key]||[];
+    appState.caseSelections[caseId].steps[key]=arr.includes(val)?arr.filter(x=>x!==val):[...arr,val];
+  }
+  renderTab();
+}
+
+function submitGenericCase(caseId,answer){
+  if(!appState.caseSelections[caseId])appState.caseSelections[caseId]={steps:{}};
+  const allVals=Object.values(appState.caseSelections[caseId].steps||{}).flat().join(' ').toLowerCase();
+  const correct=answer&&allVals.includes(answer.toLowerCase().split(' ')[0]);
+  appState.caseSelections[caseId].feedback={correct,note:'Expected: '+answer};
+  renderTab();
+}
+
+// ─── MICROBIOLOGY CASES ───────────────────────────────────────────────────────
+async function renderMicroCases(el){
+  if(!appState.microCasesPage){
+    // Landing — choose gram +/-
+    const {count:posCount}=await sb.from('mlsboc_cases').select('id',{count:'exact',head:true}).eq('subject','microbiology').eq('group_label','gram_positive');
+    const {count:negCount}=await sb.from('mlsboc_cases').select('id',{count:'exact',head:true}).eq('subject','microbiology').eq('group_label','gram_negative');
+    el.innerHTML=`
+      ${isAdmin?`<div class="mb-16">${adminMicroCaseControls()}</div>`:''}
+      <div class="section-title" style="font-size:15px;margin-bottom:8px">Microbiology Cases</div>
+      <p class="text-muted mb-20" style="font-size:13px">Work through identification cases step by step based on test results.</p>
+      <div class="gram-nav">
+        <button class="gram-btn gram-pos" onclick="appState.microCasesPage='gram_positive';renderTab()">
+          <div class="gram-btn-title">🟣 Gram Positive</div>
+          <div class="gram-btn-sub">${posCount||0} cases</div>
+        </button>
+        <button class="gram-btn gram-neg" onclick="appState.microCasesPage='gram_negative';renderTab()">
+          <div class="gram-btn-title">🔴 Gram Negative</div>
+          <div class="gram-btn-sub">${negCount||0} cases</div>
+        </button>
+      </div>
+    `;
+    return;
+  }
+  // Inside gram +/- page
+  const label=appState.microCasesPage==='gram_positive'?'Gram Positive':'Gram Negative';
+  const tagCls=appState.microCasesPage==='gram_positive'?'tag-gram-pos':'tag-gram-neg';
+  const {data}=await sb.from('mlsboc_cases').select('*').eq('subject','microbiology').eq('group_label',appState.microCasesPage).order('created_at');
+  el.innerHTML=`
+    <div class="breadcrumb mb-16">
+      <span class="breadcrumb-link" onclick="appState.microCasesPage=null;appState.caseSelections={};renderTab()">Cases</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-cur">${label}</span>
+      ${isAdmin?`<div class="ml-auto">${adminMicroCaseControls(appState.microCasesPage)}</div>`:''}
+    </div>
+    ${!data||!data.length?'<div class="empty">No cases yet for '+label+'.</div>':''}
+    ${(data||[]).map((c,i)=>renderMicroCaseCard(c,i,tagCls)).join('')}
+  `;
+}
+
+function renderMicroCaseCard(c,idx,tagCls){
+  const steps=parseSteps(c.steps);
+  const fb=appState.caseSelections[c.id]?.feedback;
+  const imgs=c.images||[];
+  return `
+    <div class="case-card" id="mcard-${c.id}">
+      <div class="flex-center gap-8 mb-8 flex-wrap">
+        <span class="tag ${tagCls}">${appState.microCasesPage==='gram_positive'?'Gram (+)':'Gram (-)'}</span>
+        <span style="font-size:14px;font-weight:600">${c.title}</span>
+        ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
+      </div>
+      <div class="case-scenario">${c.scenario}</div>
+      ${c.case_data?`<div class="case-data">${c.case_data}</div>`:''}
+      ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
+      ${steps.map((step,si)=>renderCaseStep(c.id,step,si,fb)).join('')}
+      ${!fb?`<button class="btn btn-primary btn-sm mt-8" onclick="submitMicroCase('${c.id}','${esc(c.answer)}')">Submit</button>`:''}
+      ${fb?`<div class="case-feedback ${fb.correct?'correct':'wrong'}">${fb.correct?'✓ Correct':'✗ Incorrect'} — ${fb.note}</div>`:''}
+      ${isAdmin?`<div class="flex gap-8 mt-8">
+        ${c.is_draft?`<button class="btn btn-success btn-xs" onclick="publishCase('${c.id}')">Publish</button>`:''}
+        <button class="btn btn-danger btn-xs" onclick="deleteCase('${c.id}')">Delete</button>
+        <button class="btn btn-ghost btn-xs" onclick="openCaseImageEditor('${c.id}')">Edit Image</button>
+      </div>`:''}
+    </div>
+  `;
+}
+
+function submitMicroCase(caseId,answer){
+  if(!appState.caseSelections[caseId])appState.caseSelections[caseId]={steps:{}};
+  const allVals=Object.values(appState.caseSelections[caseId].steps||{}).flat().join(' ').toLowerCase();
+  const correct=answer&&allVals.includes(answer.toLowerCase().split(' ')[0]);
+  appState.caseSelections[caseId].feedback={correct,note:correct?'Correct! '+answer:'Expected: '+answer};
+  renderTab();
+}
+
+// ─── BLOOD BANK CASES ─────────────────────────────────────────────────────────
+
+// ─── BLOOD BANK CASES (MC question system) ────────────────────────────────────
+async function renderBloodBankCases(el){
+  const {data}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
+
+  el.innerHTML=`
+    ${isAdmin?`<div class="mb-16">${adminBBCaseControls()}</div>`:''}
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Blood Bank Cases</div>
+    <p class="text-muted mb-20" style="font-size:13px">Read the case and typing results, then answer each question.</p>
+    ${!data||!data.length?'<div class="empty">No Blood Bank cases yet. Use Admin mode to add one.</div>':''}
+    ${(data||[]).map((c,i)=>renderBBCase(c,i)).join('')}
+  `;
+}
+
+function renderBBCase(c,idx){
+  const qs=c.questions||[];
+  const selState=appState.bbAnswers[c.id]||{};
+  const imgs=c.images||[];
+  const table=c.typing_table||[];
+  const collapsed=!appState.bbCollapsed||appState.bbCollapsed[c.id]!==false;
+  return `
+    <div class="case-card" id="bbcase-${c.id}" style="margin-bottom:12px">
+      <div class="flex-center gap-8 flex-wrap" style="cursor:pointer" onclick="toggleBBCollapse('${c.id}')">
+        <span class="tag tag-info" style="font-size:13px;font-weight:700;padding:4px 12px">Case ${idx+1}</span>
+        <span style="font-size:17px;font-weight:700">${c.title||'Untitled Case'}</span>
+        ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
+        <span class="ml-auto" style="font-size:18px;color:var(--text3);transition:transform .2s;transform:rotate(${collapsed?'0':'180'}deg)">⌃</span>
+        ${isAdmin?`<div class="flex gap-6" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-xs" onclick="openBBCaseEditor('${c.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteBBCase('${c.id}')">Delete</button>
+        </div>`:''}
+      </div>
+      ${collapsed?'':`
+        <div style="margin-top:16px">
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
+          ${table.length?`
+            <div style="margin-bottom:24px">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Typing Results</div>
+              <div style="overflow-x:auto">
+                <table style="border-collapse:collapse;width:100%">
+                  <thead>
+                    <tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:12px 18px;text-align:center;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr>
+                  </thead>
+                  <tbody>
+                    <tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:12px 18px;text-align:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>`:''}
+          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
+          ${qs.length?`
+            <div class="divider"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
+              ${bbAllChecked(c.id,qs.length)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllBB('${c.id}',${qs.length})">Check All</button>`}
+              ${bbAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllBB('${c.id}')">Reset All</button>`:''}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
+              ${qs.map((q,qi)=>renderBBQuestion(c.id,q,qi,selState)).join('')}
+            </div>
+          `:`<div class="empty" style="padding:16px;text-align:left">No questions added yet.</div>`}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function renderBBQuestion(caseId,q,qi,selState){
+  const checked=selState[qi]?.checked===true;
+  const chosen=selState[qi]?.choice;
+  const letters=['a','b','c','d'];
+  const correctIdx=letters.indexOf(q.correct);
+  return `
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono);letter-spacing:.5px">Q${qi+1}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${(q.options||[]).map((opt,oi)=>{
+          if(!opt)return '';
+          const letter=letters[oi];
+          let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
+          if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
+          if(checked){
+            if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
+            else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
+          }
+          return `<button onclick="selectBBQ('${caseId}',${qi},'${letter}')" ${checked?'disabled':''} style="display:flex;align-items:flex-start;gap:10px;background:${bg};border:1px solid ${bd};border-radius:var(--r);padding:9px 13px;cursor:${checked?'default':'pointer'};text-align:left;width:100%;transition:all .12s">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:600;color:${color};min-width:20px;margin-top:1px">${letter.toUpperCase()}.</span>
+            <span style="font-size:13px;color:${color};font-weight:${weight};line-height:1.5">${opt}</span>
+          </button>`;
+        }).filter(Boolean).join('')}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
+        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkBBQ('${caseId}',${qi})">Check Answer</button>`:''}
+        ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetBBQ('${caseId}',${qi})">Reset</button>`:''}
+      </div>
+      ${checked?`
+        <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
+          ${chosen===q.correct
+            ?'✓ Correct!'
+            :`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
+        </div>
+        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+    </div>
+  `;
+}
+
+function bbAllChecked(caseId,count){
+  const s=appState.bbAnswers[caseId]||{};
+  for(let i=0;i<count;i++){if(!s[i]?.checked)return false;}
+  return count>0;
+}
+function bbAnyAnswered(caseId){
+  return Object.values(appState.bbAnswers[caseId]||{}).some(v=>v?.choice);
+}
+function selectBBQ(caseId,qi,letter){
+  if(!appState.bbAnswers[caseId])appState.bbAnswers[caseId]={};
+  if(appState.bbAnswers[caseId][qi]?.checked)return;
+  appState.bbAnswers[caseId][qi]={choice:letter,checked:false};
+  renderTab();
+}
+function checkAllBB(caseId,count){
+  if(!appState.bbAnswers[caseId])appState.bbAnswers[caseId]={};
+  for(let i=0;i<count;i++){
+    if(appState.bbAnswers[caseId][i]?.choice&&!appState.bbAnswers[caseId][i]?.checked)
+      appState.bbAnswers[caseId][i].checked=true;
+  }
+  renderTab();
+}
+function resetAllBB(caseId){appState.bbAnswers[caseId]={};renderTab();}
+function checkBBQ(caseId,qi){if(appState.bbAnswers[caseId]?.[qi])appState.bbAnswers[caseId][qi].checked=true;renderTab();}
+function resetBBQ(caseId,qi){if(appState.bbAnswers[caseId])delete appState.bbAnswers[caseId][qi];renderTab();}
+
+function toggleBBCollapse(id){
+  if(!appState.bbCollapsed)appState.bbCollapsed={};
+  // undefined/true = collapsed, false = open
+  appState.bbCollapsed[id]=appState.bbCollapsed[id]===false?true:false;
+  renderTab();
+}
+
+function adminBBCaseControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Blood Bank Cases</div>
+      <button class="btn btn-primary" onclick="openBBCaseEditor(null)">+ New Case</button>
+    </div>`;
+}
+
+async function openBBCaseEditor(caseId){
+  let c={title:'',scenario:'',typing_table:[],questions:[],images:[],is_draft:false};
+  if(caseId){
+    const {data}=await sb.from('mlsboc_bb_cases').select('*').eq('id',caseId).single();
+    if(data)c=data;
+  }
+  const qs=c.questions||[];
+  const table=c.typing_table||[];
+  window._bbQCount=qs.length;
+  window._bbTableCount=table.length;
+
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">${caseId?'Edit':'New'} Blood Bank Case</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Case Title</label>
+      <input type="text" id="bb-title" value="${esc(c.title||'')}" placeholder="e.g. ABO Discrepancy Case">
+    </div>
+    <div class="form-group">
+      <label>Case Scenario / Patient Info</label>
+      <textarea id="bb-scenario" style="min-height:100px">${c.scenario||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Typing Results Table Columns</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Each column = one reagent/cell. Add as many as needed.</div>
+      <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text3)">Column Label</div>
+        <div style="font-size:11px;color:var(--text3)">Result</div>
+        <div></div>
+      </div>
+      <div id="bb-table-rows">
+        ${table.map((col,i)=>bbTableRow(i,col.label,col.value)).join('')}
+      </div>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="addBBTableCol()">+ Add Column</button>
+    </div>
+    <div class="divider"></div>
+    <div class="flex-center gap-8 mb-12">
+      <span style="font-size:13px;font-weight:600">Questions</span>
+      <span style="font-size:11px;color:var(--text3)">(up to 5)</span>
+    </div>
+    <div id="bb-questions-list">
+      ${qs.map((q,i)=>bbQuestionEditor(i,q)).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm mb-16" id="bb-add-q-btn" onclick="addBBQuestion()" ${qs.length>=5?'style="display:none"':''}>+ Add Question</button>
+    <div class="divider"></div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="bb-draft">
+        <option value="false" ${!c.is_draft?'selected':''}>Published</option>
+        <option value="true" ${c.is_draft?'selected':''}>Draft (hidden from students)</option>
+      </select>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBBCase('${caseId||''}')">Save Case</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function bbTableRow(i,label,value){
+  return `<div class="flex-center gap-8 mb-6" id="bb-tr-${i}">
+    <input type="text" placeholder="e.g. Anti-A" value="${esc(label||'')}" id="bb-tl-${i}" style="flex:1">
+    <input type="text" placeholder="e.g. 4+" value="${esc(value||'')}" id="bb-tv-${i}" style="width:100px">
+    <button class="btn btn-danger btn-xs" onclick="document.getElementById('bb-tr-${i}').remove()">✕</button>
+  </div>`;
+}
+
+function addBBTableCol(){
+  const i=window._bbTableCount++;
+  const container=document.getElementById('bb-table-rows');
+  if(!container)return;
+  const div=document.createElement('div');
+  div.innerHTML=bbTableRow(i,'','');
+  container.appendChild(div.firstElementChild);
+}
+
+function bbQuestionEditor(i,q){
+  q=q||{question:'',options:['','','',''],correct:'a',explanation:''};
+  const opts=q.options||['','','',''];
+  return `<div class="card-sm mb-12" id="bb-q-${i}" style="border-left:3px solid var(--accent)">
+    <div class="flex-center gap-8 mb-10">
+      <span style="font-size:12px;font-weight:600;color:var(--accent);font-family:var(--mono)">Q${i+1}</span>
+      <button class="btn btn-danger btn-xs ml-auto" onclick="removeBBQuestion(${i})">Remove</button>
+    </div>
+    <div class="form-group">
+      <label>Question</label>
+      <textarea id="bb-qq-${i}" style="min-height:60px">${q.question||''}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      ${['a','b','c','d'].map((l,oi)=>`<div>
+        <label>${l.toUpperCase()}.</label>
+        <input type="text" id="bb-qo-${i}-${l}" value="${esc(opts[oi]||'')}" placeholder="Option ${l.toUpperCase()}">
+      </div>`).join('')}
+    </div>
+    <div class="form-group">
+      <label>Correct Answer</label>
+      <select id="bb-qc-${i}">
+        ${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0">
+      <label>Explanation (optional)</label>
+      <input type="text" id="bb-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
+    </div>
+  </div>`;
+}
+
+function addBBQuestion(){
+  if((window._bbQCount||0)>=5){alert('Maximum 5 questions per case.');return;}
+  const i=window._bbQCount++;
+  const container=document.getElementById('bb-questions-list');
+  if(!container)return;
+  const div=document.createElement('div');
+  div.innerHTML=bbQuestionEditor(i,null);
+  container.appendChild(div.firstElementChild);
+  if(window._bbQCount>=5){
+    const btn=document.getElementById('bb-add-q-btn');
+    if(btn)btn.style.display='none';
+  }
+}
+
+function removeBBQuestion(i){
+  const el=document.getElementById('bb-q-'+i);
+  if(el)el.remove();
+  window._bbQCount=Math.max(0,(window._bbQCount||1)-1);
+  const btn=document.getElementById('bb-add-q-btn');
+  if(btn)btn.style.display='';
+}
+
+async function saveBBCase(caseId){
+  const title=document.getElementById('bb-title')?.value.trim();
+  const scenario=document.getElementById('bb-scenario')?.value.trim();
+  const isDraft=document.getElementById('bb-draft')?.value==='true';
+  if(!title){alert('Case title is required.');return;}
+
+  const typing_table=[];
+  for(let i=0;i<(window._bbTableCount||0);i++){
+    const lbl=document.getElementById('bb-tl-'+i);
+    const val=document.getElementById('bb-tv-'+i);
+    if(lbl&&lbl.closest&&!lbl.closest('[id^="bb-tr-"]')?.isConnected)continue;
+    if(lbl&&lbl.isConnected&&lbl.value.trim())typing_table.push({label:lbl.value.trim(),value:val?val.value.trim():''});
+  }
+
+  const questions=[];
+  for(let i=0;i<(window._bbQCount||0);i++){
+    const qEl=document.getElementById('bb-q-'+i);
+    if(!qEl||!qEl.isConnected)continue;
+    const question=document.getElementById('bb-qq-'+i)?.value.trim()||'';
+    if(!question)continue;
+    const options=['a','b','c','d'].map(l=>document.getElementById('bb-qo-'+i+'-'+l)?.value.trim()||'');
+    const correct=document.getElementById('bb-qc-'+i)?.value||'a';
+    const explanation=document.getElementById('bb-qe-'+i)?.value.trim()||'';
+    questions.push({question,options,correct,explanation});
+  }
+
+  const payload={title,scenario:scenario||'',typing_table,questions,is_draft:isDraft,images:[]};
+
+  let error;
+  if(caseId){
+    ({error}=await sb.from('mlsboc_bb_cases').update(payload).eq('id',caseId));
+  }else{
+    ({error}=await sb.from('mlsboc_bb_cases').insert(payload));
+  }
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  appState.bbAnswers={};
+  renderTab();
+}
+
+async function deleteBBCase(id){
+  if(!confirm('Delete this case and all its questions?'))return;
+  await sb.from('mlsboc_bb_cases').delete().eq('id',id);
+  delete appState.bbAnswers[id];
+  renderTab();
+}
+
+
+// ─── FORMULAS VIEW ────────────────────────────────────────────────────────────
+async function renderFormulasView(v){
+  const {data}=await sb.from('mlsboc_formulas').select('*').order('category,name');
+  const cats={};
+  (data||[]).forEach(f=>{
+    const c=f.category||'General';
+    if(!cats[c])cats[c]=[];
+    cats[c].push(f);
+  });
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
+      <div class="section-title">Formulas / Equations</div>
+      ${isAdmin?`<button class="btn btn-primary btn-sm ml-auto" onclick="openFormulaEditor(null)">+ Add Formula</button>`:''}
+    </div>
+    ${!data||!data.length?'<div class="empty">No formulas yet. Use Admin mode to add some.</div>':''}
+    ${Object.entries(cats).map(([cat,items])=>`
+      <div class="mb-24">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${cat}</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${items.map(f=>renderFormulaCard(f)).join('')}
+        </div>
+      </div>`).join('')}
+  `;
+}
+
+function renderFormulaCard(f){
+  return `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px">
+      <div class="flex-center gap-8 mb-8">
+        <span style="font-size:15px;font-weight:700;color:var(--text)">${f.name}</span>
+        ${isAdmin?`<div class="ml-auto flex gap-6">
+          <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
+        </div>`:''}
+      </div>
+      <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);padding:12px 16px;margin-bottom:${f.notes?'10px':'0'};font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent2);letter-spacing:.3px;overflow-x:auto;white-space:pre-wrap">${f.formula}</div>
+      ${f.notes?`<div style="font-size:13px;color:var(--text2);line-height:1.7">${f.notes}</div>`:''}
+      ${f.example?`<div style="margin-top:8px;background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;font-size:13px;color:var(--text2)"><strong style="color:var(--text)">Example:</strong> ${f.example}</div>`:''}
+    </div>
+  `;
+}
+
+async function openFormulaEditor(id){
+  let f={name:'',category:'',formula:'',notes:'',example:''};
+  if(id){
+    const {data}=await sb.from('mlsboc_formulas').select('*').eq('id',id).single();
+    if(data)f=data;
+  }
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">${id?'Edit':'New'} Formula</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="form-group"><label>Name</label><input type="text" id="fm-name" value="${esc(f.name||'')}" placeholder="e.g. Creatinine Clearance"></div>
+    <div class="form-group"><label>Category</label><input type="text" id="fm-cat" value="${esc(f.category||'')}" placeholder="e.g. Chemistry, Hematology"></div>
+    <div class="form-group"><label>Formula</label><textarea id="fm-formula" style="min-height:70px;font-family:var(--mono)">${f.formula||''}</textarea></div>
+    <div class="form-group"><label>Notes / Explanation (optional)</label><textarea id="fm-notes" style="min-height:70px">${f.notes||''}</textarea></div>
+    <div class="form-group"><label>Example (optional)</label><textarea id="fm-example" style="min-height:60px">${f.example||''}</textarea></div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFormula('${id||''}')">Save</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function saveFormula(id){
+  const name=document.getElementById('fm-name')?.value.trim();
+  const category=document.getElementById('fm-cat')?.value.trim();
+  const formula=document.getElementById('fm-formula')?.value.trim();
+  const notes=document.getElementById('fm-notes')?.value.trim();
+  const example=document.getElementById('fm-example')?.value.trim();
+  if(!name||!formula){alert('Name and formula required.');return;}
+  const payload={name,category:category||'General',formula,notes:notes||'',example:example||''};
+  let error;
+  if(id){({error}=await sb.from('mlsboc_formulas').update(payload).eq('id',id));}
+  else{({error}=await sb.from('mlsboc_formulas').insert(payload));}
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  renderView();
+}
+
+async function deleteFormula(id){
+  if(!confirm('Delete this formula?'))return;
+  await sb.from('mlsboc_formulas').delete().eq('id',id);
+  renderView();
+}
+
+// ─── ALL SUBJECTS ─────────────────────────────────────────────────────────────
+async function renderAllView(v){
+  if(appState.allDone){renderAllDone(v);return;}
+  if(!appState.allStarted){renderAllStart(v);return;}
+  renderAllExam(v);
+}
+
+async function renderAllStart(v){
+  const {data:attempts}=await sb.from('mlsboc_attempts').select('*').eq('user_id',getUID()).order('completed_at',{ascending:false}).limit(3);
+  appState.attempts=attempts||[];
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
+      <div class="section-title">Practice Exam — All Subjects</div>
+    </div>
+    <div class="card" style="max-width:560px;margin-bottom:24px">
+      <p style="font-size:13px;color:var(--text2);line-height:1.8">100-question mixed exam following ASCP BOC subject weighting. Timer runs but no time limit. Last 3 attempts are saved.</p>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
+        ${Object.entries(BOC_WEIGHTS).map(([s,w])=>`
+          <div class="flex-center gap-8">
+            <span style="font-size:12px;color:var(--text2)">${s.replace(/_/g,' ')}</span>
+            <span class="text-mono ml-auto" style="font-size:11px;color:var(--text3)">${w}%</span>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-primary" onclick="startAllExam()">Start Exam</button>
+    </div>
+    ${appState.attempts.length?`
+      <div style="font-size:15px;font-weight:600;margin-bottom:12px">Previous Attempts</div>
+      ${appState.attempts.map((a,i)=>`
+        <div class="attempt-card">
+          <div>
+            <span class="score-badge ${a.score/a.total>=0.6?'score-pass':'score-fail'}">${a.score}/${a.total} (${Math.round(a.score/a.total*100)}%)</span>
+            <div class="attempt-meta">${new Date(a.completed_at).toLocaleDateString()} · ${fmtTime(a.time_seconds)}</div>
+          </div>
+          <div class="flex gap-8 flex-wrap">
+            <button class="btn btn-ghost btn-sm" onclick="exportAttempt('${a.id}')">Export CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="reviewAttemptFromAll(${i})">Review</button>
+          </div>
+        </div>`).join('')}`:''}
+  `;
+}
+
+async function startAllExam(){
+  const total=100;
+  const allQ=[];
+  for(const s of SUBJECTS){
+    const w=BOC_WEIGHTS[s.key]||0;
+    if(!w)continue;
+    const count=Math.round(total*w/100);
+    const {data}=await sb.from('mlsboc_questions').select('*').eq('subject',s.key);
+    if(data&&data.length)allQ.push(...shuffle(data).slice(0,count));
+  }
+  // Also pull lab_operations if exists
+  const labW=BOC_WEIGHTS['lab_operations']||7.5;
+  const labCount=Math.round(total*labW/100);
+  const {data:labQ}=await sb.from('mlsboc_questions').select('*').eq('subject','lab_operations');
+  if(labQ&&labQ.length)allQ.push(...shuffle(labQ).slice(0,labCount));
+
+  appState.allQ=shuffle(allQ).slice(0,Math.min(total,allQ.length));
+  appState.allIdx=0;appState.allAns=[];appState.allStarted=true;appState.allDone=false;appState.allSeconds=0;
+  clearInterval(appState.allTimer);
+  appState.allTimer=setInterval(()=>{appState.allSeconds++;updateAllTimer();},1000);
+  renderView();
+}
+
+function updateAllTimer(){
+  const el=document.getElementById('all-timer');
+  if(el)el.textContent=fmtTime(appState.allSeconds);
+}
+
+function renderAllExam(v){
+  if(!appState.allQ.length){v.innerHTML='<div class="empty">No questions available. Add questions to subject banks first.</div>';return;}
+  const q=appState.allQ[appState.allIdx];
+  const answered=appState.allAns[appState.allIdx];
+  const pct=Math.round((appState.allIdx+1)/appState.allQ.length*100);
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="if(confirm('Quit? Progress lost.'))goHome()">← Quit</button>
+      <span class="tag tag-info">${q.subject?.replace(/_/g,' ')}</span>
+      <div class="ml-auto timer" id="all-timer">${fmtTime(appState.allSeconds)}</div>
+    </div>
+    <div class="quiz-header">
+      <span class="question-num">Question ${appState.allIdx+1} of ${appState.allQ.length}</span>
+      <div class="flex gap-8">
+        ${appState.allIdx>0?`<button class="btn btn-ghost btn-sm" onclick="allPrev()">← Prev</button>`:''}
+        ${answered&&appState.allIdx<appState.allQ.length-1?`<button class="btn btn-primary btn-sm" onclick="allNext()">Next →</button>`:''}
+        ${answered&&appState.allIdx===appState.allQ.length-1?`<button class="btn btn-success btn-sm" onclick="finishAll()">Finish & Submit</button>`:''}
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="question-text">${q.question}</div>
+    <div class="options">
+      ${['a','b','c','d'].map(opt=>{
+        let cls='option';
+        if(answered){if(opt===q.correct_answer)cls+=' correct';else if(opt===answered&&answered!==q.correct_answer)cls+=' wrong';}
+        return `<button class="${cls}" onclick="answerAll('${opt}')" ${answered?'disabled':''}>
+          <span class="option-letter">${opt.toUpperCase()}.</span>
+          <span>${q['option_'+opt]}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    ${answered&&q.explanation?`<div class="explanation">${q.explanation}</div>`:''}
+  `;
+}
+
+function answerAll(opt){appState.allAns[appState.allIdx]=opt;renderView();}
+function allNext(){appState.allIdx++;renderView();}
+function allPrev(){appState.allIdx--;renderView();}
+
+async function finishAll(){
+  clearInterval(appState.allTimer);
+  appState.allDone=true;
+  const qs=appState.allQ,ans=appState.allAns;
+  let correct=0,correctIds=[],incorrectIds=[];
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer){correct++;correctIds.push(q.id);}else{incorrectIds.push(q.id);}});
+  const uid=getUID();
+  await sb.from('mlsboc_attempts').insert({user_id:uid,score:correct,total:qs.length,correct_ids:correctIds,incorrect_ids:incorrectIds,time_seconds:appState.allSeconds});
+  const {data:all}=await sb.from('mlsboc_attempts').select('id,completed_at').eq('user_id',uid).order('completed_at',{ascending:false});
+  if(all&&all.length>3){
+    await sb.from('mlsboc_attempts').delete().in('id',all.slice(3).map(a=>a.id));
+  }
+  renderView();
+}
+
+function renderAllDone(v){
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
+      <div class="section-title">Exam Results</div>
+    </div>
+    <div id="all-results"></div>
+  `;
+  renderQuizResults(document.getElementById('all-results'),true);
+}
+
+async function exportAttempt(attemptId){
+  const {data:attempt}=await sb.from('mlsboc_attempts').select('*').eq('id',attemptId).single();
+  if(!attempt)return;
+  const ids=attempt.incorrect_ids||[];
+  if(!ids.length){alert('No missed questions in this attempt.');return;}
+  const {data:qs}=await sb.from('mlsboc_questions').select('*').in('id',ids);
+  const rows=[['Question','Correct Answer','Subject']];
+  (qs||[]).forEach(q=>rows.push([csvEsc(q.question),csvEsc(q['option_'+q.correct_answer]),q.subject]));
+  dlCSV(rows,'missed_'+attemptId.slice(0,8)+'.csv');
+}
+
+function exportFromResults(){
+  const qs=appState.allQ,ans=appState.allAns;
+  const rows=[['Question','Your Answer','Correct Answer','Subject']];
+  qs.forEach((q,i)=>{
+    if(ans[i]!==q.correct_answer)rows.push([csvEsc(q.question),csvEsc(q['option_'+(ans[i]||'?')]||'(unanswered)'),csvEsc(q['option_'+q.correct_answer]),q.subject]);
+  });
+  dlCSV(rows,'missed_questions.csv');
+}
+
+async function reviewAttempt(idx){
+  const a=appState.attempts[idx];
+  const allIds=[...(a.correct_ids||[]),...(a.incorrect_ids||[])];
+  const {data:qs}=await sb.from('mlsboc_questions').select('*').in('id',allIds);
+  appState.allQ=qs||[];
+  appState.allAns=qs.map(q=>(a.correct_ids||[]).includes(q.id)?q.correct_answer:'?');
+  appState.allSeconds=a.time_seconds||0;
+  appState.allDone=true;appState.view='all';
+  renderView();
+}
+async function reviewAttemptFromAll(idx){reviewAttempt(idx);}
+
+// ─── ADMIN CONTROLS ───────────────────────────────────────────────────────────
+function adminQuizControls(){
+  return `
+    <div class="card mt-16">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Question</div>
+      <div class="form-group"><label>Question</label><textarea id="adm-q"></textarea></div>
+      <div class="form-group"><label>Option A</label><input type="text" id="adm-a"></div>
+      <div class="form-group"><label>Option B</label><input type="text" id="adm-b"></div>
+      <div class="form-group"><label>Option C</label><input type="text" id="adm-c"></div>
+      <div class="form-group"><label>Option D</label><input type="text" id="adm-d"></div>
+      <div class="form-group"><label>Correct Answer</label>
+        <select id="adm-ans"><option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option></select>
+      </div>
+      <div class="form-group"><label>Explanation (optional)</label><textarea id="adm-exp"></textarea></div>
+      <div class="flex gap-8 flex-wrap">
+        <button class="btn btn-primary" onclick="adminAddQ()">Add Question</button>
+        <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV Upload
+          <input type="file" accept=".csv" style="display:none" onchange="adminBulkQ(event)">
+        </label>
+        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['question','option_a','option_b','option_c','option_d','correct_answer','explanation'],['Sample question?','Choice A','Choice B','Choice C','Choice D','a','Explanation here']],'quiz_template.csv')">Download Template</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d), explanation</div>
+    </div>`;
+}
+
+async function adminAddQ(){
+  const q=document.getElementById('adm-q')?.value.trim();
+  const a=document.getElementById('adm-a')?.value.trim();
+  const b=document.getElementById('adm-b')?.value.trim();
+  const c=document.getElementById('adm-c')?.value.trim();
+  const d=document.getElementById('adm-d')?.value.trim();
+  const ans=document.getElementById('adm-ans')?.value;
+  const exp=document.getElementById('adm-exp')?.value.trim();
+  if(!q||!a||!b||!c||!d){alert('Fill in all fields.');return;}
+  const {error}=await sb.from('mlsboc_questions').insert({subject:appState.subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:exp||''});
+  if(error)alert('Error: '+error.message);
+  else renderTab();
+}
+
+async function adminBulkQ(e){
+  const rows=parseCSV(await e.target.files[0].text());
+  for(const r of rows){
+    if(r.length<6)continue;
+    await sb.from('mlsboc_questions').insert({subject:appState.subject,question:r[0],option_a:r[1],option_b:r[2],option_c:r[3],option_d:r[4],correct_answer:r[5].toLowerCase(),explanation:r[6]||''}).catch(()=>{});
+  }
+  renderTab();
+}
+
+function adminImageControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Image</div>
+      <div class="form-group"><label>Title</label><input type="text" id="img-title"></div>
+      <div class="form-group"><label>Description</label><textarea id="img-desc" style="min-height:60px"></textarea></div>
+      <div class="form-group">
+        <label>Image (drag & drop or click)</label>
+        <div class="drop-zone" id="img-dropzone"
+          ondrop="handleImgDrop(event)"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('img-file').click()">
+          <div id="img-drop-preview" style="font-size:28px;margin-bottom:4px">📷</div>
+          <div>Drag image here or click to select</div>
+          <input type="file" id="img-file" accept="image/*" style="display:none" onchange="handleImgFile(event)">
+        </div>
+      </div>
+      <input type="hidden" id="img-dataurl">
+      <div class="flex gap-8 flex-wrap">
+        <button class="btn btn-warn" onclick="adminAddImg(true)">Save as Draft</button>
+        <button class="btn btn-primary" onclick="adminAddImg(false)">Add & Publish</button>
+        <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV
+          <input type="file" accept=".csv" style="display:none" onchange="adminBulkImgs(event)">
+        </label>
+        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['title','description'],['Sample title','Sample description note here (no image in CSV - upload separately)']],'images_template.csv')">Download Template</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV format: title, description. Images are added separately via drag & drop after upload.</div>
+    </div>`;
+}
+
+function handleImgFile(e){
+  const file=e.target.files[0];if(!file)return;
+  readFileAsDataURL(file,url=>{
+    document.getElementById('img-dataurl').value=url;
+    const p=document.getElementById('img-drop-preview');
+    if(p)p.innerHTML=`<img src="${url}" style="max-width:100%;max-height:120px;border-radius:4px">`;
+  });
+}
+
+function handleImgDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  readFileAsDataURL(file,url=>{
+    document.getElementById('img-dataurl').value=url;
+    const p=document.getElementById('img-drop-preview');
+    if(p)p.innerHTML=`<img src="${url}" style="max-width:100%;max-height:120px;border-radius:4px">`;
+  });
+}
+
+async function adminAddImg(isDraft){
+  const title=document.getElementById('img-title')?.value.trim();
+  const desc=document.getElementById('img-desc')?.value.trim();
+  const url=document.getElementById('img-dataurl')?.value;
+  if(!title){alert('Title required.');return;}
+  const {error}=await sb.from('mlsboc_images').insert({subject:appState.subject,title,description:desc||'',image_url:url||'',is_draft:isDraft});
+  if(error)alert('Error: '+error.message);
+  else renderTab();
+}
+
+async function adminBulkImgs(e){
+  const rows=parseCSV(await e.target.files[0].text());
+  for(const r of rows){
+    if(!r[0])continue;
+    await sb.from('mlsboc_images').insert({subject:appState.subject,title:r[0],description:r[1]||'',image_url:'',is_draft:true}).catch(()=>{});
+  }
+  renderTab();
+}
+
+async function deleteImage(id){if(!confirm('Delete?'))return;await sb.from('mlsboc_images').delete().eq('id',id);renderTab();}
+async function publishImage(id){await sb.from('mlsboc_images').update({is_draft:false}).eq('id',id);renderTab();}
+
+function adminCaseControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Case</div>
+      <div class="form-group"><label>Title</label><input type="text" id="case-title"></div>
+      <div class="form-group"><label>Scenario</label><textarea id="case-scenario"></textarea></div>
+      <div class="form-group"><label>Lab Data / Table (optional)</label><textarea id="case-data" style="min-height:60px"></textarea></div>
+      <div class="form-group"><label>Correct Answer</label><input type="text" id="case-ans"></div>
+      <div class="form-group"><label>Group (optional)</label><input type="text" id="case-group" placeholder="gram_positive, gram_negative, etc."></div>
+      <div class="form-group"><label>Steps JSON (optional)</label><textarea id="case-steps" placeholder='[{"label":"Catalase?","type":"select","options":["Positive","Negative"],"key":"catalase"}]'></textarea></div>
+      <div class="flex gap-8 flex-wrap">
+        <button class="btn btn-warn" onclick="adminAddCase(true)">Save as Draft</button>
+        <button class="btn btn-primary" onclick="adminAddCase(false)">Add & Publish</button>
+        <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV
+          <input type="file" accept=".csv" style="display:none" onchange="adminBulkCases(event)">
+        </label>
+        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['title','scenario','case_data','answer','group_label'],['Case title','Patient scenario text','Lab value: X','Expected answer','gram_positive']],'cases_template.csv')">Download Template</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: title, scenario, case_data, answer, group_label</div>
+    </div>`;
+}
+
+function adminMicroCaseControls(group){
+  const grp=group||'gram_positive';
+  return `
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Micro Case</div>
+      <div class="form-group"><label>Gram group</label>
+        <select id="micro-group">
+          <option value="gram_positive" ${grp==='gram_positive'?'selected':''}>Gram Positive</option>
+          <option value="gram_negative" ${grp==='gram_negative'?'selected':''}>Gram Negative</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Title</label><input type="text" id="micro-title"></div>
+      <div class="form-group"><label>Scenario</label><textarea id="micro-scenario"></textarea></div>
+      <div class="form-group"><label>Lab Data</label><textarea id="micro-data" style="min-height:60px"></textarea></div>
+      <div class="form-group"><label>Correct Answer (organism name)</label><input type="text" id="micro-ans"></div>
+      <div class="form-group"><label>Steps JSON</label><textarea id="micro-steps" placeholder='[{"label":"Catalase?","type":"select","options":["Positive","Negative"],"key":"catalase"}]'></textarea></div>
+      <div class="flex gap-8 flex-wrap">
+        <button class="btn btn-warn" onclick="adminAddMicroCase(true)">Save as Draft</button>
+        <button class="btn btn-primary" onclick="adminAddMicroCase(false)">Add & Publish</button>
+        <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV
+          <input type="file" accept=".csv" style="display:none" onchange="adminBulkCases(event)">
+        </label>
+        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['title','scenario','case_data','answer','group_label'],['Unknown GPC','Wound culture GPC in clusters','Catalase: +','Staphylococcus aureus','gram_positive']],'micro_cases_template.csv')">Download Template</button>
+      </div>
+    </div>`;
+}
+
+async function adminAddCase(isDraft){
+  const title=document.getElementById('case-title')?.value.trim();
+  const scenario=document.getElementById('case-scenario')?.value.trim();
+  const case_data=document.getElementById('case-data')?.value.trim();
+  const answer=document.getElementById('case-ans')?.value.trim();
+  const group_label=document.getElementById('case-group')?.value.trim();
+  let steps='[]';
+  try{steps=document.getElementById('case-steps')?.value.trim()||'[]';JSON.parse(steps);}catch{alert('Invalid steps JSON');return;}
+  if(!title||!scenario||!answer){alert('Title, scenario, and answer required.');return;}
+  const {error}=await sb.from('mlsboc_cases').insert({subject:appState.subject,title,scenario,case_data:case_data||'',answer,group_label:group_label||'',steps,images:[],is_draft:isDraft});
+  if(error)alert('Error: '+error.message);
+  else renderTab();
+}
+
+async function adminAddMicroCase(isDraft){
+  const group=document.getElementById('micro-group')?.value;
+  const title=document.getElementById('micro-title')?.value.trim();
+  const scenario=document.getElementById('micro-scenario')?.value.trim();
+  const case_data=document.getElementById('micro-data')?.value.trim();
+  const answer=document.getElementById('micro-ans')?.value.trim();
+  let steps='[]';
+  try{steps=document.getElementById('micro-steps')?.value.trim()||'[]';JSON.parse(steps);}catch{alert('Invalid steps JSON');return;}
+  if(!title||!scenario||!answer){alert('Fill in all fields.');return;}
+  const {error}=await sb.from('mlsboc_cases').insert({subject:'microbiology',title,scenario,case_data:case_data||'',answer,group_label:group,steps,images:[],is_draft:isDraft});
+  if(error)alert('Error: '+error.message);
+  else renderTab();
+}
+
+async function adminBulkCases(e){
+  const rows=parseCSV(await e.target.files[0].text());
+  for(const r of rows){
+    if(!r[0])continue;
+    await sb.from('mlsboc_cases').insert({subject:appState.subject,title:r[0],scenario:r[1]||'',case_data:r[2]||'',answer:r[3]||'',group_label:r[4]||'',steps:'[]',images:[],is_draft:true}).catch(()=>{});
+  }
+  renderTab();
+}
+
+async function deleteCase(id){if(!confirm('Delete case?'))return;await sb.from('mlsboc_cases').delete().eq('id',id);renderTab();}
+async function publishCase(id){await sb.from('mlsboc_cases').update({is_draft:false}).eq('id',id);renderTab();}
+
+async function openCaseImageEditor(caseId){
+  const {data}=await sb.from('mlsboc_cases').select('images').eq('id',caseId).single();
+  const imgs=data?.images||[];
+  // Simple prompt-based for one image
+  const url=prompt('Enter image URL or paste base64 data URL:');
+  if(!url)return;
+  const newImgs=[url,...imgs.slice(0,3)].filter(Boolean);
+  await sb.from('mlsboc_cases').update({images:newImgs}).eq('id',caseId);
+  renderTab();
+}
+
+// Hematology admin controls
+function adminHemeImageControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Condition</div>
+      <button class="btn btn-primary" onclick="showAddConditionModal(null)">+ Add New Condition</button>
+      <div class="divider"></div>
+      <label class="btn btn-ghost" style="cursor:pointer;display:inline-flex">Bulk CSV Upload
+        <input type="file" accept=".csv" style="display:none" onchange="adminBulkConditions(event)">
+      </label>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="dlCSV([['name','folder','key_features','notes'],['Iron Deficiency Anemia','anemias','Microcytic; Hypochromic; Low ferritin; High TIBC','Pencil cells and target cells seen on peripheral smear']],'conditions_template.csv')">Download Template</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: name, folder (anemias/malignancies_acute/etc.), key_features (semicolon-separated), notes. Images added separately via drag & drop.</div>
+    </div>`;
+}
+
+function showAddConditionModal(folder){
+  const modal=document.getElementById('condition-modal');
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="modal-title">Add Condition</div>
+    <div class="form-group"><label>Name</label><input type="text" id="cond-name"></div>
+    <div class="form-group"><label>Folder</label>
+      <select id="cond-folder">
+        ${HEME_FOLDERS.map(f=>`<option value="${f.key}" ${folder===f.key?'selected':''}>${f.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Key Features (one per line)</label><textarea id="cond-features" placeholder="Microcytic&#10;Hypochromic&#10;Low ferritin"></textarea></div>
+    <div class="form-group"><label>Notes</label><textarea id="cond-notes"></textarea></div>
+    <div class="flex gap-8 mt-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="adminAddCondition()">Add Condition</button>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+async function adminAddCondition(){
+  const name=document.getElementById('cond-name')?.value.trim();
+  const folder=document.getElementById('cond-folder')?.value;
+  const featText=document.getElementById('cond-features')?.value||'';
+  const notes=document.getElementById('cond-notes')?.value.trim();
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!name||!folder){alert('Name and folder required.');return;}
+  const {error}=await sb.from('mlsboc_heme_conditions').insert({name,folder,key_features:features,notes:notes||'',images:[]});
+  if(error)alert('Error: '+error.message);
+  else{document.getElementById('condition-modal').classList.add('hidden');renderTab();}
+}
+
+async function adminBulkConditions(e){
+  const rows=parseCSV(await e.target.files[0].text());
+  for(const r of rows){
+    if(!r[0])continue;
+    const features=(r[2]||'').split(';').map(x=>x.trim()).filter(Boolean);
+    await sb.from('mlsboc_heme_conditions').insert({name:r[0],folder:r[1]||'anemias',key_features:features,notes:r[3]||'',images:[]}).catch(()=>{});
+  }
+  renderTab();
+}
+
+async function deleteCondition(id){
+  if(!confirm('Delete this condition?'))return;
+  await sb.from('mlsboc_heme_conditions').delete().eq('id',id);
+  renderTab();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+function fmtTime(s){const m=Math.floor(s/60),sec=s%60;return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+function esc(s){return String(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function csvEsc(s){s=String(s||'');if(s.includes(',')||s.includes('"')||s.includes('\n'))s='"'+s.replace(/"/g,'""')+'"';return s;}
+function dlCSV(rows,filename){
+  const csv=rows.map(r=>r.map(csvEsc).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=filename;a.click();
+}
+function parseCSV(text){
+  return text.trim().split('\n').slice(1).map(line=>{
+    const r=[],re=/("(?:[^"]|"")*"|[^,]*),?/g;let m;
+    while((m=re.exec(line))!==null&&m[0])r.push(m[1].replace(/^"|"$/g,'').replace(/""/g,'"'));
+    return r;
+  });
+}
+function parseSteps(s){
+  try{return typeof s==='string'?JSON.parse(s||'[]'):(s||[]);}catch{return [];}
+}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light-mode');
+  localStorage.setItem('mlsboc_theme', isLight?'light':'dark');
+  const btn=document.getElementById('theme-btn');
+  if(btn)btn.textContent=isLight?'🌑':'🌙';
+}
+function handleILImgFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const t=new Image();
+    t.onload=()=>{
+      const M=600;let w=t.width,ht=t.height;
+      if(w>M){ht=Math.round(ht*M/w);w=M;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
+      cv.getContext('2d').drawImage(t,0,0,w,ht);
+      const url=cv.toDataURL('image/jpeg',0.75);
+      const dz=document.getElementById('il-img-dz');
+      const hid=document.getElementById('il-img-data');
+      if(hid)hid.value=url;
+      if(dz)dz.innerHTML='<img src="'+url+'" style="max-height:60px;border-radius:4px">';
+    };
+    t.src=ev.target.result;
+  };
+  r.readAsDataURL(file);
+}
+function handleILImgDrop(e){
+  e.preventDefault();e.currentTarget.style.borderColor='var(--border2)';
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  readFileAsDataURL(file,url=>{
+    const dz=document.getElementById('il-img-dz');
+    const hid=document.getElementById('il-img-data');
+    if(hid)hid.value=url;
+    if(dz)dz.innerHTML='<img src="'+url+'" style="max-height:60px;border-radius:4px">';
+  });
+}
+function handleSubjectIconFile(e,key){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const t=new Image();
+    t.onload=()=>{
+      const M=600;let w=t.width,ht=t.height;
+      if(w>M){ht=Math.round(ht*M/w);w=M;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
+      cv.getContext('2d').drawImage(t,0,0,w,ht);
+      const url=cv.toDataURL('image/jpeg',0.75);
+      try{localStorage.setItem('mlsboc_icon_'+key,url);}
+      catch(err){alert('Image too large, try a smaller one.');return;}
+      renderHome(document.getElementById('view-main'));
+    };
+    t.src=ev.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function readFileAsDataURL(file,cb){
+  const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(file);
+}
+function openImgViewer(src){
+  const v=document.getElementById('img-viewer');
+  const i=document.getElementById('img-viewer-img');
+  if(!v||!i)return;
+  i.src=src;
+  v.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeImgViewer(){
+  const v=document.getElementById('img-viewer');
+  if(v)v.style.display='none';
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgViewer();});
+</script>
+<div id="img-viewer" style="display:none" onclick="closeImgViewer()">
+  <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
+  <img id="img-viewer-img" src="" alt="">
+</div>
+</body>
+</html>
