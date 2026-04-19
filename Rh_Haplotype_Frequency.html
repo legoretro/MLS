@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rh Haplotype Frequency – Rank It!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+  * { box-sizing: border-box; }
+
+  :root{
+    --bg: #ece9e2;
+    --panel: #f7f3eb;
+    --header: #aa9352;
+    --cell: #d8d3ca;
+    --cell2: #d2cdc4;
+    --border: #f3f0ea;
+    --text: #111;
+    --muted: #666;
+    --drop: #fffaf0;
+    --drop-border: #c8b27a;
+    --good: #2e8b57;
+    --bad: #c0392b;
+    --top-dark: #2c2c2c;
+    --top-yellow: #f5c842;
+    --shadow: 0 2px 12px rgba(0,0,0,.10);
+    --gold-line: #a89055;
+  }
+
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:12px;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  header{
+    background:var(--top-dark);
+    color:#fff;
+    padding:10px 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-radius:12px;
+    margin-bottom:10px;
+    box-shadow: var(--shadow);
+  }
+
+  header h1{
+    margin:0;
+    font-size:1.35rem;
+    font-weight:900;
+    color:var(--top-yellow);
+  }
+
+  header p{
+    margin:2px 0 0;
+    font-size:.72rem;
+    color:#d4d4d4;
+    line-height:1.35;
+  }
+
+  .badge{
+    margin-left:auto;
+    background:var(--bad);
+    color:#fff;
+    font-weight:800;
+    font-size:.68rem;
+    padding:4px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+
+  .controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+    background:var(--panel);
+    border-radius:12px;
+    padding:10px 12px;
+    box-shadow: var(--shadow);
+    align-items:center;
+  }
+
+  .section-controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+    background:var(--panel);
+    border-radius:12px;
+    padding:10px 12px;
+    box-shadow: var(--shadow);
+    align-items:center;
+  }
+
+  button{
+    border:none;
+    border-radius:8px;
+    padding:8px 12px;
+    font-family:'Nunito', sans-serif;
+    font-weight:800;
+    cursor:pointer;
+    font-size:.82rem;
+  }
+
+  .checkBtn{ background:#1f1f1f; color:#fff; }
+  .resetBtn{ background:#d9d2c6; color:#333; }
+
+  .score{
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:8px;
+    min-height:32px;
+    font-size:.82rem;
+  }
+
+  .score.good{
+    background:#edf8f1;
+    color:var(--good);
+  }
+
+  .score.bad{
+    background:#fff0ee;
+    color:var(--bad);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 230px 1fr 230px;
+    gap:10px;
+    align-items:start;
+  }
+
+  .bank{
+    background:var(--panel);
+    border-radius:12px;
+    padding:10px;
+    box-shadow:var(--shadow);
+    position:sticky;
+    top:10px;
+  }
+
+  .bank h2{
+    margin:0 0 8px;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+
+  .hint{
+    font-size:.68rem;
+    color:var(--muted);
+    line-height:1.3;
+    margin-bottom:8px;
+  }
+
+  .chip{
+    background:#fff;
+    border:2px solid #ddd4c4;
+    border-radius:8px;
+    padding:7px 9px;
+    margin-bottom:6px;
+    cursor:grab;
+    user-select:none;
+    transition:.15s ease;
+    text-align:center;
+    font-weight:900;
+  }
+
+  .chip.dragging{
+    opacity:.45;
+  }
+
+  .chip.used{
+    opacity:.22;
+    pointer-events:none;
+  }
+
+  .chip .use-count{
+    display:block;
+    font-size:.62rem;
+    color:#777;
+    margin-top:2px;
+    font-weight:800;
+  }
+
+  .tables{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:10px;
+  }
+
+  .section{
+    box-shadow:var(--shadow);
+    border-radius:12px;
+    overflow:hidden;
+    background:transparent;
+  }
+
+  .section-title{
+    background:var(--header);
+    color:#fff;
+    text-align:center;
+    font-size:1rem;
+    font-weight:900;
+    padding:10px 6px;
+    letter-spacing:.5px;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+  }
+
+  th, td{
+    border:2px solid var(--border);
+    padding:7px;
+    text-align:center;
+  }
+
+  th{
+    background:var(--header);
+    color:#fff;
+    font-size:.82rem;
+    font-weight:900;
+  }
+
+  td{
+    background:var(--cell);
+    font-size:.82rem;
+    font-weight:800;
+  }
+
+  tbody tr:nth-child(even) td{
+    background:var(--cell2);
+  }
+
+  .dropzone{
+    min-height:40px;
+    background:var(--drop);
+    border:2px dashed #cfc3a5;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.15s ease;
+    padding:4px 6px;
+    text-align:center;
+    line-height:1.2;
+  }
+
+  .dropzone.drag-over{
+    border-color:var(--drop-border);
+    background:#fff4d8;
+    transform:scale(1.02);
+  }
+
+  .dropzone.filled{
+    border-style:solid;
+    background:#fff;
+    cursor:pointer;
+    color:#111;
+  }
+
+  .dropzone.correct{
+    background:#edf8f1;
+    border-color:var(--good);
+    color:var(--good);
+  }
+
+  .dropzone.wrong{
+    background:#fff0ee;
+    border-color:var(--bad);
+    color:var(--bad);
+  }
+
+  .placeholder{
+    color:#9b8b66;
+    font-weight:800;
+    font-size:.7rem;
+    text-align:center;
+    width:100%;
+  }
+
+  .donor-section{
+    margin-top:28px;
+    padding-top:8px;
+  }
+
+  .donor-title{
+    font-family:'Anton', sans-serif;
+    font-size:4.25rem;
+    line-height:.95;
+    letter-spacing:1px;
+    color:#222;
+    text-transform:uppercase;
+    margin:0 0 18px 0;
+    text-align:center;
+  }
+
+  .donor-wrap{
+    max-width:920px;
+    margin:0 auto;
+  }
+
+  .donor-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+    background:#d6d2ca;
+    box-shadow:var(--shadow);
+  }
+
+  .donor-table th,
+  .donor-table td{
+    border:2px solid var(--gold-line);
+    background:#d6d2ca;
+    color:#000;
+  }
+
+  .donor-table th{
+    font-size:1rem;
+    font-weight:900;
+    text-align:left;
+    padding:10px 14px;
+  }
+
+  .donor-table td{
+    padding:10px 12px;
+    vertical-align:middle;
+  }
+
+  .donor-static{
+    min-height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-weight:400;
+  }
+
+  .donor-static.antigen{
+    font-size:2.6rem;
+  }
+
+  .donor-drop{
+    min-height:56px;
+    background:#f7f3eb;
+    border:2px dashed var(--gold-line);
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6px;
+    font-weight:800;
+  }
+
+  .donor-drop.drag-over{
+    background:#fff4d8;
+    transform:scale(1.02);
+  }
+
+  .donor-drop.filled{
+    background:#fff;
+    border-style:solid;
+    cursor:pointer;
+  }
+
+  .donor-drop.correct{
+    background:#edf8f1;
+    border-color:var(--good);
+    color:var(--good);
+  }
+
+  .donor-drop.wrong{
+    background:#fff0ee;
+    border-color:var(--bad);
+    color:var(--bad);
+  }
+
+  .donor-banks{
+    margin:14px auto 0;
+    max-width:920px;
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:10px;
+  }
+
+  .donor-bank{
+    background:var(--panel);
+    border-radius:12px;
+    padding:10px;
+    box-shadow:var(--shadow);
+  }
+
+  .donor-bank h3{
+    margin:0 0 8px;
+    font-size:.8rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+
+  .donor-chip{
+    background:#fff;
+    border:2px solid #ddd4c4;
+    border-radius:8px;
+    padding:7px 9px;
+    margin-bottom:6px;
+    cursor:grab;
+    user-select:none;
+    transition:.15s ease;
+    text-align:center;
+    font-weight:900;
+  }
+
+  .donor-chip.dragging{
+    opacity:.45;
+  }
+
+  .donor-chip.used{
+    opacity:.22;
+    pointer-events:none;
+  }
+
+  .donor-chip .use-count{
+    display:block;
+    font-size:.62rem;
+    color:#777;
+    margin-top:2px;
+    font-weight:800;
+  }
+
+  @media (max-width: 700px){
+    .tables{
+      grid-template-columns:1fr;
+    }
+
+    .donor-title{
+      font-size:2.8rem;
+    }
+
+    .donor-banks{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width: 980px){
+    .layout{
+      grid-template-columns:1fr;
+    }
+
+    .bank{
+      position:static;
+    }
+
+    header{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+
+    .badge{
+      margin-left:0;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>🩸 Rh Haplotype Frequency – Rank It!</h1>
+      <p>Drag each haplotype into the correct order for White, Black, and Asian populations. Top row = most frequent. Bottom row = least frequent. Click a filled box to return it.</p>
+    </div>
+    <div class="badge">8 Haplotypes</div>
+  </header>
+
+  <div class="section-controls">
+    <button id="rhCheckBtn" class="checkBtn">✔ Check Rh Section</button>
+    <button id="rhResetBtn" class="resetBtn">↺ Reset Rh Section</button>
+    <div id="rhMsg" class="score"></div>
+  </div>
+
+  <div class="layout">
+    <div class="bank">
+      <h2>Weiner Bank</h2>
+      <div class="hint">Each Weiner symbol can be used once in each section, so up to 3 times total.</div>
+      <div id="weinerWrap"></div>
+    </div>
+
+    <div class="tables" id="tablesWrap"></div>
+
+    <div class="bank">
+      <h2>Fisher-Race Bank</h2>
+      <div class="hint">Each Fisher-Race symbol can be used once in each section, so up to 3 times total.</div>
+      <div id="fisherWrap"></div>
+    </div>
+  </div>
+
+  <section class="donor-section">
+    <div class="donor-wrap">
+      <h2 class="donor-title">Donor<br>Frequency</h2>
+
+      <div class="section-controls" style="margin-bottom:14px;">
+        <button id="donorCheckBtn" class="checkBtn">✔ Check Donor Section</button>
+        <button id="donorResetBtn" class="resetBtn">↺ Reset Donor Section</button>
+        <div id="donorMsg" class="score"></div>
+      </div>
+
+      <table class="donor-table">
+        <thead>
+          <tr>
+            <th style="width:24%;">Antigen</th>
+            <th style="width:31%;">Frequency</th>
+            <th style="width:45%;">Population Difference</th>
+          </tr>
+        </thead>
+        <tbody id="donorBody"></tbody>
+      </table>
+    </div>
+
+    <div class="donor-banks">
+      <div class="donor-bank">
+        <h3>Frequency Bank</h3>
+        <div id="donorFrequencyWrap"></div>
+      </div>
+      <div class="donor-bank">
+        <h3>Population Difference Bank</h3>
+        <div id="donorPopWrap"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================
+   RH HAPLOTYPE SECTION
+========================= */
+
+const WEINERS = ["R0","R1","R2","RZ","r","r’","r’’","rY"];
+const FISHERS = ["Dce","DCe","DcE","DCE","dce","dCe","dcE","dCE"];
+
+const ANSWERS = {
+  white: {
+    weiner: ["R1","r","R2","R0","r’","r’’","RZ","rY"],
+    fisher: ["DCe","dce","DcE","Dce","dCe","dcE","DCE","dCE"]
+  },
+  black: {
+    weiner: ["R0","r","R1","R2","r’","r’’","rY","RZ"],
+    fisher: ["Dce","dce","DCe","DcE","dCe","dcE","dCE","DCE"]
+  },
+  asian: {
+    weiner: ["R1","R2","R0","r","r’","RZ","r’’","rY"],
+    fisher: ["DCe","DcE","Dce","dce","dCe","DCE","dcE","dCE"]
+  }
+};
+
+const GROUPS = [
+  { key: "white", label: "WHITE" },
+  { key: "black", label: "BLACK" },
+  { key: "asian", label: "ASIAN" }
+];
+
+const state = {};
+let dragItem = null;
+let dragFrom = null;
+
+function slotKey(group, row, col){
+  return `${group}-${row}-${col}`;
+}
+
+function getState(key){
+  return state[key] || null;
+}
+
+function setState(key, value){
+  if(value === null) delete state[key];
+  else state[key] = value;
+}
+
+function countUses(type, value){
+  let count = 0;
+  Object.values(state).forEach(v => {
+    if(v && v.type === type && v.value === value) count++;
+  });
+  return count;
+}
+
+function cssSafe(str){
+  return str.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+function shuffleArray(arr){
+  const copy = [...arr];
+  for(let i = copy.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function renderBankUsage(){
+  WEINERS.forEach(value => {
+    const chip = document.getElementById(`weiner-${cssSafe(value)}`);
+    if(!chip) return;
+    const count = countUses("weiner", value);
+    chip.querySelector(".use-count").textContent = `${count}/3`;
+    chip.classList.toggle("used", count >= 3);
+  });
+
+  FISHERS.forEach(value => {
+    const chip = document.getElementById(`fisher-${cssSafe(value)}`);
+    if(!chip) return;
+    const count = countUses("fisher", value);
+    chip.querySelector(".use-count").textContent = `${count}/3`;
+    chip.classList.toggle("used", count >= 3);
+  });
+}
+
+function buildBanks(){
+  const weinerWrap = document.getElementById("weinerWrap");
+  const fisherWrap = document.getElementById("fisherWrap");
+  weinerWrap.innerHTML = "";
+  fisherWrap.innerHTML = "";
+
+  WEINERS.forEach(value => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `weiner-${cssSafe(value)}`;
+    chip.draggable = true;
+    chip.innerHTML = `${value}<span class="use-count">0/3</span>`;
+
+    chip.addEventListener("dragstart", e => {
+      if(countUses("weiner", value) >= 3){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { section: "rh", type: "weiner", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    weinerWrap.appendChild(chip);
+  });
+
+  FISHERS.forEach(value => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `fisher-${cssSafe(value)}`;
+    chip.draggable = true;
+    chip.innerHTML = `${value}<span class="use-count">0/3</span>`;
+
+    chip.addEventListener("dragstart", e => {
+      if(countUses("fisher", value) >= 3){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { section: "rh", type: "fisher", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    fisherWrap.appendChild(chip);
+  });
+
+  renderBankUsage();
+}
+
+function buildTables(){
+  const wrap = document.getElementById("tablesWrap");
+  wrap.innerHTML = "";
+
+  GROUPS.forEach(group => {
+    const section = document.createElement("div");
+    section.className = "section";
+
+    section.innerHTML = `
+      <div class="section-title">${group.label}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Weiner</th>
+            <th>Fisher-Race</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-${group.key}"></tbody>
+      </table>
+    `;
+
+    wrap.appendChild(section);
+    const tbody = section.querySelector(`#tbody-${group.key}`);
+
+    for(let row = 1; row <= 8; row++){
+      const tr = document.createElement("tr");
+
+      const tdWeiner = document.createElement("td");
+      const tdFisher = document.createElement("td");
+
+      tdWeiner.appendChild(makeDropzone(group.key, row, "weiner"));
+      tdFisher.appendChild(makeDropzone(group.key, row, "fisher"));
+
+      tr.appendChild(tdWeiner);
+      tr.appendChild(tdFisher);
+      tbody.appendChild(tr);
+    }
+  });
+}
+
+function makeDropzone(group, row, col){
+  const dz = document.createElement("div");
+  dz.className = "dropzone";
+  dz.id = `slot-${slotKey(group, row, col)}`;
+  dz.draggable = true;
+  renderSlotContent(dz, null, col);
+
+  dz.addEventListener("dragover", e => {
+    if(dragItem && dragItem.section === "rh" && dragItem.type === col){
+      e.preventDefault();
+      dz.classList.add("drag-over");
+    }
+  });
+
+  dz.addEventListener("dragleave", () => {
+    dz.classList.remove("drag-over");
+  });
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    if(!dragItem || dragItem.section !== "rh" || dragItem.type !== col) return;
+
+    const key = slotKey(group, row, col);
+
+    const alreadyUsedInThisGroup = Object.entries(state).some(([k, v]) => {
+      return k !== key && k.startsWith(group + "-") && k.endsWith("-" + col) && v && v.value === dragItem.value;
+    });
+
+    if(alreadyUsedInThisGroup){
+      dragItem = null;
+      dragFrom = null;
+      return;
+    }
+
+    const atMax = countUses(col, dragItem.value) >= 3;
+    const movingSameItem = dragFrom && getState(dragFrom) && getState(dragFrom).value === dragItem.value;
+
+    if(atMax && !movingSameItem){
+      dragItem = null;
+      dragFrom = null;
+      return;
+    }
+
+    if(dragFrom && dragFrom !== key){
+      setState(dragFrom, null);
+      renderSlot(dragFrom);
+    }
+
+    setState(key, { ...dragItem });
+    renderSlot(key);
+    dragItem = null;
+    dragFrom = null;
+    clearRhMarks();
+    renderBankUsage();
+  });
+
+  dz.addEventListener("click", () => {
+    const key = slotKey(group, row, col);
+    if(!getState(key)) return;
+    setState(key, null);
+    renderSlot(key);
+    clearRhMarks();
+    renderBankUsage();
+  });
+
+  dz.addEventListener("dragstart", e => {
+    const key = slotKey(group, row, col);
+    const current = getState(key);
+    if(!current){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { ...current };
+    dragFrom = key;
+  });
+
+  return dz;
+}
+
+function renderSlotContent(slotEl, value, col){
+  if(!value){
+    slotEl.innerHTML = `<div class="placeholder">— drop ${col} here —</div>`;
+    slotEl.classList.remove("filled");
+    return;
+  }
+
+  slotEl.textContent = value.value;
+  slotEl.classList.add("filled");
+}
+
+function renderSlot(key){
+  const slot = document.getElementById(`slot-${key}`);
+  if(!slot) return;
+
+  slot.classList.remove("correct", "wrong");
+  const col = key.split("-").pop();
+  renderSlotContent(slot, getState(key), col);
+}
+
+function clearRhMarks(){
+  document.querySelectorAll(".dropzone").forEach(z => {
+    z.classList.remove("correct", "wrong");
+  });
+  const msg = document.getElementById("rhMsg");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
+function checkRhAnswers(){
+  let correct = 0;
+  const total = GROUPS.length * 8 * 2;
+
+  GROUPS.forEach(group => {
+    for(let row = 1; row <= 8; row++){
+      ["weiner","fisher"].forEach(col => {
+        const key = slotKey(group.key, row, col);
+        const slot = document.getElementById(`slot-${key}`);
+        const current = getState(key);
+        const rightValue = ANSWERS[group.key][col][row - 1];
+
+        slot.classList.remove("correct", "wrong");
+
+        if(current && current.value === rightValue){
+          slot.classList.add("correct");
+          correct++;
+        } else {
+          slot.classList.add("wrong");
+        }
+      });
+    }
+  });
+
+  const msg = document.getElementById("rhMsg");
+  msg.textContent = `${correct}/${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+function resetRh(){
+  Object.keys(state).forEach(k => delete state[k]);
+
+  GROUPS.forEach(group => {
+    for(let row = 1; row <= 8; row++){
+      ["weiner","fisher"].forEach(col => renderSlot(slotKey(group.key, row, col)));
+    }
+  });
+
+  clearRhMarks();
+  renderBankUsage();
+}
+
+/* =========================
+   DONOR FREQUENCY SECTION
+========================= */
+
+const DONOR_ROWS = 5;
+
+const DONOR_ANSWERS = [
+  { antigen: "D", frequency: "85", pop: "Lower White" },
+  { antigen: "C", frequency: "70", pop: "Lower Black" },
+  { antigen: "c", frequency: "80", pop: "Lower Asian" },
+  { antigen: "E", frequency: "30", pop: "" },
+  { antigen: "e", frequency: "98", pop: "" }
+];
+
+const DONOR_ANTIGENS = ["D","C","c","E","e"];
+const DONOR_FREQUENCIES = ["85","70","80","30","98"];
+const DONOR_POPS = ["Lower White","Lower Black","Lower Asian"];
+
+const donorState = {};
+let donorDragItem = null;
+let donorDragFrom = null;
+
+function donorKey(row, col){
+  return `donor-${row}-${col}`;
+}
+
+function donorGetState(key){
+  return donorState[key] || null;
+}
+
+function donorSetState(key, value){
+  if(value === null) delete donorState[key];
+  else donorState[key] = value;
+}
+
+function donorCountUses(type, value){
+  let count = 0;
+  Object.values(donorState).forEach(v => {
+    if(v && v.type === type && v.value === value) count++;
+  });
+  return count;
+}
+
+function renderDonorBankUsage(){
+  DONOR_FREQUENCIES.forEach(value => {
+    const chip = document.getElementById(`donor-frequency-${cssSafe(value)}`);
+    if(!chip) return;
+    const count = donorCountUses("frequency", value);
+    chip.querySelector(".use-count").textContent = `${count}/1`;
+    chip.classList.toggle("used", count >= 1);
+  });
+
+  DONOR_POPS.forEach(value => {
+    const chip = document.getElementById(`donor-pop-${cssSafe(value)}`);
+    if(!chip) return;
+    const count = donorCountUses("pop", value);
+    chip.querySelector(".use-count").textContent = `${count}/1`;
+    chip.classList.toggle("used", count >= 1);
+  });
+}
+
+function buildDonorBanks(){
+  const frequencyWrap = document.getElementById("donorFrequencyWrap");
+  const popWrap = document.getElementById("donorPopWrap");
+
+  frequencyWrap.innerHTML = "";
+  popWrap.innerHTML = "";
+
+  shuffleArray(DONOR_FREQUENCIES).forEach(value => {
+    const chip = document.createElement("div");
+    chip.className = "donor-chip";
+    chip.id = `donor-frequency-${cssSafe(value)}`;
+    chip.draggable = true;
+    chip.innerHTML = `${value}<span class="use-count">0/1</span>`;
+
+    chip.addEventListener("dragstart", e => {
+      if(donorCountUses("frequency", value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      donorDragItem = { section: "donor", type: "frequency", value };
+      donorDragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    frequencyWrap.appendChild(chip);
+  });
+
+  shuffleArray(DONOR_POPS).forEach(value => {
+    const chip = document.createElement("div");
+    chip.className = "donor-chip";
+    chip.id = `donor-pop-${cssSafe(value)}`;
+    chip.draggable = true;
+    chip.innerHTML = `${value}<span class="use-count">0/1</span>`;
+
+    chip.addEventListener("dragstart", e => {
+      if(donorCountUses("pop", value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      donorDragItem = { section: "donor", type: "pop", value };
+      donorDragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    popWrap.appendChild(chip);
+  });
+
+  renderDonorBankUsage();
+}
+
+function buildDonorTable(){
+  const body = document.getElementById("donorBody");
+  body.innerHTML = "";
+
+  for(let row = 1; row <= DONOR_ROWS; row++){
+    const tr = document.createElement("tr");
+
+    const tdA = document.createElement("td");
+    const tdF = document.createElement("td");
+    const tdP = document.createElement("td");
+
+    const fixedAntigen = document.createElement("div");
+    fixedAntigen.className = "donor-static antigen";
+    fixedAntigen.textContent = DONOR_ANTIGENS[row - 1];
+    tdA.appendChild(fixedAntigen);
+
+    tdF.appendChild(makeDonorDropzone(row, "frequency"));
+    tdP.appendChild(makeDonorDropzone(row, "pop"));
+
+    tr.appendChild(tdA);
+    tr.appendChild(tdF);
+    tr.appendChild(tdP);
+
+    body.appendChild(tr);
+  }
+}
+
+function makeDonorDropzone(row, col){
+  const dz = document.createElement("div");
+  dz.className = "donor-drop";
+  dz.id = `slot-${donorKey(row, col)}`;
+  dz.draggable = true;
+  renderDonorSlotContent(dz, null, col);
+
+  dz.addEventListener("dragover", e => {
+    if(donorDragItem && donorDragItem.section === "donor" && donorDragItem.type === col){
+      e.preventDefault();
+      dz.classList.add("drag-over");
+    }
+  });
+
+  dz.addEventListener("dragleave", () => {
+    dz.classList.remove("drag-over");
+  });
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    if(!donorDragItem || donorDragItem.section !== "donor" || donorDragItem.type !== col) return;
+
+    const key = donorKey(row, col);
+
+    const atMax = donorCountUses(col, donorDragItem.value) >= 1;
+    const movingSameItem = donorDragFrom && donorGetState(donorDragFrom) && donorGetState(donorDragFrom).value === donorDragItem.value;
+
+    if(atMax && !movingSameItem){
+      donorDragItem = null;
+      donorDragFrom = null;
+      return;
+    }
+
+    if(donorDragFrom && donorDragFrom !== key){
+      donorSetState(donorDragFrom, null);
+      renderDonorSlot(donorDragFrom);
+    }
+
+    donorSetState(key, { ...donorDragItem });
+    renderDonorSlot(key);
+    donorDragItem = null;
+    donorDragFrom = null;
+    clearDonorMarks();
+    renderDonorBankUsage();
+  });
+
+  dz.addEventListener("click", () => {
+    const key = donorKey(row, col);
+    if(!donorGetState(key)) return;
+    donorSetState(key, null);
+    renderDonorSlot(key);
+    clearDonorMarks();
+    renderDonorBankUsage();
+  });
+
+  dz.addEventListener("dragstart", e => {
+    const key = donorKey(row, col);
+    const current = donorGetState(key);
+    if(!current){
+      e.preventDefault();
+      return;
+    }
+    donorDragItem = { ...current };
+    donorDragFrom = key;
+  });
+
+  return dz;
+}
+
+function renderDonorSlotContent(slotEl, value, col){
+  if(!value){
+    slotEl.innerHTML = `<div class="placeholder">— drop ${col} here —</div>`;
+    slotEl.classList.remove("filled");
+    return;
+  }
+
+  slotEl.textContent = value.value;
+  slotEl.classList.add("filled");
+}
+
+function renderDonorSlot(key){
+  const slot = document.getElementById(`slot-${key}`);
+  if(!slot) return;
+
+  slot.classList.remove("correct", "wrong");
+  const col = key.split("-").pop();
+  renderDonorSlotContent(slot, donorGetState(key), col);
+}
+
+function clearDonorMarks(){
+  document.querySelectorAll(".donor-drop").forEach(z => {
+    z.classList.remove("correct", "wrong");
+  });
+  const msg = document.getElementById("donorMsg");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
+function checkDonorAnswers(){
+  let correct = 0;
+  const total = DONOR_ROWS * 3;
+
+  for(let row = 1; row <= DONOR_ROWS; row++){
+    ["frequency","pop"].forEach(col => {
+      const key = donorKey(row, col);
+      const slot = document.getElementById(`slot-${key}`);
+      const current = donorGetState(key);
+      const rightValue = DONOR_ANSWERS[row - 1][col];
+
+      slot.classList.remove("correct", "wrong");
+
+      if(rightValue === ""){
+        if(!current || current.value === ""){
+          slot.classList.add("correct");
+          correct++;
+        } else {
+          slot.classList.add("wrong");
+        }
+      } else {
+        if(current && current.value === rightValue){
+          slot.classList.add("correct");
+          correct++;
+        } else {
+          slot.classList.add("wrong");
+        }
+      }
+    });
+
+    correct++; // fixed antigen column counts as correct automatically
+  }
+
+  const msg = document.getElementById("donorMsg");
+  msg.textContent = `${correct}/${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+function resetDonor(){
+  Object.keys(donorState).forEach(k => delete donorState[k]);
+
+  for(let row = 1; row <= DONOR_ROWS; row++){
+    ["frequency","pop"].forEach(col => renderDonorSlot(donorKey(row, col)));
+  }
+
+  clearDonorMarks();
+  renderDonorBankUsage();
+}
+
+/* =========================
+   INIT
+========================= */
+
+document.getElementById("rhCheckBtn").addEventListener("click", checkRhAnswers);
+document.getElementById("rhResetBtn").addEventListener("click", resetRh);
+document.getElementById("donorCheckBtn").addEventListener("click", checkDonorAnswers);
+document.getElementById("donorResetBtn").addEventListener("click", resetDonor);
+
+buildBanks();
+buildTables();
+buildDonorBanks();
+buildDonorTable();
+resetRh();
+resetDonor();
+</script>
+</body>
+</html>

@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blood Banking Structures – ABH System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
+
+  * { box-sizing: border-box; }
+
+  :root{
+    --bg: #ece9e2;
+    --panel: #f7f3eb;
+    --header: #aa9352;
+    --border: #f3f0ea;
+    --text: #111;
+    --muted: #666;
+    --drop: #fffaf0;
+    --drop-border: #c8b27a;
+    --good: #2e8b57;
+    --bad: #c0392b;
+    --top-dark: #2c2c2c;
+    --top-yellow: #f5c842;
+    --shadow: 0 2px 12px rgba(0,0,0,.10);
+    --fixed: #efe8dc;
+    --fixed-border: #d8ccb7;
+  }
+
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:12px;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+  }
+
+  header{
+    background:var(--top-dark);
+    color:#fff;
+    padding:10px 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-radius:12px;
+    margin-bottom:10px;
+    box-shadow:var(--shadow);
+  }
+
+  header h1{
+    margin:0;
+    font-size:1.35rem;
+    font-weight:900;
+    color:var(--top-yellow);
+  }
+
+  header p{
+    margin:2px 0 0;
+    font-size:.72rem;
+    color:#d4d4d4;
+    line-height:1.35;
+  }
+
+  .badge{
+    margin-left:auto;
+    background:#c0392b;
+    color:#fff;
+    font-weight:800;
+    font-size:.68rem;
+    padding:4px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+
+  .section-controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+    background:var(--panel);
+    border-radius:12px;
+    padding:10px 12px;
+    box-shadow:var(--shadow);
+    align-items:center;
+  }
+
+  button{
+    border:none;
+    border-radius:8px;
+    padding:8px 12px;
+    font-family:'Nunito', sans-serif;
+    font-weight:800;
+    cursor:pointer;
+    font-size:.82rem;
+  }
+
+  .checkBtn{ background:#1f1f1f; color:#fff; }
+  .resetBtn{ background:#d9d2c6; color:#333; }
+
+  .score{
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:8px;
+    min-height:32px;
+    font-size:.82rem;
+  }
+
+  .score.good{
+    background:#edf8f1;
+    color:var(--good);
+  }
+
+  .score.bad{
+    background:#fff0ee;
+    color:var(--bad);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:220px 1fr 220px;
+    gap:12px;
+    align-items:start;
+  }
+
+  .bank{
+    background:var(--panel);
+    border-radius:12px;
+    padding:10px;
+    box-shadow:var(--shadow);
+    position:sticky;
+    top:10px;
+  }
+
+  .bank h2{
+    margin:0 0 8px;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+
+  .hint{
+    font-size:.68rem;
+    color:var(--muted);
+    line-height:1.3;
+    margin-bottom:8px;
+  }
+
+  .chip{
+    background:#fff;
+    border:2px solid #ddd4c4;
+    border-radius:8px;
+    padding:8px 9px;
+    margin-bottom:6px;
+    cursor:grab;
+    user-select:none;
+    transition:.15s ease;
+    text-align:center;
+    font-weight:900;
+    line-height:1.2;
+  }
+
+  .chip.dragging{ opacity:.45; }
+  .chip.used{
+    opacity:.22;
+    pointer-events:none;
+  }
+
+  .main-card{
+    background:var(--panel);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  .main-title{
+    background:var(--header);
+    color:#fff;
+    text-align:center;
+    font-size:1rem;
+    font-weight:900;
+    padding:10px 6px;
+    letter-spacing:.5px;
+  }
+
+  .main-body{
+    padding:16px 12px 14px;
+  }
+
+  .structure{
+    position:relative;
+    height:420px;
+    background:#fff;
+    border:2px solid #ebe5d8;
+    border-radius:12px;
+    overflow:hidden;
+  }
+
+  .line{
+    position:absolute;
+    background:#9a8d74;
+    border-radius:2px;
+  }
+  .line.h{ height:4px; }
+  .line.v{ width:4px; }
+
+  .hex{
+    position:absolute;
+    width:100px;
+    height:86px;
+    clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:10px 10px;
+    font-size:.68rem;
+    font-weight:900;
+    line-height:1.05;
+    box-shadow:0 1px 4px rgba(0,0,0,.08);
+  }
+
+  .fixed{
+    background:var(--fixed);
+    border:2px solid var(--fixed-border);
+    color:#222;
+  }
+
+  .dropzone{
+    background:var(--drop);
+    border:2px dashed #cfc3a5;
+    color:#9b8b66;
+    transition:.15s ease;
+  }
+
+  .dropzone.drag-over{
+    border-color:var(--drop-border);
+    background:#fff4d8;
+    transform:scale(1.03);
+  }
+
+  .dropzone.filled{
+    border-style:solid;
+    background:#fff;
+    color:#111;
+    cursor:pointer;
+  }
+
+  .dropzone.correct{
+    background:#edf8f1;
+    border-color:var(--good);
+    color:var(--good);
+  }
+
+  .dropzone.wrong{
+    background:#fff0ee;
+    border-color:var(--bad);
+    color:var(--bad);
+  }
+
+  .placeholder{
+    font-size:.62rem;
+    line-height:1.05;
+    padding:0 2px;
+  }
+
+  .label-wrap{
+    margin-top:14px;
+  }
+
+  .label-title{
+    font-size:.72rem;
+    font-weight:900;
+    margin-bottom:6px;
+    color:#555;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+
+  .label-drop{
+    min-height:46px;
+    background:var(--drop);
+    border:2px dashed #cfc3a5;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6px 8px;
+    font-size:.82rem;
+    font-weight:900;
+    line-height:1.1;
+    transition:.15s ease;
+  }
+
+  .label-drop.drag-over{
+    border-color:var(--drop-border);
+    background:#fff4d8;
+    transform:scale(1.02);
+  }
+
+  .label-drop.filled{
+    border-style:solid;
+    background:#fff;
+    color:#111;
+    cursor:pointer;
+  }
+
+  .label-drop.correct{
+    background:#edf8f1;
+    border-color:var(--good);
+    color:var(--good);
+  }
+
+  .label-drop.wrong{
+    background:#fff0ee;
+    border-color:var(--bad);
+    color:var(--bad);
+  }
+
+
+  .section-block{
+    margin-top:18px;
+  }
+
+  .subbank-title{
+    margin:12px 0 6px;
+    font-size:.72rem;
+    font-weight:900;
+    color:#555;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+
+  .spacer-line{
+    height:2px;
+    background:#ded6c8;
+    border-radius:999px;
+    margin:18px 0;
+  }
+
+  @media (max-width: 980px){
+    .layout{
+      grid-template-columns:1fr;
+    }
+    .bank{
+      position:static;
+    }
+    header{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .badge{
+      margin-left:0;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>🩸 Blood Banking Structures – ABH System</h1>
+      <p>Use one base structure. The chain runs bottom to top. Add FUT1 or FUT2 to the side and add the antigen sugar to the top to build Bombay, H, A, B, or Acquired B-Antigen.</p>
+    </div>
+    <div class="badge">1 Structure</div>
+  </header>
+
+  <div class="section-controls">
+    <button id="checkBtn" class="checkBtn">✔ Check Answers</button>
+    <button id="resetBtn" class="resetBtn">↺ Reset</button>
+    <div id="msg" class="score"></div>
+  </div>
+
+  <div class="layout">
+    <div class="bank">
+      <h2>Final Sugar Bank</h2>
+      <div class="hint">Drag the side and top sugars.</div>
+      <div id="sugarWrap"></div>
+    </div>
+
+    <div class="main-card">
+      <div class="main-title">Type 2 Chain Base Structure</div>
+      <div class="main-body">
+        <div class="structure">
+          <div class="line v" style="left:267px; top:246px; height:70px;"></div>
+          <div class="line v" style="left:267px; top:158px; height:70px;"></div>
+
+          <div class="line h" style="left:184px; top:196px; width:78px;"></div>
+          <div class="line v" style="left:267px; top:74px; height:64px;"></div>
+
+          <div class="hex fixed" style="left:218px; top:302px;">Glucose</div>
+          <div class="hex fixed" style="left:218px; top:214px;">Galactose</div>
+          <div class="hex fixed" style="left:218px; top:126px;">N-acetyl-<br>glucosamine</div>
+
+          <div class="hex dropzone" id="drop-side" style="left:92px; top:152px;"></div>
+          <div class="hex dropzone" id="drop-top" style="left:218px; top:36px;"></div>
+        </div>
+
+        <div class="label-wrap">
+          <div class="label-title">Antigen Label</div>
+          <div class="label-drop" id="label-drop"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bank">
+      <h2>Antigen Label Bank</h2>
+      <div class="hint">Match the structure name.</div>
+      <div id="labelWrap"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="wrap section-block">
+  <div class="section-controls">
+    <button id="checkBtnType1" class="checkBtn">✔ Check Answers</button>
+    <button id="resetBtnType1" class="resetBtn">↺ Reset Type 1 Only</button>
+    <div id="msgType1" class="score"></div>
+  </div>
+
+  <div class="layout">
+    <div class="bank">
+      <h2>Type 1 Sugar Bank</h2>
+      <div class="hint">Drag FUT3, FUT2 and and ABH to structure.</div>
+      <div id="sugarWrapType1"></div>
+    </div>
+
+    <div class="main-card">
+      <div class="main-title">Type 1 Chain Base Structure</div>
+      <div class="main-body">
+        <div class="structure">
+          <div class="line v" style="left:267px; top:246px; height:70px;"></div>
+          <div class="line v" style="left:267px; top:158px; height:70px;"></div>
+          <div class="line h" style="left:184px; top:196px; width:78px;"></div>
+          <div class="line h" style="left:184px; top:284px; width:78px;"></div>
+          <div class="line v" style="left:267px; top:74px; height:64px;"></div>
+
+          <div class="hex fixed" style="left:218px; top:302px;">Glucose</div>
+          <div class="hex fixed" style="left:218px; top:214px;">Galactose</div>
+          <div class="hex fixed" style="left:218px; top:126px;">N-acetyl-<br>glucosamine</div>
+
+          <div class="hex dropzone" id="drop-side-lewis-type1" style="left:92px; top:152px;"></div>
+          <div class="hex dropzone" id="drop-side-secretor-type1" style="left:92px; top:240px;"></div>
+          <div class="hex dropzone" id="drop-top-type1" style="left:218px; top:36px;"></div>
+        </div>
+
+        <div class="label-wrap">
+          <div class="label-title">ABH Label</div>
+          <div class="label-drop" id="label-drop-abh-type1"></div>
+        </div>
+
+        <div class="label-wrap">
+          <div class="label-title">Lewis Label</div>
+          <div class="label-drop" id="label-drop-lewis-type1"></div>
+        </div>
+
+        <div class="label-wrap">
+          <div class="label-title">Is it a Secretor?</div>
+          <div class="label-drop" id="label-drop-secretor-type1"></div>
+        </div>
+
+        <div class="label-wrap">
+          <div class="label-title">Will it Agglutinate in Lab?</div>
+          <div class="label-drop" id="label-drop-agglutination-type1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bank">
+      <h2>Type 1 Label Bank</h2>
+      <div class="hint">Use one choice for each section.</div>
+      <div class="subbank-title">ABH System</div>
+      <div id="labelWrapABHType1"></div>
+      <div class="spacer-line"></div>
+      <div class="subbank-title">Lewis System</div>
+      <div id="labelWrapLewisType1"></div>
+      <div class="spacer-line"></div>
+      <div class="subbank-title">Secretor</div>
+      <div id="labelWrapSecretorType1"></div>
+      <div class="spacer-line"></div>
+      <div class="subbank-title">Agglutination</div>
+      <div id="labelWrapAgglutinationType1"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const SUGAR_CHIPS = [
+  "FUT1",
+  "FUT2",
+  "N-acetylgalactosamine",
+  "Galactose",
+  "galactosamine"
+];
+
+const LABEL_CHIPS = [
+  "Bombay",
+  "H antigen",
+  "A antigen",
+  "B antigen",
+  "Acquired B-Antigen"
+];
+
+const ANSWERS = {
+  bombay: { side: null, top: null, label: "Bombay" },
+  h: { side: "FUT1", top: null, label: "H antigen" },
+  a: { side: "FUT1", top: "N-acetylgalactosamine", label: "A antigen" },
+  b: { side: "FUT1", top: "Galactose", label: "B antigen" },
+  acquiredb: { side: "FUT1", top: "galactosamine", label: "Acquired B-Antigen" }
+};
+
+const state = {
+  side: null,
+  top: null,
+  label: null
+};
+
+let currentTarget = "bombay";
+let dragItem = null;
+let dragFrom = null;
+
+function clearMarks(){
+  document.querySelectorAll(".dropzone, .label-drop").forEach(el => {
+    el.classList.remove("correct","wrong");
+  });
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
+function countSugarUses(value){
+  let count = 0;
+  if(state.side === value) count++;
+  if(state.top === value) count++;
+  return count;
+}
+
+function countLabelUses(value){
+  return state.label === value ? 1 : 0;
+}
+
+function buildSugarBank(){
+  const wrap = document.getElementById("sugarWrap");
+  wrap.innerHTML = "";
+
+  SUGAR_CHIPS.forEach((value, index) => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `sugar-${index}`;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("dragstart", e => {
+      if(countSugarUses(value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { type: "sugar", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    wrap.appendChild(chip);
+  });
+
+  renderSugarBankUsage();
+}
+
+function renderSugarBankUsage(){
+  document.querySelectorAll("#sugarWrap .chip").forEach(chip => {
+    chip.classList.toggle("used", countSugarUses(chip.textContent) >= 1);
+  });
+}
+
+function buildLabelBank(){
+  const wrap = document.getElementById("labelWrap");
+  wrap.innerHTML = "";
+
+  LABEL_CHIPS.forEach((value, index) => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `label-${index}`;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("dragstart", e => {
+      if(countLabelUses(value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { type: "label", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    wrap.appendChild(chip);
+  });
+
+  renderLabelBankUsage();
+}
+
+function renderLabelBankUsage(){
+  document.querySelectorAll("#labelWrap .chip").forEach(chip => {
+    chip.classList.toggle("used", countLabelUses(chip.textContent) >= 1);
+  });
+}
+
+function setupSugarDrop(slotId, stateKey){
+  const el = document.getElementById(slotId);
+  el.draggable = true;
+
+  el.addEventListener("dragover", e => {
+    if(dragItem && dragItem.type === "sugar"){
+      e.preventDefault();
+      el.classList.add("drag-over");
+    }
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if(!dragItem || dragItem.type !== "sugar") return;
+
+    const usedElsewhere =
+      (stateKey !== "side" && state.side === dragItem.value) ||
+      (stateKey !== "top" && state.top === dragItem.value);
+
+    if(usedElsewhere && dragFrom !== stateKey){
+      dragItem = null;
+      dragFrom = null;
+      return;
+    }
+
+    if(dragFrom && dragFrom !== stateKey){
+      state[dragFrom] = null;
+      renderSugarDrop(dragFrom);
+    }
+
+    state[stateKey] = dragItem.value;
+    renderSugarDrop(stateKey);
+    updateTargetGuess();
+
+    dragItem = null;
+    dragFrom = null;
+    clearMarks();
+    renderSugarBankUsage();
+  });
+
+  el.addEventListener("click", () => {
+    if(!state[stateKey]) return;
+    state[stateKey] = null;
+    renderSugarDrop(stateKey);
+    updateTargetGuess();
+    clearMarks();
+    renderSugarBankUsage();
+  });
+
+  el.addEventListener("dragstart", e => {
+    if(!state[stateKey]){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { type: "sugar", value: state[stateKey] };
+    dragFrom = stateKey;
+  });
+}
+
+function renderSugarDrop(stateKey){
+  const el = document.getElementById(stateKey === "side" ? "drop-side" : "drop-top");
+  if(!el) return;
+
+  el.classList.remove("correct","wrong","filled");
+
+  if(state[stateKey]){
+    el.textContent = state[stateKey];
+    el.classList.add("filled");
+  } else {
+    el.innerHTML = `<div class="placeholder">— drop sugar here —</div>`;
+  }
+}
+
+function setupLabelDrop(){
+  const el = document.getElementById("label-drop");
+  el.draggable = true;
+
+  el.addEventListener("dragover", e => {
+    if(dragItem && dragItem.type === "label"){
+      e.preventDefault();
+      el.classList.add("drag-over");
+    }
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if(!dragItem || dragItem.type !== "label") return;
+
+    state.label = dragItem.value;
+    renderLabelDrop();
+
+    dragItem = null;
+    dragFrom = null;
+    clearMarks();
+    renderLabelBankUsage();
+  });
+
+  el.addEventListener("click", () => {
+    if(!state.label) return;
+    state.label = null;
+    renderLabelDrop();
+    clearMarks();
+    renderLabelBankUsage();
+  });
+
+  el.addEventListener("dragstart", e => {
+    if(!state.label){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { type: "label", value: state.label };
+    dragFrom = "label";
+  });
+}
+
+function renderLabelDrop(){
+  const el = document.getElementById("label-drop");
+  if(!el) return;
+
+  el.classList.remove("correct","wrong","filled");
+
+  if(state.label){
+    el.textContent = state.label;
+    el.classList.add("filled");
+  } else {
+    el.innerHTML = `<div class="placeholder">— drop antigen label here —</div>`;
+  }
+}
+
+function updateTargetGuess(){
+  if(!state.side && !state.top) currentTarget = "bombay";
+  else if(state.side === "FUT1" && !state.top) currentTarget = "h";
+  else if(state.side === "FUT1" && state.top === "N-acetylgalactosamine") currentTarget = "a";
+  else if(state.side === "FUT1" && state.top === "Galactose") currentTarget = "b";
+  else if(state.side === "FUT1" && state.top === "galactosamine") currentTarget = "acquiredb";
+  else currentTarget = null;
+}
+
+function checkAnswers(){
+  updateTargetGuess();
+
+  const sideEl = document.getElementById("drop-side");
+  const topEl = document.getElementById("drop-top");
+  const labelEl = document.getElementById("label-drop");
+
+  sideEl.classList.remove("correct","wrong");
+  topEl.classList.remove("correct","wrong");
+  labelEl.classList.remove("correct","wrong");
+
+  let correct = 0;
+  let total = 3;
+
+  if(!currentTarget){
+    sideEl.classList.add("wrong");
+    topEl.classList.add("wrong");
+    if(state.label) labelEl.classList.add("wrong");
+  } else {
+    const ans = ANSWERS[currentTarget];
+
+    if(ans.side === null){
+      if(!state.side){
+        sideEl.classList.add("correct");
+        correct++;
+      } else {
+        sideEl.classList.add("wrong");
+      }
+    } else {
+      if(state.side === ans.side){
+        sideEl.classList.add("correct");
+        correct++;
+      } else {
+        sideEl.classList.add("wrong");
+      }
+    }
+
+    if(ans.top === null){
+      if(!state.top){
+        topEl.classList.add("correct");
+        correct++;
+      } else {
+        topEl.classList.add("wrong");
+      }
+    } else {
+      if(state.top === ans.top){
+        topEl.classList.add("correct");
+        correct++;
+      } else {
+        topEl.classList.add("wrong");
+      }
+    }
+
+    if(state.label === ans.label){
+      labelEl.classList.add("correct");
+      correct++;
+    } else {
+      labelEl.classList.add("wrong");
+    }
+  }
+
+  const msg = document.getElementById("msg");
+  msg.textContent = `${correct}/${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+
+const T1_SUGAR_CHIPS = [
+  "FUT2",
+  "FUT3",
+  "N-acetylgalactosamine",
+  "Galactose"
+];
+
+const T1_ABH_LABEL_CHIPS = [
+  "H antigen",
+  "A antigen",
+  "B antigen"
+];
+
+const T1_LEWIS_LABEL_CHIPS = [
+  "Le(a+,b-)",
+  "Le(a-,b+)"
+];
+
+const T1_YESNO_LABEL_CHIPS = [
+  "Yes",
+  "No"
+];
+
+const type1State = {
+  lewisSide: null,
+  secretorSide: null,
+  top: null,
+  abhLabel: null,
+  lewisLabel: null,
+  secretorLabel: null,
+  agglutinationLabel: null
+};
+
+function clearType1Marks(){
+  [
+    document.getElementById("drop-side-lewis-type1"),
+    document.getElementById("drop-side-secretor-type1"),
+    document.getElementById("drop-top-type1"),
+    document.getElementById("label-drop-abh-type1"),
+    document.getElementById("label-drop-lewis-type1"),
+    document.getElementById("label-drop-secretor-type1"),
+    document.getElementById("label-drop-agglutination-type1")
+  ].forEach(el => el.classList.remove("correct","wrong"));
+
+  const msg = document.getElementById("msgType1");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
+function countType1SugarUses(value){
+  let count = 0;
+  if(type1State.lewisSide === value) count++;
+  if(type1State.secretorSide === value) count++;
+  if(type1State.top === value) count++;
+  return count;
+}
+
+function buildType1SugarBank(){
+  const wrap = document.getElementById("sugarWrapType1");
+  wrap.innerHTML = "";
+
+  T1_SUGAR_CHIPS.forEach((value, index) => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `type1-sugar-${index}`;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("dragstart", e => {
+      if(countType1SugarUses(value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { type: "type1-sugar", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    wrap.appendChild(chip);
+  });
+
+  renderType1SugarBankUsage();
+}
+
+function renderType1SugarBankUsage(){
+  document.querySelectorAll("#sugarWrapType1 .chip").forEach(chip => {
+    chip.classList.toggle("used", countType1SugarUses(chip.textContent) >= 1);
+  });
+}
+
+function countType1LabelUses(group, value){
+  if(group === "abh") return type1State.abhLabel === value ? 1 : 0;
+  if(group === "lewis") return type1State.lewisLabel === value ? 1 : 0;
+  if(group === "secretor") return type1State.secretorLabel === value ? 1 : 0;
+  return type1State.agglutinationLabel === value ? 1 : 0;
+}
+
+function buildType1LabelBank(wrapId, values, group){
+  const wrap = document.getElementById(wrapId);
+  wrap.innerHTML = "";
+
+  values.forEach((value, index) => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `${group}-type1-label-${index}`;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("dragstart", e => {
+      if(countType1LabelUses(group, value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { type: `type1-label-${group}`, value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    wrap.appendChild(chip);
+  });
+
+  renderType1LabelBankUsage(group);
+}
+
+function renderType1LabelBankUsage(group){
+  const map = {
+    abh: "#labelWrapABHType1 .chip",
+    lewis: "#labelWrapLewisType1 .chip",
+    secretor: "#labelWrapSecretorType1 .chip",
+    agglutination: "#labelWrapAgglutinationType1 .chip"
+  };
+  document.querySelectorAll(map[group]).forEach(chip => {
+    chip.classList.toggle("used", countType1LabelUses(group, chip.textContent) >= 1);
+  });
+}
+
+function setupType1SugarDrop(slotId, stateKey, allowedValue){
+  const el = document.getElementById(slotId);
+  el.draggable = true;
+
+  el.addEventListener("dragover", e => {
+    if(dragItem && dragItem.type === "type1-sugar"){
+      e.preventDefault();
+      el.classList.add("drag-over");
+    }
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if(!dragItem || dragItem.type !== "type1-sugar") return;
+    if(allowedValue !== null && dragItem.value !== allowedValue) {
+      dragItem = null;
+      dragFrom = null;
+      clearType1Marks();
+      return;
+    }
+
+    const usedElsewhere = Object.entries(type1State)
+      .some(([key, val]) => ["lewisSide","secretorSide","top"].includes(key) && key !== stateKey && val === dragItem.value);
+
+    if(usedElsewhere && dragFrom !== `type1-${stateKey}`){
+      dragItem = null;
+      dragFrom = null;
+      return;
+    }
+
+    if(dragFrom && dragFrom.startsWith("type1-") && dragFrom !== `type1-${stateKey}`){
+      const oldKey = dragFrom.replace("type1-", "");
+      if(["lewisSide","secretorSide","top"].includes(oldKey)){
+        type1State[oldKey] = null;
+        renderType1SugarDrop(oldKey);
+      }
+    }
+
+    type1State[stateKey] = dragItem.value;
+    renderType1SugarDrop(stateKey);
+
+    dragItem = null;
+    dragFrom = null;
+    clearType1Marks();
+    renderType1SugarBankUsage();
+  });
+
+  el.addEventListener("click", () => {
+    if(!type1State[stateKey]) return;
+    type1State[stateKey] = null;
+    renderType1SugarDrop(stateKey);
+    clearType1Marks();
+    renderType1SugarBankUsage();
+  });
+
+  el.addEventListener("dragstart", e => {
+    if(!type1State[stateKey]){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { type: "type1-sugar", value: type1State[stateKey] };
+    dragFrom = `type1-${stateKey}`;
+  });
+}
+
+function renderType1SugarDrop(stateKey){
+  const idMap = {
+    lewisSide: "drop-side-lewis-type1",
+    secretorSide: "drop-side-secretor-type1",
+    top: "drop-top-type1"
+  };
+  const placeholderMap = {
+    lewisSide: "— drop Le Gene here —",
+    secretorSide: "— drop Se Gene here —",
+    top: "— drop ABH sugar here —"
+  };
+  const el = document.getElementById(idMap[stateKey]);
+  el.classList.remove("correct","wrong","filled");
+
+  if(type1State[stateKey]){
+    el.textContent = type1State[stateKey];
+    el.classList.add("filled");
+  } else {
+    el.innerHTML = `<div class="placeholder">${placeholderMap[stateKey]}</div>`;
+  }
+}
+
+function setupType1LabelDrop(elId, stateKey, dragType, group){
+  const el = document.getElementById(elId);
+  el.draggable = true;
+
+  el.addEventListener("dragover", e => {
+    if(dragItem && dragItem.type === dragType){
+      e.preventDefault();
+      el.classList.add("drag-over");
+    }
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if(!dragItem || dragItem.type !== dragType) return;
+
+    type1State[stateKey] = dragItem.value;
+    renderType1LabelDrop(stateKey);
+
+    dragItem = null;
+    dragFrom = null;
+    clearType1Marks();
+    renderType1LabelBankUsage(group);
+  });
+
+  el.addEventListener("click", () => {
+    if(!type1State[stateKey]) return;
+    type1State[stateKey] = null;
+    renderType1LabelDrop(stateKey);
+    clearType1Marks();
+    renderType1LabelBankUsage(group);
+  });
+
+  el.addEventListener("dragstart", e => {
+    if(!type1State[stateKey]){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { type: dragType, value: type1State[stateKey] };
+    dragFrom = stateKey;
+  });
+}
+
+function renderType1LabelDrop(stateKey){
+  const idMap = {
+    abhLabel: "label-drop-abh-type1",
+    lewisLabel: "label-drop-lewis-type1",
+    secretorLabel: "label-drop-secretor-type1",
+    agglutinationLabel: "label-drop-agglutination-type1"
+  };
+  const placeholders = {
+    abhLabel: "— drop ABH label here —",
+    lewisLabel: "— drop Lewis label here —",
+    secretorLabel: "— Yes or No —",
+    agglutinationLabel: "— Yes or No —"
+  };
+  const el = document.getElementById(idMap[stateKey]);
+  el.classList.remove("correct","wrong","filled");
+
+  if(type1State[stateKey]){
+    el.textContent = type1State[stateKey];
+    el.classList.add("filled");
+  } else {
+    el.innerHTML = `<div class="placeholder">${placeholders[stateKey]}</div>`;
+  }
+}
+
+function getType1ExpectedABH(){
+  if(type1State.secretorSide !== "FUT2") return null;
+  if(type1State.top === "N-acetylgalactosamine") return "A antigen";
+  if(type1State.top === "Galactose") return "B antigen";
+  if(!type1State.top) return "H antigen";
+  return null;
+}
+
+function getType1ExpectedLewis(){
+  if(type1State.lewisSide === "FUT3" && type1State.secretorSide === "FUT2") return "Le(a-,b+)";
+  if(type1State.lewisSide === "FUT3" && !type1State.secretorSide) return "Le(a+,b-)";
+  return null;
+}
+
+function getType1ExpectedSecretor(){
+  return type1State.secretorSide === "FUT2" ? "Yes" : "No";
+}
+
+function getType1ExpectedAgglutination(){
+  return type1State.secretorSide === "FUT2" ? "No" : "Yes";
+}
+
+function checkAnswersType1(){
+  const lewisSideEl = document.getElementById("drop-side-lewis-type1");
+  const secretorSideEl = document.getElementById("drop-side-secretor-type1");
+  const topEl = document.getElementById("drop-top-type1");
+  const abhEl = document.getElementById("label-drop-abh-type1");
+  const lewisEl = document.getElementById("label-drop-lewis-type1");
+  const secretorEl = document.getElementById("label-drop-secretor-type1");
+  const agglutinationEl = document.getElementById("label-drop-agglutination-type1");
+
+  [lewisSideEl, secretorSideEl, topEl, abhEl, lewisEl, secretorEl, agglutinationEl].forEach(el => el.classList.remove("correct","wrong"));
+
+  let correct = 0;
+  let total = 7;
+
+  const lewisSideValid = !type1State.lewisSide || type1State.lewisSide === "FUT3";
+  const secretorSideValid = !type1State.secretorSide || type1State.secretorSide === "FUT2";
+  const topValid = !type1State.top || type1State.top === "N-acetylgalactosamine" || type1State.top === "Galactose";
+
+  if(lewisSideValid){ lewisSideEl.classList.add("correct"); correct++; } else { lewisSideEl.classList.add("wrong"); }
+  if(secretorSideValid){ secretorSideEl.classList.add("correct"); correct++; } else { secretorSideEl.classList.add("wrong"); }
+  if(topValid){ topEl.classList.add("correct"); correct++; } else { topEl.classList.add("wrong"); }
+
+  const expectedABH = getType1ExpectedABH();
+  const expectedLewis = getType1ExpectedLewis();
+  const expectedSecretor = getType1ExpectedSecretor();
+  const expectedAgglutination = getType1ExpectedAgglutination();
+
+  if((expectedABH === null && !type1State.abHLabel) || type1State.abhLabel === expectedABH){ abhEl.classList.add("correct"); correct++; } else { abhEl.classList.add("wrong"); }
+  if((expectedLewis === null && !type1State.lewisLabel) || type1State.lewisLabel === expectedLewis){ lewisEl.classList.add("correct"); correct++; } else { lewisEl.classList.add("wrong"); }
+  if(type1State.secretorLabel === expectedSecretor){ secretorEl.classList.add("correct"); correct++; } else { secretorEl.classList.add("wrong"); }
+  if(type1State.agglutinationLabel === expectedAgglutination){ agglutinationEl.classList.add("correct"); correct++; } else { agglutinationEl.classList.add("wrong"); }
+
+  const msg = document.getElementById("msgType1");
+  const summaryParts = [];
+  if(expectedABH) summaryParts.push(expectedABh);
+  if(expectedLewis) summaryParts.push(expectedLewis);
+  summaryParts.push(`Secretor: ${expectedSecretor}`);
+  summaryParts.push(`Agglutination: ${expectedAgglutination}`);
+  msg.textContent = `${correct}/${total} correct • ${summaryParts.join(" • ")}`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+function resetType1(){
+  type1State.lewisSide = null;
+  type1State.secretorSide = null;
+  type1State.top = null;
+  type1State.abhLabel = null;
+  type1State.lewisLabel = null;
+  type1State.secretorLabel = null;
+  type1State.agglutinationLabel = null;
+
+  renderType1SugarDrop("lewisSide");
+  renderType1SugarDrop("secretorSide");
+  renderType1SugarDrop("top");
+  renderType1LabelDrop("abhLabel");
+  renderType1LabelDrop("lewisLabel");
+  renderType1LabelDrop("secretorLabel");
+  renderType1LabelDrop("agglutinationLabel");
+  clearType1Marks();
+  renderType1SugarBankUsage();
+  renderType1LabelBankUsage("abh");
+  renderType1LabelBankUsage("lewis");
+  renderType1LabelBankUsage("secretor");
+  renderType1LabelBankUsage("agglutination");
+}
+
+function resetAll(){
+  state.side = null;
+  state.top = null;
+  state.label = null;
+  currentTarget = "bombay";
+
+  renderSugarDrop("side");
+  renderSugarDrop("top");
+  renderLabelDrop();
+
+  clearMarks();
+  renderSugarBankUsage();
+  renderLabelBankUsage();
+}
+
+document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+buildSugarBank();
+buildLabelBank();
+setupSugarDrop("drop-side", "side");
+setupSugarDrop("drop-top", "top");
+setupLabelDrop();
+
+buildType1SugarBank();
+buildType1LabelBank("labelWrapABHType1", T1_ABH_LABEL_CHIPS, "abh");
+buildType1LabelBank("labelWrapLewisType1", T1_LEWIS_LABEL_CHIPS, "lewis");
+buildType1LabelBank("labelWrapSecretorType1", T1_YESNO_LABEL_CHIPS, "secretor");
+buildType1LabelBank("labelWrapAgglutinationType1", T1_YESNO_LABEL_CHIPS, "agglutination");
+setupType1SugarDrop("drop-side-lewis-type1", "lewisSide", "FUT3");
+setupType1SugarDrop("drop-side-secretor-type1", "secretorSide", "FUT2");
+setupType1SugarDrop("drop-top-type1", "top", null);
+setupType1LabelDrop("label-drop-abh-type1", "abhLabel", "type1-label-abh", "abh");
+setupType1LabelDrop("label-drop-lewis-type1", "lewisLabel", "type1-label-lewis", "lewis");
+setupType1LabelDrop("label-drop-secretor-type1", "secretorLabel", "type1-label-secretor", "secretor");
+setupType1LabelDrop("label-drop-agglutination-type1", "agglutinationLabel", "type1-label-agglutination", "agglutination");
+document.getElementById("checkBtnType1").addEventListener("click", checkAnswersType1);
+document.getElementById("resetBtnType1").addEventListener("click", resetType1);
+resetType1();
+resetAll();
+</script>
+</body>
+</html>
