@@ -530,7 +530,7 @@ function renderHome(v){
 }
 
 async function loadInteractiveLinks(){
-  const {data:links} = await sb.from('mlsboc_interactive_links').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+  const {data:links} = await sb.from('mlsboc_interactive_links').select('*').order('created_at',{ascending:true});
   const grid = document.getElementById('interactive-links-grid');
   const adminDiv = document.getElementById('interactive-admin');
 
@@ -538,7 +538,7 @@ async function loadInteractiveLinks(){
     if(!links||!links.length){
       grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.' + (isAdmin?' Use the form below to add one.':'') + '</div>';
     } else {
-      grid.innerHTML = '<div class="subject-grid">' + links.map((lnk,i) =>
+      grid.innerHTML = '<div class="subject-grid">' + links.map((lnk) =>
         '<div class="subject-card" style="position:relative;cursor:pointer" onclick="window.open(\'' + lnk.url + '\',\'_blank\')">'
         + (lnk.image_url ? '<div style="width:100%;height:130px;overflow:hidden"><img src="'+lnk.image_url+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>'
           : '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px">🔗</div>')
@@ -561,10 +561,8 @@ async function loadInteractiveLinks(){
       + '<div class="form-group"><label>Title</label><input type="text" id="il-title" placeholder="e.g. Blood Cell Identifier"></div>'
       + '<div class="form-group"><label>URL</label><input type="text" id="il-url" placeholder="https://..."></div>'
       + '<div class="form-group" style="margin-bottom:12px"><label>Description (optional)</label><input type="text" id="il-desc" placeholder="Short note about this tool"></div>'
-      + '<div class="form-group" style="margin-bottom:12px"><label>Image URL (optional — paste a GitHub raw URL or any image link)</label>'
-      + '<input type="text" id="il-img-url" placeholder="https://raw.githubusercontent.com/...">'
-      + '<div style="font-size:11px;color:var(--text3);margin-top:4px">Or drag & drop / click to upload a local image</div>'
-      + '<div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px" id="il-img-dz" ondrop="handleILImgDrop(event)" ondragover="event.preventDefault();this.style.borderColor=\'var(--accent)\'" ondragleave="this.style.borderColor=\'var(--border2)\'" onclick="document.getElementById(\'il-img-file\').click()">📷 Drop image or click to upload'
+      + '<div class="form-group" style="margin-bottom:12px"><label>Image (drag & drop or click)</label>'
+      + '<div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px" id="il-img-dz" ondrop="handleILImgDrop(event)" ondragover="event.preventDefault();this.style.borderColor=\'var(--accent)\'" ondragleave="this.style.borderColor=\'var(--border2)\'" onclick="document.getElementById(\'il-img-file\').click()">📷 Drop image or click'
       + '<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">'
       + '</div>'
       + '<input type="hidden" id="il-img-data" value="">'
@@ -579,16 +577,13 @@ async function addInteractiveLink(){
   const url   = document.getElementById('il-url')?.value.trim();
   const desc  = document.getElementById('il-desc')?.value.trim();
   if(!title || !url){ alert('Title and URL are required.'); return; }
-  // Prefer typed image URL, fall back to uploaded base64
-  const imgUrl = document.getElementById('il-img-url')?.value.trim()
-    || document.getElementById('il-img-data')?.value || '';
-  const {error} = await sb.from('mlsboc_interactive_links').insert({title, url, description:desc||'', image_url:imgUrl});
-  if(error){alert('Error saving: '+error.message);return;}
+  const image_url = document.getElementById('il-img-data')?.value || '';
+  const {error} = await sb.from('mlsboc_interactive_links').insert({title, url, description:desc||'', image_url});
+  if(error){alert('Error: '+error.message);return;}
   document.getElementById('il-title').value='';
   document.getElementById('il-url').value='';
   document.getElementById('il-desc').value='';
-  const iurl=document.getElementById('il-img-url');if(iurl)iurl.value='';
-  const dz=document.getElementById('il-img-dz');if(dz)dz.innerHTML='📷 Drop image or click to upload<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">';
+  const dz=document.getElementById('il-img-dz');if(dz)dz.innerHTML='📷 Drop image or click<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">';
   const hid=document.getElementById('il-img-data');if(hid)hid.value='';
   loadInteractiveLinks();
 }
@@ -605,10 +600,8 @@ async function editInteractiveLink(id){
     <div class="form-group"><label>URL</label><input type="text" id="eil-url" value="${esc(lnk.url||'')}"></div>
     <div class="form-group"><label>Description</label><input type="text" id="eil-desc" value="${esc(lnk.description||'')}"></div>
     <div class="form-group">
-      <label>Image URL (GitHub raw or any direct image link)</label>
-      <input type="text" id="eil-img-url" value="${esc(lnk.image_url&&!lnk.image_url.startsWith('data:')?lnk.image_url:'')}" placeholder="https://raw.githubusercontent.com/...">
-      <div style="font-size:11px;color:var(--text3);margin-top:4px">Or drag & drop / click below to upload</div>
-      <div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column;margin-top:6px"
+      <label>Image (drag & drop or click to change)</label>
+      <div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column"
         id="eil-img-dz"
         ondrop="handleEILImgDrop(event,'${id}')"
         ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
@@ -639,8 +632,6 @@ function handleEILImgFile(e,id){
       cv.getContext('2d').drawImage(t,0,0,w,ht);
       const url=cv.toDataURL('image/jpeg',0.75);
       const hid=document.getElementById('eil-img-data');if(hid)hid.value=url;
-      // Clear the URL field so uploaded base64 takes priority
-      const iurl=document.getElementById('eil-img-url');if(iurl)iurl.value='';
       const dz=document.getElementById('eil-img-dz');
       if(dz)dz.innerHTML=`<img src="${url}" style="max-height:80px;border-radius:4px;max-width:100%"><input type="file" id="eil-img-file" accept="image/*" style="display:none" onchange="handleEILImgFile(event,'${id}')">`;
     };
@@ -661,11 +652,9 @@ async function saveInteractiveLink(id){
   const title=document.getElementById('eil-title')?.value.trim();
   const url=document.getElementById('eil-url')?.value.trim();
   const desc=document.getElementById('eil-desc')?.value.trim();
-  // Typed URL takes priority; fall back to uploaded base64
-  const imgUrl=document.getElementById('eil-img-url')?.value.trim()
-    || document.getElementById('eil-img-data')?.value || '';
+  const image_url=document.getElementById('eil-img-data')?.value||'';
   if(!title||!url){alert('Title and URL required.');return;}
-  const {error}=await sb.from('mlsboc_interactive_links').update({title,url,description:desc||'',image_url:imgUrl}).eq('id',id);
+  const {error}=await sb.from('mlsboc_interactive_links').update({title,url,description:desc||'',image_url}).eq('id',id);
   if(error){alert('Save failed: '+error.message);return;}
   document.getElementById('condition-modal').classList.add('hidden');
   loadInteractiveLinks();
