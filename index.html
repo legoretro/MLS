@@ -3348,16 +3348,15 @@ function closeImgViewer(){
   document.body.style.overflow='';
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgViewer();});
-  let selectedPop = null;
 
-// tap on bank
+let selectedPop = null;
+
 document.querySelectorAll('.chip').forEach(chip=>{
   chip.addEventListener('click',()=>{
     selectedPop = chip.textContent;
   });
 });
 
-// tap on dropzone
 document.querySelectorAll('.dropzone').forEach(dz=>{
   dz.addEventListener('click',()=>{
     if(!selectedPop) return;
@@ -3373,6 +3372,7 @@ document.querySelectorAll('.dropzone').forEach(dz=>{
     selectedPop = null;
   });
 });
+  
 </script>
 <div id="img-viewer" style="display:none" onclick="closeImgViewer()">
   <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
