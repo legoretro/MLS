@@ -2,11 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MLS BOC Prep — Student Created · For Studying Purposes Only</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MLS BOC Prep</title>
+
+<!-- PWA / Apple home screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="MLS BOC">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d0f12">
+
+<!-- Apple touch icon (shown on home screen) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230d0f12'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle' fill='%234f8ef7'%3E🩸%3C/text%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Splash/loading screen shown instantly before JS loads -->
+<style>
+#pwa-splash{position:fixed;inset:0;background:#0d0f12;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px}
+#pwa-splash .sp-logo{font-family:monospace;font-size:22px;color:#4f8ef7;letter-spacing:-1px}
+#pwa-splash .sp-sub{font-size:13px;color:#5c6380;font-family:sans-serif}
+#pwa-splash .sp-dot{display:inline-block;animation:blink 1.2s infinite}
+#pwa-splash .sp-dot:nth-child(2){animation-delay:.2s}
+#pwa-splash .sp-dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+</style>
+</head>
 <style>
 :root {
   --bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;--bg4:#242840;
@@ -218,9 +240,59 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .breadcrumb-link:hover{color:var(--accent2)}
 .breadcrumb-cur{font-size:13px;color:var(--text2)}
 .image-quiz-img{width:100%;max-width:500px;height:320px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);margin-bottom:20px}
+
+/* Blood Bank Quiz Mode */
+.bbq-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;overflow-y:auto}
+.bbq-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.bbq-body{flex:1;padding:20px;max-width:740px;margin:0 auto;width:100%}
+.bbq-context{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:20px;font-size:13px}
+.bbq-question{font-size:19px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:24px;text-align:center}
+.bbq-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+@media(max-width:520px){.bbq-options{grid-template-columns:1fr}}
+.bbq-opt{border:none;border-radius:var(--r2);padding:18px 16px;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;text-align:left;min-height:70px;line-height:1.4}
+.bbq-opt-a{background:#e63946;color:#fff}
+.bbq-opt-b{background:#2196f3;color:#fff}
+.bbq-opt-c{background:#f5a623;color:#fff}
+.bbq-opt-d{background:#3ddc84;color:#1a2a1a}
+.bbq-opt:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px)}
+.bbq-opt:disabled{cursor:default}
+.bbq-opt.correct-ans{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--success);transform:scale(1.03)}
+.bbq-opt.wrong-ans{opacity:.45;transform:scale(0.97)}
+.bbq-opt-letter{font-size:18px;font-weight:800;min-width:28px;opacity:.85}
+.bbq-timer-ring{width:52px;height:52px;flex-shrink:0}
+.bbq-score-big{font-size:64px;font-weight:800;font-family:var(--mono);color:var(--accent);text-align:center;margin:16px 0}
 </style>
 </head>
 <body>
+
+<!-- Splash shown while JS/Supabase loads -->
+<div id="pwa-splash">
+  <div class="sp-logo">MLS / BOC PREP</div>
+  <div class="sp-sub">Loading<span class="sp-dot">.</span><span class="sp-dot">.</span><span class="sp-dot">.</span></div>
+</div>
+
+<!-- Load Supabase safely (no document.write, works in PWA/Safari standalone) -->
+<script>
+(function(){
+  function init(){
+    if(typeof supabase!=='undefined'||window.__sbLoaded)return;
+    window.__sbLoaded=true;
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.onerror=function(){
+      var s2=document.createElement('script');
+      s2.src='https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      s2.onload=window.__appInit;
+      document.head.appendChild(s2);
+    };
+    s.onload=window.__appInit;
+    document.head.appendChild(s);
+  }
+  // __appInit is defined by the main script block; call init after DOM ready
+  document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+
 <div id="app">
 
 <!-- ADMIN MODAL -->
@@ -340,6 +412,7 @@ let appState = {
   hemeImgMode:'browse', // 'browse','quiz'
   hemeQuizItems:[], hemeQuizIdx:0, hemeQuizAns:[], hemeQuizDone:false,
   bbAnswers:{}, // blood bank MC answers: {caseId: {qIdx: letter}}
+  bbQuizMode:false, bbQuizItems:[], bbQuizIdx:0, bbQuizChosen:null, bbQuizAnswered:false, bbQuizScore:0, bbQuizDone:false,
   hemeCaseAnswers:{}, // hematology case answers
   hemeCaseCollapsed:{}, // hematology case collapse state
   bbCollapsed:{}, // blood bank case collapse state
@@ -354,11 +427,24 @@ let appState = {
 };
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', async ()=>{
-  sb = supabase.createClient(SB_URL, SB_KEY);
-  await seedIfEmpty();
-  await loadIconCache();
+window.__appInit = async function(){
+  // Guard: only run once even if called multiple times
+  if(window.__appInitDone)return;
+  window.__appInitDone=true;
+  try{
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    await seedIfEmpty();
+    await loadIconCache();
+  }catch(e){console.warn('Init error',e);}
+  // Hide splash and show app
+  const splash=document.getElementById('pwa-splash');
+  if(splash)splash.style.display='none';
   renderView();
+};
+
+// Also hook DOMContentLoaded in case supabase was already loaded inline
+window.addEventListener('DOMContentLoaded',function(){
+  if(typeof supabase!=='undefined')window.__appInit();
 });
 
 function getUID(){
@@ -2395,14 +2481,215 @@ async function deleteMicroCase(id){
 
 // ─── BLOOD BANK CASES (MC question system) ────────────────────────────────────
 async function renderBloodBankCases(el){
+  if(appState.bbQuizMode){renderBBQuiz(el);return;}
   const {data}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
+
+  // Flatten all questions across all cases for the quiz button
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c.typing_table||[],_imgs:c.images||[]})));
 
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminBBCaseControls()}</div>`:''}
-    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Blood Bank Cases</div>
-    <p class="text-muted mb-20" style="font-size:13px">Read the case and typing results, then answer each question.</p>
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:2px">Blood Bank Cases</div>
+        <div class="text-muted" style="font-size:13px">Read the case and typing results, then answer each question.</div>
+      </div>
+      ${allQs.length?`<button class="btn btn-primary ml-auto" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+    </div>
     ${!data||!data.length?'<div class="empty">No Blood Bank cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderBBCase(c,i)).join('')}
+  `;
+}
+
+// ─── BLOOD BANK QUIZ MODE ─────────────────────────────────────────────────────
+async function startBBQuiz(){
+  const {data}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c.typing_table||[],_imgs:c.images||[]})));
+  if(!allQs.length){alert('No questions found in any case yet.');return;}
+  appState.bbQuizMode=true;
+  appState.bbQuizItems=shuffle(allQs);
+  appState.bbQuizIdx=0;
+  appState.bbQuizChosen=null;
+  appState.bbQuizAnswered=false;
+  appState.bbQuizScore=0;
+  appState.bbQuizDone=false;
+  appState.bbQuizAnswers={};
+  clearInterval(appState.bbQuizTimer);
+  renderTab();
+}
+
+function exitBBQuiz(){
+  clearInterval(appState.bbQuizTimer);
+  appState.bbQuizMode=false;
+  appState.bbQuizDone=false;
+  renderTab();
+}
+
+function renderBBQuiz(el){
+  if(appState.bbQuizDone){renderBBQuizResults(el);return;}
+
+  const items=appState.bbQuizItems;
+  const idx=appState.bbQuizIdx;
+  const item=items[idx];
+  const answered=appState.bbQuizAnswered;
+  const chosen=appState.bbQuizChosen;
+  const letters=['a','b','c','d'];
+  const colors=['bbq-opt-a','bbq-opt-b','bbq-opt-c','bbq-opt-d'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+  const pct=Math.round((idx+1)/items.length*100);
+
+  const tableHtml=item._table&&item._table.length?`
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Typing Results</div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse;font-size:12px">
+          <thead><tr>${item._table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:6px 10px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+          <tbody><tr>${item._table.map(col=>`<td style="border:1px solid var(--border);padding:6px 10px;text-align:center;font-family:var(--mono);font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
+        </table>
+      </div>
+    </div>`:'' ;
+
+  const imgHtml=item._imgs&&item._imgs.filter(Boolean).length?`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      ${item._imgs.filter(Boolean).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="height:70px;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;object-fit:cover">`).join('')}
+    </div>`:'' ;
+
+  const optsHtml=(item.options||[]).map((opt,oi)=>{
+    if(!opt)return '';
+    const letter=letters[oi];
+    let cls=`bbq-opt ${colors[oi]}`;
+    if(answered){
+      if(letter===item.correct)cls+=' correct-ans';
+      else if(letter===chosen&&chosen!==item.correct)cls+=' wrong-ans';
+    }
+    return `<button class="${cls}" onclick="answerBBQuiz('${letter}')" ${answered?'disabled':''}><span class="bbq-opt-letter">${emojis[oi]}</span><span>${opt}</span></button>`;
+  }).filter(Boolean).join('');
+
+  let afterHtml='';
+  if(answered){
+    const isCorrect=chosen===item.correct;
+    const correctIdx=letters.indexOf(item.correct);
+    afterHtml=`
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:22px;font-weight:800;color:${isCorrect?'var(--success)':'var(--danger)'};margin-bottom:6px">${isCorrect?'✓ Correct!':'✗ Incorrect'}</div>
+        ${!isCorrect?`<div style="font-size:13px;color:var(--text2)">Correct answer: <strong style="color:var(--success)">${(item.options||[])[correctIdx]||''}</strong></div>`:''}
+        ${item.explanation?`<div style="font-size:13px;color:var(--text2);margin-top:8px;background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left">${item.explanation}</div>`:''}
+      </div>
+      <div style="text-align:center">
+        ${idx<items.length-1
+          ?`<button class="btn btn-primary" onclick="bbQuizNext()" style="font-size:15px;padding:12px 32px">Next →</button>`
+          :`<button class="btn btn-success" onclick="appState.bbQuizDone=true;clearInterval(appState.bbQuizTimer);renderTab()" style="font-size:15px;padding:12px 32px">See Results</button>`}
+      </div>`;
+  }
+
+  el.innerHTML=`
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="exitBBQuiz()">✕ Exit</button>
+        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="question-num" style="white-space:nowrap">${idx+1} / ${items.length}</span>
+        <span class="timer" id="bbq-timer" style="min-width:44px;text-align:center">--</span>
+      </div>
+      <div class="bbq-body">
+        <div class="bbq-context">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">${item._caseTitle||'Case'}</div>
+          ${item._scenario?`<div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.6">${item._scenario}</div>`:''}
+          ${tableHtml}${imgHtml}
+        </div>
+        <div class="bbq-question">${item.question}</div>
+        <div class="bbq-options">${optsHtml}</div>
+        ${afterHtml}
+      </div>
+    </div>
+  `;
+
+  // Start per-question countdown timer (20s)
+  clearInterval(appState.bbQuizTimer);
+  if(!answered){
+    let t=20;
+    const timerEl=()=>document.getElementById('bbq-timer');
+    const update=()=>{
+      const el=timerEl();
+      if(el){el.textContent=t+'s';el.style.color=t<=5?'var(--danger)':t<=10?'var(--warn)':'var(--text2)';}
+    };
+    update();
+    appState.bbQuizTimer=setInterval(()=>{
+      t--;
+      update();
+      if(t<=0){clearInterval(appState.bbQuizTimer);if(!appState.bbQuizAnswered)answerBBQuiz(null);}
+    },1000);
+  }
+}
+
+function answerBBQuiz(letter){
+  if(appState.bbQuizAnswered)return;
+  clearInterval(appState.bbQuizTimer);
+  appState.bbQuizAnswered=true;
+  appState.bbQuizChosen=letter;
+  if(!appState.bbQuizAnswers)appState.bbQuizAnswers={};
+  appState.bbQuizAnswers[appState.bbQuizIdx]=letter;
+  const item=appState.bbQuizItems[appState.bbQuizIdx];
+  if(letter&&letter===item.correct)appState.bbQuizScore++;
+  renderTab();
+}
+
+function bbQuizNext(){
+  appState.bbQuizIdx++;
+  appState.bbQuizChosen=null;
+  appState.bbQuizAnswered=false;
+  renderTab();
+}
+
+function renderBBQuizResults(el){
+  const total=appState.bbQuizItems.length;
+  const score=appState.bbQuizScore;
+  const pct=Math.round(score/total*100);
+  const answers=appState.bbQuizAnswers||{};
+  const letters=['a','b','c','d'];
+
+  let reviewHtml='';
+  appState.bbQuizItems.forEach((item,i)=>{
+    const ans=answers[i]||null;
+    const wasCorrect=ans===item.correct;
+    const correctIdx=letters.indexOf(item.correct);
+    const chosenIdx=ans?letters.indexOf(ans):-1;
+    reviewHtml+=`
+      <div style="background:var(--bg2);border:1px solid ${wasCorrect?'var(--border)':'#f0647433'};border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${item._caseTitle||''}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${item.question}</div>
+        ${wasCorrect
+          ?`<div style="font-size:12px;color:var(--success)">✓ Correct — ${(item.options||[])[correctIdx]||''}</div>`
+          :`<div style="font-size:12px;color:var(--danger)">✗ ${ans&&chosenIdx>=0?'Your answer: '+((item.options||[])[chosenIdx]||''):'Time ran out'}</div>
+           <div style="font-size:12px;color:var(--success);margin-top:2px">Correct: ${(item.options||[])[correctIdx]||''}</div>`}
+        ${item.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">${item.explanation}</div>`:''}
+      </div>`;
+  });
+
+  el.innerHTML=`
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="exitBBQuiz()">← Back to Cases</button>
+        <div class="ml-auto"><span class="question-num">Quiz Complete</span></div>
+      </div>
+      <div class="bbq-body">
+        <div style="text-align:center;padding:24px 0 32px">
+          <div style="font-size:48px;margin-bottom:8px">${pct>=80?'🏆':pct>=60?'✅':'📚'}</div>
+          <div class="bbq-score-big">${pct}%</div>
+          <div style="font-size:16px;color:var(--text2)">${score} of ${total} correct</div>
+        </div>
+        <div class="result-grid" style="margin-bottom:24px">
+          <div class="stat-card"><div class="stat-num text-success">${score}</div><div class="stat-label">Correct</div></div>
+          <div class="stat-card"><div class="stat-num text-danger">${total-score}</div><div class="stat-label">Missed</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
+        </div>
+        <div class="flex gap-8 mb-20 flex-wrap">
+          <button class="btn btn-primary" onclick="startBBQuiz()">Retry Quiz</button>
+          <button class="btn btn-ghost" onclick="exitBBQuiz()">Back to Cases</button>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review All Questions</div>
+        ${reviewHtml}
+      </div>
+    </div>
   `;
 }
 
@@ -3348,31 +3635,6 @@ function closeImgViewer(){
   document.body.style.overflow='';
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgViewer();});
-
-let selectedPop = null;
-
-document.querySelectorAll('.chip').forEach(chip=>{
-  chip.addEventListener('click',()=>{
-    selectedPop = chip.textContent;
-  });
-});
-
-document.querySelectorAll('.dropzone').forEach(dz=>{
-  dz.addEventListener('click',()=>{
-    if(!selectedPop) return;
-
-    const key = dz.id.replace('slot-','');
-    const [ph, rank] = key.split('__');
-
-    if(countUsesInPhenotype(ph, selectedPop) > 0) return;
-
-    setState(key, { pop: selectedPop });
-    renderSlot(key);
-    renderBankUsage();
-    selectedPop = null;
-  });
-});
-  
 </script>
 <div id="img-viewer" style="display:none" onclick="closeImgViewer()">
   <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
