@@ -243,6 +243,41 @@
     text-align:center;
     width:100%;
   }
+
+  .seeAnswersBtn{ background:#b8860b; color:#fff; }
+  .answers-panel{
+    display:none;
+    margin-top:10px;
+    background:var(--panel);
+    border-radius:12px;
+    padding:12px;
+    box-shadow:var(--shadow);
+    line-height:1.5;
+  }
+  .answers-panel.show{ display:block; }
+  .answers-panel h3{
+    margin:0 0 8px;
+    font-size:.9rem;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .answers-panel h4{
+    margin:10px 0 6px;
+    font-size:.82rem;
+  }
+  .answers-panel table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:6px;
+  }
+  .answers-panel th, .answers-panel td{
+    border:2px solid var(--border);
+    padding:6px 8px;
+    text-align:left;
+    background:#fff;
+    font-size:.8rem;
+  }
+
 </style>
 </head>
 <body>
@@ -268,7 +303,29 @@
   <div class="controls">
     <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
     <button class="resetBtn" id="resetBtn">↺ Reset</button>
+    <button class="seeAnswersBtn" id="showAnswersBtn">See All Answers</button>
     <div class="score" id="scoreMsg"></div>
+  </div>
+
+  <div class="answers-panel" id="answersPanel">
+    <h3>Answers — ABO Fill In</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Phenotype</th>
+          <th>White</th>
+          <th>Black</th>
+          <th>Hispanic</th>
+          <th>Asian</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>O</td><td>45%</td><td>50%</td><td>56%</td><td>40%</td></tr>
+        <tr><td>A</td><td>40%</td><td>26%</td><td>31%</td><td>28%</td></tr>
+        <tr><td>B</td><td>11%</td><td>20%</td><td>10%</td><td>25%</td></tr>
+        <tr><td>AB</td><td>4%</td><td>4%</td><td>3%</td><td>7%</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="split-layout">
@@ -319,7 +376,20 @@
   <div class="controls">
     <button class="checkBtn" id="rankCheckBtn">✔ Check Answers</button>
     <button class="resetBtn" id="rankResetBtn">↺ Reset</button>
+    <button class="seeAnswersBtn" id="showRankAnswersBtn">See All Answers</button>
     <div class="score" id="rankScoreMsg"></div>
+  </div>
+
+  <div class="answers-panel" id="rankAnswersPanel">
+    <h3>Answers — ABO Rank It</h3>
+    <h4>O</h4>
+    <div>Hispanic → Black → White → Asian</div>
+    <h4>A</h4>
+    <div>White → Hispanic → Asian → Black</div>
+    <h4>B</h4>
+    <div>Asian → Black → White → Hispanic</div>
+    <h4>AB</h4>
+    <div>Asian → White / Black tie → Hispanic</div>
   </div>
 
   <div class="layout">
@@ -727,7 +797,28 @@ buildRankBank(); buildRankColumns(); resetRank();
   <div class="controls">
     <button class="checkBtn" id="dCheckBtn">✔ Check Answers</button>
     <button class="resetBtn" id="dResetBtn">↺ Reset</button>
+    <button class="seeAnswersBtn" id="showDAnswersBtn">See All Answers</button>
     <div class="score" id="dScoreMsg"></div>
+  </div>
+
+  <div class="answers-panel" id="dAnswersPanel">
+    <h3>Answers — D Antigen</h3>
+    <h4>D Antigen Frequency</h4>
+    <div>Asian → Black → Hispanic → Caucasian</div>
+    <h4>D-Negative Mechanism by Ancestry</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Mechanism</th>
+          <th>Ancestry</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>"Del" mutant RHD gene</td><td>Asian (10-30%)</td></tr>
+        <tr><td>RHD gene with missense mutations</td><td>African</td></tr>
+        <tr><td>Deletion of RHD gene</td><td>European</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- outer 3-col: pop bank | activities | ancestry bank -->
@@ -1021,4 +1112,19 @@ document.getElementById("dResetBtn").addEventListener("click",resetD);
 buildDBank(); buildDTable();
 buildMBank(); buildMTable();
 resetD();
+
+function setupAnswerToggle(btnId, panelId){
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  if(!btn || !panel) return;
+  btn.addEventListener("click", () => {
+    panel.classList.toggle("show");
+    btn.textContent = panel.classList.contains("show") ? "Hide Answers" : "See All Answers";
+  });
+}
+
+setupAnswerToggle("showAnswersBtn", "answersPanel");
+setupAnswerToggle("showRankAnswersBtn", "rankAnswersPanel");
+setupAnswerToggle("showDAnswersBtn", "dAnswersPanel");
+
 </script>
