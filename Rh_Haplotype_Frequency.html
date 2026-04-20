@@ -494,6 +494,7 @@
   <div class="section-controls">
     <button id="rhCheckBtn" class="checkBtn">✔ Check Rh Section</button>
     <button id="rhResetBtn" class="resetBtn">↺ Reset Rh Section</button>
+    <button id="rhShowAnswersBtn" class="resetBtn">👁 See Rh Answers</button>
     <div id="rhMsg" class="score"></div>
   </div>
 
@@ -520,6 +521,7 @@
       <div class="section-controls" style="margin-bottom:14px;">
         <button id="donorCheckBtn" class="checkBtn">✔ Check Donor Section</button>
         <button id="donorResetBtn" class="resetBtn">↺ Reset Donor Section</button>
+        <button id="donorShowAnswersBtn" class="resetBtn">👁 See Donor Answers</button>
         <div id="donorMsg" class="score"></div>
       </div>
 
@@ -545,7 +547,87 @@
         <div id="donorPopWrap"></div>
       </div>
     </div>
+  
+    <div id="donorAnswersSection" style="display:none; margin:16px auto 0; max-width:920px; background:var(--panel); border-radius:12px; padding:14px; box-shadow:var(--shadow);">
+      <div style="font-weight:900; margin-bottom:10px;">Donor Section Answers</div>
+      <table class="donor-table">
+        <thead>
+          <tr>
+            <th style="width:24%;">Antigen</th>
+            <th style="width:31%;">Frequency</th>
+            <th style="width:45%;">Population Difference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>D</td><td>85</td><td>Lower White</td></tr>
+          <tr><td>C</td><td>70</td><td>Lower Black</td></tr>
+          <tr><td>c</td><td>80</td><td>Lower Asian</td></tr>
+          <tr><td>E</td><td>30</td><td></td></tr>
+          <tr><td>e</td><td>98</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
+
+  <div id="rhAnswersSection" style="display:none; margin-top:20px; background:var(--panel); border-radius:12px; padding:14px; box-shadow:var(--shadow);">
+    <div style="font-weight:900; margin-bottom:10px;">Rh Section Answers</div>
+    <div class="tables">
+      <div class="section">
+        <div class="section-title">WHITE</div>
+        <table>
+          <thead>
+            <tr><th>Weiner</th><th>Fisher-Race</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>R1</td><td>DCe</td></tr>
+            <tr><td>r</td><td>dce</td></tr>
+            <tr><td>R2</td><td>DcE</td></tr>
+            <tr><td>R0</td><td>Dce</td></tr>
+            <tr><td>r’</td><td>dCe</td></tr>
+            <tr><td>r’’</td><td>dcE</td></tr>
+            <tr><td>RZ</td><td>DCE</td></tr>
+            <tr><td>rY</td><td>dCE</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="section-title">BLACK</div>
+        <table>
+          <thead>
+            <tr><th>Weiner</th><th>Fisher-Race</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>R0</td><td>Dce</td></tr>
+            <tr><td>r</td><td>dce</td></tr>
+            <tr><td>R1</td><td>DCe</td></tr>
+            <tr><td>R2</td><td>DcE</td></tr>
+            <tr><td>r’</td><td>dCe</td></tr>
+            <tr><td>r’’</td><td>dcE</td></tr>
+            <tr><td>rY</td><td>dCE</td></tr>
+            <tr><td>RZ</td><td>DCE</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="section-title">ASIAN</div>
+        <table>
+          <thead>
+            <tr><th>Weiner</th><th>Fisher-Race</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>R1</td><td>DCe</td></tr>
+            <tr><td>R2</td><td>DcE</td></tr>
+            <tr><td>R0</td><td>Dce</td></tr>
+            <tr><td>r</td><td>dce</td></tr>
+            <tr><td>r’</td><td>dCe</td></tr>
+            <tr><td>RZ</td><td>DCE</td></tr>
+            <tr><td>r’’</td><td>dcE</td></tr>
+            <tr><td>rY</td><td>dCE</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
 </div>
 
@@ -1178,6 +1260,14 @@ document.getElementById("rhCheckBtn").addEventListener("click", checkRhAnswers);
 document.getElementById("rhResetBtn").addEventListener("click", resetRh);
 document.getElementById("donorCheckBtn").addEventListener("click", checkDonorAnswers);
 document.getElementById("donorResetBtn").addEventListener("click", resetDonor);
+document.getElementById("rhShowAnswersBtn").addEventListener("click", () => {
+  const section = document.getElementById("rhAnswersSection");
+  section.style.display = section.style.display === "none" ? "block" : "none";
+});
+document.getElementById("donorShowAnswersBtn").addEventListener("click", () => {
+  const section = document.getElementById("donorAnswersSection");
+  section.style.display = section.style.display === "none" ? "block" : "none";
+});
 
 buildBanks();
 buildTables();
