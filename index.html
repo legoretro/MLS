@@ -112,7 +112,7 @@ select option{background:var(--bg3)}
 .option:hover:not(.selected):not(.correct):not(.wrong){border-color:var(--border2);background:var(--bg4)}
 .option.correct{border-color:var(--success);background:#3ddc8415;color:var(--success)}
 .option.wrong{border-color:var(--danger);background:#f0647415;color:var(--danger)}
-.option-letter{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text3);min-width:18px;margin-top:1px}
+.option-letter{font-family:var(--mono);font-size:12px;font-weight:500;min-width:18px;margin-top:1px}
 .explanation{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;margin-top:16px;font-size:13px;color:var(--text2)}
 
 /* Timer */
@@ -155,7 +155,7 @@ select option{background:var(--bg3)}
 .condition-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s}
 .condition-card:hover{border-color:#4f8ef766;transform:translateY(-1px)}
 .condition-imgs{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:130px;background:var(--bg3)}
-.condition-imgs img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+.condition-imgs img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:var(--bg3)}
 .condition-imgs .img-ph{width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px}
 /* full-screen image viewer */
 body.light-mode .case-card{background:#f8f9fc}
@@ -245,22 +245,35 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .bbq-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;overflow-y:auto}
 .bbq-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .bbq-body{flex:1;padding:20px;max-width:740px;margin:0 auto;width:100%}
-.bbq-context{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:20px;font-size:13px}
-.bbq-question{font-size:19px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:24px;text-align:center}
+.bbq-context{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:20px;font-size:15px;color:var(--text)}
+.bbq-context-title{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.bbq-context-scenario{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:12px}
+.bbq-question{font-size:20px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:20px;text-align:center}
 .bbq-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 @media(max-width:520px){.bbq-options{grid-template-columns:1fr}}
-.bbq-opt{border:none;border-radius:var(--r2);padding:18px 16px;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;text-align:left;min-height:70px;line-height:1.4}
-.bbq-opt-a{background:#e63946;color:#fff}
-.bbq-opt-b{background:#2196f3;color:#fff}
-.bbq-opt-c{background:#f5a623;color:#fff}
+.bbq-opt{border:none;border-radius:var(--r2);padding:14px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;text-align:left;min-height:56px;line-height:1.3;color:#fff}
+.bbq-opt-a{background:#e63946}
+.bbq-opt-b{background:#2196f3}
+.bbq-opt-c{background:#f5a623}
 .bbq-opt-d{background:#3ddc84;color:#1a2a1a}
 .bbq-opt:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px)}
 .bbq-opt:disabled{cursor:default}
 .bbq-opt.correct-ans{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--success);transform:scale(1.03)}
 .bbq-opt.wrong-ans{opacity:.45;transform:scale(0.97)}
 .bbq-opt-letter{font-size:18px;font-weight:800;min-width:28px;opacity:.85}
-.bbq-timer-ring{width:52px;height:52px;flex-shrink:0}
 .bbq-score-big{font-size:64px;font-weight:800;font-family:var(--mono);color:var(--accent);text-align:center;margin:16px 0}
+/* Option letters always white in dark mode */
+.option-letter{font-family:var(--mono);font-size:12px;font-weight:500;color:#fff !important;min-width:18px;margin-top:1px}
+body.light-mode .option-letter{color:var(--text3) !important}
+/* Desktop scaling — bigger but not overwhelming on mobile */
+@media(min-width:768px){
+  .case-scenario{font-size:16px !important;line-height:1.9 !important}
+  .bbq-context{font-size:16px !important;padding:20px 24px !important}
+  .bbq-context-title{font-size:13px !important}
+  .bbq-context-scenario{font-size:16px !important}
+  .bbq-question{font-size:22px !important}
+  .bbq-opt{font-size:16px !important;padding:16px 18px !important;min-height:62px !important}
+}
 </style>
 </head>
 <body>
@@ -270,6 +283,9 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   <div class="sp-logo">MLS / BOC PREP</div>
   <div class="sp-sub">Loading<span class="sp-dot">.</span><span class="sp-dot">.</span><span class="sp-dot">.</span></div>
 </div>
+
+<!-- jsPDF for case export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- Load Supabase safely (no document.write, works in PWA/Safari standalone) -->
 <script>
@@ -435,6 +451,7 @@ window.__appInit = async function(){
     sb = supabase.createClient(SB_URL, SB_KEY);
     await seedIfEmpty();
     await loadIconCache();
+    await loadFolderIconCache();
   }catch(e){console.warn('Init error',e);}
   // Hide splash and show app
   const splash=document.getElementById('pwa-splash');
@@ -558,10 +575,18 @@ function renderView(){
 // ─── HOME ─────────────────────────────────────────────────────────────────────
 // ─── SUBJECT ICONS (Supabase-backed) ─────────────────────────────────────────
 let iconCache = {}; // key -> base64 data url, populated at startup
+let folderIconCache = {}; // 'heme_KEY' or 'micro_KEY' -> base64
 
 async function loadIconCache(){
   const {data} = await sb.from('mlsboc_subject_icons').select('key,image_url');
   if(data) data.forEach(row=>{ iconCache[row.key]=row.image_url; });
+}
+
+async function loadFolderIconCache(){
+  try{
+    const {data,error} = await sb.from('mlsboc_folder_icons').select('key,image_url');
+    if(!error&&data) data.forEach(row=>{ folderIconCache[row.key]=row.image_url; });
+  }catch(e){}
 }
 
 function getSubjectIcon(key,fallback){
@@ -862,28 +887,40 @@ async function renderQuizTab(el){
   const q=appState.quizQ[appState.quizIdx];
   const answered=appState.quizAns[appState.quizIdx];
   const pct=Math.round((appState.quizIdx+1)/appState.quizQ.length*100);
+  const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
+  const textColors=['#fff','#fff','#fff','#1a2a1a'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+  const opts=['a','b','c','d'];
   el.innerHTML=`
-    <div class="quiz-header">
-      <span class="question-num">Question ${appState.quizIdx+1} of ${appState.quizQ.length}</span>
-      <div class="flex gap-8">
-        ${appState.quizIdx>0?`<button class="btn btn-ghost btn-sm" onclick="qPrev()">← Prev</button>`:''}
-        ${answered&&appState.quizIdx<appState.quizQ.length-1?`<button class="btn btn-primary btn-sm" onclick="qNext()">Next →</button>`:''}
-        ${answered&&appState.quizIdx===appState.quizQ.length-1?`<button class="btn btn-success btn-sm" onclick="()=>{appState.quizDone=true;renderTab()}">Finish</button>`:''}
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('quiz')">✕ Exit</button>
+        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
+      </div>
+      <div class="bbq-body">
+        <div class="bbq-question">${q.question}</div>
+        <div class="bbq-options">
+          ${opts.map((opt,oi)=>`
+            <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
+              " style="background:${colors[oi]};color:${textColors[oi]}" onclick="answerQ('${opt}')" ${answered?'disabled':''}>
+              <span class="bbq-opt-letter">${emojis[oi]}</span>
+              <span>${q['option_'+opt]}</span>
+            </button>`).join('')}
+        </div>
+        ${answered?`
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:8px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
+            ${q.explanation?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:500px;margin:0 auto">${q.explanation}</div>`:''}
+          </div>
+          <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            ${appState.quizIdx>0?`<button class="btn btn-ghost" onclick="qPrev()">← Prev</button>`:''}
+            ${appState.quizIdx<appState.quizQ.length-1
+              ?`<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="qNext()">Next →</button>`
+              :`<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="appState.quizDone=true;renderTab()">See Results</button>`}
+          </div>`:''}
       </div>
     </div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    <div class="question-text">${q.question}</div>
-    <div class="options">
-      ${['a','b','c','d'].map(opt=>{
-        let cls='option';
-        if(answered){if(opt===q.correct_answer)cls+=' correct';else if(opt===answered&&answered!==q.correct_answer)cls+=' wrong';}
-        return `<button class="${cls}" onclick="answerQ('${opt}')" ${answered?'disabled':''}>
-          <span class="option-letter">${opt.toUpperCase()}.</span>
-          <span>${q['option_'+opt]}</span>
-        </button>`;
-      }).join('')}
-    </div>
-    ${answered&&q.explanation?`<div class="explanation">${q.explanation}</div>`:''}
   `;
 }
 
@@ -891,7 +928,7 @@ async function startSubjectQuiz(){
   const cnt=parseInt(document.getElementById('q-count').value)||10;
   const {data}=await sb.from('mlsboc_questions').select('*').eq('subject',appState.subject);
   if(!data||!data.length){alert('No questions found.');return;}
-  appState.quizQ=shuffle(data).slice(0,cnt);
+  window._kqOpts={};appState.quizQ=shuffle(data).slice(0,cnt);
   appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;
   renderTab();
 }
@@ -1167,78 +1204,127 @@ async function startUAQuiz(){
   const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
   if(!valid.length){alert('No images to quiz on yet.');return;}
   appState.uaImgMode='quiz';
-  appState.uaQuizItems=shuffle(valid);
+  window._kqOpts={};appState.uaQuizItems=shuffle(valid);
   appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
   renderTab();
 }
 
 function renderUAImageQuiz(el){
-  const items=appState.uaQuizItems;
-  if(appState.uaQuizDone){
-    const ans=appState.uaQuizAns;
-    let correct=0;
-    items.forEach((o,i)=>{if(ans[i]===o.id)correct++;});
-    let reviewHtml='';
-    items.forEach((o,i)=>{
-      const wasCorrect=ans[i]===o.id;
-      const chosen=items.find(x=>x.id===ans[i]);
-      reviewHtml+='<div class="missed-item"><div class="missed-q">'+o.name+'</div>'
-        +(wasCorrect?'<div class="missed-a">✓ Correct</div>':'<div class="missed-wrong">Your answer: '+(chosen?chosen.name:'(none)')+'</div><div class="missed-a">Correct: '+o.name+'</div>')
-        +'</div>';
-    });
-    el.innerHTML='<div class="result-grid">'
-      +'<div class="stat-card"><div class="stat-num" style="color:'+(correct/items.length>=0.6?'var(--success)':'var(--danger)')+'">'+Math.round(correct/items.length*100)+'%</div><div class="stat-label">Score</div></div>'
-      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
-      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
-      +'</div><div class="flex gap-8 mb-16">'
-      +'<button class="btn btn-primary" onclick="startUAQuiz()">Retry</button>'
-      +'<button class="btn btn-ghost" onclick="appState.uaImgMode=\'browse\';appState.uaQuizDone=false;renderTab()">Back to Browse</button>'
-      +'</div>'+reviewHtml;
-    return;
-  }
-  const item=items[appState.uaQuizIdx];
-  const answered=appState.uaQuizAns[appState.uaQuizIdx]!==undefined;
-  const chosen=appState.uaQuizAns[appState.uaQuizIdx];
-  const imgs=(item.images||[]).filter(Boolean);
-  const pct=Math.round((appState.uaQuizIdx+1)/items.length*100);
-  const pool=items.filter(x=>x.id!==item.id);
-  const wrong=shuffle(pool).slice(0,Math.min(3,pool.length));
-  const opts=shuffle([item,...wrong]);
-  let imgsHtml='<div class="image-placeholder" style="height:180px;margin-bottom:16px;border-radius:var(--r2)">🧪</div>';
-  if(imgs.length){
-    const cols=imgs.length===1?'1fr':'1fr 1fr';
-    imgsHtml='<div style="display:grid;grid-template-columns:'+cols+';gap:6px;margin-bottom:16px">'
-      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')
-      +'</div>';
-  }
-  let optHtml='';
-  opts.forEach(o=>{
-    let cls='option';
-    if(answered){if(o.id===item.id)cls+=' correct';else if(o.id===chosen&&chosen!==item.id)cls+=' wrong';}
-    optHtml+='<button class="'+cls+'" onclick="answerUAImgQ(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
-      +'<span class="option-letter" style="min-width:12px"></span><span>'+o.name+'</span></button>';
+  renderKahootImageQuiz(el,{
+    items:appState.uaQuizItems,
+    idx:appState.uaQuizIdx,
+    ans:appState.uaQuizAns,
+    done:appState.uaQuizDone,
+    prompt:'What is this urinalysis finding?',
+    placeholder:'🧪',
+    onAnswer:id=>{appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();},
+    onNext:()=>{appState.uaQuizIdx++;renderTab();},
+    onDone:()=>{appState.uaQuizDone=true;renderTab();},
+    onRetry:()=>startUAQuiz(),
+    onExit:()=>{appState.uaImgMode='browse';appState.uaQuizDone=false;renderTab();}
   });
-  let afterHtml='';
-  if(answered){
-    afterHtml='<div class="case-feedback '+(chosen===item.id?'correct':'wrong')+'" style="margin-top:14px">'
-      +(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>';
-    if(item.key_features&&item.key_features.length)
-      afterHtml+='<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>';
-    afterHtml+='<div class="flex gap-8 mt-16">'
-      +(appState.uaQuizIdx<items.length-1
-        ?'<button class="btn btn-primary" onclick="uaQuizNext()">Next →</button>'
-        :'<button class="btn btn-success" onclick="appState.uaQuizDone=true;renderTab()">View Results</button>')
-      +'</div>';
-  }
-  el.innerHTML='<div class="quiz-header"><span class="question-num">Image '+(appState.uaQuizIdx+1)+' of '+items.length+'</span>'
-    +'<button class="btn btn-ghost btn-sm" onclick="appState.uaImgMode=\'browse\';renderTab()">Exit Quiz</button></div>'
-    +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
-    +'<p class="text-muted mb-12" style="font-size:13px">What is this urinalysis finding?</p>'
-    +imgsHtml+'<div class="options">'+optHtml+'</div>'+afterHtml;
 }
 
 function answerUAImgQ(id){appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();}
 function uaQuizNext(){appState.uaQuizIdx++;renderTab();}
+
+// ─── SHARED KAHOOT IMAGE QUIZ RENDERER ───────────────────────────────────────
+function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onNext,onDone,onRetry,onExit}){
+  const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
+  const textColors=['#fff','#fff','#fff','#1a2a1a'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+
+  if(done){
+    let correct=0;
+    items.forEach((o,i)=>{if(ans[i]===o.id)correct++;});
+    const pct=Math.round(correct/items.length*100);
+    let reviewHtml='';
+    items.forEach((o,i)=>{
+      const wasCorrect=ans[i]===o.id;
+      const chosen=items.find(x=>x.id===ans[i]);
+      reviewHtml+='<div style="background:var(--bg2);border:1px solid '+(wasCorrect?'var(--border)':'#f0647433')+';border-radius:var(--r);padding:14px 16px;margin-bottom:8px">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">'+o.name+'</div>'
+        +(wasCorrect
+          ?'<div style="font-size:12px;color:var(--success)">✓ Correct</div>'
+          :'<div style="font-size:12px;color:var(--danger)">✗ Your answer: '+(chosen?chosen.name:'(none)')+'</div>'
+          +'<div style="font-size:12px;color:var(--success);margin-top:2px">Correct: '+o.name+'</div>')
+        +(o.key_features&&o.key_features.length?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">'+o.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>':'')
+        +'</div>';
+    });
+    el.innerHTML='<div class="bbq-overlay"><div class="bbq-header">'
+      +'<button class="btn btn-ghost btn-sm" onclick="('+onExit.toString()+')()">← Back</button>'
+      +'<div class="ml-auto"><span class="question-num">Quiz Complete</span></div>'
+      +'</div><div class="bbq-body">'
+      +'<div style="text-align:center;padding:24px 0 28px">'
+      +'<div style="font-size:48px;margin-bottom:8px">'+(pct>=80?'🏆':pct>=60?'✅':'📚')+'</div>'
+      +'<div class="bbq-score-big">'+pct+'%</div>'
+      +'<div style="font-size:16px;color:var(--text2)">'+correct+' of '+items.length+' correct</div>'
+      +'</div>'
+      +'<div class="result-grid" style="margin-bottom:24px">'
+      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
+      +'<div class="stat-card"><div class="stat-num" style="color:var(--accent)">'+pct+'%</div><div class="stat-label">Score</div></div>'
+      +'</div>'
+      +'<div class="flex gap-8 mb-20">'
+      +'<button class="btn btn-primary" onclick="('+onRetry.toString()+')()">Retry</button>'
+      +'<button class="btn btn-ghost" onclick="('+onExit.toString()+')()">Back to Browse</button>'
+      +'</div>'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review</div>'
+      +reviewHtml+'</div></div>';
+    return;
+  }
+
+  const item=items[idx];
+  const answered=ans[idx]!==undefined;
+  const chosen=ans[idx];
+  const imgs=(item.images||[]).filter(Boolean);
+  const pct=Math.round((idx+1)/items.length*100);
+  const pool=items.filter(x=>x.id!==item.id);
+  const wrongItems=shuffle(pool).slice(0,Math.min(3,pool.length));
+  // Store shuffled opts per question so they don't re-shuffle on re-render
+  if(!window._kqOpts)window._kqOpts={};
+  const optKey=item.id+'_'+idx;
+  if(!window._kqOpts[optKey])window._kqOpts[optKey]=shuffle([item,...wrongItems]);
+  const opts=window._kqOpts[optKey];
+
+  const imgsHtml=imgs.length
+    ?'<div style="display:grid;grid-template-columns:'+(imgs.length===1?'1fr':'1fr 1fr')+';gap:6px;margin-bottom:16px">'
+      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
+    :'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:12px">'+placeholder+'</div>';
+
+  const optsHtml=opts.map((o,oi)=>{
+    let extra='';
+    if(answered){
+      if(o.id===item.id)extra=' correct-ans';
+      else if(o.id===chosen&&chosen!==item.id)extra=' wrong-ans';
+    }
+    return '<button class="bbq-opt'+extra+'" style="background:'+colors[oi]+';color:'+textColors[oi]+'" onclick="('+onAnswer.toString()+')(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
+      +'<span class="bbq-opt-letter">'+emojis[oi]+'</span><span>'+o.name+'</span></button>';
+  }).join('');
+
+  const feedbackHtml=answered?'<div style="text-align:center;margin-bottom:16px">'
+    +'<div style="font-size:20px;font-weight:800;color:'+(chosen===item.id?'var(--success)':'var(--danger)')+';margin-bottom:6px">'+(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>'
+    +(item.key_features&&item.key_features.length?'<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>':'')
+    +'</div>'
+    +'<div style="text-align:center">'
+    +(idx<items.length-1
+      ?'<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="('+onNext.toString()+')()">Next →</button>'
+      :'<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="('+onDone.toString()+')()">See Results</button>')
+    +'</div>':'';
+
+  el.innerHTML='<div class="bbq-overlay">'
+    +'<div class="bbq-header">'
+    +'<button class="btn btn-ghost btn-sm" onclick="('+onExit.toString()+')()">✕ Exit</button>'
+    +'<div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+    +'<span class="question-num" style="white-space:nowrap">'+(idx+1)+' / '+items.length+'</span>'
+    +'</div>'
+    +'<div class="bbq-body">'
+    +'<p style="font-size:13px;color:var(--text3);text-align:center;margin-bottom:12px">'+prompt+'</p>'
+    +imgsHtml
+    +'<div class="bbq-options">'+optsHtml+'</div>'
+    +feedbackHtml
+    +'</div></div>';
+}
 
 // Hematology images — folder system
 async function renderHemeImages(el){
@@ -1264,11 +1350,18 @@ async function renderHemeImages(el){
             ${g.keys.map(k=>{
               const f=HEME_FOLDERS.find(x=>x.key===k);
               if(!f)return '';
-              return `<button class="folder-card" onclick="openHemeFolder('${f.key}')">
-                <div class="folder-icon">${f.icon}</div>
-                <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3">${f.name}</div>
-                <div class="folder-count">${counts[f.key]||0} conditions</div>
-              </button>`;
+              const cacheKey='heme_'+f.key;
+              const imgSrc=folderIconCache[cacheKey];
+              const imgHtml=imgSrc
+                ?`<div style="width:100%;height:90px;overflow:hidden;border-radius:var(--r) var(--r) 0 0;flex-shrink:0"><img src="${imgSrc}" style="width:100%;height:90px;object-fit:cover"></div>`
+                :`<div class="folder-icon">${f.icon}</div>`;
+              const uploadBtn=isAdmin?`<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;cursor:pointer;z-index:2" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleFolderIconFile(event,'heme_${f.key}')"></label>`:'';
+              return `<div style="position:relative">
+                <button class="folder-card" style="padding:${imgSrc?'0 0 12px':'16px'};overflow:hidden" onclick="openHemeFolder('${f.key}')">
+                  ${imgHtml}
+                  <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3;${imgSrc?'margin-top:8px':''}">${f.name}</div>
+                  <div class="folder-count">${counts[f.key]||0} conditions</div>
+                </button>${uploadBtn}</div>`;
             }).join('')}
           </div>
         </div>`).join('')}
@@ -1412,7 +1505,7 @@ async function startHemeQuiz(){
   const valid=(data||[]).filter(c=>c.images&&c.images.filter(Boolean).length>0);
   if(!valid.length){alert('No conditions with images to quiz on yet.');return;}
   appState.hemeImgMode='quiz';
-  appState.hemeQuizItems=shuffle(valid);
+  window._kqOpts={};appState.hemeQuizItems=shuffle(valid);
   appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
   renderTab();
 }
@@ -1422,84 +1515,26 @@ async function startHemeQuizFolder(folder){
   const valid=(data||[]).filter(c=>c.images&&c.images.filter(Boolean).length>0);
   if(!valid.length){alert('No conditions with images in this folder yet.');return;}
   appState.hemeImgMode='quiz';
-  appState.hemeQuizItems=shuffle(valid);
+  window._kqOpts={};appState.hemeQuizItems=shuffle(valid);
   appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
   appState.hemeImgPage=folder;
   renderTab();
 }
 
 function renderHemeImageQuiz(el){
-  const items=appState.hemeQuizItems;
-  if(appState.hemeQuizDone){
-    const ans=appState.hemeQuizAns;
-    let correct=0;
-    items.forEach((c,i)=>{if(ans[i]===c.id)correct++;});
-    let reviewHtml='';
-    items.forEach((c,i)=>{
-      const wasCorrect=ans[i]===c.id;
-      const chosen=items.find(x=>x.id===ans[i]);
-      reviewHtml+='<div class="missed-item"><div class="missed-q">'+c.name+'</div>'
-        +(wasCorrect?'<div class="missed-a">\u2713 Correct</div>':'<div class="missed-wrong">Your answer: '+(chosen?chosen.name:'(none)')+'</div><div class="missed-a">Correct: '+c.name+'</div>')
-        +'</div>';
-    });
-    el.innerHTML='<div class="result-grid">'
-      +'<div class="stat-card"><div class="stat-num" style="color:'+(correct/items.length>=0.6?'var(--success)':'var(--danger)')+'">'+Math.round(correct/items.length*100)+'%</div><div class="stat-label">Score</div></div>'
-      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
-      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
-      +'</div><div class="flex gap-8 mb-16">'
-      +'<button class="btn btn-primary" onclick="startHemeQuiz()">Retry All</button>'
-      +'<button class="btn btn-ghost" onclick="appState.hemeImgMode=\'browse\';appState.hemeImgPage=null;appState.hemeQuizDone=false;renderTab()">Back to Browse</button>'
-      +'</div>'+reviewHtml;
-    return;
-  }
-  const item=items[appState.hemeQuizIdx];
-  const answered=appState.hemeQuizAns[appState.hemeQuizIdx]!==undefined;
-  const chosen=appState.hemeQuizAns[appState.hemeQuizIdx];
-  const imgs=(item.images||[]).filter(Boolean);
-  const pct=Math.round((appState.hemeQuizIdx+1)/items.length*100);
-
-  // Build MC: correct + up to 3 random wrong from pool
-  const pool=items.filter(x=>x.id!==item.id);
-  const wrong=shuffle(pool).slice(0,Math.min(3,pool.length));
-  const opts=shuffle([item,...wrong]);
-
-  let imgsHtml='<div class="image-placeholder" style="height:180px;margin-bottom:16px;border-radius:var(--r2)">🖼️</div>';
-  if(imgs.length){
-    const cols=imgs.length===1?'1fr':'1fr 1fr';
-    imgsHtml='<div style="display:grid;grid-template-columns:'+cols+';gap:6px;margin-bottom:16px">'
-      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')
-      +'</div>';
-  }
-
-  let optHtml='';
-  opts.forEach(o=>{
-    let cls='option';
-    if(answered){
-      if(o.id===item.id)cls+=' correct';
-      else if(o.id===chosen&&chosen!==item.id)cls+=' wrong';
-    }
-    optHtml+='<button class="'+cls+'" onclick="answerHemeImgQ(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
-      +'<span class="option-letter" style="min-width:12px"></span><span>'+o.name+'</span></button>';
+  renderKahootImageQuiz(el,{
+    items:appState.hemeQuizItems,
+    idx:appState.hemeQuizIdx,
+    ans:appState.hemeQuizAns,
+    done:appState.hemeQuizDone,
+    prompt:'What condition does this represent?',
+    placeholder:'🖼️',
+    onAnswer:id=>{appState.hemeQuizAns[appState.hemeQuizIdx]=id;renderTab();},
+    onNext:()=>{appState.hemeQuizIdx++;renderTab();},
+    onDone:()=>{appState.hemeQuizDone=true;renderTab();},
+    onRetry:()=>startHemeQuiz(),
+    onExit:()=>{appState.hemeImgMode='browse';appState.hemeImgPage=null;appState.hemeQuizDone=false;renderTab();}
   });
-
-  let afterHtml='';
-  if(answered){
-    afterHtml='<div class="case-feedback '+(chosen===item.id?'correct':'wrong')+'" style="margin-top:14px">'
-      +(chosen===item.id?'\u2713 Correct!':'\u2717 Incorrect \u2014 '+item.name)+'</div>';
-    if(item.key_features&&item.key_features.length)
-      afterHtml+='<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>';
-    afterHtml+='<div class="flex gap-8 mt-16">'
-      +(appState.hemeQuizIdx<items.length-1
-        ?'<button class="btn btn-primary" onclick="hemeQuizNext()">Next \u2192</button>'
-        :'<button class="btn btn-success" onclick="appState.hemeQuizDone=true;renderTab()">View Results</button>')
-      +'</div>';
-  }
-
-  el.innerHTML='<div class="quiz-header"><span class="question-num">Image '+(appState.hemeQuizIdx+1)+' of '+items.length+'</span>'
-    +'<button class="btn btn-ghost btn-sm" onclick="appState.hemeImgMode=\'browse\';renderTab()">Exit Quiz</button></div>'
-    +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
-    +'<p class="text-muted mb-12" style="font-size:13px">What condition does this represent?</p>'
-    +imgsHtml+'<div class="options">'+optHtml+'</div>'+afterHtml;
 }
 
 function answerHemeImgQ(id){
@@ -1531,11 +1566,18 @@ async function renderMicroImages(el){
             ${g.keys.map(k=>{
               const f=MICRO_FOLDERS.find(x=>x.key===k);
               if(!f)return '';
-              return `<button class="folder-card" onclick="openMicroFolder('${f.key}')">
-                <div class="folder-icon">${f.icon}</div>
-                <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3">${f.name}</div>
-                <div class="folder-count">${counts[f.key]||0} organisms</div>
-              </button>`;
+              const cacheKey='micro_'+f.key;
+              const imgSrc=folderIconCache[cacheKey];
+              const imgHtml=imgSrc
+                ?`<div style="width:100%;height:90px;overflow:hidden;border-radius:var(--r) var(--r) 0 0;flex-shrink:0"><img src="${imgSrc}" style="width:100%;height:90px;object-fit:cover"></div>`
+                :`<div class="folder-icon">${f.icon}</div>`;
+              const uploadBtn=isAdmin?`<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;cursor:pointer;z-index:2" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleFolderIconFile(event,'micro_${f.key}')"></label>`:'';
+              return `<div style="position:relative">
+                <button class="folder-card" style="padding:${imgSrc?'0 0 12px':'16px'};overflow:hidden" onclick="openMicroFolder('${f.key}')">
+                  ${imgHtml}
+                  <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3;${imgSrc?'margin-top:8px':''}">${f.name}</div>
+                  <div class="folder-count">${counts[f.key]||0} organisms</div>
+                </button>${uploadBtn}</div>`;
             }).join('')}
           </div>
         </div>`).join('')}
@@ -1673,7 +1715,7 @@ async function startMicroQuiz(){
   const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
   if(!valid.length){alert('No organisms with images to quiz on yet.');return;}
   appState.microImgMode='quiz';
-  appState.microQuizItems=shuffle(valid);
+  window._kqOpts={};appState.microQuizItems=shuffle(valid);
   appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
   renderTab();
 }
@@ -1683,83 +1725,26 @@ async function startMicroQuizFolder(folder){
   const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
   if(!valid.length){alert('No organisms with images in this folder yet.');return;}
   appState.microImgMode='quiz';
-  appState.microQuizItems=shuffle(valid);
+  window._kqOpts={};appState.microQuizItems=shuffle(valid);
   appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
   appState.microImgPage=folder;
   renderTab();
 }
 
 function renderMicroImageQuiz(el){
-  const items=appState.microQuizItems;
-  if(appState.microQuizDone){
-    const ans=appState.microQuizAns;
-    let correct=0;
-    items.forEach((o,i)=>{if(ans[i]===o.id)correct++;});
-    let reviewHtml='';
-    items.forEach((o,i)=>{
-      const wasCorrect=ans[i]===o.id;
-      const chosen=items.find(x=>x.id===ans[i]);
-      reviewHtml+='<div class="missed-item"><div class="missed-q">'+o.name+'</div>'
-        +(wasCorrect?'<div class="missed-a">✓ Correct</div>':'<div class="missed-wrong">Your answer: '+(chosen?chosen.name:'(none)')+'</div><div class="missed-a">Correct: '+o.name+'</div>')
-        +'</div>';
-    });
-    el.innerHTML='<div class="result-grid">'
-      +'<div class="stat-card"><div class="stat-num" style="color:'+(correct/items.length>=0.6?'var(--success)':'var(--danger)')+'">'+Math.round(correct/items.length*100)+'%</div><div class="stat-label">Score</div></div>'
-      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
-      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
-      +'</div><div class="flex gap-8 mb-16">'
-      +'<button class="btn btn-primary" onclick="startMicroQuiz()">Retry All</button>'
-      +'<button class="btn btn-ghost" onclick="appState.microImgMode=\'browse\';appState.microImgPage=null;appState.microQuizDone=false;renderTab()">Back to Browse</button>'
-      +'</div>'+reviewHtml;
-    return;
-  }
-  const item=items[appState.microQuizIdx];
-  const answered=appState.microQuizAns[appState.microQuizIdx]!==undefined;
-  const chosen=appState.microQuizAns[appState.microQuizIdx];
-  const imgs=(item.images||[]).filter(Boolean);
-  const pct=Math.round((appState.microQuizIdx+1)/items.length*100);
-
-  const pool=items.filter(x=>x.id!==item.id);
-  const wrong=shuffle(pool).slice(0,Math.min(3,pool.length));
-  const opts=shuffle([item,...wrong]);
-
-  let imgsHtml='<div class="image-placeholder" style="height:180px;margin-bottom:16px;border-radius:var(--r2)">🔬</div>';
-  if(imgs.length){
-    const cols=imgs.length===1?'1fr':'1fr 1fr';
-    imgsHtml='<div style="display:grid;grid-template-columns:'+cols+';gap:6px;margin-bottom:16px">'
-      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')
-      +'</div>';
-  }
-
-  let optHtml='';
-  opts.forEach(o=>{
-    let cls='option';
-    if(answered){
-      if(o.id===item.id)cls+=' correct';
-      else if(o.id===chosen&&chosen!==item.id)cls+=' wrong';
-    }
-    optHtml+='<button class="'+cls+'" onclick="answerMicroImgQ(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
-      +'<span class="option-letter" style="min-width:12px"></span><span>'+o.name+'</span></button>';
+  renderKahootImageQuiz(el,{
+    items:appState.microQuizItems,
+    idx:appState.microQuizIdx,
+    ans:appState.microQuizAns,
+    done:appState.microQuizDone,
+    prompt:'Identify this organism.',
+    placeholder:'🔬',
+    onAnswer:id=>{appState.microQuizAns[appState.microQuizIdx]=id;renderTab();},
+    onNext:()=>{appState.microQuizIdx++;renderTab();},
+    onDone:()=>{appState.microQuizDone=true;renderTab();},
+    onRetry:()=>startMicroQuiz(),
+    onExit:()=>{appState.microImgMode='browse';appState.microImgPage=null;appState.microQuizDone=false;renderTab();}
   });
-
-  let afterHtml='';
-  if(answered){
-    afterHtml='<div class="case-feedback '+(chosen===item.id?'correct':'wrong')+'" style="margin-top:14px">'
-      +(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>';
-    if(item.key_features&&item.key_features.length)
-      afterHtml+='<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>';
-    afterHtml+='<div class="flex gap-8 mt-16">'
-      +(appState.microQuizIdx<items.length-1
-        ?'<button class="btn btn-primary" onclick="microQuizNext()">Next →</button>'
-        :'<button class="btn btn-success" onclick="appState.microQuizDone=true;renderTab()">View Results</button>')
-      +'</div>';
-  }
-
-  el.innerHTML='<div class="quiz-header"><span class="question-num">Image '+(appState.microQuizIdx+1)+' of '+items.length+'</span>'
-    +'<button class="btn btn-ghost btn-sm" onclick="appState.microImgMode=\'browse\';renderTab()">Exit Quiz</button></div>'
-    +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
-    +'<p class="text-muted mb-12" style="font-size:13px">Identify this organism.</p>'
-    +imgsHtml+'<div class="options">'+optHtml+'</div>'+afterHtml;
 }
 
 function answerMicroImgQ(id){appState.microQuizAns[appState.microQuizIdx]=id;renderTab();}
@@ -1844,8 +1829,13 @@ async function renderHematologyCases(el){
   if(!appState.hemeCaseCollapsed)appState.hemeCaseCollapsed={};
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminHemeCaseControls()}</div>`:''}
-    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Hematology Cases</div>
-    <p class="text-muted mb-20" style="font-size:13px">Read the patient scenario and CBC/smear results, then answer each question.</p>
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:2px">Hematology Cases</div>
+        <p class="text-muted" style="font-size:13px">Read the patient scenario and CBC/smear results, then answer each question.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal()">📄 Export</button>
+    </div>
     ${!data||!data.length?'<div class="empty">No Hematology cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderHemeCase(c,i)).join('')}
   `;
@@ -2201,8 +2191,13 @@ async function renderMicroCases(el){
   if(!appState.microCaseCollapsed)appState.microCaseCollapsed={};
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminMicroCaseControls()}</div>`:''}
-    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Microbiology Cases</div>
-    <p class="text-muted mb-20" style="font-size:13px">Read the scenario and test results, then answer each question.</p>
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:2px">Microbiology Cases</div>
+        <p class="text-muted" style="font-size:13px">Read the scenario and test results, then answer each question.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal()">📄 Export</button>
+    </div>
     ${!data||!data.length?'<div class="empty">No Microbiology cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderMicroCase(c,i)).join('')}
   `;
@@ -2494,7 +2489,10 @@ async function renderBloodBankCases(el){
         <div style="font-size:15px;font-weight:600;margin-bottom:2px">Blood Bank Cases</div>
         <div class="text-muted" style="font-size:13px">Read the case and typing results, then answer each question.</div>
       </div>
-      ${allQs.length?`<button class="btn btn-primary ml-auto" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+      <div class="flex gap-8 ml-auto flex-wrap">
+        <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📄 Export</button>
+        ${allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+      </div>
     </div>
     ${!data||!data.length?'<div class="empty">No Blood Bank cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderBBCase(c,i)).join('')}
@@ -2514,12 +2512,12 @@ async function startBBQuiz(){
   appState.bbQuizScore=0;
   appState.bbQuizDone=false;
   appState.bbQuizAnswers={};
-  clearInterval(appState.bbQuizTimer);
+  
   renderTab();
 }
 
 function exitBBQuiz(){
-  clearInterval(appState.bbQuizTimer);
+  
   appState.bbQuizMode=false;
   appState.bbQuizDone=false;
   renderTab();
@@ -2540,11 +2538,11 @@ function renderBBQuiz(el){
 
   const tableHtml=item._table&&item._table.length?`
     <div style="margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Typing Results</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Typing Results</div>
       <div style="overflow-x:auto">
-        <table style="border-collapse:collapse;font-size:12px">
-          <thead><tr>${item._table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:6px 10px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-          <tbody><tr>${item._table.map(col=>`<td style="border:1px solid var(--border);padding:6px 10px;text-align:center;font-family:var(--mono);font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
+        <table style="border-collapse:collapse;font-size:14px">
+          <thead><tr>${item._table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+          <tbody><tr>${item._table.map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
         </table>
       </div>
     </div>`:'' ;
@@ -2578,7 +2576,7 @@ function renderBBQuiz(el){
       <div style="text-align:center">
         ${idx<items.length-1
           ?`<button class="btn btn-primary" onclick="bbQuizNext()" style="font-size:15px;padding:12px 32px">Next →</button>`
-          :`<button class="btn btn-success" onclick="appState.bbQuizDone=true;clearInterval(appState.bbQuizTimer);renderTab()" style="font-size:15px;padding:12px 32px">See Results</button>`}
+          :`<button class="btn btn-success" onclick="appState.bbQuizDone=true;renderTab()" style="font-size:15px;padding:12px 32px">See Results</button>`}
       </div>`;
   }
 
@@ -2588,12 +2586,11 @@ function renderBBQuiz(el){
         <button class="btn btn-ghost btn-sm" onclick="exitBBQuiz()">✕ Exit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         <span class="question-num" style="white-space:nowrap">${idx+1} / ${items.length}</span>
-        <span class="timer" id="bbq-timer" style="min-width:44px;text-align:center">--</span>
       </div>
       <div class="bbq-body">
         <div class="bbq-context">
-          <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">${item._caseTitle||'Case'}</div>
-          ${item._scenario?`<div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.6">${item._scenario}</div>`:''}
+          <div class="bbq-context-title">${item._caseTitle||'Case'}</div>
+          ${item._scenario?`<div class="bbq-context-scenario">${item._scenario}</div>`:''}
           ${tableHtml}${imgHtml}
         </div>
         <div class="bbq-question">${item.question}</div>
@@ -2602,28 +2599,11 @@ function renderBBQuiz(el){
       </div>
     </div>
   `;
-
-  // Start per-question countdown timer (20s)
-  clearInterval(appState.bbQuizTimer);
-  if(!answered){
-    let t=20;
-    const timerEl=()=>document.getElementById('bbq-timer');
-    const update=()=>{
-      const el=timerEl();
-      if(el){el.textContent=t+'s';el.style.color=t<=5?'var(--danger)':t<=10?'var(--warn)':'var(--text2)';}
-    };
-    update();
-    appState.bbQuizTimer=setInterval(()=>{
-      t--;
-      update();
-      if(t<=0){clearInterval(appState.bbQuizTimer);if(!appState.bbQuizAnswered)answerBBQuiz(null);}
-    },1000);
-  }
 }
 
 function answerBBQuiz(letter){
   if(appState.bbQuizAnswered)return;
-  clearInterval(appState.bbQuizTimer);
+  
   appState.bbQuizAnswered=true;
   appState.bbQuizChosen=letter;
   if(!appState.bbQuizAnswers)appState.bbQuizAnswers={};
@@ -3155,7 +3135,7 @@ async function startAllExam(){
   const {data:labQ}=await sb.from('mlsboc_questions').select('*').eq('subject','lab_operations');
   if(labQ&&labQ.length)allQ.push(...shuffle(labQ).slice(0,labCount));
 
-  appState.allQ=shuffle(allQ).slice(0,Math.min(total,allQ.length));
+  window._kqOpts={};appState.allQ=shuffle(allQ).slice(0,Math.min(total,allQ.length));
   appState.allIdx=0;appState.allAns=[];appState.allStarted=true;appState.allDone=false;appState.allSeconds=0;
   clearInterval(appState.allTimer);
   appState.allTimer=setInterval(()=>{appState.allSeconds++;updateAllTimer();},1000);
@@ -3172,33 +3152,42 @@ function renderAllExam(v){
   const q=appState.allQ[appState.allIdx];
   const answered=appState.allAns[appState.allIdx];
   const pct=Math.round((appState.allIdx+1)/appState.allQ.length*100);
+  const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
+  const textColors=['#fff','#fff','#fff','#1a2a1a'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+  const opts=['a','b','c','d'];
   v.innerHTML=`
-    <div class="flex-center gap-12 mb-16 flex-wrap">
-      <button class="btn btn-ghost btn-sm" onclick="if(confirm('Quit? Progress lost.'))goHome()">← Quit</button>
-      <span class="tag tag-info">${q.subject?.replace(/_/g,' ')}</span>
-      <div class="ml-auto timer" id="all-timer">${fmtTime(appState.allSeconds)}</div>
-    </div>
-    <div class="quiz-header">
-      <span class="question-num">Question ${appState.allIdx+1} of ${appState.allQ.length}</span>
-      <div class="flex gap-8">
-        ${appState.allIdx>0?`<button class="btn btn-ghost btn-sm" onclick="allPrev()">← Prev</button>`:''}
-        ${answered&&appState.allIdx<appState.allQ.length-1?`<button class="btn btn-primary btn-sm" onclick="allNext()">Next →</button>`:''}
-        ${answered&&appState.allIdx===appState.allQ.length-1?`<button class="btn btn-success btn-sm" onclick="finishAll()">Finish & Submit</button>`:''}
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Quit? Progress will be lost.'))goHome()">← Quit</button>
+        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="tag tag-info" style="font-size:11px;white-space:nowrap">${(q.subject||'').replace(/_/g,' ')}</span>
+        <span class="question-num" style="white-space:nowrap;margin-left:8px">${appState.allIdx+1} / ${appState.allQ.length}</span>
+        <div class="timer ml-auto" id="all-timer" style="font-size:12px">${fmtTime(appState.allSeconds)}</div>
+      </div>
+      <div class="bbq-body">
+        <div class="bbq-question">${q.question}</div>
+        <div class="bbq-options">
+          ${opts.map((opt,oi)=>`
+            <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
+              " style="background:${colors[oi]};color:${textColors[oi]}" onclick="answerAll('${opt}')" ${answered?'disabled':''}>
+              <span class="bbq-opt-letter">${emojis[oi]}</span>
+              <span>${q['option_'+opt]}</span>
+            </button>`).join('')}
+        </div>
+        ${answered?`
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:8px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
+            ${q.explanation?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:500px;margin:0 auto">${q.explanation}</div>`:''}
+          </div>
+          <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            ${appState.allIdx>0?`<button class="btn btn-ghost" onclick="allPrev()">← Prev</button>`:''}
+            ${appState.allIdx<appState.allQ.length-1
+              ?`<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="allNext()">Next →</button>`
+              :`<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="finishAll()">Finish & Submit</button>`}
+          </div>`:''}
       </div>
     </div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    <div class="question-text">${q.question}</div>
-    <div class="options">
-      ${['a','b','c','d'].map(opt=>{
-        let cls='option';
-        if(answered){if(opt===q.correct_answer)cls+=' correct';else if(opt===answered&&answered!==q.correct_answer)cls+=' wrong';}
-        return `<button class="${cls}" onclick="answerAll('${opt}')" ${answered?'disabled':''}>
-          <span class="option-letter">${opt.toUpperCase()}.</span>
-          <span>${q['option_'+opt]}</span>
-        </button>`;
-      }).join('')}
-    </div>
-    ${answered&&q.explanation?`<div class="explanation">${q.explanation}</div>`:''}
   `;
 }
 
@@ -3542,6 +3531,225 @@ async function deleteCondition(id){
   renderTab();
 }
 
+// ─── CASE PDF EXPORT ─────────────────────────────────────────────────────────
+let _exportCases = []; // {source, cases} loaded when modal opens
+
+async function openExportModal(){
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Loading cases...</div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+
+  // Load all three case sources in parallel
+  const [bbRes, hcRes, mcRes] = await Promise.all([
+    sb.from('mlsboc_bb_cases').select('*').order('created_at'),
+    sb.from('mlsboc_heme_cases').select('*').order('created_at'),
+    sb.from('mlsboc_micro_cases').select('*').order('created_at')
+  ]);
+
+  const sources = [
+    {label:'Blood Bank', key:'bb', data: bbRes.data||[], tableField:'typing_table', tableLabel:'Typing Results'},
+    {label:'Hematology', key:'hc', data: hcRes.data||[], tableField:'results_table', tableLabel:'Lab Results'},
+    {label:'Microbiology', key:'mc', data: mcRes.data||[], tableField:'test_results', tableLabel:'Test Results'}
+  ].filter(s=>s.data.length>0);
+
+  if(!sources.length){
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      <div class="empty">No cases found to export.</div>`;
+    return;
+  }
+
+  _exportCases = sources;
+
+  let html = `
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select the cases to include. All selected cases go into one PDF.</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(false)">Deselect All</button>
+    </div>`;
+
+  sources.forEach(s=>{
+    html += `<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">${s.label}</div>`;
+    s.data.forEach(c=>{
+      html += `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
+        <input type="checkbox" class="export-cb" data-key="${s.key}" data-id="${c.id}" checked style="width:16px;height:16px;flex-shrink:0">
+        <span style="font-weight:600">${c.title||'Untitled'}</span>
+        ${c.questions&&c.questions.length?`<span style="font-size:11px;color:var(--text3);margin-left:auto">${c.questions.length} Q</span>`:''}
+      </label>`;
+    });
+  });
+
+  html += `
+    <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="generateCasePDF()">📄 Generate PDF</button>
+    </div>`;
+
+  document.getElementById('condition-modal-body').innerHTML = html;
+}
+
+function exportSelectAll(checked){
+  document.querySelectorAll('.export-cb').forEach(cb=>cb.checked=checked);
+}
+
+async function generateCasePDF(){
+  const selected = [];
+  document.querySelectorAll('.export-cb:checked').forEach(cb=>{
+    const key = cb.dataset.key;
+    const id  = cb.dataset.id;
+    const src = _exportCases.find(s=>s.key===key);
+    if(!src) return;
+    const c = src.data.find(x=>x.id===id);
+    if(c) selected.push({src, c});
+  });
+  if(!selected.length){alert('Select at least one case.');return;}
+
+  const btn = document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+
+  try{
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 18;
+    const contentW = pageW - margin*2;
+    let y = margin;
+    let isFirstPage = true;
+
+    const checkPage = (needed=10)=>{
+      if(y + needed > pageH - margin){doc.addPage();y=margin;}
+    };
+
+    const writeText = (text, opts={})=>{
+      const {size=11, bold=false, color=[30,30,30], indent=0, maxWidth=contentW}=opts;
+      doc.setFontSize(size);
+      doc.setFont('helvetica', bold?'bold':'normal');
+      doc.setTextColor(...color);
+      const lines = doc.splitTextToSize(String(text||''), maxWidth - indent);
+      lines.forEach(line=>{
+        checkPage(6);
+        doc.text(line, margin+indent, y);
+        y += size * 0.4 + 1.2;
+      });
+    };
+
+    const writeHR = (color=[200,200,200])=>{
+      checkPage(4);
+      doc.setDrawColor(...color);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, pageW-margin, y);
+      y += 4;
+    };
+
+    selected.forEach(({src, c}, ci)=>{
+      if(!isFirstPage){doc.addPage();y=margin;}
+      isFirstPage = false;
+
+      // Case header bar
+      doc.setFillColor(210,210,210);
+      doc.rect(margin, y, contentW, 10, 'F');
+      doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);
+      doc.rect(margin, y, contentW, 10, 'S');
+      doc.setFontSize(13);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(20,20,20);
+      doc.text(`${src.label} — Case ${ci+1}: ${c.title||'Untitled'}`, margin+3, y+7);
+      y += 14;
+
+      // Scenario
+      if(c.scenario){
+        writeText('Patient Scenario', {size:10, bold:true, color:[40,40,40]});
+        writeText(c.scenario, {size:10, indent:2, color:[30,30,30]});
+        y += 3;
+      }
+
+      // Table (typing / lab results / test results)
+      const table = c[src.tableField]||[];
+      if(table.length){
+        checkPage(20);
+        writeText(src.tableLabel, {size:10, bold:true, color:[40,40,40]});
+        const colW = Math.min(contentW/table.length, 38);
+        const tableW = colW * table.length;
+        const startX = margin;
+        // Header row
+        doc.setFillColor(220,220,220);
+        doc.rect(startX, y, tableW, 8, 'F');
+        doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);
+        doc.rect(startX, y, tableW, 8, 'S');
+        doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+        table.forEach((col,i)=>{
+          doc.text(String(col.label||'').substring(0,10), startX+i*colW+2, y+5.5);
+        });
+        y += 8;
+        // Value row
+        doc.setFillColor(245,245,245);
+        doc.rect(startX, y, tableW, 9, 'F');
+        doc.rect(startX, y, tableW, 9, 'S');
+        doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+        table.forEach((col,i)=>{
+          const val = String(col.value||'')+(col.flag==='high'?' ↑':col.flag==='low'?' ↓':'');
+          doc.text(val.substring(0,8), startX+i*colW+2, y+6.5);
+        });
+        y += 12;
+      }
+
+      // Questions — no answers revealed, all black text
+      const qs = c.questions||[];
+      if(qs.length){
+        y += 2;
+        writeHR([180,180,180]);
+        writeText('Questions', {size:10, bold:true, color:[40,40,40]});
+        y += 1;
+        const letters=['a','b','c','d'];
+        qs.forEach((q,qi)=>{
+          checkPage(28);
+          writeText(`Q${qi+1}. ${q.question}`, {size:10, bold:true, indent:2, color:[20,20,20]});
+          (q.options||[]).forEach((opt,oi)=>{
+            if(!opt)return;
+            checkPage(6);
+            doc.setFontSize(9.5);
+            doc.setFont('helvetica','normal');
+            doc.setTextColor(30,30,30);
+            doc.text(`${letters[oi].toUpperCase()}. ${opt}`, margin+6, y);
+            y += 5.5;
+          });
+          y += 4;
+        });
+      }
+    });
+
+    // Footer on all pages
+    const totalPages = doc.internal.getNumberOfPages();
+    for(let p=1;p<=totalPages;p++){
+      doc.setPage(p);
+      doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+      doc.text(`MLS BOC Prep — Case Export · Page ${p} of ${totalPages}`, margin, pageH-8);
+      doc.text(new Date().toLocaleDateString(), pageW-margin, pageH-8, {align:'right'});
+    }
+
+    doc.save('mls-cases.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){
+    console.error(err);
+    alert('PDF generation failed: '+err.message);
+    const btn=document.querySelector('#condition-modal-body .btn-primary');
+    if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
+  }
+}
+
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
 function fmtTime(s){const m=Math.floor(s/60),sec=s%60;return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
@@ -3612,6 +3820,34 @@ async function handleSubjectIconFile(e,key){
       if(error){alert('Upload failed: '+error.message);return;}
       iconCache[key]=url;
       renderHome(document.getElementById('view-main'));
+    };
+    t.src=ev.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+async function handleFolderIconFile(e,key){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    const t=new Image();
+    t.onload=async ()=>{
+      const M=600;let w=t.width,ht=t.height;
+      if(w>M){ht=Math.round(ht*M/w);w=M;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=ht;
+      cv.getContext('2d').drawImage(t,0,0,w,ht);
+      const url=cv.toDataURL('image/jpeg',0.75);
+      const {error}=await sb.from('mlsboc_folder_icons').upsert({key,image_url:url},{onConflict:'key'});
+      if(error){
+        if(error.message&&error.message.includes('mlsboc_folder_icons')){
+          alert('Table missing. Run this SQL in Supabase:\n\ncreate table mlsboc_folder_icons (\n  key text primary key,\n  image_url text not null,\n  updated_at timestamptz default now()\n);\nalter table mlsboc_folder_icons enable row level security;\ncreate policy "public all folder_icons"\n  on mlsboc_folder_icons for all using (true) with check (true);');
+        }else{
+          alert('Upload failed: '+error.message);
+        }
+        return;
+      }
+      folderIconCache[key]=url;
+      renderTab();
     };
     t.src=ev.target.result;
   };
