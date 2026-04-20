@@ -1146,10 +1146,25 @@ function renderType1LabelDrop(stateKey){
 }
 
 function getType1ExpectedABH(){
-  if(type1State.secretorSide !== "FUT2") return null;
-  if(type1State.top === "N-acetylgalactosamine") return "A antigen";
-  if(type1State.top === "Galactose") return "B antigen";
-  if(!type1State.top) return "H antigen";
+
+  // NO FUT2 → NO H, NO A, NO B
+  if(type1State.secretorSide !== "FUT2"){
+    return null;
+  }
+
+  // FUT2 present → H exists
+  if(!type1State.top){
+    return "H antigen";
+  }
+
+  if(type1State.top === "N-acetylgalactosamine"){
+    return "A antigen";
+  }
+
+  if(type1State.top === "Galactose"){
+    return "B antigen";
+  }
+
   return null;
 }
 
