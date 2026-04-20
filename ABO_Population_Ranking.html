@@ -246,7 +246,67 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<style>
+  .split-layout{
+    display:grid;
+    grid-template-columns: 110px 1fr 110px;
+    gap:10px;
+    align-items:start;
+  }
+</style>
+
+<div class="wrap" style="max-width:960px;">
+
+  <header>
+    <div>
+      <h1>🩸 ABO Phenotype Frequency – Fill It In!</h1>
+      <p>Drag the correct percentage into each cell of the table.<br>Click a filled cell to return it to the bank.</p>
+    </div>
+    <span class="badge">FILL IT IN!</span>
+  </header>
+
+  <div class="controls">
+    <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="resetBtn">↺ Reset</button>
+    <div class="score" id="scoreMsg"></div>
+  </div>
+
+  <div class="split-layout">
+
+    <!-- LEFT BANK (7 chips) -->
+    <div class="bank" style="position:sticky;top:10px;">
+      <h2>Numbers</h2>
+      <div id="chipWrapLeft"></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="col-section">
+      <div class="col-title" style="font-size:.95rem; padding:10px 8px;">ABO Phenotype Frequency (%) by Population</div>
+      <table style="table-layout:fixed;">
+        <thead>
+          <tr>
+            <th style="width:20%;">Phenotype</th>
+            <th>White</th>
+            <th>Black</th>
+            <th>Hispanic</th>
+            <th>Asian</th>
+          </tr>
+        </thead>
+        <tbody id="aboTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- RIGHT BANK (7 chips) -->
+    <div class="bank" style="position:sticky;top:10px;">
+      <h2>Numbers</h2>
+      <div id="chipWrapRight"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── RANKING ACTIVITY ── -->
+<div class="wrap" style="max-width:960px; margin-top:28px;">
 
   <header>
     <div>
@@ -257,88 +317,73 @@
   </header>
 
   <div class="controls">
-    <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
-    <button class="resetBtn" id="resetBtn">↺ Reset</button>
-    <div class="score" id="scoreMsg"></div>
+    <button class="checkBtn" id="rankCheckBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="rankResetBtn">↺ Reset</button>
+    <div class="score" id="rankScoreMsg"></div>
   </div>
 
   <div class="layout">
-
-    <!-- BANK -->
     <div class="bank">
       <h2>Populations</h2>
       <p class="hint">Each population can be used once per phenotype. Drag to rank top → bottom.</p>
-      <div id="chipWrap"></div>
+      <div id="rankChipWrap"></div>
     </div>
-
-    <!-- PHENOTYPE COLUMNS -->
-    <div class="columns" id="colsWrap"></div>
-
+    <div class="columns" id="rankColsWrap"></div>
   </div>
 </div>
 
 <script>
-/* ── DATA ── */
-// Frequencies:
-//          White  Black  Hispanic  Asian
-// O          45     50      56      40
-// A          40     26      31      28
-// B          11     20      10      25
-// AB          4      4       3       7
+/* ════════════════════════════════════
+   ACTIVITY 1 — ABO FILL-IN
+════════════════════════════════════ */
+const ABO_PHENOTYPES = ["O","A","B","AB"];
+const ABO_POPS = ["White","Black","Hispanic","Asian"];
 
-const PHENOTYPES = ["O","A","B","AB"];
-const POPULATIONS = ["White","Black","Hispanic","Asian"];
-
-// Correct order per phenotype (most → least frequent)
-const CORRECT = {
-  O:  ["Hispanic","Black","White","Asian"],   // 56, 50, 45, 40
-  A:  ["White","Hispanic","Asian","Black"],   // 40, 31, 28, 26
-  B:  ["Asian","Black","White","Hispanic"],   // 25, 20, 11, 10
-  AB: ["Asian","White","Black","Hispanic"],   // 7, 4, 4, 3
+const ABO_ANSWERS = {
+  O:  { White:"45", Black:"50", Hispanic:"56", Asian:"40" },
+  A:  { White:"40", Black:"26", Hispanic:"31", Asian:"28" },
+  B:  { White:"11", Black:"20", Hispanic:"10", Asian:"25" },
+  AB: { White:"4",  Black:"4",  Hispanic:"3",  Asian:"7"  },
 };
 
-// AB: White & Black both = 4%, accept either order at ranks 1 & 2
-const TIED = {
-  AB: { ranks:[1,2], pops:["White","Black"] }
-};
+const ABO_VALUE_MAX = {};
+ABO_PHENOTYPES.forEach(ph => {
+  ABO_POPS.forEach(pop => {
+    const v = ABO_ANSWERS[ph][pop];
+    ABO_VALUE_MAX[v] = (ABO_VALUE_MAX[v] || 0) + 1;
+  });
+});
+// Sort descending numerically → 14 unique values, split into two halves of 7
+const ABO_VALUES = Object.keys(ABO_VALUE_MAX).sort((a,b) => +b - +a);
+const LEFT_VALS  = ABO_VALUES.slice(0, 7);
+const RIGHT_VALS = ABO_VALUES.slice(7);
 
-/* ── STATE ── */
 const state = {};
 let dragItem = null;
 let dragFrom = null;
 
-function slotKey(ph, rank){ return `${ph}__${rank}`; }
+function slotKey(ph, pop){ return `${ph}__${pop}`; }
 function getState(k){ return state[k] || null; }
 function setState(k, v){ if(v == null) delete state[k]; else state[k] = v; }
+function countUses(val){ return Object.values(state).filter(v => v && v.val === val).length; }
 
-function countUsesInPhenotype(ph, pop){
-  let n = 0;
-  for(let r = 0; r < 4; r++){
-    const s = getState(slotKey(ph, r));
-    if(s && s.pop === pop) n++;
-  }
-  return n;
-}
-
-function countTotalUses(pop){
-  return Object.values(state).filter(v => v && v.pop === pop).length;
-}
-
-/* ── BUILD BANK ── */
 function buildBank(){
-  const wrap = document.getElementById("chipWrap");
+  buildBankSide("chipWrapLeft",  LEFT_VALS);
+  buildBankSide("chipWrapRight", RIGHT_VALS);
+}
+
+function buildBankSide(wrapperId, vals){
+  const wrap = document.getElementById(wrapperId);
   wrap.innerHTML = "";
-  POPULATIONS.forEach(pop => {
+  vals.forEach(val => {
     const chip = document.createElement("div");
     chip.className = "chip";
-    chip.id = `chip-${pop}`;
+    chip.dataset.val = val;
     chip.draggable = true;
-    chip.textContent = pop;
-
+    chip.textContent = val + "%";
     chip.addEventListener("dragstart", e => {
-      if(countTotalUses(pop) >= 4){ e.preventDefault(); return; }
-      dragItem = { pop };
-      dragFrom = null;
+      if(countUses(val) >= ABO_VALUE_MAX[val]){ e.preventDefault(); return; }
+      dragItem = { val }; dragFrom = null;
       chip.classList.add("dragging");
     });
     chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
@@ -347,46 +392,34 @@ function buildBank(){
 }
 
 function renderBankUsage(){
-  POPULATIONS.forEach(pop => {
-    const chip = document.getElementById(`chip-${pop}`);
-    if(!chip) return;
-    chip.classList.toggle("used", countTotalUses(pop) >= 4);
+  ABO_VALUES.forEach(val => {
+    // query both banks
+    document.querySelectorAll(`.chip[data-val="${val}"]`).forEach(chip => {
+      chip.classList.toggle("used", countUses(val) >= ABO_VALUE_MAX[val]);
+    });
   });
 }
 
-/* ── BUILD COLUMNS ── */
-function buildColumns(){
-  const wrap = document.getElementById("colsWrap");
-  wrap.innerHTML = "";
-
-  PHENOTYPES.forEach(ph => {
-    const section = document.createElement("div");
-    section.className = "col-section";
-
-    const title = document.createElement("div");
-    title.className = "col-title";
-    title.textContent = ph;
-    section.appendChild(title);
-
-    const tbl = document.createElement("table");
-    const tbody = document.createElement("tbody");
-
-    for(let r = 0; r < 4; r++){
-      const tr = document.createElement("tr");
+function buildABOTable(){
+  const body = document.getElementById("aboTableBody");
+  body.innerHTML = "";
+  ABO_PHENOTYPES.forEach(ph => {
+    const tr = document.createElement("tr");
+    const tdPh = document.createElement("td");
+    tdPh.style.cssText = "font-size:1.2rem;font-weight:900;color:#7a4800;";
+    tdPh.textContent = ph;
+    tr.appendChild(tdPh);
+    ABO_POPS.forEach(pop => {
       const td = document.createElement("td");
-      td.appendChild(makeDropzone(ph, r));
+      td.appendChild(makeDropzone(ph, pop));
       tr.appendChild(td);
-      tbody.appendChild(tr);
-    }
-
-    tbl.appendChild(tbody);
-    section.appendChild(tbl);
-    wrap.appendChild(section);
+    });
+    body.appendChild(tr);
   });
 }
 
-function makeDropzone(ph, rank){
-  const key = slotKey(ph, rank);
+function makeDropzone(ph, pop){
+  const key = slotKey(ph, pop);
   const dz = document.createElement("div");
   dz.className = "dropzone";
   dz.id = `slot-${key}`;
@@ -402,50 +435,40 @@ function makeDropzone(ph, rank){
     e.preventDefault();
     dz.classList.remove("drag-over");
     if(!dragItem) return;
-    const { pop } = dragItem;
+    const { val } = dragItem;
     const existing = getState(key);
-    const movingSame = dragFrom && getState(dragFrom) && getState(dragFrom).pop === pop;
-
-    if(countUsesInPhenotype(ph, pop) > 0 && !movingSame){
-      dragItem = null; dragFrom = null; return;
-    }
-
+    const movingSame = dragFrom && getState(dragFrom) && getState(dragFrom).val === val;
+    const atMax = countUses(val) >= ABO_VALUE_MAX[val];
+    if(atMax && !movingSame){ dragItem = null; dragFrom = null; return; }
     if(dragFrom && dragFrom !== key){
       if(existing){ setState(dragFrom, existing); renderSlot(dragFrom); }
       else { setState(dragFrom, null); renderSlot(dragFrom); }
     }
-
-    setState(key, { pop });
+    setState(key, { val });
     renderSlot(key);
     dragItem = null; dragFrom = null;
-    clearMarks();
-    renderBankUsage();
+    clearMarks(); renderBankUsage();
   });
 
   dz.addEventListener("click", () => {
     if(!getState(key)) return;
-    setState(key, null);
-    renderSlot(key);
-    clearMarks();
-    renderBankUsage();
+    setState(key, null); renderSlot(key); clearMarks(); renderBankUsage();
   });
 
   dz.addEventListener("dragstart", e => {
     const cur = getState(key);
     if(!cur){ e.preventDefault(); return; }
-    dragItem = { ...cur };
-    dragFrom = key;
+    dragItem = { ...cur }; dragFrom = key;
   });
-
   return dz;
 }
 
 function renderSlotContent(el, val){
   if(!val){
-    el.innerHTML = `<div class="placeholder">— drop here —</div>`;
+    el.innerHTML = `<div class="placeholder">— drop —</div>`;
     el.classList.remove("filled");
   } else {
-    el.textContent = val.pop;
+    el.textContent = val.val + "%";
     el.classList.add("filled");
   }
 }
@@ -457,34 +480,24 @@ function renderSlot(key){
   renderSlotContent(el, getState(key));
 }
 
-/* ── CHECK / RESET ── */
 function clearMarks(){
-  document.querySelectorAll(".dropzone").forEach(z => z.classList.remove("correct","wrong"));
+  document.querySelectorAll("#aboTableBody .dropzone").forEach(z => z.classList.remove("correct","wrong"));
   const msg = document.getElementById("scoreMsg");
   msg.textContent = ""; msg.className = "score";
 }
 
-function isCorrect(ph, rank, pop){
-  const tied = TIED[ph];
-  if(tied && tied.ranks.includes(rank)) return tied.pops.includes(pop);
-  return CORRECT[ph][rank] === pop;
-}
-
 function checkAnswers(){
   let correct = 0, total = 0;
-  PHENOTYPES.forEach(ph => {
-    for(let r = 0; r < 4; r++){
+  ABO_PHENOTYPES.forEach(ph => {
+    ABO_POPS.forEach(pop => {
       total++;
-      const key = slotKey(ph, r);
+      const key = slotKey(ph, pop);
       const el = document.getElementById(`slot-${key}`);
       const cur = getState(key);
       el.classList.remove("correct","wrong");
-      if(cur && isCorrect(ph, r, cur.pop)){
-        el.classList.add("correct"); correct++;
-      } else {
-        el.classList.add("wrong");
-      }
-    }
+      if(cur && cur.val === ABO_ANSWERS[ph][pop]){ el.classList.add("correct"); correct++; }
+      else el.classList.add("wrong");
+    });
   });
   const msg = document.getElementById("scoreMsg");
   msg.textContent = `${correct}/${total} correct`;
@@ -493,20 +506,519 @@ function checkAnswers(){
 
 function reset(){
   Object.keys(state).forEach(k => delete state[k]);
-  PHENOTYPES.forEach(ph => {
-    for(let r = 0; r < 4; r++) renderSlot(slotKey(ph, r));
-  });
-  clearMarks();
-  renderBankUsage();
+  ABO_PHENOTYPES.forEach(ph => ABO_POPS.forEach(pop => renderSlot(slotKey(ph, pop))));
+  clearMarks(); renderBankUsage();
 }
 
-/* ── INIT ── */
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", reset);
+buildBank(); buildABOTable(); reset();
 
-buildBank();
-buildColumns();
-reset();
+
+/* ════════════════════════════════════
+   ACTIVITY 2 — ABO RANKING
+════════════════════════════════════ */
+const RANK_PHENOTYPES = ["O","A","B","AB"];
+const RANK_POPULATIONS = ["White","Black","Hispanic","Asian"];
+
+const RANK_CORRECT = {
+  O:  ["Hispanic","Black","White","Asian"],
+  A:  ["White","Hispanic","Asian","Black"],
+  B:  ["Asian","Black","White","Hispanic"],
+  AB: ["Asian","White","Black","Hispanic"],
+};
+
+const RANK_TIED = {
+  AB: { ranks:[1,2], pops:["White","Black"] }
+};
+
+const rankState = {};
+let rankDragItem = null;
+let rankDragFrom = null;
+
+function rankSlotKey(ph, r){ return `rank__${ph}__${r}`; }
+function rankGetState(k){ return rankState[k] || null; }
+function rankSetState(k, v){ if(v == null) delete rankState[k]; else rankState[k] = v; }
+
+function rankCountInPhenotype(ph, pop){
+  let n = 0;
+  for(let r = 0; r < 4; r++){
+    const s = rankGetState(rankSlotKey(ph, r));
+    if(s && s.pop === pop) n++;
+  }
+  return n;
+}
+function rankCountTotal(pop){
+  return Object.values(rankState).filter(v => v && v.pop === pop).length;
+}
+
+function buildRankBank(){
+  const wrap = document.getElementById("rankChipWrap"); wrap.innerHTML = "";
+  RANK_POPULATIONS.forEach(pop => {
+    const chip = document.createElement("div");
+    chip.className = "chip"; chip.id = `rankchip-${pop}`; chip.draggable = true;
+    chip.textContent = pop;
+    chip.addEventListener("dragstart", e => {
+      if(rankCountTotal(pop) >= 4){ e.preventDefault(); return; }
+      rankDragItem = { pop }; rankDragFrom = null; chip.classList.add("dragging");
+    });
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    wrap.appendChild(chip);
+  });
+}
+
+function renderRankBankUsage(){
+  RANK_POPULATIONS.forEach(pop => {
+    const chip = document.getElementById(`rankchip-${pop}`);
+    if(!chip) return;
+    chip.classList.toggle("used", rankCountTotal(pop) >= 4);
+  });
+}
+
+function buildRankColumns(){
+  const wrap = document.getElementById("rankColsWrap"); wrap.innerHTML = "";
+  RANK_PHENOTYPES.forEach(ph => {
+    const section = document.createElement("div");
+    section.className = "col-section";
+    const title = document.createElement("div");
+    title.className = "col-title"; title.textContent = ph;
+    section.appendChild(title);
+    const tbl = document.createElement("table");
+    const tbody = document.createElement("tbody");
+    for(let r = 0; r < 4; r++){
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.appendChild(makeRankDropzone(ph, r));
+      tr.appendChild(td); tbody.appendChild(tr);
+    }
+    tbl.appendChild(tbody); section.appendChild(tbl); wrap.appendChild(section);
+  });
+}
+
+function makeRankDropzone(ph, rank){
+  const key = rankSlotKey(ph, rank);
+  const dz = document.createElement("div");
+  dz.className = "dropzone"; dz.id = `rslot-${key}`; dz.draggable = true;
+  renderRankSlotContent(dz, null);
+
+  dz.addEventListener("dragover", e => {
+    if(rankDragItem){ e.preventDefault(); dz.classList.add("drag-over"); }
+  });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("drag-over");
+    if(!rankDragItem) return;
+    const { pop } = rankDragItem;
+    const existing = rankGetState(key);
+    const movingSame = rankDragFrom && rankGetState(rankDragFrom) && rankGetState(rankDragFrom).pop === pop;
+    if(rankCountInPhenotype(ph, pop) > 0 && !movingSame){ rankDragItem = null; rankDragFrom = null; return; }
+    if(rankDragFrom && rankDragFrom !== key){
+      if(existing){ rankSetState(rankDragFrom, existing); renderRankSlot(rankDragFrom); }
+      else { rankSetState(rankDragFrom, null); renderRankSlot(rankDragFrom); }
+    }
+    rankSetState(key, { pop }); renderRankSlot(key);
+    rankDragItem = null; rankDragFrom = null;
+    clearRankMarks(); renderRankBankUsage();
+  });
+
+  dz.addEventListener("click", () => {
+    if(!rankGetState(key)) return;
+    rankSetState(key, null); renderRankSlot(key); clearRankMarks(); renderRankBankUsage();
+  });
+
+  dz.addEventListener("dragstart", e => {
+    const cur = rankGetState(key);
+    if(!cur){ e.preventDefault(); return; }
+    rankDragItem = { ...cur }; rankDragFrom = key;
+  });
+  return dz;
+}
+
+function renderRankSlotContent(el, val){
+  if(!val){
+    el.innerHTML = `<div class="placeholder">— drop here —</div>`;
+    el.classList.remove("filled");
+  } else {
+    el.textContent = val.pop; el.classList.add("filled");
+  }
+}
+
+function renderRankSlot(key){
+  const el = document.getElementById(`rslot-${key}`);
+  if(!el) return;
+  el.classList.remove("correct","wrong");
+  renderRankSlotContent(el, rankGetState(key));
+}
+
+function clearRankMarks(){
+  document.querySelectorAll("#rankColsWrap .dropzone").forEach(z => z.classList.remove("correct","wrong"));
+  const msg = document.getElementById("rankScoreMsg");
+  msg.textContent = ""; msg.className = "score";
+}
+
+function isRankCorrect(ph, rank, pop){
+  const tied = RANK_TIED[ph];
+  if(tied && tied.ranks.includes(rank)) return tied.pops.includes(pop);
+  return RANK_CORRECT[ph][rank] === pop;
+}
+
+function checkRankAnswers(){
+  let correct = 0, total = 0;
+  RANK_PHENOTYPES.forEach(ph => {
+    for(let r = 0; r < 4; r++){
+      total++;
+      const key = rankSlotKey(ph, r);
+      const el = document.getElementById(`rslot-${key}`);
+      const cur = rankGetState(key);
+      el.classList.remove("correct","wrong");
+      if(cur && isRankCorrect(ph, r, cur.pop)){ el.classList.add("correct"); correct++; }
+      else el.classList.add("wrong");
+    }
+  });
+  const msg = document.getElementById("rankScoreMsg");
+  msg.textContent = `${correct}/${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+function resetRank(){
+  Object.keys(rankState).forEach(k => delete rankState[k]);
+  RANK_PHENOTYPES.forEach(ph => { for(let r=0;r<4;r++) renderRankSlot(rankSlotKey(ph,r)); });
+  clearRankMarks(); renderRankBankUsage();
+}
+
+document.getElementById("rankCheckBtn").addEventListener("click", checkRankAnswers);
+document.getElementById("rankResetBtn").addEventListener("click", resetRank);
+buildRankBank(); buildRankColumns(); resetRank();
 </script>
 </body>
 </html>
+
+<!-- ═══════════════════════════════════════════
+     D ANTIGEN SECTION (Frequency + Mutation)
+═══════════════════════════════════════════ -->
+<style>
+  /* extra styles for the mutation match table */
+  .mutation-td{
+    text-align:left;
+    font-size:.78rem;
+    font-weight:800;
+    color:#7a4800;
+    padding-left:8px;
+    line-height:1.45;
+  }
+  .d-two-col{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+  }
+</style>
+
+<div class="wrap" style="max-width:1000px; margin-top:28px;">
+
+  <header>
+    <div>
+      <h1>🩸 D Antigen – Rank &amp; Match!</h1>
+      <p>Left: rank populations by D antigen frequency (highest → lowest). &nbsp;|&nbsp; Right: match each ancestry to its D-negative mechanism.<br>Click a filled slot to return it to the bank.</p>
+    </div>
+    <span class="badge">RANK &amp; MATCH!</span>
+  </header>
+
+  <div class="controls">
+    <button class="checkBtn" id="dCheckBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="dResetBtn">↺ Reset</button>
+    <div class="score" id="dScoreMsg"></div>
+  </div>
+
+  <!-- outer 3-col: pop bank | activities | ancestry bank -->
+  <div style="display:grid; grid-template-columns:160px 1fr 170px; gap:10px; align-items:start;">
+
+    <!-- LEFT BANK: populations -->
+    <div class="bank" style="position:sticky; top:10px;">
+      <h2>Populations</h2>
+      <p class="hint">Drag into the frequency ranking (left activity).</p>
+      <div id="dChipWrap"></div>
+    </div>
+
+    <!-- TWO ACTIVITIES SIDE BY SIDE -->
+    <div class="d-two-col">
+
+      <!-- Activity 1: frequency ranking -->
+      <div class="col-section">
+        <div class="col-title" style="font-size:.95rem; padding:10px 6px;">D Antigen Frequency<br><span style="font-size:.72rem; font-weight:700; opacity:.85;">highest → lowest</span></div>
+        <table><tbody id="dTableBody"></tbody></table>
+      </div>
+
+      <!-- Activity 2: mutation match -->
+      <div class="col-section">
+        <div class="col-title" style="font-size:.95rem; padding:10px 6px;">D-Negative Mechanism by Ancestry<br><span style="font-size:.72rem; font-weight:700; opacity:.85;">drag ancestry into each row</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:55%;">Mechanism</th>
+              <th>Ancestry</th>
+            </tr>
+          </thead>
+          <tbody id="mTableBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- RIGHT BANK: ancestries for mutation match -->
+    <div class="bank" style="position:sticky; top:10px;">
+      <h2>Ancestries</h2>
+      <p class="hint">Drag into the mutation match (right activity).</p>
+      <div id="mChipWrap"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════
+   ACTIVITY 1 — D Frequency Rank
+══════════════════════════════ */
+const D_POPS = ["Caucasian","Black","Hispanic","Asian"];
+// highest → lowest: Asian ~100, Black 95, Hispanic 92.5, Caucasian 80
+const D_CORRECT = ["Asian","Black","Hispanic","Caucasian"];
+
+const dState = {};
+let dDragItem = null;
+let dDragFrom = null;
+
+function dSlotKey(r){ return `d__${r}`; }
+function dGetState(k){ return dState[k]||null; }
+function dSetState(k,v){ if(v==null) delete dState[k]; else dState[k]=v; }
+function dCountTotal(pop){ return Object.values(dState).filter(v=>v&&v.pop===pop).length; }
+
+function buildDBank(){
+  const wrap=document.getElementById("dChipWrap"); wrap.innerHTML="";
+  D_POPS.forEach(pop=>{
+    const chip=document.createElement("div");
+    chip.className="chip"; chip.id=`dchip-${pop}`; chip.draggable=true; chip.textContent=pop;
+    chip.addEventListener("dragstart",e=>{
+      if(dCountTotal(pop)>=1){e.preventDefault();return;}
+      dDragItem={type:"freq",pop}; dDragFrom=null; chip.classList.add("dragging");
+    });
+    chip.addEventListener("dragend",()=>chip.classList.remove("dragging"));
+    wrap.appendChild(chip);
+  });
+}
+
+function renderDBankUsage(){
+  D_POPS.forEach(pop=>{
+    const chip=document.getElementById(`dchip-${pop}`);
+    if(!chip) return;
+    chip.classList.toggle("used",dCountTotal(pop)>=1);
+  });
+}
+
+function buildDTable(){
+  const body=document.getElementById("dTableBody"); body.innerHTML="";
+  for(let r=0;r<4;r++){
+    const tr=document.createElement("tr");
+    const td=document.createElement("td");
+    td.appendChild(makeDDropzone(r));
+    tr.appendChild(td); body.appendChild(tr);
+  }
+}
+
+function makeDDropzone(rank){
+  const key=dSlotKey(rank);
+  const dz=document.createElement("div");
+  dz.className="dropzone"; dz.id=`dslot-${key}`; dz.draggable=true;
+  renderDSlotContent(dz,null);
+
+  dz.addEventListener("dragover",e=>{
+    if(dDragItem&&dDragItem.type==="freq"){e.preventDefault();dz.classList.add("drag-over");}
+  });
+  dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
+  dz.addEventListener("drop",e=>{
+    e.preventDefault(); dz.classList.remove("drag-over");
+    if(!dDragItem||dDragItem.type!=="freq") return;
+    const {pop}=dDragItem;
+    const existing=dGetState(key);
+    const movingSame=dDragFrom&&dGetState(dDragFrom)&&dGetState(dDragFrom).pop===pop;
+    if(dCountTotal(pop)>0&&!movingSame){dDragItem=null;dDragFrom=null;return;}
+    if(dDragFrom&&dDragFrom!==key){
+      if(existing){dSetState(dDragFrom,existing);renderDSlot(dDragFrom);}
+      else{dSetState(dDragFrom,null);renderDSlot(dDragFrom);}
+    }
+    dSetState(key,{pop}); renderDSlot(key);
+    dDragItem=null; dDragFrom=null;
+    clearDMarks(); renderDBankUsage();
+  });
+  dz.addEventListener("click",()=>{
+    if(!dGetState(key)) return;
+    dSetState(key,null); renderDSlot(key); clearDMarks(); renderDBankUsage();
+  });
+  dz.addEventListener("dragstart",e=>{
+    const cur=dGetState(key); if(!cur){e.preventDefault();return;}
+    dDragItem={type:"freq",...cur}; dDragFrom=key;
+  });
+  return dz;
+}
+
+function renderDSlotContent(el,val){
+  if(!val){el.innerHTML=`<div class="placeholder">— drop here —</div>`;el.classList.remove("filled");}
+  else{el.textContent=val.pop;el.classList.add("filled");}
+}
+function renderDSlot(key){
+  const el=document.getElementById(`dslot-${key}`); if(!el) return;
+  el.classList.remove("correct","wrong"); renderDSlotContent(el,dGetState(key));
+}
+
+/* ══════════════════════════════
+   ACTIVITY 2 — Mutation Match
+══════════════════════════════ */
+// Rows: mechanism text → correct ancestry
+const M_ROWS = [
+  { id:"m0", mechanism:'"Del" mutant RHD gene', ancestry:"Asian (10-30%)" },
+  { id:"m1", mechanism:"RHD gene with missense mutations",  ancestry:"African"  },
+  { id:"m2", mechanism:"Deletion of RHD gene", ancestry:"European" },
+];
+const M_ANCESTRIES = ["African","Asian (10-30%)","European",];
+
+const mState = {};
+let mDragItem = null;
+let mDragFrom = null;
+
+function mSlotKey(id){ return `m__${id}`; }
+function mGetState(k){ return mState[k]||null; }
+function mSetState(k,v){ if(v==null) delete mState[k]; else mState[k]=v; }
+function mCountTotal(anc){ return Object.values(mState).filter(v=>v&&v.ancestry===anc).length; }
+
+function buildMBank(){
+  const wrap=document.getElementById("mChipWrap"); wrap.innerHTML="";
+  M_ANCESTRIES.forEach(anc=>{
+    const chip=document.createElement("div");
+    chip.className="chip"; chip.id=`mchip-${anc}`; chip.draggable=true; chip.textContent=anc;
+    chip.addEventListener("dragstart",e=>{
+      if(mCountTotal(anc)>=1){e.preventDefault();return;}
+      mDragItem={type:"mut",ancestry:anc}; mDragFrom=null; chip.classList.add("dragging");
+    });
+    chip.addEventListener("dragend",()=>chip.classList.remove("dragging"));
+    wrap.appendChild(chip);
+  });
+}
+
+function renderMBankUsage(){
+  M_ANCESTRIES.forEach(anc=>{
+    const chip=document.getElementById(`mchip-${anc}`); if(!chip) return;
+    chip.classList.toggle("used",mCountTotal(anc)>=1);
+  });
+}
+
+function buildMTable(){
+  const body=document.getElementById("mTableBody"); body.innerHTML="";
+  M_ROWS.forEach(row=>{
+    const tr=document.createElement("tr");
+    const tdM=document.createElement("td");
+    tdM.className="mutation-td"; tdM.textContent=row.mechanism;
+    const tdD=document.createElement("td");
+    tdD.appendChild(makeMDropzone(row.id));
+    tr.appendChild(tdM); tr.appendChild(tdD); body.appendChild(tr);
+  });
+}
+
+function makeMDropzone(rowId){
+  const key=mSlotKey(rowId);
+  const dz=document.createElement("div");
+  dz.className="dropzone"; dz.id=`mslot-${key}`; dz.draggable=true;
+  renderMSlotContent(dz,null);
+
+  dz.addEventListener("dragover",e=>{
+    if(mDragItem&&mDragItem.type==="mut"){e.preventDefault();dz.classList.add("drag-over");}
+  });
+  dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
+  dz.addEventListener("drop",e=>{
+    e.preventDefault(); dz.classList.remove("drag-over");
+    if(!mDragItem||mDragItem.type!=="mut") return;
+    const {ancestry}=mDragItem;
+    const existing=mGetState(key);
+    const movingSame=mDragFrom&&mGetState(mDragFrom)&&mGetState(mDragFrom).ancestry===ancestry;
+    if(mCountTotal(ancestry)>0&&!movingSame){mDragItem=null;mDragFrom=null;return;}
+    if(mDragFrom&&mDragFrom!==key){
+      if(existing){mSetState(mDragFrom,existing);renderMSlot(mDragFrom);}
+      else{mSetState(mDragFrom,null);renderMSlot(mDragFrom);}
+    }
+    mSetState(key,{ancestry}); renderMSlot(key);
+    mDragItem=null; mDragFrom=null;
+    clearDMarks(); renderMBankUsage();
+  });
+  dz.addEventListener("click",()=>{
+    if(!mGetState(key)) return;
+    mSetState(key,null); renderMSlot(key); clearDMarks(); renderMBankUsage();
+  });
+  dz.addEventListener("dragstart",e=>{
+    const cur=mGetState(key); if(!cur){e.preventDefault();return;}
+    mDragItem={type:"mut",...cur}; mDragFrom=key;
+  });
+  return dz;
+}
+
+function renderMSlotContent(el,val){
+  if(!val){el.innerHTML=`<div class="placeholder">— drop here —</div>`;el.classList.remove("filled");}
+  else{el.textContent=val.ancestry;el.classList.add("filled");}
+}
+function renderMSlot(key){
+  const el=document.getElementById(`mslot-${key}`); if(!el) return;
+  el.classList.remove("correct","wrong"); renderMSlotContent(el,mGetState(key));
+}
+
+/* ══════════════════════════════
+   SHARED CHECK / RESET
+══════════════════════════════ */
+function clearDMarks(){
+  document.querySelectorAll("#dTableBody .dropzone, #mTableBody .dropzone")
+    .forEach(z=>z.classList.remove("correct","wrong"));
+  const msg=document.getElementById("dScoreMsg");
+  msg.textContent=""; msg.className="score";
+}
+
+function checkDAnswers(){
+  let correct=0, total=0;
+
+  // Check freq ranking
+  for(let r=0;r<4;r++){
+    total++;
+    const key=dSlotKey(r);
+    const el=document.getElementById(`dslot-${key}`);
+    const cur=dGetState(key);
+    el.classList.remove("correct","wrong");
+    if(cur&&cur.pop===D_CORRECT[r]){el.classList.add("correct");correct++;}
+    else el.classList.add("wrong");
+  }
+
+  // Check mutation match
+  M_ROWS.forEach(row=>{
+    total++;
+    const key=mSlotKey(row.id);
+    const el=document.getElementById(`mslot-${key}`);
+    const cur=mGetState(key);
+    el.classList.remove("correct","wrong");
+    if(cur&&cur.ancestry===row.ancestry){el.classList.add("correct");correct++;}
+    else el.classList.add("wrong");
+  });
+
+  const msg=document.getElementById("dScoreMsg");
+  msg.textContent=`${correct}/${total} correct`;
+  msg.className=`score ${correct===total?"good":"bad"}`;
+}
+
+function resetD(){
+  Object.keys(dState).forEach(k=>delete dState[k]);
+  Object.keys(mState).forEach(k=>delete mState[k]);
+  for(let r=0;r<4;r++) renderDSlot(dSlotKey(r));
+  M_ROWS.forEach(row=>renderMSlot(mSlotKey(row.id)));
+  clearDMarks(); renderDBankUsage(); renderMBankUsage();
+}
+
+document.getElementById("dCheckBtn").addEventListener("click",checkDAnswers);
+document.getElementById("dResetBtn").addEventListener("click",resetD);
+
+buildDBank(); buildDTable();
+buildMBank(); buildMTable();
+resetD();
+</script>
