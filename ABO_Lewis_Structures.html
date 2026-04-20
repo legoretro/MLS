@@ -101,6 +101,7 @@
 
   .checkBtn{ background:#1f1f1f; color:#fff; }
   .resetBtn{ background:#d9d2c6; color:#333; }
+  .seeBtn{ background:#8c6f2f; color:#fff; }
 
   .score{
     font-weight:800;
@@ -345,6 +346,66 @@
     margin:18px 0;
   }
 
+
+  .answers-panel{
+    margin-top:18px;
+    background:var(--panel);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    padding:16px 14px;
+    display:none;
+  }
+
+  .answers-panel.show{
+    display:block;
+  }
+
+  .answers-title{
+    font-size:1rem;
+    font-weight:900;
+    margin:0 0 10px;
+  }
+
+  .answers-subtitle{
+    font-size:.8rem;
+    font-weight:900;
+    margin:16px 0 8px;
+    color:#555;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+
+  .answers-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px;
+  }
+
+  .answer-card{
+    background:#fff;
+    border:2px solid #ebe5d8;
+    border-radius:12px;
+    padding:10px;
+  }
+
+  .answer-card h3{
+    margin:0 0 8px;
+    font-size:.9rem;
+  }
+
+  .answer-card div{
+    font-size:.8rem;
+    line-height:1.35;
+    margin:3px 0;
+  }
+
+  .answer-note{
+    font-size:.75rem;
+    color:#666;
+    margin-top:10px;
+    line-height:1.4;
+  }
+
   @media (max-width: 980px){
     .layout{
       grid-template-columns:1fr;
@@ -376,6 +437,7 @@
   <div class="section-controls">
     <button id="checkBtn" class="checkBtn">✔ Check Answers</button>
     <button id="resetBtn" class="resetBtn">↺ Reset</button>
+    <button id="seeAnswersBtn" class="seeBtn">👁 See All Answers</button>
     <div id="msg" class="score"></div>
   </div>
 
@@ -424,6 +486,7 @@
   <div class="section-controls">
     <button id="checkBtnType1" class="checkBtn">✔ Check Answers</button>
     <button id="resetBtnType1" class="resetBtn">↺ Reset Type 1 Only</button>
+    <button id="seeAnswersBtnType1" class="seeBtn">👁 See All Answers</button>
     <div id="msgType1" class="score"></div>
   </div>
 
@@ -493,6 +556,132 @@
   </div>
 </div>
 
+
+
+<div class="wrap">
+  <div id="answersPanel" class="answers-panel">
+    <div class="answers-title">See All Answers</div>
+
+    <div class="answers-subtitle">Type 2 Chain Base Structure</div>
+    <div class="answers-grid">
+      <div class="answer-card">
+        <h3>Bombay</h3>
+        <div><strong>Side:</strong> blank</div>
+        <div><strong>Top:</strong> blank</div>
+        <div><strong>Label:</strong> Bombay</div>
+      </div>
+      <div class="answer-card">
+        <h3>H antigen</h3>
+        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Top:</strong> blank</div>
+        <div><strong>Label:</strong> H antigen</div>
+      </div>
+      <div class="answer-card">
+        <h3>A antigen</h3>
+        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Top:</strong> N-acetylgalactosamine</div>
+        <div><strong>Label:</strong> A antigen</div>
+      </div>
+      <div class="answer-card">
+        <h3>B antigen</h3>
+        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Top:</strong> Galactose</div>
+        <div><strong>Label:</strong> B antigen</div>
+      </div>
+      <div class="answer-card">
+        <h3>Acquired B-Antigen</h3>
+        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Top:</strong> galactosamine</div>
+        <div><strong>Label:</strong> Acquired B-Antigen</div>
+      </div>
+    </div>
+
+    <div class="answers-subtitle">Type 1 Chain Rules</div>
+    <div class="answers-grid">
+      <div class="answer-card">
+        <h3>No FUT2 and no FUT3</h3>
+        <div><strong>Le Gene:</strong> blank</div>
+        <div><strong>Se Gene:</strong> blank</div>
+        <div><strong>ABH top:</strong> blank</div>
+        <div><strong>ABH Label:</strong> blank</div>
+        <div><strong>Lewis Label:</strong> blank</div>
+        <div><strong>Secretor:</strong> No</div>
+        <div><strong>Agglutination:</strong> Yes</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT3 only</h3>
+        <div><strong>Le Gene:</strong> FUT3</div>
+        <div><strong>Se Gene:</strong> blank</div>
+        <div><strong>ABH top:</strong> blank</div>
+        <div><strong>ABH Label:</strong> blank</div>
+        <div><strong>Lewis Label:</strong> Le(a+,b-)</div>
+        <div><strong>Secretor:</strong> No</div>
+        <div><strong>Agglutination:</strong> Yes</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT2 only</h3>
+        <div><strong>Le Gene:</strong> blank</div>
+        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>ABH top:</strong> blank = H antigen</div>
+        <div><strong>Lewis Label:</strong> blank</div>
+        <div><strong>Secretor:</strong> Yes</div>
+        <div><strong>Agglutination:</strong> No</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT2 + N-acetylgalactosamine</h3>
+        <div><strong>Le Gene:</strong> blank or FUT3</div>
+        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>ABH top:</strong> N-acetylgalactosamine</div>
+        <div><strong>ABH Label:</strong> A antigen</div>
+        <div><strong>Lewis Label:</strong> blank or Le(a-,b+)</div>
+        <div><strong>Secretor:</strong> Yes</div>
+        <div><strong>Agglutination:</strong> No</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT2 + Galactose</h3>
+        <div><strong>Le Gene:</strong> blank or FUT3</div>
+        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>ABH top:</strong> Galactose</div>
+        <div><strong>ABH Label:</strong> B antigen</div>
+        <div><strong>Lewis Label:</strong> blank or Le(a-,b+)</div>
+        <div><strong>Secretor:</strong> Yes</div>
+        <div><strong>Agglutination:</strong> No</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT2 + FUT3</h3>
+        <div><strong>Le Gene:</strong> FUT3</div>
+        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>ABH top:</strong> blank = H antigen</div>
+        <div><strong>ABH Label:</strong> H antigen</div>
+        <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
+        <div><strong>Secretor:</strong> Yes</div>
+        <div><strong>Agglutination:</strong> No</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT2 + FUT3 + N-acetylgalactosamine</h3>
+        <div><strong>Le Gene:</strong> FUT3</div>
+        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>ABH top:</strong> N-acetylgalactosamine</div>
+        <div><strong>ABH Label:</strong> A antigen</div>
+        <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
+        <div><strong>Secretor:</strong> Yes</div>
+        <div><strong>Agglutination:</strong> No</div>
+      </div>
+      <div class="answer-card">
+        <h3>FUT2 + FUT3 + Galactose</h3>
+        <div><strong>Le Gene:</strong> FUT3</div>
+        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>ABH top:</strong> Galactose</div>
+        <div><strong>ABH Label:</strong> B antigen</div>
+        <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
+        <div><strong>Secretor:</strong> Yes</div>
+        <div><strong>Agglutination:</strong> No</div>
+      </div>
+    </div>
+
+    <div class="answer-note">This section is just a quick reveal panel. It does not change your drag and drop logic.</div>
+  </div>
+</div>
 
 <script>
 const SUGAR_CHIPS = [
@@ -1235,6 +1424,17 @@ function resetType1(){
   renderType1LabelBankUsage("agglutination");
 }
 
+
+function toggleAnswersPanel(){
+  const panel = document.getElementById("answersPanel");
+  const isOpen = panel.classList.toggle("show");
+  const text = isOpen ? "🙈 Hide Answers" : "👁 See All Answers";
+  const btn1 = document.getElementById("seeAnswersBtn");
+  const btn2 = document.getElementById("seeAnswersBtnType1");
+  if(btn1) btn1.textContent = text;
+  if(btn2) btn2.textContent = text;
+}
+
 function resetAll(){
   state.side = null;
   state.top = null;
@@ -1252,6 +1452,7 @@ function resetAll(){
 
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", resetAll);
+document.getElementById("seeAnswersBtn").addEventListener("click", toggleAnswersPanel);
 
 buildSugarBank();
 buildLabelBank();
@@ -1273,6 +1474,7 @@ setupType1LabelDrop("label-drop-secretor-type1", "secretorLabel", "type1-label-s
 setupType1LabelDrop("label-drop-agglutination-type1", "agglutinationLabel", "type1-label-agglutination", "agglutination");
 document.getElementById("checkBtnType1").addEventListener("click", checkAnswersType1);
 document.getElementById("resetBtnType1").addEventListener("click", resetType1);
+document.getElementById("seeAnswersBtnType1").addEventListener("click", toggleAnswersPanel);
 resetType1();
 resetAll();
 </script>
