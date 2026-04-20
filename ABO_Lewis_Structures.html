@@ -1146,25 +1146,12 @@ function renderType1LabelDrop(stateKey){
 }
 
 function getType1ExpectedABH(){
+  // No FUT2 on type 1 chain = no H, so no A or B either
+  if(type1State.secretorSide !== "FUT2") return null;
 
-  // ❌ No FUT2 → NO H (even if FUT3 or nothing)
-  if(type1State.secretorSide !== "FUT2"){
-    return null;
-  }
-
-  // ✅ FUT2 present → H exists
-  if(!type1State.top){
-    return "H antigen";
-  }
-
-  if(type1State.top === "N-acetylgalactosamine"){
-    return "A antigen";
-  }
-
-  if(type1State.top === "Galactose"){
-    return "B antigen";
-  }
-
+  if(type1State.top === "N-acetylgalactosamine") return "A antigen";
+  if(type1State.top === "Galactose") return "B antigen";
+  if(!type1State.top) return "H antigen";
   return null;
 }
 
@@ -1209,14 +1196,14 @@ function checkAnswersType1(){
   const expectedSecretor = getType1ExpectedSecretor();
   const expectedAgglutination = getType1ExpectedAgglutination();
 
-  if((expectedABH === null && !type1State.abHLabel) || type1State.abhLabel === expectedABH){ abhEl.classList.add("correct"); correct++; } else { abhEl.classList.add("wrong"); }
+  if((expectedABH === null && !type1State.abhLabel) || type1State.abhLabel === expectedABH){ abhEl.classList.add("correct"); correct++; } else { abhEl.classList.add("wrong"); }
   if((expectedLewis === null && !type1State.lewisLabel) || type1State.lewisLabel === expectedLewis){ lewisEl.classList.add("correct"); correct++; } else { lewisEl.classList.add("wrong"); }
   if(type1State.secretorLabel === expectedSecretor){ secretorEl.classList.add("correct"); correct++; } else { secretorEl.classList.add("wrong"); }
   if(type1State.agglutinationLabel === expectedAgglutination){ agglutinationEl.classList.add("correct"); correct++; } else { agglutinationEl.classList.add("wrong"); }
 
   const msg = document.getElementById("msgType1");
   const summaryParts = [];
-  if(expectedABH) summaryParts.push(expectedABh);
+  if(expectedABH) summaryParts.push(expectedABH);
   if(expectedLewis) summaryParts.push(expectedLewis);
   summaryParts.push(`Secretor: ${expectedSecretor}`);
   summaryParts.push(`Agglutination: ${expectedAgglutination}`);
