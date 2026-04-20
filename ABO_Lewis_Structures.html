@@ -1147,12 +1147,12 @@ function renderType1LabelDrop(stateKey){
 
 function getType1ExpectedABH(){
 
-  // NO FUT2 → NO H, NO A, NO B
+  // ❌ No FUT2 → NO H (even if FUT3 or nothing)
   if(type1State.secretorSide !== "FUT2"){
     return null;
   }
 
-  // FUT2 present → H exists
+  // ✅ FUT2 present → H exists
   if(!type1State.top){
     return "H antigen";
   }
