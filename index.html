@@ -1090,8 +1090,9 @@ async function renderUAImages(el){
           <div class="condition-imgs">${buildUAThumbs(img)}</div>
           <div class="condition-body">
             <div class="condition-name">${img.name}</div>
-            ${img.key_features?`<div class="condition-features">${(img.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+            ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
             ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+              <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
               <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
             </div>`:''}
           </div>
@@ -1170,43 +1171,104 @@ async function generateUAPDF(){
 }
 
 function buildUAThumbs(img){
-  const imgs=img.images||[];
-  const slots=4;let html='';
-  for(let i=0;i<slots;i++){
-    if(imgs[i])html+=`<img src="${imgs[i]}" alt="" onerror="this.style.display='none'">`;
-    else html+=`<div class="img-ph">${i===0?'🧪':''}</div>`;
-  }
-  return html;
+  const imgs=(img.images||[]).filter(Boolean);
+  if(imgs[0]) return `<img src="${imgs[0]}" alt="" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="this.style.display='none'">`;
+  return `<div class="img-ph" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div>`;
 }
 
 function openUAImage(id){
   sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=data.images||[];
+    const imgs=(data.images||[]).filter(Boolean);
     const features=data.key_features||[];
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
         <div class="section-title" style="font-size:16px">${data.name}</div>
-        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+        <div class="flex gap-6 ml-auto">
+          ${isAdmin?`<button class="btn btn-ghost btn-xs" onclick="document.getElementById('condition-modal').classList.add('hidden');openUAEditModal('${data.id}')">Edit</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+        </div>
       </div>
-      ${imgs.length?`
-        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
-          ${imgs.map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
-        </div>`:''}
+      ${imgs[0]?`<img src="${imgs[0]}" onclick="openImgViewer('${imgs[0]}')" style="width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3);margin-bottom:16px" alt="">`:'<div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px">🧪</div>'}
       ${features.length?`
-        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
           ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
-        </div>`:''}
+        </div>`:'<div style="color:var(--text3);font-size:13px;margin-bottom:12px">No key features added yet.</div>'}
       ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
-      ${isAdmin?`
-        <div class="divider"></div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images (drag & drop or click)</div>
-        ${buildUAImageEditor(data)}
-      `:''}
     `;
     document.getElementById('condition-modal').classList.remove('hidden');
   });
+}
+
+function openUAEditModal(id){
+  sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=(data.images||[]).filter(Boolean);
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div style="font-size:16px;font-weight:600">Edit UA Finding</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Name / Condition</label>
+        <input type="text" id="uaedit-name" value="${esc(data.name||'')}" placeholder="e.g. RBC Cast" style="font-size:15px">
+      </div>
+      <div class="form-group">
+        <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
+        <textarea id="uaedit-features" style="min-height:90px" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome">${(data.key_features||[]).join('\n')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <textarea id="uaedit-notes" style="min-height:60px">${data.notes||''}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Image <span style="font-size:11px;color:var(--text3)">(one image per finding)</span></label>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          ${imgs[0]?`<img src="${imgs[0]}" style="height:100px;max-width:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3)">`:
+            `<div style="height:100px;width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div>`}
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+            ${imgs[0]?'Replace Image':'Upload Image'}
+            <input type="file" accept="image/*" style="display:none" onchange="handleUASingleImgUpload(event,'${data.id}')">
+          </label>
+          ${imgs[0]?`<button class="btn btn-danger btn-xs" onclick="clearUAImage('${data.id}')">Remove</button>`:''}
+        </div>
+      </div>
+      <div class="flex gap-8 mt-8">
+        <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUAEdit('${data.id}')">Save Changes</button>
+      </div>
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+async function saveUAEdit(id){
+  const name=document.getElementById('uaedit-name')?.value.trim();
+  if(!name){alert('Name is required.');return;}
+  const featText=document.getElementById('uaedit-features')?.value||'';
+  const notes=document.getElementById('uaedit-notes')?.value.trim()||'';
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes}).eq('id',id);
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  renderTab();
+}
+
+async function handleUASingleImgUpload(e,id){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    await sb.from('mlsboc_ua_images').update({images:[ev.target.result]}).eq('id',id);
+    openUAEditModal(id);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function clearUAImage(id){
+  if(!confirm('Remove the image?'))return;
+  await sb.from('mlsboc_ua_images').update({images:[]}).eq('id',id);
+  openUAEditModal(id);
 }
 
 function buildUAImageEditor(item){
@@ -1336,17 +1398,45 @@ async function deleteUAImage(id){
   renderTab();
 }
 
-async function startUAQuiz(){
+async function startUAQuiz(forceNew=false){
+  // Resume if in progress
+  if(!forceNew && appState.uaImgMode==='quiz' && appState.uaQuizItems&&appState.uaQuizItems.length && !appState.uaQuizDone && appState.uaQuizIdx>0){
+    renderTab();return;
+  }
+  if(!forceNew && appState.uaQuizItems&&appState.uaQuizItems.length && !appState.uaQuizDone && appState.uaQuizIdx>0){
+    appState.uaImgMode='quiz';
+    window._uaShowResume=true;
+    renderTab();return;
+  }
   const {data}=await sb.from('mlsboc_ua_images').select('*').not('images','is',null);
   const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
   if(!valid.length){alert('No images to quiz on yet.');return;}
   appState.uaImgMode='quiz';
+  window._uaShowResume=false;
   window._kqOpts={};appState.uaQuizItems=shuffle(valid);
   appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
   renderTab();
 }
 
 function renderUAImageQuiz(el){
+  // Show resume prompt if returning mid-quiz
+  if(appState.uaQuizIdx>0 && !appState.uaQuizDone && window._uaShowResume){
+    window._uaShowResume=false;
+    el.innerHTML=`
+      <div class="bbq-overlay">
+        <div class="bbq-header"><button class="btn btn-ghost btn-sm" onclick="appState.uaImgMode='browse';renderTab()">← Back</button></div>
+        <div class="bbq-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center">
+          <div style="font-size:36px;margin-bottom:16px">🧪</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">UA Image Quiz</div>
+          <div style="font-size:14px;color:var(--text2);margin-bottom:28px">You're on image ${appState.uaQuizIdx+1} of ${appState.uaQuizItems.length}</div>
+          <div class="flex gap-12 flex-wrap" style="justify-content:center">
+            <button class="btn btn-primary" style="font-size:15px;padding:12px 28px" onclick="window._uaShowResume=false;renderTab()">Resume →</button>
+            <button class="btn btn-ghost" style="font-size:15px;padding:12px 28px" onclick="startUAQuiz(true)">Restart</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
   renderKahootImageQuiz(el,{
     items:appState.uaQuizItems,
     idx:appState.uaQuizIdx,
@@ -1357,7 +1447,7 @@ function renderUAImageQuiz(el){
     onAnswer:id=>{appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();},
     onNext:()=>{appState.uaQuizIdx++;renderTab();},
     onDone:()=>{appState.uaQuizDone=true;renderTab();},
-    onRetry:()=>startUAQuiz(),
+    onRetry:()=>startUAQuiz(true),
     onExit:()=>{appState.uaImgMode='browse';appState.uaQuizDone=false;renderTab();},
     onRetryWrong:(wrongItems)=>{
       if(!wrongItems.length)return;
@@ -1879,8 +1969,9 @@ async function renderMicroImages(el){
                   <div class="condition-imgs">${buildOrganismThumbs(o)}</div>
                   <div class="condition-body">
                     <div class="condition-name">${o.name}</div>
-                    ${o.key_features?`<div class="condition-features">${(o.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+                    ${o.key_features&&o.key_features.length?`<div class="condition-features">${(o.key_features||[]).slice(0,3).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
                     ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                      <button class="btn btn-ghost btn-xs" onclick="openOrganismEditModal('${o.id}')">Edit</button>
                       <button class="btn btn-danger btn-xs" onclick="deleteOrganism('${o.id}')">Delete</button>
                     </div>`:''}
                   </div>
@@ -1983,46 +2074,92 @@ function openOrganism(id){
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
         <div class="section-title" style="font-size:16px">${data.name}</div>
-        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+        <div class="flex gap-6 ml-auto">
+          ${isAdmin?`<button class="btn btn-ghost btn-xs" onclick="document.getElementById('condition-modal').classList.add('hidden');openOrganismEditModal('${data.id}')">Edit</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+        </div>
       </div>
-      ${imgs.length?`
-        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
-          ${imgs.map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
-        </div>`:''}
+      ${imgs.filter(Boolean).length?`
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.filter(Boolean).length,2)},1fr);gap:8px;margin-bottom:16px">
+          ${imgs.filter(Boolean).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+        </div>`:'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:12px">🔬</div>'}
       ${features.length?`
-        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
           ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
-        </div>`:''}
+        </div>`:'<div style="color:var(--text3);font-size:13px;margin-bottom:12px">No key features added yet.</div>'}
       ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
-      ${isAdmin?`
-        <div class="divider"></div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images (drag & drop or click)</div>
-        ${buildOrganismImageEditor(data)}
-      `:''}
     `;
     document.getElementById('condition-modal').classList.remove('hidden');
   });
 }
 
-function buildOrganismImageEditor(organism){
-  const imgs=organism.images||[];
-  return `
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
-      ${[0,1,2,3].map(i=>`
-        <div class="drop-zone" id="odz-${organism.id}-${i}"
-          ondrop="handleOrganismImgDrop(event,'${organism.id}',${i})"
-          ondragover="event.preventDefault();this.classList.add('dragover')"
-          ondragleave="this.classList.remove('dragover')"
-          onclick="document.getElementById('oimg-${organism.id}-${i}').click()"
-        >
-          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
-          <input type="file" accept="image/*" id="oimg-${organism.id}-${i}" style="display:none" onchange="handleOrganismImgFile(event,'${organism.id}',${i})">
-        </div>`).join('')}
-    </div>
-    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
-  `;
+function openOrganismEditModal(id){
+  sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=data.images||[];
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div style="font-size:16px;font-weight:600">Edit Organism</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="oedit-name" value="${esc(data.name||'')}" placeholder="e.g. S. aureus" style="font-size:15px">
+      </div>
+      <div class="form-group">
+        <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
+        <textarea id="oedit-features" style="min-height:90px" placeholder="Coagulase positive&#10;Beta-hemolytic&#10;Gram positive cocci">${(data.key_features||[]).join('\n')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <textarea id="oedit-notes" style="min-height:60px">${data.notes||''}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Gram Stain Group</label>
+        <select id="oedit-folder">
+          ${['gram_positive','gram_negative'].map(k=>`<option value="${k}" ${data.folder===k?'selected':''}>${k==='gram_positive'?'Gram Positive':'Gram Negative'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Images <span style="font-size:11px;color:var(--text3)">(up to 4 — click or drag)</span></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[0,1,2,3].map(i=>`
+            <div class="drop-zone" id="odz-${data.id}-${i}"
+              ondrop="handleOrganismImgDrop(event,'${data.id}',${i})"
+              ondragover="event.preventDefault();this.classList.add('dragover')"
+              ondragleave="this.classList.remove('dragover')"
+              onclick="document.getElementById('oimg-${data.id}-${i}').click()"
+              style="min-height:90px">
+              ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:contain;border-radius:4px;background:var(--bg3)">`:`<div style="font-size:22px;margin-bottom:4px">📷</div><div style="font-size:12px">Slot ${i+1}</div>`}
+              <input type="file" accept="image/*" id="oimg-${data.id}-${i}" style="display:none" onchange="handleOrganismImgFile(event,'${data.id}',${i})">
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="flex gap-8 mt-8">
+        <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveOrganismEdit('${data.id}')">Save Changes</button>
+      </div>
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
 }
+
+async function saveOrganismEdit(id){
+  const name=document.getElementById('oedit-name')?.value.trim();
+  if(!name){alert('Name is required.');return;}
+  const featText=document.getElementById('oedit-features')?.value||'';
+  const notes=document.getElementById('oedit-notes')?.value.trim()||'';
+  const folder=document.getElementById('oedit-folder')?.value||'gram_positive';
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  const {error}=await sb.from('mlsboc_micro_organisms').update({name,key_features:features,notes,folder}).eq('id',id);
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  renderTab();
+}
+
+// handleOrganismImgFile and handleOrganismImgDrop reopen edit modal so slots refresh
+
 
 async function handleOrganismImgFile(e,orgId,slot){
   const file=e.target.files[0];if(!file)return;
@@ -2034,7 +2171,7 @@ async function handleOrganismImgFile(e,orgId,slot){
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=dataUrl;
     await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
-    openOrganism(orgId);
+    openOrganismEditModal(orgId);
   };
   reader.readAsDataURL(file);
 }
@@ -2051,7 +2188,7 @@ async function handleOrganismImgDrop(e,orgId,slot){
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=dataUrl;
     await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
-    openOrganism(orgId);
+    openOrganismEditModal(orgId);
   };
   reader.readAsDataURL(file);
 }
