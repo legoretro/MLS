@@ -27,9 +27,6 @@
 #pwa-splash .sp-dot:nth-child(2){animation-delay:.2s}
 #pwa-splash .sp-dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
-
-
-  
 </style>
 </head>
 <style>
@@ -142,16 +139,6 @@ select option{background:var(--bg3)}
 .image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
 .image-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
 .image-card img{width:100%;height:180px;object-fit:cover;background:var(--bg3)}
-  .ua-image-grid .image-card{
-  overflow:hidden;
-}.ua-image-grid .image-card img{
-  display:block;
-}
-  .ua-image-grid .image-card img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
 .image-placeholder{width:100%;height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:28px}
 .image-card-body{padding:12px}
 .image-title{font-size:13px;font-weight:500;color:var(--text)}
@@ -1061,7 +1048,7 @@ async function renderGenericImages(el){
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminImageControls()}</div>`:''}
     ${!data||!data.length?'<div class="empty">No images yet for this subject.</div>':''}
-    <div class="image-grid ua-image-grid">
+    <div class="image-grid">
       ${(data||[]).map(img=>`
         <div class="image-card">
           ${img.image_url?`<img src="${img.image_url}" alt="${esc(img.title)}" onerror="this.parentElement.querySelector('.image-placeholder').style.display='flex';this.style.display='none'">`:''}
