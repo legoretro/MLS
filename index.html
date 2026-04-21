@@ -274,6 +274,13 @@ body.light-mode .option-letter{color:var(--text3) !important}
   .bbq-question{font-size:22px !important}
   .bbq-opt{font-size:16px !important;padding:16px 18px !important;min-height:62px !important}
 }
+/* Flashcard flip animation */
+.flash-flip-scene{perspective:1200px;width:100%}
+.flash-flip-card{position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(.4,0,.2,1);width:100%}
+.flash-flip-card.is-flipped{transform:rotateY(180deg)}
+.flash-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r2) var(--r2) 0 0;width:100%}
+.flash-face-back{transform:rotateY(180deg);position:absolute;inset:0;background:var(--bg2);display:flex;align-items:center;justify-content:center}
+.flash-face-front{background:var(--bg2)}
 </style>
 </head>
 <body>
@@ -467,6 +474,26 @@ window.__appInit = async function(){
     await seedIfEmpty();
     await loadIconCache();
     await loadFolderIconCache();
+    // Restore last navigation position
+    try{
+      const saved=sessionStorage.getItem('mlsboc_nav');
+      if(saved){
+        const nav=JSON.parse(saved);
+        // Only restore safe views — skip quiz/exam in-progress states
+        if(nav.view==='subject'&&nav.subject){
+          appState.view='subject';appState.subject=nav.subject;
+          appState.subjectTab=nav.subjectTab||'quiz';
+        }else if(nav.view==='formulas'){
+          appState.view='formulas';
+        }else if(nav.view==='class'&&nav.classSubject){
+          appState.view='class';appState.classView='subject';
+          appState.classSubject=nav.classSubject;
+        }else if(nav.view==='class'){
+          appState.view='class';appState.classView=null;
+        }
+        // 'all' exam and quiz mid-session intentionally not restored
+      }
+    }catch(e){}
   }catch(e){console.warn('Init error',e);}
   // Hide splash and show app
   const splash=document.getElementById('pwa-splash');
@@ -580,6 +607,14 @@ function exitAdmin(){isAdmin=false;document.getElementById('admin-bar-el').class
 
 // ─── ROUTING ──────────────────────────────────────────────────────────────────
 function renderView(){
+  // Persist navigation state so refresh restores position
+  try{sessionStorage.setItem('mlsboc_nav',JSON.stringify({
+    view:appState.view,
+    subject:appState.subject,
+    subjectTab:appState.subjectTab,
+    classView:appState.classView,
+    classSubject:appState.classSubject
+  }));}catch(e){}
   const v=document.getElementById('view-main');
   if(appState.view==='home')renderHome(v);
   else if(appState.view==='subject')renderSubjectView(v);
@@ -1035,19 +1070,24 @@ async function renderGenericImages(el){
 // ─── URINALYSIS IMAGES — flat list with bulk upload + quiz (no folders) ───────
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
-  const {data}=await sb.from('mlsboc_ua_images').select('*').order('name');
+  const {data:items}=await sb.from('mlsboc_ua_images').select('*').order('name');
+  const all=items||[];
+
   el.innerHTML=`
     <div class="flex-center gap-8 mb-16 flex-wrap">
-      <button class="btn btn-primary btn-sm" onclick="startUAQuiz()">Image Quiz Mode</button>
+      <button class="btn btn-primary btn-sm" onclick="startUAQuiz()">⚡ Image Quiz Mode</button>
+      <button class="btn btn-ghost btn-sm" onclick="openUAExportModal()">📄 Export</button>
       ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddUAImageModal()">+ Add Image</button>`:''}
     </div>
-    ${!data||!data.length?'<div class="empty">No urinalysis images yet. Use Admin mode to add some.</div>':''}
-    <div class="condition-grid">
-      ${(data||[]).map(img=>`
-        <div class="condition-card" onclick="openUAImage('${img.id}')">
-          <div class="condition-imgs">
-            ${buildUAThumbs(img)}
-          </div>
+    <div style="position:relative;margin-bottom:20px">
+      <input type="text" id="ua-search" placeholder="Search findings..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterUAItems(this.value)">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+    </div>
+    ${!all.length?'<div class="empty">No urinalysis images yet. Use Admin mode to add some.</div>':''}
+    <div class="condition-grid" id="ua-items-body">
+      ${all.map(img=>`
+        <div class="condition-card ua-item" data-name="${esc(img.name.toLowerCase())}" onclick="openUAImage('${img.id}')">
+          <div class="condition-imgs">${buildUAThumbs(img)}</div>
           <div class="condition-body">
             <div class="condition-name">${img.name}</div>
             ${img.key_features?`<div class="condition-features">${(img.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
@@ -1059,6 +1099,74 @@ async function renderUAImages(el){
     </div>
     ${isAdmin?`<div class="mt-16">${adminUAImageControls()}</div>`:''}
   `;
+}
+
+function filterUAItems(query){
+  const q=query.toLowerCase().trim();
+  document.querySelectorAll('.ua-item').forEach(card=>{
+    card.style.display=(!q||card.dataset.name.includes(q))?'':'none';
+  });
+}
+
+async function openUAExportModal(){
+  const {data:items}=await sb.from('mlsboc_ua_images').select('*').order('name');
+  if(!items||!items.length){alert('No images to export.');return;}
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export UA Findings to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="flex gap-8 mb-12 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=false)">Deselect All</button>
+    </div>`;
+  items.forEach(img=>{
+    html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
+      <input type="checkbox" class="ua-exp-cb" data-id="${img.id}" checked style="width:16px;height:16px;flex-shrink:0">
+      <span style="font-weight:600">${img.name}</span>
+    </label>`;
+  });
+  html+=`<div class="flex gap-8 mt-20"><button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" onclick="generateUAPDF()">📄 Generate PDF</button></div>`;
+  document.getElementById('condition-modal-body').innerHTML=html;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function generateUAPDF(){
+  const ids=[...document.querySelectorAll('.ua-exp-cb:checked')].map(cb=>cb.dataset.id);
+  if(!ids.length){alert('Select at least one.');return;}
+  const btn=document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+  try{
+    const {data:all}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
+    if(!all||!all.length){return;}
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin,first=true;
+    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const getImgDims=(src)=>new Promise(res=>{const img=new Image();img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});img.onerror=()=>res({w:4,h:3});img.src=src;});
+    for(const item of all){
+      if(!first){doc.addPage();y=margin;}first=false;
+      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      doc.text(item.name,margin+3,y+7);y+=14;
+      if(item.key_features&&item.key_features.length){
+        doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+        doc.text('Key features: '+item.key_features.join(' · '),margin,y);y+=7;
+      }
+      if(item.notes){doc.setFontSize(9.5);doc.setTextColor(60,60,60);doc.splitTextToSize(item.notes,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5;});y+=3;}
+      for(const src of (item.images||[]).filter(Boolean).slice(0,4)){
+        let dims={w:4,h:3};try{dims=await getImgDims(src);}catch(e){}
+        const dw=cW,dh=Math.min(dw*(dims.h/dims.w),120);
+        checkPage(dh+6);
+        try{doc.addImage(src,src.startsWith('data:image/png')?'PNG':'JPEG',margin,y,dw,dh,'','NONE');y+=dh+6;}catch(e){}
+      }
+    }
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — UA Findings · Page ${p} of ${total}`,margin,pageH-8);}
+    doc.save('urinalysis_findings.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
 }
 
 function buildUAThumbs(img){
@@ -1250,7 +1358,13 @@ function renderUAImageQuiz(el){
     onNext:()=>{appState.uaQuizIdx++;renderTab();},
     onDone:()=>{appState.uaQuizDone=true;renderTab();},
     onRetry:()=>startUAQuiz(),
-    onExit:()=>{appState.uaImgMode='browse';appState.uaQuizDone=false;renderTab();}
+    onExit:()=>{appState.uaImgMode='browse';appState.uaQuizDone=false;renderTab();},
+    onRetryWrong:(wrongItems)=>{
+      if(!wrongItems.length)return;
+      window._kqOpts={};appState.uaQuizItems=shuffle(wrongItems);
+      appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
+      renderTab();
+    }
   });
 }
 
@@ -1258,14 +1372,18 @@ function answerUAImgQ(id){appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();
 function uaQuizNext(){appState.uaQuizIdx++;renderTab();}
 
 // ─── SHARED KAHOOT IMAGE QUIZ RENDERER ───────────────────────────────────────
-function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onNext,onDone,onRetry,onExit}){
+function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onNext,onDone,onRetry,onExit,onRetryWrong}){
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const emojis=['🔴','🔵','🟡','🟢'];
 
   if(done){
     let correct=0;
-    items.forEach((o,i)=>{if(ans[i]===o.id)correct++;});
+    const missed=[];
+    items.forEach((o,i)=>{
+      if(ans[i]===o.id)correct++;
+      else missed.push({item:o,givenId:ans[i]});
+    });
     const pct=Math.round(correct/items.length*100);
     let reviewHtml='';
     items.forEach((o,i)=>{
@@ -1280,9 +1398,38 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
         +(o.key_features&&o.key_features.length?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">'+o.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>':'')
         +'</div>';
     });
+
+    const exportMissedFn=()=>{
+      if(!missed.length){alert('No missed items.');return;}
+      try{
+        const {jsPDF}=window.jspdf;
+        const doc=new jsPDF({unit:'mm',format:'a4'});
+        const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+        let y=margin;
+        const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+        doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+        doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+        doc.text('Missed Items',(pageW/2),y+7,{align:'center'});y+=16;
+        missed.forEach(({item:o,givenId},i)=>{
+          checkPage(20);
+          const given=items.find(x=>x.id===givenId);
+          doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+          doc.splitTextToSize(`${i+1}. ${o.name}`,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5.5;});
+          if(given){doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(160,40,40);doc.text(`Your answer: ${given.name}`,margin+4,y);y+=5;}
+          if(o.key_features&&o.key_features.length){doc.setFontSize(9);doc.setTextColor(60,60,60);doc.text(`Features: ${o.key_features.join(', ')}`,margin+4,y);y+=5;}
+          y+=3;
+        });
+        const total=doc.internal.getNumberOfPages();
+        for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — Missed Items · Page ${p} of ${total}`,margin,pageH-8);}
+        doc.save('missed_images.pdf');
+      }catch(err){alert('PDF export failed: '+err.message);}
+    };
+    window._kqExportMissed=exportMissedFn;
+    window._kqRetryWrong=onRetryWrong?()=>onRetryWrong(missed.map(m=>m.item)):null;
+
     el.innerHTML='<div class="bbq-overlay"><div class="bbq-header">'
       +'<button class="btn btn-ghost btn-sm" onclick="('+onExit.toString()+')()">← Back</button>'
-      +'<div class="ml-auto"><span class="question-num">Quiz Complete</span></div>'
+      +'<div class="ml-auto" style="color:var(--text);font-size:13px;font-family:var(--mono)">Quiz Complete</div>'
       +'</div><div class="bbq-body">'
       +'<div style="text-align:center;padding:24px 0 28px">'
       +'<div style="font-size:48px;margin-bottom:8px">'+(pct>=80?'🏆':pct>=60?'✅':'📚')+'</div>'
@@ -1294,12 +1441,14 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
       +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
       +'<div class="stat-card"><div class="stat-num" style="color:var(--accent)">'+pct+'%</div><div class="stat-label">Score</div></div>'
       +'</div>'
-      +'<div class="flex gap-8 mb-20">'
-      +'<button class="btn btn-primary" onclick="('+onRetry.toString()+')()">Retry</button>'
-      +'<button class="btn btn-ghost" onclick="('+onExit.toString()+')()">Back to Browse</button>'
+      +'<div class="flex gap-8 mb-20 flex-wrap">'
+      +'<button class="btn btn-primary" onclick="('+onRetry.toString()+')()">🔄 Retry All</button>'
+      +(missed.length&&window._kqRetryWrong?'<button class="btn btn-warn" onclick="window._kqRetryWrong()">⚡ Retry Wrong Only ('+missed.length+')</button>':'')
+      +(missed.length?'<button class="btn btn-ghost btn-sm" onclick="window._kqExportMissed()">📥 Export Missed</button>':'')
+      +'<button class="btn btn-ghost" onclick="('+onExit.toString()+')()">Back</button>'
       +'</div>'
-      +'<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review</div>'
-      +reviewHtml+'</div></div>';
+      +(missed.length?'<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review</div>'+reviewHtml:'<div style="color:var(--success);font-weight:600;text-align:center;font-size:18px">Perfect score! 🎉</div>')
+      +'</div></div>';
     return;
   }
 
@@ -1360,74 +1509,187 @@ async function renderHemeImages(el){
   if(appState.hemeImgMode==='quiz'){
     renderHemeImageQuiz(el);return;
   }
-  if(!appState.hemeImgPage){
-    // Folder landing
-    const counts={};
-    for(const f of HEME_FOLDERS){
-      const {count}=await sb.from('mlsboc_heme_conditions').select('id',{count:'exact',head:true}).eq('folder',f.key);
-      counts[f.key]=count||0;
-    }
-    el.innerHTML=`
-      <div class="flex-center gap-8 mb-16 flex-wrap">
-        <button class="btn btn-primary btn-sm" onclick="startHemeQuiz()">Image Quiz Mode</button>
-        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddConditionModal(null)">+ Add Condition</button>`:''}
-      </div>
-      ${HEME_FOLDER_GROUPS.map(g=>`
-        <div class="mb-24">
-          <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${g.label}</div>
-          <div class="folder-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
-            ${g.keys.map(k=>{
-              const f=HEME_FOLDERS.find(x=>x.key===k);
-              if(!f)return '';
-              const cacheKey='heme_'+f.key;
-              const imgSrc=folderIconCache[cacheKey];
-              const imgHtml=imgSrc
-                ?`<div style="width:100%;height:90px;overflow:hidden;border-radius:var(--r) var(--r) 0 0;flex-shrink:0"><img src="${imgSrc}" style="width:100%;height:90px;object-fit:cover"></div>`
-                :`<div class="folder-icon">${f.icon}</div>`;
-              const uploadBtn=isAdmin?`<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;cursor:pointer;z-index:2" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleFolderIconFile(event,'heme_${f.key}')"></label>`:'';
-              return `<div style="position:relative">
-                <button class="folder-card" style="padding:${imgSrc?'0 0 12px':'16px'};overflow:hidden" onclick="openHemeFolder('${f.key}')">
-                  ${imgHtml}
-                  <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3;${imgSrc?'margin-top:8px':''}">${f.name}</div>
-                  <div class="folder-count">${counts[f.key]||0} conditions</div>
-                </button>${uploadBtn}</div>`;
-            }).join('')}
-          </div>
-        </div>`).join('')}
-      ${isAdmin?`<div class="mt-16">${adminHemeImageControls()}</div>`:''}
-    `;
-    return;
-  }
-  // Inside a folder — show conditions
-  const f=HEME_FOLDERS.find(x=>x.key===appState.hemeImgPage);
-  const {data:conditions}=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',appState.hemeImgPage).order('name');
+
+  // Flat view — load all conditions, group by folder inline
+  const {data:allConditions}=await sb.from('mlsboc_heme_conditions').select('*').order('name');
+  const conditions=allConditions||[];
+
+  // Group by folder preserving HEME_FOLDER_GROUPS order
+  const byFolder={};
+  conditions.forEach(c=>{ if(!byFolder[c.folder])byFolder[c.folder]=[]; byFolder[c.folder].push(c); });
+  const allFolderKeys=HEME_FOLDER_GROUPS.flatMap(g=>g.keys);
+  // also catch any folder key not in the predefined list
+  Object.keys(byFolder).forEach(k=>{ if(!allFolderKeys.includes(k))allFolderKeys.push(k); });
+
+  // Build flat condition list for export checkbox tracking
+  window._hemeAllConditions=conditions;
+
   el.innerHTML=`
-    <div class="breadcrumb mb-16">
-      <span class="breadcrumb-link" onclick="appState.hemeImgPage=null;renderTab()">Images</span>
-      <span class="breadcrumb-sep">›</span>
-      <span class="breadcrumb-cur">${f?f.name:appState.hemeImgPage}</span>
-      <div class="ml-auto flex gap-8">
-        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddConditionModal('${appState.hemeImgPage}')">+ Add Condition</button>`:''}
-        <button class="btn btn-primary btn-sm" onclick="startHemeQuizFolder('${appState.hemeImgPage}')">Quiz This Folder</button>
-      </div>
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="startHemeQuiz()">⚡ Image Quiz Mode</button>
+      <button class="btn btn-ghost btn-sm" onclick="openHemeExportModal()">📄 Export</button>
+      ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddConditionModal(null)">+ Add Condition</button>`:''}
     </div>
-    ${!conditions||!conditions.length?'<div class="empty">No conditions yet in this folder.</div>':''}
-    <div class="condition-grid">
-      ${(conditions||[]).map(c=>`
-        <div class="condition-card" onclick="openCondition('${c.id}')">
-          <div class="condition-imgs">
-            ${buildConditionThumbs(c)}
-          </div>
-          <div class="condition-body">
-            <div class="condition-name">${c.name}</div>
-            ${c.key_features?`<div class="condition-features">${(c.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
-            ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
-              <button class="btn btn-danger btn-xs" onclick="deleteCondition('${c.id}')">Delete</button>
-            </div>`:''}
-          </div>
-        </div>`).join('')}
+    <div style="position:relative;margin-bottom:20px">
+      <input type="text" id="heme-search" placeholder="Search conditions..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterHemeConditions(this.value)">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
     </div>
+    <div id="heme-conditions-body">
+      ${allFolderKeys.map(fkey=>{
+        const folderDef=HEME_FOLDERS.find(x=>x.key===fkey);
+        const folderLabel=folderDef?folderDef.name:fkey;
+        const items=byFolder[fkey]||[];
+        if(!items.length)return '';
+        return `
+          <div class="heme-section mb-24" data-folder="${fkey}">
+            <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${folderLabel} <span style="font-weight:400;font-size:11px">(${items.length})</span></div>
+            <div class="condition-grid">
+              ${items.map(c=>`
+                <div class="condition-card heme-item" data-name="${esc(c.name.toLowerCase())}" onclick="openCondition('${c.id}')">
+                  <div class="condition-imgs">${buildConditionThumbs(c)}</div>
+                  <div class="condition-body">
+                    <div class="condition-name">${c.name}</div>
+                    ${c.key_features?`<div class="condition-features">${(c.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+                    ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                      <button class="btn btn-danger btn-xs" onclick="deleteCondition('${c.id}')">Delete</button>
+                    </div>`:''}
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }).join('')}
+      ${conditions.length===0?'<div class="empty">No conditions yet. Use Admin mode to add one.</div>':''}
+    </div>
+    ${isAdmin?`<div class="mt-16">${adminHemeImageControls()}</div>`:''}
   `;
+}
+
+function filterHemeConditions(query){
+  const q=query.toLowerCase().trim();
+  document.querySelectorAll('.heme-item').forEach(card=>{
+    const name=card.dataset.name||'';
+    card.style.display=(!q||name.includes(q))?'':'none';
+  });
+  // Hide empty sections
+  document.querySelectorAll('.heme-section').forEach(section=>{
+    const visible=[...section.querySelectorAll('.heme-item')].some(c=>c.style.display!=='none');
+    section.style.display=visible?'':'none';
+  });
+}
+
+async function openHemeExportModal(){
+  const {data:conditions}=await sb.from('mlsboc_heme_conditions').select('*').order('name');
+  if(!conditions||!conditions.length){alert('No conditions to export.');return;}
+
+  const byFolder={};
+  conditions.forEach(c=>{ if(!byFolder[c.folder])byFolder[c.folder]=[]; byFolder[c.folder].push(c); });
+
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export Conditions to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select conditions to include in the PDF.</div>
+    <div class="flex gap-8 mb-16 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.heme-exp-cb').forEach(c=>c.checked=true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.heme-exp-cb').forEach(c=>c.checked=false)">Deselect All</button>
+    </div>`;
+
+  HEME_FOLDER_GROUPS.flatMap(g=>g.keys).concat(Object.keys(byFolder).filter(k=>!HEME_FOLDER_GROUPS.flatMap(g=>g.keys).includes(k))).forEach(fkey=>{
+    const items=byFolder[fkey];if(!items||!items.length)return;
+    const folderDef=HEME_FOLDERS.find(x=>x.key===fkey);
+    html+=`<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:12px">${folderDef?folderDef.name:fkey}</div>`;
+    items.forEach(c=>{
+      html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
+        <input type="checkbox" class="heme-exp-cb" data-id="${c.id}" checked style="width:16px;height:16px;flex-shrink:0">
+        <span style="font-weight:600">${c.name}</span>
+        ${c.key_features&&c.key_features.length?`<span style="font-size:11px;color:var(--text3);margin-left:auto">${c.key_features.slice(0,2).join(' · ')}</span>`:''}
+      </label>`;
+    });
+  });
+
+  html+=`
+    <div class="flex gap-8 mt-20 flex-wrap">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="generateHemeConditionsPDF()">📄 Generate PDF</button>
+    </div>`;
+
+  document.getElementById('condition-modal-body').innerHTML=html;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function generateHemeConditionsPDF(){
+  const selectedIds=[...document.querySelectorAll('.heme-exp-cb:checked')].map(cb=>cb.dataset.id);
+  if(!selectedIds.length){alert('Select at least one condition.');return;}
+  const btn=document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+  try{
+    const {data:all}=await sb.from('mlsboc_heme_conditions').select('*').in('id',selectedIds);
+    if(!all||!all.length){alert('Could not load conditions.');return;}
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth();
+    const pageH=doc.internal.pageSize.getHeight();
+    const margin=18;const contentW=pageW-margin*2;
+    let y=margin;let first=true;
+    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const write=(text,opts={})=>{
+      const{size=11,bold=false,color=[30,30,30],indent=0}=opts;
+      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
+      doc.splitTextToSize(String(text||''),contentW-indent).forEach(line=>{checkPage(6);doc.text(line,margin+indent,y);y+=size*0.4+1.2;});
+    };
+    for(const c of all){
+      if(!first){doc.addPage();y=margin;}first=false;
+      // Header
+      doc.setFillColor(210,210,210);doc.rect(margin,y,contentW,10,'F');
+      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      doc.text(c.name,margin+3,y+7);y+=14;
+      // Key features
+      if(c.key_features&&c.key_features.length){
+        write('Key Features',{size:10,bold:true,color:[40,40,40]});
+        write(c.key_features.join('  ·  '),{size:10,indent:2,color:[30,30,30]});
+        y+=3;
+      }
+      if(c.notes){write('Notes',{size:10,bold:true,color:[40,40,40]});write(c.notes,{size:10,indent:2,color:[40,40,40]});y+=3;}
+      // Images — preserve actual aspect ratio, one per row at full width
+      const imgs=(c.images||[]).filter(Boolean);
+      if(imgs.length){
+        const getImgDims=(src)=>new Promise(res=>{
+          const img=new Image();
+          img.onload=()=>res({w:img.naturalWidth||1,h:img.naturalHeight||1});
+          img.onerror=()=>res({w:4,h:3});
+          img.src=src;
+        });
+
+        for(let i=0;i<Math.min(imgs.length,4);i++){
+          let dims={w:4,h:3};
+          try{dims=await getImgDims(imgs[i]);}catch(e){}
+          const aspect=dims.h/dims.w;
+          const drawW=contentW;
+          const drawH=Math.min(drawW*aspect, 120); // cap at 120mm tall
+          checkPage(drawH+6);
+          try{
+            const fmt=imgs[i].startsWith('data:image/png')?'PNG':'JPEG';
+            doc.addImage(imgs[i],fmt,margin,y,drawW,drawH,'','NONE');
+            y+=drawH+6;
+          }catch(e){}
+        }
+        y+=4;
+      }
+    }
+    // Footer
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+      doc.text(`MLS BOC Prep — Hematology Conditions · Page ${p} of ${total}`,margin,pageH-8);
+      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
+    }
+    doc.save('hematology_conditions.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){
+    console.error(err);alert('PDF generation failed: '+err.message);
+    if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
+  }
 }
 
 function buildConditionThumbs(c){
@@ -1562,7 +1824,13 @@ function renderHemeImageQuiz(el){
     onNext:()=>{appState.hemeQuizIdx++;renderTab();},
     onDone:()=>{appState.hemeQuizDone=true;renderTab();},
     onRetry:()=>startHemeQuiz(),
-    onExit:()=>{appState.hemeImgMode='browse';appState.hemeImgPage=null;appState.hemeQuizDone=false;renderTab();}
+    onExit:()=>{appState.hemeImgMode='browse';appState.hemeImgPage=null;appState.hemeQuizDone=false;renderTab();},
+    onRetryWrong:(wrongItems)=>{
+      if(!wrongItems.length)return;
+      window._kqOpts={};appState.hemeQuizItems=shuffle(wrongItems);
+      appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+      renderTab();
+    }
   });
 }
 
@@ -1576,75 +1844,126 @@ function hemeQuizNext(){appState.hemeQuizIdx++;renderTab();}
 // ─── MICROBIOLOGY IMAGES — folder system (mirrors hematology) ─────────────────
 async function renderMicroImages(el){
   if(appState.microImgMode==='quiz'){renderMicroImageQuiz(el);return;}
-  if(!appState.microImgPage){
-    // Folder landing
-    const counts={};
-    for(const f of MICRO_FOLDERS){
-      const {count}=await sb.from('mlsboc_micro_organisms').select('id',{count:'exact',head:true}).eq('folder',f.key);
-      counts[f.key]=count||0;
-    }
-    el.innerHTML=`
-      <div class="flex-center gap-8 mb-16 flex-wrap">
-        <button class="btn btn-primary btn-sm" onclick="startMicroQuiz()">Image Quiz Mode</button>
-        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddOrganismModal(null)">+ Add Organism</button>`:''}
-      </div>
-      ${MICRO_FOLDER_GROUPS.map(g=>`
-        <div class="mb-24">
-          <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${g.label}</div>
-          <div class="folder-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
-            ${g.keys.map(k=>{
-              const f=MICRO_FOLDERS.find(x=>x.key===k);
-              if(!f)return '';
-              const cacheKey='micro_'+f.key;
-              const imgSrc=folderIconCache[cacheKey];
-              const imgHtml=imgSrc
-                ?`<div style="width:100%;height:90px;overflow:hidden;border-radius:var(--r) var(--r) 0 0;flex-shrink:0"><img src="${imgSrc}" style="width:100%;height:90px;object-fit:cover"></div>`
-                :`<div class="folder-icon">${f.icon}</div>`;
-              const uploadBtn=isAdmin?`<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;cursor:pointer;z-index:2" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleFolderIconFile(event,'micro_${f.key}')"></label>`:'';
-              return `<div style="position:relative">
-                <button class="folder-card" style="padding:${imgSrc?'0 0 12px':'16px'};overflow:hidden" onclick="openMicroFolder('${f.key}')">
-                  ${imgHtml}
-                  <div class="folder-name" style="font-size:12px;font-weight:600;line-height:1.3;${imgSrc?'margin-top:8px':''}">${f.name}</div>
-                  <div class="folder-count">${counts[f.key]||0} organisms</div>
-                </button>${uploadBtn}</div>`;
-            }).join('')}
-          </div>
-        </div>`).join('')}
-      ${isAdmin?`<div class="mt-16">${adminMicroImageControls()}</div>`:''}
-    `;
-    return;
-  }
-  // Inside a folder
-  const f=MICRO_FOLDERS.find(x=>x.key===appState.microImgPage);
-  const {data:organisms}=await sb.from('mlsboc_micro_organisms').select('*').eq('folder',appState.microImgPage).order('name');
+
+  // Flat view — load all organisms grouped by gram stain section
+  const {data:allOrgs}=await sb.from('mlsboc_micro_organisms').select('*').order('name');
+  const all=allOrgs||[];
+  const byFolder={};
+  all.forEach(o=>{if(!byFolder[o.folder])byFolder[o.folder]=[];byFolder[o.folder].push(o);});
+
+  const folderOrder=MICRO_FOLDER_GROUPS.flatMap(g=>g.keys);
+  Object.keys(byFolder).forEach(k=>{if(!folderOrder.includes(k))folderOrder.push(k);});
+
   el.innerHTML=`
-    <div class="breadcrumb mb-16">
-      <span class="breadcrumb-link" onclick="appState.microImgPage=null;renderTab()">Images</span>
-      <span class="breadcrumb-sep">›</span>
-      <span class="breadcrumb-cur">${f?f.name:appState.microImgPage}</span>
-      <div class="ml-auto flex gap-8">
-        ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddOrganismModal('${appState.microImgPage}')">+ Add Organism</button>`:''}
-        <button class="btn btn-primary btn-sm" onclick="startMicroQuizFolder('${appState.microImgPage}')">Quiz This Folder</button>
-      </div>
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="startMicroQuiz()">⚡ Image Quiz Mode</button>
+      <button class="btn btn-ghost btn-sm" onclick="openMicroExportModal()">📄 Export</button>
+      ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddOrganismModal(null)">+ Add Organism</button>`:''}
     </div>
-    ${!organisms||!organisms.length?'<div class="empty">No organisms yet in this folder.</div>':''}
-    <div class="condition-grid">
-      ${(organisms||[]).map(o=>`
-        <div class="condition-card" onclick="openOrganism('${o.id}')">
-          <div class="condition-imgs">
-            ${buildOrganismThumbs(o)}
-          </div>
-          <div class="condition-body">
-            <div class="condition-name">${o.name}</div>
-            ${o.key_features?`<div class="condition-features">${(o.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
-            ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
-              <button class="btn btn-danger btn-xs" onclick="deleteOrganism('${o.id}')">Delete</button>
-            </div>`:''}
-          </div>
-        </div>`).join('')}
+    <div style="position:relative;margin-bottom:20px">
+      <input type="text" id="micro-search" placeholder="Search organisms..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterMicroItems(this.value)">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
     </div>
+    <div id="micro-items-body">
+      ${folderOrder.map(fkey=>{
+        const folderDef=MICRO_FOLDERS.find(x=>x.key===fkey);
+        const label=folderDef?folderDef.name:fkey;
+        const items=byFolder[fkey]||[];
+        if(!items.length)return '';
+        return `
+          <div class="micro-section mb-24" data-folder="${fkey}">
+            <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${label} <span style="font-weight:400;font-size:11px">(${items.length})</span></div>
+            <div class="condition-grid">
+              ${items.map(o=>`
+                <div class="condition-card micro-item" data-name="${esc(o.name.toLowerCase())}" onclick="openOrganism('${o.id}')">
+                  <div class="condition-imgs">${buildOrganismThumbs(o)}</div>
+                  <div class="condition-body">
+                    <div class="condition-name">${o.name}</div>
+                    ${o.key_features?`<div class="condition-features">${(o.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+                    ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                      <button class="btn btn-danger btn-xs" onclick="deleteOrganism('${o.id}')">Delete</button>
+                    </div>`:''}
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }).join('')}
+      ${all.length===0?'<div class="empty">No organisms yet. Use Admin mode to add some.</div>':''}
+    </div>
+    ${isAdmin?`<div class="mt-16">${adminMicroImageControls()}</div>`:''}
   `;
 }
+
+function filterMicroItems(query){
+  const q=query.toLowerCase().trim();
+  document.querySelectorAll('.micro-item').forEach(card=>{
+    card.style.display=(!q||card.dataset.name.includes(q))?'':'none';
+  });
+  document.querySelectorAll('.micro-section').forEach(section=>{
+    const visible=[...section.querySelectorAll('.micro-item')].some(c=>c.style.display!=='none');
+    section.style.display=visible?'':'none';
+  });
+}
+
+async function openMicroExportModal(){
+  const {data:all}=await sb.from('mlsboc_micro_organisms').select('*').order('name');
+  if(!all||!all.length){alert('No organisms to export.');return;}
+  const byFolder={};
+  all.forEach(o=>{if(!byFolder[o.folder])byFolder[o.folder]=[];byFolder[o.folder].push(o);});
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export Organisms to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="flex gap-8 mb-12"><button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.micro-exp-cb').forEach(c=>c.checked=true)">Select All</button><button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.micro-exp-cb').forEach(c=>c.checked=false)">Deselect All</button></div>`;
+  MICRO_FOLDER_GROUPS.flatMap(g=>g.keys).forEach(fkey=>{
+    const items=byFolder[fkey];if(!items||!items.length)return;
+    const fd=MICRO_FOLDERS.find(x=>x.key===fkey);
+    html+=`<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:8px;margin-top:12px">${fd?fd.name:fkey}</div>`;
+    items.forEach(o=>{
+      html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px"><input type="checkbox" class="micro-exp-cb" data-id="${o.id}" checked style="width:16px;height:16px;flex-shrink:0"><span style="font-weight:600">${o.name}</span></label>`;
+    });
+  });
+  html+=`<div class="flex gap-8 mt-20"><button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" onclick="generateMicroPDF()">📄 Generate PDF</button></div>`;
+  document.getElementById('condition-modal-body').innerHTML=html;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function generateMicroPDF(){
+  const ids=[...document.querySelectorAll('.micro-exp-cb:checked')].map(cb=>cb.dataset.id);
+  if(!ids.length){alert('Select at least one.');return;}
+  const btn=document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+  try{
+    const {data:all}=await sb.from('mlsboc_micro_organisms').select('*').in('id',ids);
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin,first=true;
+    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const getImgDims=(src)=>new Promise(res=>{const img=new Image();img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});img.onerror=()=>res({w:4,h:3});img.src=src;});
+    for(const o of (all||[])){
+      if(!first){doc.addPage();y=margin;}first=false;
+      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      doc.text(o.name,margin+3,y+7);y+=14;
+      if(o.key_features&&o.key_features.length){doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);doc.text('Key features: '+o.key_features.join(' · '),margin,y);y+=7;}
+      if(o.notes){doc.setFontSize(9.5);doc.setTextColor(60,60,60);doc.splitTextToSize(o.notes,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5;});y+=3;}
+      for(const src of (o.images||[]).filter(Boolean).slice(0,4)){
+        let dims={w:4,h:3};try{dims=await getImgDims(src);}catch(e){}
+        const dw=cW,dh=Math.min(dw*(dims.h/dims.w),120);
+        checkPage(dh+6);
+        try{doc.addImage(src,src.startsWith('data:image/png')?'PNG':'JPEG',margin,y,dw,dh,'','NONE');y+=dh+6;}catch(e){}
+      }
+    }
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — Microbiology · Page ${p} of ${total}`,margin,pageH-8);}
+    doc.save('microbiology_organisms.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
+}
+
+function openMicroFolder(key){appState.microImgPage=key;renderTab();}
 
 function buildOrganismThumbs(o){
   const imgs=o.images||[];
@@ -1655,8 +1974,6 @@ function buildOrganismThumbs(o){
   }
   return html;
 }
-
-function openMicroFolder(key){appState.microImgPage=key;renderTab();}
 
 function openOrganism(id){
   sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
@@ -1772,7 +2089,13 @@ function renderMicroImageQuiz(el){
     onNext:()=>{appState.microQuizIdx++;renderTab();},
     onDone:()=>{appState.microQuizDone=true;renderTab();},
     onRetry:()=>startMicroQuiz(),
-    onExit:()=>{appState.microImgMode='browse';appState.microImgPage=null;appState.microQuizDone=false;renderTab();}
+    onExit:()=>{appState.microImgMode='browse';appState.microImgPage=null;appState.microQuizDone=false;renderTab();},
+    onRetryWrong:(wrongItems)=>{
+      if(!wrongItems.length)return;
+      window._kqOpts={};appState.microQuizItems=shuffle(wrongItems);
+      appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+      renderTab();
+    }
   });
 }
 
@@ -2655,6 +2978,7 @@ function renderBBQuizResults(el){
   const pct=Math.round(score/total*100);
   const answers=appState.bbQuizAnswers||{};
   const letters=['a','b','c','d'];
+  const missed=[];
 
   let reviewHtml='';
   appState.bbQuizItems.forEach((item,i)=>{
@@ -2662,23 +2986,67 @@ function renderBBQuizResults(el){
     const wasCorrect=ans===item.correct;
     const correctIdx=letters.indexOf(item.correct);
     const chosenIdx=ans?letters.indexOf(ans):-1;
+    if(!wasCorrect) missed.push({item,ans});
     reviewHtml+=`
       <div style="background:var(--bg2);border:1px solid ${wasCorrect?'var(--border)':'#f0647433'};border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
         <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${item._caseTitle||''}</div>
         <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${item.question}</div>
         ${wasCorrect
           ?`<div style="font-size:12px;color:var(--success)">✓ Correct — ${(item.options||[])[correctIdx]||''}</div>`
-          :`<div style="font-size:12px;color:var(--danger)">✗ ${ans&&chosenIdx>=0?'Your answer: '+((item.options||[])[chosenIdx]||''):'Time ran out'}</div>
+          :`<div style="font-size:12px;color:var(--danger)">✗ ${ans&&chosenIdx>=0?'Your answer: '+((item.options||[])[chosenIdx]||''):'(unanswered)'}</div>
            <div style="font-size:12px;color:var(--success);margin-top:2px">Correct: ${(item.options||[])[correctIdx]||''}</div>`}
         ${item.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">${item.explanation}</div>`:''}
       </div>`;
   });
 
+  const exportBBMissed=()=>{
+    if(!missed.length){alert('Nothing missed!');return;}
+    try{
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF({unit:'mm',format:'a4'});
+      const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+      let y=margin;
+      const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      doc.text('Missed Blood Bank Quiz Questions',(pageW/2),y+7,{align:'center'});y+=16;
+      missed.forEach(({item,ans},i)=>{
+        checkPage(32);
+        const correctIdx=letters.indexOf(item.correct);
+        const chosenIdx=ans?letters.indexOf(ans):-1;
+        if(item._caseTitle){doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,140);doc.text(item._caseTitle,margin,y);y+=5;}
+        doc.setFontSize(10.5);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+        doc.splitTextToSize(`Q${i+1}. ${item.question}`,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5.5;});
+        (item.options||[]).forEach((opt,oi)=>{
+          if(!opt)return;
+          const ltr=letters[oi];
+          const isCorrect=ltr===item.correct,isGiven=ltr===ans;
+          doc.setFontSize(9.5);doc.setFont('helvetica',isCorrect?'bold':'normal');
+          doc.setTextColor(...(isCorrect?[20,120,60]:isGiven?[180,40,40]:[50,50,50]));
+          checkPage();doc.text(`${ltr.toUpperCase()}. ${opt}${isCorrect?' ✓':isGiven?' ←':''}`,margin+4,y);y+=5;
+        });
+        if(item.explanation){y+=1;doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);doc.splitTextToSize('Note: '+item.explanation,cW-4).forEach(l=>{checkPage();doc.text(l,margin+4,y);y+=4.5;});}
+        y+=5;
+      });
+      const total=doc.internal.getNumberOfPages();
+      for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — Missed Questions · Page ${p} of ${total}`,margin,pageH-8);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});}
+      doc.save('missed_bb_quiz.pdf');
+    }catch(err){alert('PDF export failed: '+err.message);}
+  };
+
+  const retryWrongOnly=()=>{
+    if(!missed.length)return;
+    appState.bbQuizItems=shuffle(missed.map(m=>m.item));
+    appState.bbQuizIdx=0;appState.bbQuizChosen=null;appState.bbQuizAnswered=false;
+    appState.bbQuizScore=0;appState.bbQuizDone=false;appState.bbQuizAnswers={};
+    renderTab();
+  };
+
   el.innerHTML=`
     <div class="bbq-overlay">
       <div class="bbq-header">
         <button class="btn btn-ghost btn-sm" onclick="exitBBQuiz()">← Back to Cases</button>
-        <div class="ml-auto"><span class="question-num">Quiz Complete</span></div>
+        <div class="ml-auto" style="color:var(--text);font-size:13px;font-family:var(--mono)">Quiz Complete</div>
       </div>
       <div class="bbq-body">
         <div style="text-align:center;padding:24px 0 32px">
@@ -2692,11 +3060,12 @@ function renderBBQuizResults(el){
           <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
         </div>
         <div class="flex gap-8 mb-20 flex-wrap">
-          <button class="btn btn-primary" onclick="startBBQuiz()">Retry Quiz</button>
+          <button class="btn btn-primary" onclick="startBBQuiz()">🔄 Retry All</button>
+          ${missed.length?`<button class="btn btn-warn" onclick="(${retryWrongOnly.toString()})()">⚡ Retry Wrong Only (${missed.length})</button>`:''}
+          ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="(${exportBBMissed.toString()})()">📥 Export Missed</button>`:''}
           <button class="btn btn-ghost" onclick="exitBBQuiz()">Back to Cases</button>
         </div>
-        <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review All Questions</div>
-        ${reviewHtml}
+        ${missed.length?`<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review All Questions</div>${reviewHtml}`:'<div style="color:var(--success);font-weight:600;text-align:center;font-size:18px">Perfect score! 🎉</div>'}
       </div>
     </div>
   `;
@@ -3188,7 +3557,7 @@ function renderAllExam(v){
   v.innerHTML=`
     <div class="bbq-overlay">
       <div class="bbq-header">
-        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Quit? Progress will be lost.'))goHome()">← Quit</button>
+        <button class="btn btn-ghost btn-sm" onclick="goHome()">← Quit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         <span class="tag tag-info" style="font-size:11px;white-space:nowrap">${(q.subject||'').replace(/_/g,' ')}</span>
         <span class="question-num" style="white-space:nowrap;margin-left:8px">${appState.allIdx+1} / ${appState.allQ.length}</span>
@@ -3713,7 +4082,6 @@ async function generateCasePDF(){
         const colW = Math.min(contentW/table.length, 38);
         const tableW = colW * table.length;
         const startX = margin;
-        // Header row
         doc.setFillColor(220,220,220);
         doc.rect(startX, y, tableW, 8, 'F');
         doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);
@@ -3723,7 +4091,6 @@ async function generateCasePDF(){
           doc.text(String(col.label||'').substring(0,10), startX+i*colW+2, y+5.5);
         });
         y += 8;
-        // Value row
         doc.setFillColor(245,245,245);
         doc.rect(startX, y, tableW, 9, 'F');
         doc.rect(startX, y, tableW, 9, 'S');
@@ -3735,7 +4102,7 @@ async function generateCasePDF(){
         y += 12;
       }
 
-      // Questions — no answers revealed, all black text
+      // Questions — no answers, plain black
       const qs = c.questions||[];
       if(qs.length){
         y += 2;
@@ -3749,9 +4116,7 @@ async function generateCasePDF(){
           (q.options||[]).forEach((opt,oi)=>{
             if(!opt)return;
             checkPage(6);
-            doc.setFontSize(9.5);
-            doc.setFont('helvetica','normal');
-            doc.setTextColor(30,30,30);
+            doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
             doc.text(`${letters[oi].toUpperCase()}. ${opt}`, margin+6, y);
             y += 5.5;
           });
@@ -3760,12 +4125,49 @@ async function generateCasePDF(){
       }
     });
 
+    // ── Answer Key — final page ──
+    const hasAnyQuestions=selected.some(({c})=>(c.questions||[]).length>0);
+    if(hasAnyQuestions){
+      doc.addPage();y=margin;
+      doc.setFillColor(40,40,40);doc.rect(margin,y,contentW,12,'F');
+      doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+      doc.text('ANSWER KEY',(pageW/2),y+8.5,{align:'center'});y+=16;
+
+      let globalQ=1;
+      selected.forEach(({src,c},ci)=>{
+        const qs=c.questions||[];if(!qs.length)return;
+        checkPage(16);
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(40,40,40);
+        doc.text(`${src.label} — Case ${ci+1}: ${c.title||'Untitled'}`,margin,y);y+=7;
+        const letters=['a','b','c','d'];
+        qs.forEach((q,qi)=>{
+          checkPage(14);
+          const correctIdx=letters.indexOf(q.correct||'a');
+          const correctText=(q.options||[])[correctIdx]||q[q.correct]||'';
+          doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+          doc.text(`Q${globalQ}.`,margin,y);
+          doc.setTextColor(20,120,60);
+          doc.splitTextToSize(`${(q.correct||'').toUpperCase()}. ${correctText}`,contentW-14).forEach((line,li)=>{
+            doc.text(line,margin+12,y+(li*5));
+          });
+          y+=5.5;
+          if(q.explanation){
+            doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+            doc.splitTextToSize(q.explanation,contentW-16).forEach(line=>{checkPage();doc.text(line,margin+12,y);y+=4;});
+          }
+          y+=3;globalQ++;
+        });
+        y+=4;
+      });
+    }
+
     // Footer on all pages
     const totalPages = doc.internal.getNumberOfPages();
     for(let p=1;p<=totalPages;p++){
       doc.setPage(p);
       doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-      doc.text(`MLS BOC Prep — Case Export · Page ${p} of ${totalPages}`, margin, pageH-8);
+      const label=p===totalPages&&hasAnyQuestions?'Answer Key':`Page ${p} of ${totalPages-1}`;
+      doc.text(`MLS BOC Prep — Case Export · ${label}`, margin, pageH-8);
       doc.text(new Date().toLocaleDateString(), pageW-margin, pageH-8, {align:'right'});
     }
 
@@ -3830,6 +4232,7 @@ async function renderClassSubjectView(v){
             <div class="flex gap-8 ml-auto flex-wrap" onclick="event.stopPropagation()">
               <button class="btn btn-primary btn-sm" onclick="startClassQuiz('${s.id}')">⚡ Quiz</button>
               <button class="btn btn-ghost btn-sm" onclick="startClassFlashcard('${s.id}')">🃏 Flashcards</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportClassSet('${s.id}')">📄 Export</button>
               ${isAdmin?`<button class="btn btn-ghost btn-xs" onclick="openClassSetEditor('${s.id}')">Edit</button>
               <button class="btn btn-danger btn-xs" onclick="deleteClassSet('${s.id}')">Delete</button>`:''}
             </div>
@@ -3858,8 +4261,9 @@ async function renderClassSetView(v){
         ${s.topic?`<div style="font-size:12px;color:var(--text2)">Topic: ${esc(s.topic)}</div>`:''}
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
-        <button class="btn btn-primary btn-sm" onclick="startClassQuiz('${s.id}')">⚡ Quiz Mode</button>
+        <button class="btn btn-primary btn-sm" onclick="startClassQuiz('${s.id}')">⚡ Quiz</button>
         <button class="btn btn-ghost btn-sm" onclick="startClassFlashcard('${s.id}')">🃏 Flashcards</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportClassSet('${s.id}')">📄 Export</button>
       </div>
     </div>
     ${!qs.length?'<div class="empty">No questions in this set.</div>':''}
@@ -4043,27 +4447,29 @@ async function startClassQuiz(id,forceNew=false){
   const {data}=await sb.from('mlsboc_class_sets').select('*').eq('id',id).single();
   if(!data||(data.questions||[]).length===0){alert('No questions in this set.');return;}
 
-  const hasProgress = window._classQuizQs
+  const inProgress = window._classQuizQs
     && window._classQuizSetId===id
     && !appState.classQuizDone
     && appState.classQuizIdx>0
     && appState.classQuizIdx<(window._classQuizQs||[]).length;
 
-  if(hasProgress&&!forceNew){
+  if(inProgress&&!forceNew){
+    // Show resume prompt via renderClassQuiz
     appState.classSet=data;
     appState.classView='quiz';
-    // Don't reset — resume
     window._classShowQuizResume=true;
     renderView();
     return;
   }
 
+  // Fresh start
   appState.classSet=data;
   appState.classView='quiz';
   appState.classQuizIdx=0;
   appState.classQuizAns={};
   appState.classQuizDone=false;
   appState.classMissed=[];
+  appState._quizAttempt=1;
   window._classQuizQs=shuffle(data.questions||[]);
   window._classQuizQs._setId=id;
   window._classQuizSetId=id;
@@ -4072,9 +4478,108 @@ async function startClassQuiz(id,forceNew=false){
   renderView();
 }
 
+// alias — kept so any stale references work
+function openClassQuizPicker(id){ startClassQuiz(id); }
+async function startClassMiniQuiz(id){ startClassQuiz(id); }
+
+async function exportClassSet(id){
+  const {data}=await sb.from('mlsboc_class_sets').select('*').eq('id',id).single();
+  if(!data){alert('Could not load set.');return;}
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export: ${esc(data.name)}</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:6px">PDF includes all questions with answer choices.</p>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:20px">Answer key is always included as the final page.</p>
+    <div class="flex gap-12">
+      <button class="btn btn-primary" style="flex:1" onclick="document.getElementById('condition-modal').classList.add('hidden');exportClassSetPDF('${id}')">📄 Export PDF</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+    </div>`;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function exportClassSetPDF(id){
+  const {data:s}=await sb.from('mlsboc_class_sets').select('*').eq('id',id).single();
+  if(!s){alert('Could not load set.');return;}
+  const qs=s.questions||[];
+  if(!qs.length){alert('No questions to export.');return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin;
+    const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const write=(text,opts={})=>{
+      const{size=11,bold=false,color=[30,30,30],indent=0}=opts;
+      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
+      doc.splitTextToSize(String(text||''),cW-indent).forEach(line=>{checkPage();doc.text(line,margin+indent,y);y+=size*0.4+1.2;});
+    };
+
+    // ── Page 1+: Questions only (no answers shown) ──
+    doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+    doc.text(`${s.name}${s.topic?' — '+s.topic:''}`,(pageW/2),y+7,{align:'center'});y+=14;
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+    doc.text('Answer key on final page',margin,y);y+=8;
+
+    const letters=['a','b','c','d'];
+    qs.forEach((q,i)=>{
+      checkPage(32);
+      write(`Q${i+1}. ${q.question}`,{size:11,bold:true});
+      letters.forEach(l=>{
+        if(!q[l])return;
+        checkPage(6);
+        doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+        doc.text(`${l.toUpperCase()}. ${q[l]}`,margin+4,y);y+=5.5;
+      });
+      y+=4;
+    });
+
+    // ── Answer Key: last page ──
+    doc.addPage();y=margin;
+    doc.setFillColor(40,40,40);doc.rect(margin,y,cW,12,'F');
+    doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text('ANSWER KEY',(pageW/2),y+8.5,{align:'center'});y+=16;
+    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+    doc.text(`${s.name}${s.topic?' — '+s.topic:''}`,margin,y);y+=10;
+
+    qs.forEach((q,i)=>{
+      checkPage(20);
+      // Question number + correct letter
+      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      const correctLetter=(q.correct||'').toUpperCase();
+      const correctText=q[q.correct]||'';
+      doc.text(`Q${i+1}.`,margin,y);
+      doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
+      doc.text(`${correctLetter}. ${correctText}`,margin+12,y);
+      y+=5.5;
+      if(q.explanation){
+        doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+        doc.splitTextToSize(q.explanation,cW-16).forEach(line=>{checkPage();doc.text(line,margin+12,y);y+=4;});
+      }
+      y+=3;
+    });
+
+    // Footer all pages
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+      const label=p===total?'Answer Key':`Page ${p} of ${total-1}`;
+      doc.text(`MLS BOC Prep — ${s.name} · ${label}`,margin,pageH-8);
+      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
+    }
+    doc.save((s.name||'questions').replace(/\s+/g,'_')+'.pdf');
+  }catch(err){alert('PDF export failed: '+err.message);}
+}
+
 function renderClassQuiz(v){
   const s=appState.classSet;
-  if(!window._classQuizQs||window._classQuizQs._setId!==s.id){
+  const attempt=appState._quizAttempt||1;
+  const attemptLabel=attempt>1?`${attempt}${attempt===2?'nd':attempt===3?'rd':'th'} Attempt — Wrong Only`:'';
+
+  // If questions not loaded yet for this set, build them
+  if(!window._classQuizQs||window._classQuizQs._setId!==window._classQuizSetId){
     window._classQuizQs=shuffle(s.questions||[]);
     window._classQuizQs._setId=s.id;
     window._classQuizSetId=s.id;
@@ -4092,7 +4597,7 @@ function renderClassQuiz(v){
         <div class="bbq-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center">
           <div style="font-size:36px;margin-bottom:16px">⚡</div>
           <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">${esc(s.name)}</div>
-          <div style="font-size:14px;color:var(--text2);margin-bottom:28px">Question ${appState.classQuizIdx+1} of ${questions.length}</div>
+          <div style="font-size:14px;color:var(--text2);margin-bottom:28px">You're on question ${appState.classQuizIdx+1} of ${questions.length}</div>
           <div class="flex gap-12 flex-wrap" style="justify-content:center">
             <button class="btn btn-primary" style="font-size:15px;padding:12px 28px" onclick="window._classShowQuizResume=false;renderView()">Resume →</button>
             <button class="btn btn-ghost" style="font-size:15px;padding:12px 28px" onclick="startClassQuiz('${s.id}',true)">Restart from beginning</button>
@@ -4112,7 +4617,8 @@ function renderClassQuiz(v){
     });
     appState.classMissed=missed;
     const pct=Math.round(correct/questions.length*100);
-    let reviewHtml=missed.map(({q,given})=>`
+    const startNum=appState._quizStartNum||1;
+    let reviewHtml=missed.map(({q,given},mi)=>`
       <div style="background:var(--bg2);border:1px solid #f0647433;border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
         <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">${esc(q.question)}</div>
         <div style="font-size:12px;color:var(--danger)">✗ Your answer: ${esc(q[given]||'(none)')}</div>
@@ -4137,8 +4643,8 @@ function renderClassQuiz(v){
             <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
           </div>
           <div class="flex gap-8 mb-20 flex-wrap">
-            <button class="btn btn-primary" onclick="startClassQuiz('${s.id}',true)">🔄 Full Retry</button>
-            ${missed.length?`<button class="btn btn-warn" onclick="retryClassWrongOnly()">⚡ Retry Wrong Only (${missed.length})</button>`:''}
+            <button class="btn btn-primary" onclick="startClassQuiz('${s.id}',true)">🔄 Restart All</button>
+            ${missed.length?`<button class="btn btn-warn" onclick="retryClassWrongOnly()">⚡ Quiz Wrong Only (${missed.length})</button>`:''}
             <button class="btn btn-ghost" onclick="appState.classView='subject';renderView()">Back</button>
             ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="exportClassMissed()">📥 Export Missed</button>`:''}
           </div>
@@ -4150,6 +4656,9 @@ function renderClassQuiz(v){
 
   const idx=appState.classQuizIdx;
   const q=questions[idx];
+  const startNum=appState._quizStartNum||1;
+  const displayNum=startNum+idx; // e.g. 61 on 2nd attempt wrong-only
+  const displayTotal=(startNum-1)+questions.length;
   const answered=appState.classQuizAns[idx]!==undefined;
   const chosen=appState.classQuizAns[idx];
   const pct=Math.round((idx+1)/questions.length*100);
@@ -4184,11 +4693,12 @@ function renderClassQuiz(v){
   v.innerHTML=`
     <div class="bbq-overlay">
       <div class="bbq-header">
-        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Exit quiz?')){appState.classView='subject';renderView();}">✕ Exit</button>
+        <button class="btn btn-ghost btn-sm" onclick="appState.classView='subject';renderView()">✕ Exit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <span class="question-num" style="white-space:nowrap">${idx+1} / ${questions.length}</span>
+        <span class="question-num" style="white-space:nowrap">${displayNum} / ${displayTotal}</span>
       </div>
       <div class="bbq-body">
+        ${attemptLabel?`<div style="font-size:11px;color:var(--warn);text-align:center;margin-bottom:4px;font-weight:600">${attemptLabel}</div>`:''}
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">${esc(s.topic||s.name)}</div>
         <div class="bbq-question">${esc(q.question)}</div>
         <div class="bbq-options">${optsHtml}</div>
@@ -4208,15 +4718,20 @@ function retryClassWrongOnly(){
   const missed=appState.classMissed||[];
   if(!missed.length){alert('No missed questions.');return;}
   const s=appState.classSet;
-  // Build a question list from just the missed ones
-  const wrongQs=shuffle(missed.map(({q})=>q));
-  wrongQs._setId=s.id+'_wrong';
+  const prevTotal=(window._classQuizQs||[]).length;
+  const prevCorrect=prevTotal-missed.length;
+  const nextAttempt=(appState._quizAttempt||1)+1;
+
+  const wrongQs=missed.map(({q})=>q); // keep order from results, no shuffle
+  wrongQs._setId=s.id+'_wrong_'+nextAttempt;
   window._classQuizQs=wrongQs;
-  window._classQuizSetId=s.id+'_wrong';
+  window._classQuizSetId=s.id+'_wrong_'+nextAttempt;
   appState.classQuizIdx=0;
   appState.classQuizAns={};
   appState.classQuizDone=false;
   appState.classMissed=[];
+  appState._quizAttempt=nextAttempt;
+  appState._quizStartNum=prevCorrect+1; // e.g. 61 if 60 correct out of 80
   window._classShowQuizResume=false;
   window._kqOpts={};
   appState.classView='quiz';
@@ -4227,20 +4742,41 @@ function exportClassMissed(){
   const missed=appState.classMissed||[];
   if(!missed.length){alert('Nothing to export.');return;}
   const s=appState.classSet;
-  let txt=`MISSED QUESTIONS — ${s?.name||'Class Set'}\n`;
-  if(s?.topic)txt+=`Topic: ${s.topic}\n`;
-  txt+=`Date: ${new Date().toLocaleDateString()}\n`;
-  txt+=`${'─'.repeat(50)}\n\n`;
-  missed.forEach(({q,given},i)=>{
-    txt+=`Q${i+1}. ${q.question}\n`;
-    ['a','b','c','d'].forEach(l=>{if(q[l])txt+=`  ${l.toUpperCase()}. ${q[l]}${l===q.correct?' ← CORRECT':l===given?' ← your answer':''}\n`;});
-    if(q.explanation)txt+=`  Explanation: ${q.explanation}\n`;
-    txt+='\n';
-  });
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
-  a.download='missed_'+(s?.name||'questions').replace(/\s+/g,'_')+'.txt';
-  a.click();
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin;
+    const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const write=(text,opts={})=>{
+      const{size=11,bold=false,color=[30,30,30],indent=0}=opts;
+      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
+      doc.splitTextToSize(String(text||''),cW-indent).forEach(line=>{checkPage();doc.text(line,margin+indent,y);y+=size*0.4+1.2;});
+    };
+    // Header
+    doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+    doc.text(`Missed Questions — ${s?.name||'Quiz'}`+(s?.topic?` (${s.topic})`:''),(pageW/2),y+7,{align:'center'});
+    y+=16;
+    missed.forEach(({q,given},i)=>{
+      checkPage(30);
+      write(`Q${i+1}. ${q.question}`,{size:11,bold:true});
+      ['a','b','c','d'].forEach(l=>{
+        if(!q[l])return;
+        const isCorrect=l===q.correct,isGiven=l===given;
+        write(`${l.toUpperCase()}. ${q[l]}${isCorrect?' ✓ CORRECT':isGiven?' ← your answer':''}`,{size:10,indent:4,color:isCorrect?[20,120,60]:isGiven?[180,40,40]:[50,50,50]});
+      });
+      if(q.explanation){y+=2;write(`Explanation: ${q.explanation}`,{size:9,indent:4,color:[80,80,80]});}
+      y+=5;
+    });
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+      doc.text(`MLS BOC Prep — Missed Questions · Page ${p} of ${total}`,margin,pageH-8);
+      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
+    }
+    doc.save('missed_'+(s?.name||'questions').replace(/\s+/g,'_')+'.pdf');
+  }catch(err){alert('PDF export failed: '+err.message);}
 }
 
 // ── Flashcard Mode ───────────────────────────────────────────────────────────
@@ -4322,10 +4858,10 @@ function renderClassFlashcard(v){
   const q=qs[idx];
   const letters=['a','b','c','d'];
 
-  const buildFlashFront=()=>`
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 4px">
-      <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;text-align:center">Card ${idx+1} of ${qs.length}</div>
-      <div style="font-size:20px;font-weight:700;color:var(--text);line-height:1.55;margin-bottom:24px;max-width:560px;margin-left:auto;margin-right:auto;text-align:center">${esc(q.question)}</div>
+  const frontContent=`
+    <div style="padding:20px 16px;overflow-y:auto">
+      <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;text-align:center">Card ${idx+1} of ${qs.length}</div>
+      <div style="font-size:19px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:20px;text-align:center">${esc(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;text-align:left">
         ${letters.filter(l=>q[l]).map(l=>`
           <div style="padding:12px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);font-size:15px;color:var(--text);font-weight:500">
@@ -4334,10 +4870,10 @@ function renderClassFlashcard(v){
       </div>
     </div>`;
 
-  const buildFlashBack=()=>`
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px 4px;text-align:center">
-      <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Answer</div>
-      <div style="font-size:38px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${q.explanation?'20px':'0'};max-width:540px">${esc(q[q.correct]||'')}</div>
+  const backContent=`
+    <div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px;overflow-y:auto">
+      <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Answer</div>
+      <div style="font-size:36px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${q.explanation?'18px':'0'};max-width:540px">${esc(q[q.correct]||'')}</div>
       ${q.explanation?`<div style="font-size:14px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:480px;line-height:1.6">${esc(q.explanation)}</div>`:''}
     </div>`;
 
@@ -4355,12 +4891,12 @@ function renderClassFlashcard(v){
       </div>
     </div>`;
 
-  // Fast flip — swaps inner content AND action bar without full re-render
+  // Smooth flip — toggles CSS class, also updates action bar
   window._flashFlip=()=>{
     appState.classFlashFlipped=!appState.classFlashFlipped;
-    const inner=document.getElementById('flash-card-inner');
+    const card=document.getElementById('flash-flip-card');
+    if(card) card.classList.toggle('is-flipped', appState.classFlashFlipped);
     const oldBar=document.getElementById('flash-action-bar');
-    if(inner) inner.innerHTML=appState.classFlashFlipped?buildFlashBack():buildFlashFront();
     if(oldBar){
       const tmp=document.createElement('div');
       tmp.innerHTML=buildActionBar(appState.classFlashFlipped);
@@ -4376,14 +4912,17 @@ function renderClassFlashcard(v){
   v.innerHTML=`
     <div class="bbq-overlay">
       <div class="bbq-header">
-        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Leave flashcards?')){appState.classView='subject';renderView();}">✕ Exit</button>
+        <button class="btn btn-ghost btn-sm" onclick="appState.classView='subject';renderView()">✕ Exit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         <span style="white-space:nowrap;font-size:13px;color:var(--text);font-family:var(--mono)">${idx+1} / ${qs.length}</span>
       </div>
       <div class="bbq-body">
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;min-height:420px;display:flex;flex-direction:column">
-          <div id="flash-card-inner" style="flex:1;display:flex;flex-direction:column">
-            ${flipped?buildFlashBack():buildFlashFront()}
+        <div style="border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--bg2)">
+          <div class="flash-flip-scene">
+            <div id="flash-flip-card" class="flash-flip-card${flipped?' is-flipped':''}">
+              <div class="flash-face flash-face-front">${frontContent}</div>
+              <div class="flash-face flash-face-back">${backContent}</div>
+            </div>
           </div>
           ${buildActionBar(flipped)}
         </div>
