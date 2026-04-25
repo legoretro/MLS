@@ -5405,14 +5405,24 @@ async function renderClassSetView(v){
       </div>`:''}
     ${!qs.length?'<div class="empty">No questions in this set.</div>':''}
     <div style="display:flex;flex-direction:column;gap:8px">
-      ${qs.map((q,i)=>`
+      ${qs.map((q,i)=>{
+        const qtr=q.test_results||[];
+        return `
         <div class="card-sm">
+          ${qtr.length?`
+            <div style="overflow-x:auto;margin-bottom:10px">
+              <table style="border-collapse:collapse;font-size:13px">
+                <thead><tr>${qtr.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:7px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
+                <tbody><tr>${qtr.map(col=>`<td style="border:1px solid var(--border);padding:7px 12px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
+              </table>
+            </div>`:''}
           <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Q${i+1}. ${esc(q.question)}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
             ${['a','b','c','d'].map(l=>`<div style="font-size:12px;padding:4px 6px;border-radius:4px;background:${q.correct===l?'#3ddc8420':'var(--bg3)'};color:${q.correct===l?'var(--success)':'var(--text2)'}"><strong>${l.toUpperCase()}.</strong> ${esc(q[l]||'')}</div>`).join('')}
           </div>
           ${q.explanation?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${esc(q.explanation)}</div>`:''}
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>`;
 }
 
@@ -5424,15 +5434,21 @@ async function openClassSetEditor(id){
     if(data)s=data;
   }
   window._csQs=[...(s.questions||[])];
-  window._csTR=[...(s.test_results||[])];
-  window._csTRCount=(s.test_results||[]).length;
   window._csId=id||null;
 
   const renderQList=()=>{
     const container=document.getElementById('cs-q-list');
     if(!container)return;
     if(!window._csQs.length){container.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px">No questions yet.</div>';return;}
-    container.innerHTML=window._csQs.map((q,i)=>`
+    container.innerHTML=window._csQs.map((q,i)=>{
+      const tr=q.test_results||[];
+      const trRows=tr.map((col,ti)=>`
+        <div class="flex-center gap-6 mb-4" id="csqtr-${i}-${ti}">
+          <input type="text" placeholder="Label" value="${esc(col.label||'')}" id="csqtl-${i}-${ti}" style="flex:1;font-size:12px;padding:6px 8px">
+          <input type="text" placeholder="Result" value="${esc(col.value||'')}" id="csqtv-${i}-${ti}" style="width:90px;font-size:12px;padding:6px 8px">
+          <button class="btn btn-danger btn-xs" onclick="csqRemoveTR(${i},${ti})">✕</button>
+        </div>`).join('');
+      return `
       <div class="card-sm mb-8" id="csq-${i}">
         <div class="flex-center gap-8 mb-8">
           <span style="font-size:11px;font-weight:700;color:var(--accent);font-family:var(--mono)">Q${i+1}</span>
@@ -5448,25 +5464,70 @@ async function openClassSetEditor(id){
         <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
           <input type="text" id="csqe-${i}" value="${esc(q.explanation||'')}">
         </div>
-      </div>`).join('');
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
+            Test Results <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — attach up to 5 results to this question)</span>
+          </div>
+          <div id="csqtr-rows-${i}">${trRows}</div>
+          <button class="btn btn-ghost btn-xs mt-6" id="csqtr-add-${i}" onclick="csqAddTR(${i})" ${tr.length>=5?'style="display:none"':''}>+ Add Result</button>
+        </div>
+      </div>`;
+    }).join('');
   };
 
   window.csAddQ=()=>{
-    window._csQs.push({question:'',a:'',b:'',c:'',d:'',correct:'a',explanation:''});
+    window._csQs.push({question:'',a:'',b:'',c:'',d:'',correct:'a',explanation:'',test_results:[]});
     renderQList();
     setTimeout(()=>document.getElementById('csqq-'+(window._csQs.length-1))?.focus(),50);
   };
   window.csRemoveQ=(i)=>{window._csQs.splice(i,1);renderQList();};
+
+  window.csqAddTR=(qi)=>{
+    window.csSaveQState();
+    const tr=window._csQs[qi]?.test_results||[];
+    if(tr.length>=5){alert('Max 5 test results per question.');return;}
+    if(!window._csQs[qi])return;
+    window._csQs[qi].test_results=[...tr,{label:'',value:''}];
+    renderQList();
+    // focus new label
+    setTimeout(()=>{
+      const ti=window._csQs[qi].test_results.length-1;
+      document.getElementById('csqtl-'+qi+'-'+ti)?.focus();
+    },50);
+  };
+
+  window.csqRemoveTR=(qi,ti)=>{
+    window.csSaveQState();
+    if(!window._csQs[qi])return;
+    window._csQs[qi].test_results=(window._csQs[qi].test_results||[]).filter((_,idx)=>idx!==ti);
+    renderQList();
+  };
   window.csSaveQState=()=>{
-    window._csQs=window._csQs.map((_,i)=>({
-      question:document.getElementById('csqq-'+i)?.value.trim()||'',
-      a:document.getElementById('csqo-'+i+'-a')?.value.trim()||'',
-      b:document.getElementById('csqo-'+i+'-b')?.value.trim()||'',
-      c:document.getElementById('csqo-'+i+'-c')?.value.trim()||'',
-      d:document.getElementById('csqo-'+i+'-d')?.value.trim()||'',
-      correct:document.getElementById('csqc-'+i)?.value||'a',
-      explanation:document.getElementById('csqe-'+i)?.value.trim()||''
-    }));
+    window._csQs=window._csQs.map((_,i)=>{
+      // collect per-question test_results
+      const tr=[];
+      const rows=document.getElementById('csqtr-rows-'+i);
+      if(rows){
+        let ti=0;
+        while(true){
+          const lbl=document.getElementById('csqtl-'+i+'-'+ti);
+          const val=document.getElementById('csqtv-'+i+'-'+ti);
+          if(!lbl)break;
+          if(lbl.isConnected&&lbl.value.trim())tr.push({label:lbl.value.trim(),value:val?val.value.trim():''});
+          ti++;
+        }
+      }
+      return {
+        question:document.getElementById('csqq-'+i)?.value.trim()||'',
+        a:document.getElementById('csqo-'+i+'-a')?.value.trim()||'',
+        b:document.getElementById('csqo-'+i+'-b')?.value.trim()||'',
+        c:document.getElementById('csqo-'+i+'-c')?.value.trim()||'',
+        d:document.getElementById('csqo-'+i+'-d')?.value.trim()||'',
+        correct:document.getElementById('csqc-'+i)?.value||'a',
+        explanation:document.getElementById('csqe-'+i)?.value.trim()||'',
+        test_results:tr
+      };
+    });
   };
 
   document.getElementById('condition-modal-body').innerHTML=`
@@ -5476,15 +5537,6 @@ async function openClassSetEditor(id){
     </div>
     <div class="form-group"><label>Set Name</label><input type="text" id="cs-name" value="${esc(s.name||'')}" placeholder="e.g. Exam 1"></div>
     <div class="form-group"><label>Topic (optional)</label><input type="text" id="cs-topic" value="${esc(s.topic||'')}" placeholder="e.g. ABO Blood Grouping"></div>
-    <div class="divider"></div>
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px">Test Results <span style="font-size:11px;color:var(--text3);font-weight:400">(optional — up to 5 columns, shown above questions)</span></div>
-    <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
-      <div style="font-size:11px;color:var(--text3)">Label</div>
-      <div style="font-size:11px;color:var(--text3)">Result</div>
-      <div></div>
-    </div>
-    <div id="cs-tr-rows">${(s.test_results||[]).map((col,i)=>csTRRow(i,col.label,col.value)).join('')}</div>
-    <button class="btn btn-ghost btn-sm mt-8 mb-16" id="cs-add-tr-btn" onclick="addCSTRCol()" ${(s.test_results||[]).length>=5?'style="display:none"':''}>+ Add Test Result Column</button>
     <div class="divider"></div>
     <div class="flex-center gap-8 mb-12 flex-wrap">
       <span style="font-size:13px;font-weight:600">Questions</span>
@@ -5506,29 +5558,7 @@ async function openClassSetEditor(id){
   document.getElementById('condition-modal').classList.remove('hidden');
 }
 
-function csTRRow(i,label,value){
-  return `<div class="flex-center gap-8 mb-6" id="cs-tr-${i}">
-    <input type="text" placeholder="e.g. Gram stain" value="${esc(label||'')}" id="cs-tl-${i}" style="flex:1">
-    <input type="text" placeholder="e.g. 4+" value="${esc(value||'')}" id="cs-tv-${i}" style="width:100px">
-    <button class="btn btn-danger btn-xs" onclick="removeCSTRRow(${i})">✕</button>
-  </div>`;
-}
 
-function addCSTRCol(){
-  const rows=document.querySelectorAll('[id^="cs-tr-"]').length;
-  if(rows>=5){alert('Max 5 test result columns.');return;}
-  const i=window._csTRCount++;
-  const container=document.getElementById('cs-tr-rows');if(!container)return;
-  const div=document.createElement('div');div.innerHTML=csTRRow(i,'','');
-  container.appendChild(div.firstElementChild);
-  const btn=document.getElementById('cs-add-tr-btn');
-  if(btn&&document.querySelectorAll('[id^="cs-tr-"]').length>=5)btn.style.display='none';
-}
-
-function removeCSTRRow(i){
-  const el=document.getElementById('cs-tr-'+i);if(el)el.remove();
-  const btn=document.getElementById('cs-add-tr-btn');if(btn)btn.style.display='';
-}
 
 async function csImportFile(e){
   const file=e.target.files[0];if(!file)return;
@@ -5598,14 +5628,7 @@ async function saveClassSet(){
   const topic=document.getElementById('cs-topic')?.value.trim();
   if(!name){alert('Set name required.');return;}
   const questions=window._csQs.filter(q=>q.question);
-  // Collect test_results columns
-  const test_results=[];
-  for(let i=0;i<(window._csTRCount||0);i++){
-    const lbl=document.getElementById('cs-tl-'+i);
-    const val=document.getElementById('cs-tv-'+i);
-    if(lbl&&lbl.isConnected&&lbl.value.trim())test_results.push({label:lbl.value.trim(),value:val?val.value.trim():''});
-  }
-  const payload={subject:appState.classSubject,name,topic:topic||'',questions,test_results};
+  const payload={subject:appState.classSubject,name,topic:topic||'',questions};
   let error;
   if(window._csId){({error}=await sb.from('mlsboc_class_sets').update(payload).eq('id',window._csId));}
   else{({error}=await sb.from('mlsboc_class_sets').insert(payload));}
@@ -5879,13 +5902,13 @@ function renderClassQuiz(v){
       <div class="bbq-body">
         ${attemptLabel?`<div style="font-size:11px;color:var(--warn);text-align:center;margin-bottom:4px;font-weight:600">${attemptLabel}</div>`:''}
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">${esc(s.topic||s.name)}</div>
-        ${(s.test_results||[]).length?`
+        ${(q.test_results||[]).length?`
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px">
             <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Test Results</div>
             <div style="overflow-x:auto">
               <table style="border-collapse:collapse;font-size:14px">
-                <thead><tr>${(s.test_results||[]).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
-                <tbody><tr>${(s.test_results||[]).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
+                <thead><tr>${(q.test_results||[]).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
+                <tbody><tr>${(q.test_results||[]).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
               </table>
             </div>
           </div>`:''}
@@ -6047,9 +6070,18 @@ function renderClassFlashcard(v){
   const q=qs[idx];
   const letters=['a','b','c','d'];
 
+  const qtr=q.test_results||[];
+  const qtrHtml=qtr.length?`
+    <div style="overflow-x:auto;margin-bottom:18px">
+      <table style="border-collapse:collapse;font-size:13px;margin:0 auto">
+        <thead><tr>${qtr.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:7px 14px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
+        <tbody><tr>${qtr.map(col=>`<td style="border:1px solid var(--border);padding:8px 14px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
+      </table>
+    </div>`:'';
   const frontContent=`
     <div style="padding:20px 16px;overflow-y:auto">
       <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;text-align:center">Card ${idx+1} of ${qs.length}</div>
+      ${qtrHtml}
       <div style="font-size:19px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:20px;text-align:center">${esc(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;text-align:left">
         ${letters.filter(l=>q[l]).map(l=>`
