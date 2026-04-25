@@ -453,6 +453,10 @@ let appState = {
   bbCollapsed:{}, // blood bank case collapse state
   microCaseAnswers:{}, // micro case MC answers
   microCaseCollapsed:{}, // micro case collapse state
+  immCaseAnswers:{}, immCaseCollapsed:{}, immQuizMode:false, immQuizItems:[], immQuizIdx:0, immQuizChosen:null, immQuizAnswered:false, immQuizScore:0, immQuizDone:false, immQuizAnswers:{},
+  chemCaseAnswers:{}, chemCaseCollapsed:{}, chemQuizMode:false, chemQuizItems:[], chemQuizIdx:0, chemQuizChosen:null, chemQuizAnswered:false, chemQuizScore:0, chemQuizDone:false, chemQuizAnswers:{},
+  paraCaseAnswers:{}, paraCaseCollapsed:{}, paraQuizMode:false, paraQuizItems:[], paraQuizIdx:0, paraQuizChosen:null, paraQuizAnswered:false, paraQuizScore:0, paraQuizDone:false, paraQuizAnswers:{},
+  mycoCaseAnswers:{}, mycoCaseCollapsed:{}, mycoQuizMode:false, mycoQuizItems:[], mycoQuizIdx:0, mycoQuizChosen:null, mycoQuizAnswered:false, mycoQuizScore:0, mycoQuizDone:false, mycoQuizAnswers:{},
   // microbiology images
   microImgPage:null, microImgMode:'browse',
   microQuizItems:[], microQuizIdx:0, microQuizAns:[], microQuizDone:false,
@@ -478,6 +482,7 @@ window.__appInit = async function(){
     await seedIfEmpty();
     await loadIconCache();
     await loadFolderIconCache();
+    await loadClassIconCache();
     // Restore last navigation position
     try{
       const saved=sessionStorage.getItem('mlsboc_nav');
@@ -631,6 +636,7 @@ function renderView(){
 // ─── SUBJECT ICONS (Supabase-backed) ─────────────────────────────────────────
 let iconCache = {}; // key -> base64 data url, populated at startup
 let folderIconCache = {}; // 'heme_KEY' or 'micro_KEY' -> base64
+let classIconCache = {}; // class subject key -> base64
 
 async function loadIconCache(){
   const {data} = await sb.from('mlsboc_subject_icons').select('key,image_url');
@@ -642,6 +648,45 @@ async function loadFolderIconCache(){
     const {data,error} = await sb.from('mlsboc_folder_icons').select('key,image_url');
     if(!error&&data) data.forEach(row=>{ folderIconCache[row.key]=row.image_url; });
   }catch(e){}
+}
+
+async function loadClassIconCache(){
+  try{
+    const {data,error} = await sb.from('mlsboc_class_icons').select('key,image_url');
+    if(!error&&data) data.forEach(row=>{ classIconCache[row.key]=row.image_url; });
+  }catch(e){}
+}
+
+function getClassSubjectIcon(key,fallback){
+  const stored = classIconCache[key];
+  if(stored) return '<div style="width:100%;height:130px;overflow:hidden;flex-shrink:0"><img src="'+stored+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>';
+  return '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0">'+fallback+'</div>';
+}
+
+async function handleClassIconFile(e,key){
+  const file=e.target.files[0];if(!file)return;
+  const img=new Image();
+  const rdr=new FileReader();
+  rdr.onload=ev=>{
+    img.onload=async()=>{
+      const M=600;let w=img.width,h=img.height;
+      if(w>M){h=Math.round(h*M/w);w=M;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      const url=cv.toDataURL('image/jpeg',0.75);
+      classIconCache[key]=url;
+      // Upsert into supabase
+      const {data:existing}=await sb.from('mlsboc_class_icons').select('id').eq('key',key).single().catch(()=>({data:null}));
+      if(existing&&existing.id){
+        await sb.from('mlsboc_class_icons').update({image_url:url}).eq('key',key);
+      }else{
+        await sb.from('mlsboc_class_icons').insert({key,image_url:url});
+      }
+      renderView();
+    };
+    img.src=ev.target.result;
+  };
+  rdr.readAsDataURL(file);
 }
 
 function getSubjectIcon(key,fallback){
@@ -693,7 +738,17 @@ async function renderHome(v){
     + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
     + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
     + '<div class="subject-grid" id="class-material-grid">'
-    + CLASS_SUBJECTS.map(s=>`<div class="subject-card" onclick="goClassSubject('${s.key}')" style="cursor:pointer"><div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px">${s.icon}</div><div style="padding:10px 12px 12px"><div class="subject-name">${s.name}</div><div class="subject-count" id="ccnt-${s.key}">loading...</div></div></div>`).join('')
+    + CLASS_SUBJECTS.map(s=>{
+        const uploadBtn = isAdmin
+          ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleClassIconFile(event,\''+s.key+'\')" onclick="event.stopPropagation()"></label>'
+          : '';
+        return '<div style="position:relative">'
+          + '<div class="subject-card" onclick="goClassSubject(\''+s.key+'\')" style="cursor:pointer">'
+          + '<div id="csicon-'+s.key+'">'+getClassSubjectIcon(s.key,s.icon)+'</div>'
+          + '<div style="padding:10px 12px 12px"><div class="subject-name">'+s.name+'</div><div class="subject-count" id="ccnt-'+s.key+'">loading...</div></div>'
+          + '</div>'
+          + uploadBtn + '</div>';
+      }).join('')
     + '</div>'
     + '</div>'
     + '<div class="mt-24" id="attempts-home"></div>';
@@ -923,6 +978,10 @@ function switchTab(tab){
   appState.microImgPage=null;appState.microImgMode='browse';
   appState.microQuizItems=[];appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
   appState.microCaseAnswers={};appState.microCaseCollapsed={};
+  appState.immCaseAnswers={};appState.immCaseCollapsed={};appState.immQuizMode=false;appState.immQuizDone=false;
+  appState.chemCaseAnswers={};appState.chemCaseCollapsed={};appState.chemQuizMode=false;appState.chemQuizDone=false;
+  appState.paraCaseAnswers={};appState.paraCaseCollapsed={};appState.paraQuizMode=false;appState.paraQuizDone=false;
+  appState.mycoCaseAnswers={};appState.mycoCaseCollapsed={};appState.mycoQuizMode=false;appState.mycoQuizDone=false;
   appState.uaImgMode='browse';
   appState.uaQuizItems=[];appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
   appState.imgFlashMode=false;appState.imgFlashIdx=0;appState.imgFlashFlipped=false;
@@ -2470,6 +2529,14 @@ async function renderCasesTab(el){
     await renderBloodBankCases(el);
   }else if(appState.subject==='hematology'){
     await renderHematologyCases(el);
+  }else if(appState.subject==='immunology'){
+    await renderImmunologyCases(el);
+  }else if(appState.subject==='clinical_chemistry'){
+    await renderChemistryCases(el);
+  }else if(appState.subject==='parasitology'){
+    await renderParasitologyCases(el);
+  }else if(appState.subject==='mycology'){
+    await renderMycologyCases(el);
   }else{
     await renderGenericCases(el);
   }
@@ -2756,6 +2823,752 @@ async function deleteHemeCase(id){
   if(!confirm('Delete this case?'))return;
   await sb.from('mlsboc_heme_cases').delete().eq('id',id);
   renderTab();
+}
+
+
+// ─── GENERIC CASE SYSTEM FACTORY ─────────────────────────────────────────────
+// Shared renderer for immunology, chemistry, parasitology, mycology cases
+// config: {subject, table, dbTable, answerKey, collapsedKey, label, desc, quizMode, quizItems, quizIdx, quizChosen, quizAnswered, quizScore, quizDone, quizAnswers, exportTitle}
+// Each subject gets its own Supabase table and state keys
+
+// ── STATE additions ────────────────────────────────────────────────────────────
+// appState.immCaseAnswers, appState.immCaseCollapsed
+// appState.chemCaseAnswers, appState.chemCaseCollapsed
+// appState.paraCaseAnswers, appState.paraCaseCollapsed
+// appState.mycoCaseAnswers, appState.mycoCaseCollapsed
+// appState.immQuizMode, appState.chemQuizMode, etc.
+
+// ─── IMMUNOLOGY CASES ──────────────────────────────────────────────────────────
+const IMMUNO_TESTS = ['ANA', 'Anti-dsDNA', 'RF', 'C3', 'C4', 'CH50', 'IgG', 'IgM', 'IgA', 'IgE', 'ESR', 'CRP', 'WBC', 'Lymphocytes', 'Other'];
+const IMMUNO_TABLE_LABEL = 'Immunology Results';
+
+async function renderImmunologyCases(el){
+  await renderSubjectCases(el,{
+    subject:'immunology',
+    dbTable:'mlsboc_immuno_cases',
+    tableField:'test_results',
+    tableLabel:IMMUNO_TABLE_LABEL,
+    answerKey:'immCaseAnswers',
+    collapsedKey:'immCaseCollapsed',
+    quizModeKey:'immQuizMode',
+    quizStateKey:'immQuiz',
+    label:'Immunology Cases',
+    desc:'Read the scenario and lab results, then answer each question.',
+    exportTitle:'Immunology Cases',
+    adminFn:'openImmunoCaseEditor',
+    deleteFn:'deleteImmunoCase',
+    editorFn:openImmunoCaseEditor
+  });
+}
+
+async function renderChemistryCases(el){
+  await renderSubjectCases(el,{
+    subject:'clinical_chemistry',
+    dbTable:'mlsboc_chem_cases',
+    tableField:'test_results',
+    tableLabel:'Chemistry Results',
+    answerKey:'chemCaseAnswers',
+    collapsedKey:'chemCaseCollapsed',
+    quizModeKey:'chemQuizMode',
+    quizStateKey:'chemQuiz',
+    label:'Clinical Chemistry Cases',
+    desc:'Read the scenario and chemistry panel, then answer each question.',
+    exportTitle:'Clinical Chemistry Cases',
+    adminFn:'openChemCaseEditor',
+    deleteFn:'deleteChemCase',
+    editorFn:openChemCaseEditor
+  });
+}
+
+async function renderParasitologyCases(el){
+  await renderSubjectCases(el,{
+    subject:'parasitology',
+    dbTable:'mlsboc_para_cases',
+    tableField:'test_results',
+    tableLabel:'Parasitology Results',
+    answerKey:'paraCaseAnswers',
+    collapsedKey:'paraCaseCollapsed',
+    quizModeKey:'paraQuizMode',
+    quizStateKey:'paraQuiz',
+    label:'Parasitology Cases',
+    desc:'Read the scenario and specimen results, then answer each question.',
+    exportTitle:'Parasitology Cases',
+    adminFn:'openParaCaseEditor',
+    deleteFn:'deleteParaCase',
+    editorFn:openParaCaseEditor
+  });
+}
+
+async function renderMycologyCases(el){
+  await renderSubjectCases(el,{
+    subject:'mycology',
+    dbTable:'mlsboc_myco_cases',
+    tableField:'test_results',
+    tableLabel:'Mycology Results',
+    answerKey:'mycoCaseAnswers',
+    collapsedKey:'mycoCaseCollapsed',
+    quizModeKey:'mycoQuizMode',
+    quizStateKey:'mycoQuiz',
+    label:'Mycology Cases',
+    desc:'Read the scenario and fungal identification results, then answer each question.',
+    exportTitle:'Mycology Cases',
+    adminFn:'openMycoCaseEditor',
+    deleteFn:'deleteMycoCase',
+    editorFn:openMycoCaseEditor
+  });
+}
+
+// ─── SHARED SUBJECT CASE RENDERER ─────────────────────────────────────────────
+async function renderSubjectCases(el, cfg){
+  const qmKey=cfg.quizModeKey;
+  if(appState[qmKey]){renderSubjectCaseQuiz(el,cfg);return;}
+  const {data}=await sb.from(cfg.dbTable).select('*').order('created_at');
+  if(!appState[cfg.collapsedKey])appState[cfg.collapsedKey]={};
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c[cfg.tableField]||[],_imgs:c.images||[]})));
+  el.innerHTML=`
+    ${isAdmin?`<div class="mb-16"><div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: ${cfg.label}</div><button class="btn btn-primary" onclick="${cfg.adminFn}(null)">+ New Case</button></div></div>`:''}
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:2px">${cfg.label}</div>
+        <p class="text-muted" style="font-size:13px">${cfg.desc}</p>
+      </div>
+      <div class="flex gap-8 ml-auto flex-wrap">
+        <button class="btn btn-ghost btn-sm" onclick="openSubjectExportModal('${cfg.dbTable}','${cfg.tableField}','${cfg.tableLabel}','${cfg.exportTitle}')">📄 Export</button>
+        ${allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+      </div>
+    </div>
+    ${!data||!data.length?`<div class="empty">No ${cfg.label} yet. Use Admin mode to add one.</div>`:''}
+    ${(data||[]).map((c,i)=>renderSubjectCase(c,i,cfg)).join('')}
+  `;
+}
+
+function renderSubjectCase(c, idx, cfg){
+  const qs=c.questions||[];
+  const selState=(appState[cfg.answerKey]||{})[c.id]||{};
+  const table=c[cfg.tableField]||[];
+  const imgs=c.images||[];
+  const collapsed=!appState[cfg.collapsedKey]||appState[cfg.collapsedKey][c.id]!==false;
+  return `
+    <div class="case-card" id="sc-${c.id}" style="margin-bottom:12px">
+      <div class="flex-center gap-8 flex-wrap" style="cursor:pointer" onclick="toggleSubjectCaseCollapse('${c.id}','${cfg.collapsedKey}')">
+        <span class="tag tag-info" style="font-size:13px;font-weight:700;padding:4px 12px">Case ${idx+1}</span>
+        <span style="font-size:17px;font-weight:700">${c.title||'Untitled Case'}</span>
+        ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
+        <span class="ml-auto" style="font-size:18px;color:var(--text3);transition:transform .2s;transform:rotate(${collapsed?'0':'180'}deg)">⌃</span>
+        ${isAdmin?`<div class="flex gap-6" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-xs" onclick="${cfg.adminFn}('${c.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="${cfg.deleteFn}('${c.id}')">Delete</button>
+        </div>`:''}
+      </div>
+      ${collapsed?'':`
+        <div style="margin-top:16px">
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
+          ${table.length?`
+            <div style="margin-bottom:24px">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">${cfg.tableLabel}</div>
+              <div style="overflow-x:auto">
+                <table style="border-collapse:collapse;width:100%">
+                  <thead><tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:12px 18px;text-align:center;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+                  <tbody><tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:12px 18px;text-align:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
+                </table>
+              </div>
+            </div>`:''}
+          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
+          ${qs.length?`
+            <div class="divider"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
+              ${scAllChecked(c.id,qs.length,cfg.answerKey)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllSC('${c.id}',${qs.length},'${cfg.answerKey}')">Check All</button>`}
+              ${scAnyAnswered(c.id,cfg.answerKey)?`<button class="btn btn-ghost btn-sm" onclick="resetAllSC('${c.id}','${cfg.answerKey}')">Reset All</button>`:''}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
+              ${qs.map((q,qi)=>renderSubjectCaseQuestion(c.id,q,qi,selState,cfg.answerKey)).join('')}
+            </div>
+          `:`<div class="empty" style="padding:16px;text-align:left">No questions added yet.</div>`}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
+  const checked=selState[qi]?.checked===true;
+  const chosen=selState[qi]?.choice;
+  const letters=['a','b','c','d'];
+  const correctIdx=letters.indexOf(q.correct);
+  return `
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono)">Q${qi+1}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${(q.options||[]).map((opt,oi)=>{
+          if(!opt)return '';
+          const letter=letters[oi];
+          let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
+          if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
+          if(checked){
+            if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
+            else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
+          }
+          return `<button onclick="selectSubjectCaseQ('${caseId}',${qi},'${letter}','${answerKey}')" ${checked?'disabled':''} style="display:flex;align-items:flex-start;gap:10px;background:${bg};border:1px solid ${bd};border-radius:var(--r);padding:9px 13px;cursor:${checked?'default':'pointer'};text-align:left;width:100%;transition:all .12s">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:600;color:${color};min-width:20px;margin-top:1px">${letter.toUpperCase()}.</span>
+            <span style="font-size:13px;color:${color};font-weight:${weight};line-height:1.5">${opt}</span>
+          </button>`;
+        }).filter(Boolean).join('')}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
+        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Check Answer</button>`:''}
+        ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Reset</button>`:''}
+      </div>
+      ${checked?`
+        <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
+          ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
+        </div>
+        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+    </div>
+  `;
+}
+
+function toggleSubjectCaseCollapse(id,key){
+  if(!appState[key])appState[key]={};
+  appState[key][id]=appState[key][id]===false?true:false;
+  renderTab();
+}
+function scAllChecked(caseId,count,key){
+  const s=(appState[key]||{})[caseId]||{};
+  for(let i=0;i<count;i++){if(!s[i]?.checked)return false;}
+  return count>0;
+}
+function scAnyAnswered(caseId,key){
+  return Object.values((appState[key]||{})[caseId]||{}).some(v=>v?.choice);
+}
+function selectSubjectCaseQ(caseId,qi,letter,key){
+  if(!appState[key])appState[key]={};
+  if(!appState[key][caseId])appState[key][caseId]={};
+  if(appState[key][caseId][qi]?.checked)return;
+  appState[key][caseId][qi]={choice:letter,checked:false};
+  renderTab();
+}
+function checkAllSC(caseId,count,key){
+  if(!appState[key])appState[key]={};
+  if(!appState[key][caseId])appState[key][caseId]={};
+  for(let i=0;i<count;i++){
+    if(appState[key][caseId][i]?.choice&&!appState[key][caseId][i]?.checked)
+      appState[key][caseId][i].checked=true;
+  }
+  renderTab();
+}
+function resetAllSC(caseId,key){if(!appState[key])appState[key]={};appState[key][caseId]={};renderTab();}
+function checkSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId]?.[qi])appState[key][caseId][qi].checked=true;renderTab();}
+function resetSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId])delete appState[key][caseId][qi];renderTab();}
+
+// ─── SUBJECT CASE QUIZ MODE ────────────────────────────────────────────────────
+async function startSubjectCaseQuiz(qmKey,dbTable,tableField){
+  const {data}=await sb.from(dbTable).select('*').order('created_at');
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c[tableField]||[],_imgs:c.images||[]})));
+  if(!allQs.length){alert('No questions found yet.');return;}
+  appState[qmKey]=true;
+  appState[qmKey+'Items']=shuffle(allQs);
+  appState[qmKey+'Idx']=0;
+  appState[qmKey+'Chosen']=null;
+  appState[qmKey+'Answered']=false;
+  appState[qmKey+'Score']=0;
+  appState[qmKey+'Done']=false;
+  appState[qmKey+'Answers']={};
+  renderTab();
+}
+
+// These keys for quiz dispatch - called by the renderSubjectCases routing
+function renderSubjectCaseQuiz(el,cfg){
+  const qmKey=cfg.quizModeKey;
+  if(appState[qmKey+'Done']){renderSubjectCaseQuizResults(el,cfg);return;}
+  const items=appState[qmKey+'Items']||[];
+  const idx=appState[qmKey+'Idx']||0;
+  const item=items[idx];
+  if(!item){appState[qmKey]=false;renderTab();return;}
+  const answered=appState[qmKey+'Answered'];
+  const chosen=appState[qmKey+'Chosen'];
+  const letters=['a','b','c','d'];
+  const colors=['bbq-opt-a','bbq-opt-b','bbq-opt-c','bbq-opt-d'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+  const pct=Math.round((idx+1)/items.length*100);
+
+  const tableHtml=(item._table||[]).length?`
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">${cfg.tableLabel}</div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse;font-size:14px">
+          <thead><tr>${(item._table||[]).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+          <tbody><tr>${(item._table||[]).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
+        </table>
+      </div>
+    </div>`:'';
+
+  const optsHtml=(item.options||[]).map((opt,oi)=>{
+    if(!opt)return '';
+    const letter=letters[oi];
+    let cls=`bbq-opt ${colors[oi]}`;
+    if(answered){
+      if(letter===item.correct)cls+=' correct-ans';
+      else if(letter===chosen&&chosen!==item.correct)cls+=' wrong-ans';
+    }
+    return `<button class="${cls}" onclick="answerSubjectCaseQuiz('${qmKey}','${letter}')" ${answered?'disabled':''}><span class="bbq-opt-letter">${emojis[oi]}</span><span>${opt}</span></button>`;
+  }).filter(Boolean).join('');
+
+  let afterHtml='';
+  if(answered){
+    const isCorrect=chosen===item.correct;
+    const correctIdx=letters.indexOf(item.correct);
+    afterHtml=`
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:22px;font-weight:800;color:${isCorrect?'var(--success)':'var(--danger)'};margin-bottom:6px">${isCorrect?'✓ Correct!':'✗ Incorrect'}</div>
+        ${!isCorrect?`<div style="font-size:13px;color:var(--text2)">Correct: <strong style="color:var(--success)">${(item.options||[])[correctIdx]||''}</strong></div>`:''}
+        ${item.explanation?`<div style="font-size:13px;color:var(--text2);margin-top:8px;background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left">${item.explanation}</div>`:''}
+      </div>
+      <div style="text-align:center">
+        ${idx<items.length-1
+          ?`<button class="btn btn-primary" onclick="subjectCaseQuizNext('${qmKey}')" style="font-size:15px;padding:12px 32px">Next →</button>`
+          :`<button class="btn btn-success" onclick="appState['${qmKey}Done']=true;renderTab()" style="font-size:15px;padding:12px 32px">See Results</button>`}
+      </div>`;
+  }
+
+  el.innerHTML=`
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="appState['${qmKey}']=false;appState['${qmKey}Done']=false;renderTab()">✕ Exit</button>
+        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="question-num" style="white-space:nowrap">${idx+1} / ${items.length}</span>
+      </div>
+      <div class="bbq-body">
+        <div class="bbq-context">
+          <div class="bbq-context-title">${item._caseTitle||'Case'}</div>
+          ${item._scenario?`<div class="bbq-context-scenario">${item._scenario}</div>`:''}
+          ${tableHtml}
+        </div>
+        <div class="bbq-question">${item.question}</div>
+        <div class="bbq-options">${optsHtml}</div>
+        ${afterHtml}
+      </div>
+    </div>
+  `;
+}
+
+function answerSubjectCaseQuiz(qmKey,letter){
+  if(appState[qmKey+'Answered'])return;
+  appState[qmKey+'Answered']=true;
+  appState[qmKey+'Chosen']=letter;
+  if(!appState[qmKey+'Answers'])appState[qmKey+'Answers']={};
+  appState[qmKey+'Answers'][appState[qmKey+'Idx']]=letter;
+  const item=(appState[qmKey+'Items']||[])[appState[qmKey+'Idx']];
+  if(item&&letter===item.correct)appState[qmKey+'Score']=(appState[qmKey+'Score']||0)+1;
+  renderTab();
+}
+
+function subjectCaseQuizNext(qmKey){
+  appState[qmKey+'Idx']=(appState[qmKey+'Idx']||0)+1;
+  appState[qmKey+'Chosen']=null;
+  appState[qmKey+'Answered']=false;
+  renderTab();
+}
+
+function renderSubjectCaseQuizResults(el,cfg){
+  const qmKey=cfg.quizModeKey;
+  const total=(appState[qmKey+'Items']||[]).length;
+  const score=appState[qmKey+'Score']||0;
+  const pct=Math.round(score/total*100);
+  const answers=appState[qmKey+'Answers']||{};
+  const letters=['a','b','c','d'];
+  const missed=[];
+  (appState[qmKey+'Items']||[]).forEach((item,i)=>{
+    if(answers[i]!==item.correct)missed.push({item,ans:answers[i]});
+  });
+
+  const exportMissed=()=>{
+    if(!missed.length){alert('Nothing missed!');return;}
+    try{
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF({unit:'mm',format:'a4'});
+      const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+      let y=margin;
+      const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      doc.text('Missed '+cfg.exportTitle+' Quiz Questions',(pageW/2),y+7,{align:'center'});y+=16;
+      missed.forEach(({item,ans},i)=>{
+        checkPage(32);
+        const correctIdx=letters.indexOf(item.correct);
+        const chosenIdx=ans?letters.indexOf(ans):-1;
+        if(item._caseTitle){doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,140);doc.text(item._caseTitle,margin,y);y+=5;}
+        doc.setFontSize(10.5);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+        doc.splitTextToSize('Q'+(i+1)+'. '+item.question,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5.5;});
+        (item.options||[]).forEach((opt,oi)=>{
+          if(!opt)return;
+          const ltr=letters[oi];
+          const isCorrect=ltr===item.correct,isGiven=ltr===ans;
+          doc.setFontSize(9.5);doc.setFont('helvetica',isCorrect?'bold':'normal');
+          doc.setTextColor(...(isCorrect?[20,120,60]:isGiven?[180,40,40]:[50,50,50]));
+          checkPage();doc.text(ltr.toUpperCase()+'. '+opt+(isCorrect?' ✓':isGiven?' ←':''),margin+4,y);y+=5;
+        });
+        if(item.explanation){y+=1;doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);doc.splitTextToSize('Note: '+item.explanation,cW-4).forEach(l=>{checkPage();doc.text(l,margin+4,y);y+=4.5;});}
+        y+=5;
+      });
+      const total2=doc.internal.getNumberOfPages();
+      for(let p=1;p<=total2;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text('MLS BOC Prep — Missed Questions · Page '+p+' of '+total2,margin,pageH-8);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});}
+      doc.save('missed_'+cfg.subject+'_quiz.pdf');
+    }catch(err){alert('PDF export failed: '+err.message);}
+  };
+
+  const retryWrong=()=>{
+    if(!missed.length)return;
+    appState[qmKey+'Items']=shuffle(missed.map(m=>m.item));
+    appState[qmKey+'Idx']=0;appState[qmKey+'Chosen']=null;appState[qmKey+'Answered']=false;
+    appState[qmKey+'Score']=0;appState[qmKey+'Done']=false;appState[qmKey+'Answers']={};
+    renderTab();
+  };
+
+  el.innerHTML=`
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="appState['${qmKey}']=false;appState['${qmKey}Done']=false;renderTab()">← Back to Cases</button>
+        <div class="ml-auto" style="color:var(--text);font-size:13px;font-family:var(--mono)">Quiz Complete</div>
+      </div>
+      <div class="bbq-body">
+        <div style="text-align:center;padding:24px 0 32px">
+          <div style="font-size:48px;margin-bottom:8px">${pct>=80?'🏆':pct>=60?'✅':'📚'}</div>
+          <div class="bbq-score-big">${pct}%</div>
+          <div style="font-size:16px;color:var(--text2)">${score} of ${total} correct</div>
+        </div>
+        <div class="result-grid" style="margin-bottom:24px">
+          <div class="stat-card"><div class="stat-num text-success">${score}</div><div class="stat-label">Correct</div></div>
+          <div class="stat-card"><div class="stat-num text-danger">${total-score}</div><div class="stat-label">Missed</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
+        </div>
+        <div class="flex gap-8 mb-20 flex-wrap">
+          <button class="btn btn-primary" onclick="appState['${qmKey}Idx']=0;appState['${qmKey}Chosen']=null;appState['${qmKey}Answered']=false;appState['${qmKey}Score']=0;appState['${qmKey}Done']=false;appState['${qmKey}Answers']={};appState['${qmKey}Items']=shuffle(appState['${qmKey}Items']||[]);renderTab()">🔄 Retry All</button>
+          ${missed.length?`<button class="btn btn-warn" onclick="(${retryWrong.toString()})()">⚡ Retry Wrong Only (${missed.length})</button>`:''}
+          ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="(${exportMissed.toString()})()">📥 Export Missed</button>`:''}
+          <button class="btn btn-ghost" onclick="appState['${qmKey}']=false;appState['${qmKey}Done']=false;renderTab()">Back to Cases</button>
+        </div>
+        ${missed.length?`<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review Missed</div>
+          ${missed.map(({item,ans},i)=>{
+            const correctIdx=letters.indexOf(item.correct);
+            const chosenIdx=ans?letters.indexOf(ans):-1;
+            return `<div style="background:var(--bg2);border:1px solid #f0647433;border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${item._caseTitle||''}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${item.question}</div>
+              <div style="font-size:12px;color:var(--danger)">✗ ${ans&&chosenIdx>=0?'Your answer: '+((item.options||[])[chosenIdx]||''):'(unanswered)'}</div>
+              <div style="font-size:12px;color:var(--success);margin-top:2px">Correct: ${(item.options||[])[correctIdx]||''}</div>
+              ${item.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">${item.explanation}</div>`:''}
+            </div>`;
+          }).join('')}`:`<div style="color:var(--success);font-weight:600;text-align:center;font-size:18px">Perfect score! 🎉</div>`}
+      </div>
+    </div>
+  `;
+}
+
+// ─── GENERIC CASE EDITOR (shared for immuno/chem/para/myco) ───────────────────
+// config for each subject specifies table presets and labels
+
+const SUBJECT_CASE_CONFIGS = {
+  immunology: {
+    dbTable:'mlsboc_immuno_cases', tableField:'test_results',
+    tableLabel:'Immunology Results',
+    presetTests:['ANA','Anti-dsDNA','RF','C3','C4','CH50','IgG','IgM','IgA','CRP','ESR'],
+    answerKey:'immCaseAnswers', collapsedKey:'immCaseCollapsed',
+    saveFn:'saveSubjectCase', label:'Immunology'
+  },
+  clinical_chemistry: {
+    dbTable:'mlsboc_chem_cases', tableField:'test_results',
+    tableLabel:'Chemistry Results',
+    presetTests:['Glucose','BUN','Creatinine','Na','K','Cl','CO2','Ca','Mg','ALT','AST','ALP','Bili (T)','Bili (D)','Albumin','Total Protein','LDH','CK','CK-MB','Troponin I','TSH','T4','T3','Cortisol','Cholesterol','Triglycerides','HDL','LDL','Amylase','Lipase'],
+    answerKey:'chemCaseAnswers', collapsedKey:'chemCaseCollapsed',
+    saveFn:'saveSubjectCase', label:'Chemistry'
+  },
+  parasitology: {
+    dbTable:'mlsboc_para_cases', tableField:'test_results',
+    tableLabel:'Parasitology Results',
+    presetTests:['Specimen','Preparation','Morphology','Size','Stage','Nuclei','Other Features','Stain Used'],
+    answerKey:'paraCaseAnswers', collapsedKey:'paraCaseCollapsed',
+    saveFn:'saveSubjectCase', label:'Parasitology'
+  },
+  mycology: {
+    dbTable:'mlsboc_myco_cases', tableField:'test_results',
+    tableLabel:'Mycology Results',
+    presetTests:['Specimen','KOH Prep','Colony Morphology','Microscopy','Urease','Germ Tube','Growth Temp','India Ink','Other'],
+    answerKey:'mycoCaseAnswers', collapsedKey:'mycoCaseCollapsed',
+    saveFn:'saveSubjectCase', label:'Mycology'
+  }
+};
+
+function getSubjectCaseConfig(subj){ return SUBJECT_CASE_CONFIGS[subj]||SUBJECT_CASE_CONFIGS.immunology; }
+
+async function openSubjectCaseEditor(subject,caseId){
+  const cfg=getSubjectCaseConfig(subject);
+  let c={title:'',scenario:'',test_results:[],questions:[],images:[],is_draft:false};
+  if(caseId){
+    const {data}=await sb.from(cfg.dbTable).select('*').eq('id',caseId).single();
+    if(data)c=data;
+  }
+  const qs=c.questions||[];
+  const table=c.test_results||[];
+  window._scQCount=qs.length;
+  window._scTableCount=table.length;
+  window._scSubject=subject;
+  window._scCaseId=caseId||null;
+
+  const presetHtml=cfg.presetTests.map(t=>`<button class="btn btn-ghost btn-xs" style="margin:2px" onclick="addSCPresetCol('${t.replace(/'/g,"\'")}')">+${t}</button>`).join('');
+
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">${caseId?'Edit':'New'} ${cfg.label} Case</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="form-group"><label>Case Title</label><input type="text" id="sc-title" value="${esc(c.title||'')}" placeholder="e.g. Elevated ANA Case"></div>
+    <div class="form-group"><label>Case Scenario / Patient Info</label><textarea id="sc-scenario" style="min-height:100px">${c.scenario||''}</textarea></div>
+    <div class="form-group">
+      <label>${cfg.tableLabel} Columns</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Add columns for each test result. Use presets or add custom.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;padding:8px;background:var(--bg3);border-radius:var(--r)">${presetHtml}</div>
+      <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text3)">Test / Label</div>
+        <div style="font-size:11px;color:var(--text3)">Result</div>
+        <div></div>
+      </div>
+      <div id="sc-table-rows">${table.map((col,i)=>scTableRow(i,col.label,col.value)).join('')}</div>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="addSCTableCol()">+ Add Custom Column</button>
+    </div>
+    <div class="divider"></div>
+    <div class="flex-center gap-8 mb-12">
+      <span style="font-size:13px;font-weight:600">Questions</span>
+      <span style="font-size:11px;color:var(--text3)">(up to 5)</span>
+    </div>
+    <div id="sc-questions-list">${qs.map((q,i)=>scQuestionEditor(i,q)).join('')}</div>
+    <button class="btn btn-ghost btn-sm mb-16" id="sc-add-q-btn" onclick="addSCQuestion()" ${qs.length>=5?'style="display:none"':''}>+ Add Question</button>
+    <div class="divider"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="sc-draft">
+        <option value="false" ${!c.is_draft?'selected':''}>Published</option>
+        <option value="true" ${c.is_draft?'selected':''}>Draft</option>
+      </select>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSubjectCase()">Save Case</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function scTableRow(i,label,value){
+  return `<div class="flex-center gap-8 mb-6" id="sc-tr-${i}">
+    <input type="text" placeholder="e.g. ANA" value="${esc(label||'')}" id="sc-tl-${i}" style="flex:1">
+    <input type="text" placeholder="e.g. 1:320" value="${esc(value||'')}" id="sc-tv-${i}" style="width:100px">
+    <button class="btn btn-danger btn-xs" onclick="document.getElementById('sc-tr-${i}').remove()">✕</button>
+  </div>`;
+}
+
+function addSCTableCol(label,value){
+  const i=window._scTableCount++;
+  const container=document.getElementById('sc-table-rows');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=scTableRow(i,label||'',value||'');
+  container.appendChild(div.firstElementChild);
+}
+
+function addSCPresetCol(label){
+  addSCTableCol(label,'');
+  // focus the newly added result input
+  setTimeout(()=>{
+    const inputs=document.querySelectorAll('[id^="sc-tv-"]');
+    if(inputs.length)inputs[inputs.length-1].focus();
+  },50);
+}
+
+function scQuestionEditor(i,q){
+  q=q||{question:'',options:['','','',''],correct:'a',explanation:''};
+  const opts=q.options||['','','',''];
+  return `<div class="card-sm mb-12" id="sc-q-${i}" style="border-left:3px solid var(--accent)">
+    <div class="flex-center gap-8 mb-10">
+      <span style="font-size:12px;font-weight:600;color:var(--accent);font-family:var(--mono)">Q${i+1}</span>
+      <button class="btn btn-danger btn-xs ml-auto" onclick="removeSCQuestion(${i})">Remove</button>
+    </div>
+    <div class="form-group"><label>Question</label><textarea id="sc-qq-${i}" style="min-height:60px">${q.question||''}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      ${['a','b','c','d'].map((l,oi)=>`<div><label>${l.toUpperCase()}.</label><input type="text" id="sc-qo-${i}-${l}" value="${esc(opts[oi]||'')}"></div>`).join('')}
+    </div>
+    <div class="form-group"><label>Correct Answer</label>
+      <select id="sc-qc-${i}">${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
+    </div>
+    <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
+      <input type="text" id="sc-qe-${i}" value="${esc(q.explanation||'')}">
+    </div>
+  </div>`;
+}
+
+function addSCQuestion(){
+  if((window._scQCount||0)>=5){alert('Max 5 questions per case.');return;}
+  const i=window._scQCount++;
+  const container=document.getElementById('sc-questions-list');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=scQuestionEditor(i,null);
+  container.appendChild(div.firstElementChild);
+  if(window._scQCount>=5){const b=document.getElementById('sc-add-q-btn');if(b)b.style.display='none';}
+}
+
+function removeSCQuestion(i){
+  const el=document.getElementById('sc-q-'+i);if(el)el.remove();
+  window._scQCount=Math.max(0,(window._scQCount||1)-1);
+  const b=document.getElementById('sc-add-q-btn');if(b)b.style.display='';
+}
+
+async function saveSubjectCase(){
+  const subject=window._scSubject;
+  const caseId=window._scCaseId;
+  const cfg=getSubjectCaseConfig(subject);
+  const title=document.getElementById('sc-title')?.value.trim();
+  const scenario=document.getElementById('sc-scenario')?.value.trim();
+  const isDraft=document.getElementById('sc-draft')?.value==='true';
+  if(!title){alert('Title required.');return;}
+  const test_results=[];
+  for(let i=0;i<(window._scTableCount||0);i++){
+    const lbl=document.getElementById('sc-tl-'+i);
+    const val=document.getElementById('sc-tv-'+i);
+    if(lbl&&lbl.isConnected&&lbl.value.trim())test_results.push({label:lbl.value.trim(),value:val?val.value.trim():''});
+  }
+  const questions=[];
+  for(let i=0;i<(window._scQCount||0);i++){
+    const qEl=document.getElementById('sc-q-'+i);if(!qEl||!qEl.isConnected)continue;
+    const question=document.getElementById('sc-qq-'+i)?.value.trim()||'';if(!question)continue;
+    const options=['a','b','c','d'].map(l=>document.getElementById('sc-qo-'+i+'-'+l)?.value.trim()||'');
+    const correct=document.getElementById('sc-qc-'+i)?.value||'a';
+    const explanation=document.getElementById('sc-qe-'+i)?.value.trim()||'';
+    questions.push({question,options,correct,explanation});
+  }
+  const payload={title,scenario:scenario||'',test_results,questions,is_draft:isDraft,images:[]};
+  let error;
+  if(caseId){({error}=await sb.from(cfg.dbTable).update(payload).eq('id',caseId));}
+  else{({error}=await sb.from(cfg.dbTable).insert(payload));}
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  if(!appState[cfg.answerKey])appState[cfg.answerKey]={};
+  renderTab();
+}
+
+// Per-subject editor wrappers
+function openImmunoCaseEditor(id){openSubjectCaseEditor('immunology',id);}
+function openChemCaseEditor(id){openSubjectCaseEditor('clinical_chemistry',id);}
+function openParaCaseEditor(id){openSubjectCaseEditor('parasitology',id);}
+function openMycoCaseEditor(id){openSubjectCaseEditor('mycology',id);}
+
+async function deleteSubjectCase(subject,id){
+  if(!confirm('Delete this case?'))return;
+  const cfg=getSubjectCaseConfig(subject);
+  await sb.from(cfg.dbTable).delete().eq('id',id);
+  renderTab();
+}
+function deleteImmunoCase(id){deleteSubjectCase('immunology',id);}
+function deleteChemCase(id){deleteSubjectCase('clinical_chemistry',id);}
+function deleteParaCase(id){deleteSubjectCase('parasitology',id);}
+function deleteMycoCase(id){deleteSubjectCase('mycology',id);}
+
+// ─── SUBJECT CASE EXPORT MODAL ────────────────────────────────────────────────
+async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle){
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export ${exportTitle} to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2)">Loading cases...</div>`;
+  document.getElementById('condition-modal').classList.remove('hidden');
+  const {data}=await sb.from(dbTable).select('*').order('created_at');
+  if(!data||!data.length){
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div style="font-size:16px;font-weight:600">Export ${exportTitle}</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      <div class="empty">No cases to export yet.</div>`;
+    return;
+  }
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export ${exportTitle}</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select cases to include.</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=false)">Deselect All</button>
+    </div>`;
+  data.forEach(c=>{
+    html+=`<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
+      <input type="checkbox" class="sc-export-cb" data-id="${c.id}" checked style="width:16px;height:16px;flex-shrink:0">
+      <span style="font-weight:600">${c.title||'Untitled'}</span>
+      ${c.questions&&c.questions.length?`<span style="font-size:11px;color:var(--text3);margin-left:auto">${c.questions.length} Q</span>`:''}
+    </label>`;
+  });
+  html+=`
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="generateSubjectCasePDF(${JSON.stringify(data).replace(/</g,'&lt;')},'${tableField}','${tableLabel}','${exportTitle}')">📄 Generate PDF</button>
+    </div>`;
+  document.getElementById('condition-modal-body').innerHTML=html;
+}
+
+function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
+  const selected=[];
+  document.querySelectorAll('.sc-export-cb:checked').forEach(cb=>{
+    const c=data.find(x=>x.id===cb.dataset.id);
+    if(c)selected.push(c);
+  });
+  if(!selected.length){alert('Select at least one case.');return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin;let first=true;
+    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const writeText=(text,opts={})=>{
+      const {size=11,bold=false,color=[30,30,30],indent=0}=opts;
+      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
+      doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.2;});
+    };
+    selected.forEach((c,ci)=>{
+      if(!first){doc.addPage();y=margin;}first=false;
+      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+      doc.text(exportTitle+' — Case '+(ci+1)+': '+(c.title||'Untitled'),margin+3,y+7);y+=14;
+      if(c.scenario){writeText('Patient Scenario',{size:10,bold:true,color:[40,40,40]});writeText(c.scenario,{size:10,indent:2});y+=3;}
+      const table=c[tableField]||[];
+      if(table.length){
+        checkPage(20);writeText(tableLabel,{size:10,bold:true,color:[40,40,40]});
+        const colW=Math.min(cW/table.length,38);const tableW=colW*table.length;
+        doc.setFillColor(220,220,220);doc.rect(margin,y,tableW,8,'F');doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);doc.rect(margin,y,tableW,8,'S');
+        doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+        table.forEach((col,i)=>doc.text(String(col.label||'').substring(0,12),margin+i*colW+2,y+5.5));y+=8;
+        doc.setFillColor(245,245,245);doc.rect(margin,y,tableW,9,'F');doc.rect(margin,y,tableW,9,'S');
+        doc.setFontSize(11);doc.setFont('helvetica','bold');
+        table.forEach((col,i)=>doc.text(String(col.value||'').substring(0,10),margin+i*colW+2,y+6.5));y+=12;
+      }
+      const qs=c.questions||[];
+      if(qs.length){
+        y+=2;doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=4;
+        writeText('Questions',{size:10,bold:true,color:[40,40,40]});y+=1;
+        const letters=['a','b','c','d'];
+        qs.forEach((q,qi)=>{
+          checkPage(28);writeText('Q'+(qi+1)+'. '+q.question,{size:10,bold:true,indent:2,color:[20,20,20]});
+          (q.options||[]).forEach((opt,oi)=>{
+            if(!opt)return;
+            checkPage(6);doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
+            doc.text(letters[oi].toUpperCase()+'. '+opt,margin+6,y);y+=5;
+          });
+          y+=4;
+        });
+      }
+    });
+    const tot=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tot;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text('MLS BOC Prep — '+exportTitle+' · Page '+p+' of '+tot,margin,pageH-8);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});}
+    doc.save(exportTitle.replace(/\s+/g,'_').toLowerCase()+'_cases.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){alert('PDF export failed: '+err.message);}
 }
 
 // Generic cases
@@ -4242,17 +5055,25 @@ async function openExportModal(){
   `;
   document.getElementById('condition-modal').classList.remove('hidden');
 
-  // Load all three case sources in parallel
-  const [bbRes, hcRes, mcRes] = await Promise.all([
+  // Load all case sources in parallel
+  const [bbRes, hcRes, mcRes, immRes, chemRes, paraRes, mycoRes] = await Promise.all([
     sb.from('mlsboc_bb_cases').select('*').order('created_at'),
     sb.from('mlsboc_heme_cases').select('*').order('created_at'),
-    sb.from('mlsboc_micro_cases').select('*').order('created_at')
+    sb.from('mlsboc_micro_cases').select('*').order('created_at'),
+    sb.from('mlsboc_immuno_cases').select('*').order('created_at').catch(()=>({data:[]})),
+    sb.from('mlsboc_chem_cases').select('*').order('created_at').catch(()=>({data:[]})),
+    sb.from('mlsboc_para_cases').select('*').order('created_at').catch(()=>({data:[]})),
+    sb.from('mlsboc_myco_cases').select('*').order('created_at').catch(()=>({data:[]}))
   ]);
 
   const sources = [
     {label:'Blood Bank', key:'bb', data: bbRes.data||[], tableField:'typing_table', tableLabel:'Typing Results'},
     {label:'Hematology', key:'hc', data: hcRes.data||[], tableField:'results_table', tableLabel:'Lab Results'},
-    {label:'Microbiology', key:'mc', data: mcRes.data||[], tableField:'test_results', tableLabel:'Test Results'}
+    {label:'Microbiology', key:'mc', data: mcRes.data||[], tableField:'test_results', tableLabel:'Test Results'},
+    {label:'Immunology', key:'imm', data: immRes.data||[], tableField:'test_results', tableLabel:'Immunology Results'},
+    {label:'Clinical Chemistry', key:'chem', data: chemRes.data||[], tableField:'test_results', tableLabel:'Chemistry Results'},
+    {label:'Parasitology', key:'para', data: paraRes.data||[], tableField:'test_results', tableLabel:'Parasitology Results'},
+    {label:'Mycology', key:'myco', data: mycoRes.data||[], tableField:'test_results', tableLabel:'Mycology Results'}
   ].filter(s=>s.data.length>0);
 
   if(!sources.length){
@@ -4499,13 +5320,18 @@ async function renderClassView(v){
       <div class="section-title">Class Material</div>
     </div>
     <div class="subject-grid">
-      ${CLASS_SUBJECTS.map(s=>`
-        <div class="subject-card" onclick="goClassSubject('${s.key}')" style="cursor:pointer">
-          <div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px">${s.icon}</div>
-          <div style="padding:10px 12px 12px">
-            <div class="subject-name">${s.name}</div>
-          </div>
-        </div>`).join('')}
+      ${CLASS_SUBJECTS.map(s=>{
+        const uploadBtn = isAdmin
+          ? `<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleClassIconFile(event,'${s.key}')" onclick="event.stopPropagation()"></label>`
+          : '';
+        return `<div style="position:relative">
+          <div class="subject-card" onclick="goClassSubject('${s.key}')" style="cursor:pointer">
+            <div id="csicon2-${s.key}">${getClassSubjectIcon(s.key,s.icon)}</div>
+            <div style="padding:10px 12px 12px">
+              <div class="subject-name">${s.name}</div>
+            </div>
+          </div>${uploadBtn}</div>`;
+      }).join('')}
     </div>`;
 }
 
@@ -4553,6 +5379,7 @@ async function renderClassSetView(v){
   const s=appState.classSet;
   if(!s){appState.classView='subject';renderView();return;}
   const qs=s.questions||[];
+  const tr=s.test_results||[];
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16 flex-wrap">
       <button class="btn btn-ghost btn-sm" onclick="appState.classView='subject';renderView()">← Back</button>
@@ -4566,6 +5393,16 @@ async function renderClassSetView(v){
         <button class="btn btn-ghost btn-sm" onclick="exportClassSet('${s.id}')">📄 Export</button>
       </div>
     </div>
+    ${tr.length?`
+      <div class="card-sm mb-16">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Test Results</div>
+        <div style="overflow-x:auto">
+          <table style="border-collapse:collapse;width:100%">
+            <thead><tr>${tr.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;text-align:center;font-weight:600;font-size:14px;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
+            <tbody><tr>${tr.map(col=>`<td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
+          </table>
+        </div>
+      </div>`:''}
     ${!qs.length?'<div class="empty">No questions in this set.</div>':''}
     <div style="display:flex;flex-direction:column;gap:8px">
       ${qs.map((q,i)=>`
@@ -4587,6 +5424,8 @@ async function openClassSetEditor(id){
     if(data)s=data;
   }
   window._csQs=[...(s.questions||[])];
+  window._csTR=[...(s.test_results||[])];
+  window._csTRCount=(s.test_results||[]).length;
   window._csId=id||null;
 
   const renderQList=()=>{
@@ -4638,6 +5477,15 @@ async function openClassSetEditor(id){
     <div class="form-group"><label>Set Name</label><input type="text" id="cs-name" value="${esc(s.name||'')}" placeholder="e.g. Exam 1"></div>
     <div class="form-group"><label>Topic (optional)</label><input type="text" id="cs-topic" value="${esc(s.topic||'')}" placeholder="e.g. ABO Blood Grouping"></div>
     <div class="divider"></div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px">Test Results <span style="font-size:11px;color:var(--text3);font-weight:400">(optional — up to 5 columns, shown above questions)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
+      <div style="font-size:11px;color:var(--text3)">Label</div>
+      <div style="font-size:11px;color:var(--text3)">Result</div>
+      <div></div>
+    </div>
+    <div id="cs-tr-rows">${(s.test_results||[]).map((col,i)=>csTRRow(i,col.label,col.value)).join('')}</div>
+    <button class="btn btn-ghost btn-sm mt-8 mb-16" id="cs-add-tr-btn" onclick="addCSTRCol()" ${(s.test_results||[]).length>=5?'style="display:none"':''}>+ Add Test Result Column</button>
+    <div class="divider"></div>
     <div class="flex-center gap-8 mb-12 flex-wrap">
       <span style="font-size:13px;font-weight:600">Questions</span>
       <div class="flex gap-8 ml-auto flex-wrap">
@@ -4656,6 +5504,30 @@ async function openClassSetEditor(id){
   `;
   renderQList();
   document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function csTRRow(i,label,value){
+  return `<div class="flex-center gap-8 mb-6" id="cs-tr-${i}">
+    <input type="text" placeholder="e.g. Gram stain" value="${esc(label||'')}" id="cs-tl-${i}" style="flex:1">
+    <input type="text" placeholder="e.g. 4+" value="${esc(value||'')}" id="cs-tv-${i}" style="width:100px">
+    <button class="btn btn-danger btn-xs" onclick="removeCSTRRow(${i})">✕</button>
+  </div>`;
+}
+
+function addCSTRCol(){
+  const rows=document.querySelectorAll('[id^="cs-tr-"]').length;
+  if(rows>=5){alert('Max 5 test result columns.');return;}
+  const i=window._csTRCount++;
+  const container=document.getElementById('cs-tr-rows');if(!container)return;
+  const div=document.createElement('div');div.innerHTML=csTRRow(i,'','');
+  container.appendChild(div.firstElementChild);
+  const btn=document.getElementById('cs-add-tr-btn');
+  if(btn&&document.querySelectorAll('[id^="cs-tr-"]').length>=5)btn.style.display='none';
+}
+
+function removeCSTRRow(i){
+  const el=document.getElementById('cs-tr-'+i);if(el)el.remove();
+  const btn=document.getElementById('cs-add-tr-btn');if(btn)btn.style.display='';
 }
 
 async function csImportFile(e){
@@ -4726,7 +5598,14 @@ async function saveClassSet(){
   const topic=document.getElementById('cs-topic')?.value.trim();
   if(!name){alert('Set name required.');return;}
   const questions=window._csQs.filter(q=>q.question);
-  const payload={subject:appState.classSubject,name,topic:topic||'',questions};
+  // Collect test_results columns
+  const test_results=[];
+  for(let i=0;i<(window._csTRCount||0);i++){
+    const lbl=document.getElementById('cs-tl-'+i);
+    const val=document.getElementById('cs-tv-'+i);
+    if(lbl&&lbl.isConnected&&lbl.value.trim())test_results.push({label:lbl.value.trim(),value:val?val.value.trim():''});
+  }
+  const payload={subject:appState.classSubject,name,topic:topic||'',questions,test_results};
   let error;
   if(window._csId){({error}=await sb.from('mlsboc_class_sets').update(payload).eq('id',window._csId));}
   else{({error}=await sb.from('mlsboc_class_sets').insert(payload));}
@@ -5000,6 +5879,16 @@ function renderClassQuiz(v){
       <div class="bbq-body">
         ${attemptLabel?`<div style="font-size:11px;color:var(--warn);text-align:center;margin-bottom:4px;font-weight:600">${attemptLabel}</div>`:''}
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">${esc(s.topic||s.name)}</div>
+        ${(s.test_results||[]).length?`
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Test Results</div>
+            <div style="overflow-x:auto">
+              <table style="border-collapse:collapse;font-size:14px">
+                <thead><tr>${(s.test_results||[]).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
+                <tbody><tr>${(s.test_results||[]).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
+              </table>
+            </div>
+          </div>`:''}
         <div class="bbq-question">${esc(q.question)}</div>
         <div class="bbq-options">${optsHtml}</div>
         ${afterHtml}
