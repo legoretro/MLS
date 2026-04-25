@@ -103,8 +103,106 @@ select option{background:var(--bg3)}
 
 /* Quiz */
 .quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
-.progress-bar{height:4px;background:var(--bg3);border-radius:2px;margin-bottom:24px}
-.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+/* ── Progress bar — liquid glass fill ──────────────────────────────────── */
+.progress-bar{
+  height:8px;
+  background:var(--bg3);
+  border-radius:99px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:inset 0 1px 3px #0002;
+  flex:1;
+}
+.progress-fill{
+  height:100%;
+  border-radius:99px;
+  transition:width .45s cubic-bezier(.4,0,.2,1);
+  position:relative;
+  background:linear-gradient(90deg,var(--accent) 0%,color-mix(in srgb,var(--accent) 70%,#fff) 100%);
+  box-shadow:0 0 8px color-mix(in srgb,var(--accent) 50%,transparent);
+}
+.progress-fill::after{
+  content:'';
+  position:absolute;
+  top:1px;left:4px;right:4px;
+  height:3px;
+  border-radius:99px;
+  background:rgba(255,255,255,0.35);
+}
+/* subject-tinted fills */
+.progress-fill.tint-bb   { background:linear-gradient(90deg,#b22222,#e05a5a); box-shadow:0 0 8px #b2222260; }
+.progress-fill.tint-chem { background:linear-gradient(90deg,#2980b9,#74c8f5); box-shadow:0 0 8px #2980b960; }
+.progress-fill.tint-ua   { background:linear-gradient(90deg,#c8a800,#ffe066); box-shadow:0 0 8px #c8a80060; }
+.progress-fill.tint-micro{ background:linear-gradient(90deg,#27ae60,#a8e6c0); box-shadow:0 0 8px #27ae6060; }
+
+/* ── Streak counter — flame style ────────────────────────────────────── */
+.streak-wrap{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;flex-shrink:0;
+}
+.streak-flame{
+  width:36px;height:36px;
+  transition:transform .2s,filter .3s;
+  display:block;
+}
+.streak-num{
+  font-size:13px;font-weight:900;font-family:var(--mono);
+  line-height:1;color:var(--text3);
+  transition:color .3s;
+  text-align:center;
+}
+/* cold — greyed out flame */
+.streak-wrap.streak-0 .streak-flame{ opacity:.28;filter:grayscale(1); }
+.streak-wrap.streak-0 .streak-num{ color:var(--text3); }
+/* warm — 1–2 correct */
+.streak-wrap.streak-warm .streak-flame{ filter:none; }
+.streak-wrap.streak-warm .streak-num{ color:#e8901a; }
+/* hot — 3+ in a row */
+.streak-wrap.streak-hot .streak-flame{
+  filter:drop-shadow(0 0 5px #f5a62388);
+  animation:flame-pulse .8s ease-in-out infinite alternate;
+}
+.streak-wrap.streak-hot .streak-num{ color:#e8731a; }
+@keyframes flame-pulse{
+  from{transform:scale(1) translateY(0) rotate(-2deg);}
+  to{transform:scale(1.22) translateY(-3px) rotate(2deg);}
+}
+
+/* ── Subject progress visual (cartoon, bottom of question area) ──────────── */
+.spv-wrap{
+  display:flex;justify-content:center;align-items:flex-end;
+  padding:10px 0 4px;
+  pointer-events:none;
+  min-height:90px;
+}
+.spv-wrap svg{ overflow:visible; }
+/* liquid wave animation inside containers */
+@keyframes spv-wave{
+  0%{d:path("M0,6 Q20,0 40,6 Q60,12 80,6 Q100,0 120,6 L120,40 L0,40 Z")}
+  50%{d:path("M0,10 Q20,4 40,10 Q60,16 80,10 Q100,4 120,10 L120,40 L0,40 Z")}
+  100%{d:path("M0,6 Q20,0 40,6 Q60,12 80,6 Q100,0 120,6 L120,40 L0,40 Z")}
+}
+@keyframes spv-float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+@keyframes confetti-fall{
+  0%  {transform:translateY(-10px) rotate(0deg);  opacity:1}
+  80% {opacity:.8}
+  100%{transform:translateY(80px) rotate(360deg); opacity:0}
+}
+@keyframes spv-colony{
+  0%{transform:scale(0);opacity:0}
+  60%{transform:scale(1.15);opacity:.9}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes spv-bubble{
+  0%{transform:translateY(0);opacity:.7}
+  100%{transform:translateY(-12px);opacity:0}
+}
+/* streak flame — bigger, sparks visible when hot */
+.streak-wrap.streak-0 .spark{ display:none }
+.streak-wrap:not(.streak-hot) .spark{ display:none }
 .question-num{font-family:var(--mono);font-size:12px;color:var(--text3)}
 .question-text{font-size:15px;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.75}
 .options{display:flex;flex-direction:column;gap:8px}
@@ -276,6 +374,20 @@ body.light-mode .option-letter{color:var(--text3) !important}
   .bbq-context-scenario{font-size:16px !important}
   .bbq-question{font-size:22px !important}
   .bbq-opt{font-size:16px !important;padding:16px 18px !important;min-height:62px !important}
+  /* flashcard desktop */
+  .flash-answer-text{font-size:26px !important}
+  .flash-q-text{font-size:18px !important}
+}
+/* Flashcard mobile — smaller to prevent overflow */
+@media(max-width:600px){
+  .flash-answer-text{font-size:16px !important;line-height:1.3 !important}
+  .flash-q-text{font-size:13px !important;line-height:1.4 !important}
+  .flash-opt-item{font-size:12px !important;padding:8px 10px !important}
+}
+@media(max-width:400px){
+  .flash-answer-text{font-size:14px !important}
+  .flash-q-text{font-size:12px !important}
+  .flash-opt-item{font-size:11px !important;padding:6px 8px !important}
 }
 /* Flashcard flip animation */
 .flash-flip-scene{perspective:1200px;width:100%}
@@ -469,7 +581,9 @@ let appState = {
   classSubject:null, classSet:null,
   classQuizIdx:0, classQuizAns:{}, classQuizDone:false,
   classFlashIdx:0, classFlashFlipped:false,
-  classMissed:[]
+  classMissed:[],
+  classQuizStreak:0, classQuizBestStreak:0,
+  _quizResultMap:{} // idx -> 'right'|'wrong'
 };
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -3571,6 +3685,321 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
   }catch(err){alert('PDF export failed: '+err.message);}
 }
 
+
+// ─── SUBJECT PROGRESS VISUAL (cartoon animated, right=green wrong=red dual fill) ─
+function renderProgressVisual(subj, rightPct, wrongPct, isDone100){
+  const r=Math.max(0,Math.min(100,rightPct||0));
+  const w=Math.max(0,Math.min(100-r,wrongPct||0));
+  const confetti=isDone100?renderConfetti():'';
+  if(subj==='blood_bank')       return confetti+renderBBVisual(r,w);
+  if(subj==='clinical_chemistry')return confetti+renderChemVisual(r,w);
+  if(subj==='urinalysis')       return confetti+renderUAVisual(r,w);
+  if(subj==='microbiology')     return confetti+renderMicroVisual(r,w);
+  return confetti+renderGenericVisual(r,w);
+}
+
+function renderConfetti(){
+  const colors=['#f5a623','#e63946','#3ddc84','#2196f3','#9b59b6','#ffe44d'];
+  const pieces=Array.from({length:28},(_,i)=>{
+    const c=colors[i%colors.length];
+    const x=Math.round(20+Math.random()*60);
+    const delay=(Math.random()*0.6).toFixed(2);
+    const dur=(0.9+Math.random()*0.8).toFixed(2);
+    const rot=Math.round(Math.random()*360);
+    return `<rect x="${x}%" y="0" width="${3+Math.round(Math.random()*5)}" height="${4+Math.round(Math.random()*5)}"
+      fill="${c}" rx="1" opacity=".9"
+      transform="rotate(${rot},${x*1.4},0)"
+      style="animation:confetti-fall ${dur}s ease-in ${delay}s both"/>`;
+  });
+  return `<div style="position:relative;overflow:visible;height:0">
+    <svg style="position:absolute;left:0;top:-10px;width:100%;height:90px;overflow:visible;pointer-events:none">
+      ${pieces.join('')}
+    </svg>
+  </div>`;
+}
+
+// ── BLOOD BANK ── blood bag, green fill = right, red-orange fill = wrong
+function renderBBVisual(r,w){
+  // Container height = 70 SVG units (y 22 to 92)
+  const H=70;
+  const rightH=Math.round(r/100*H);
+  const wrongH=Math.round(w/100*H);
+  const emptyH=H-rightH-wrongH;
+  // wrong fills from bottom, right fills on top of wrong
+  const wrongY=92-wrongH;
+  const rightY=wrongY-rightH;
+  const smile=(r+w)>=98?'M38,58 Q48,66 58,58':'M40,56 Q48,62 56,56';
+  const wavePath=(y,col)=>rightH+wrongH>4?`
+    <path fill="none" stroke="${col}" stroke-width="2" opacity=".5">
+      <animate attributeName="d" dur="1.8s" repeatCount="indefinite"
+        values="M22,${y} Q37,${y-5} 52,${y} Q67,${y+5} 78,${y};
+                M22,${y} Q37,${y+4} 52,${y} Q67,${y-4} 78,${y};
+                M22,${y} Q37,${y-5} 52,${y} Q67,${y+5} 78,${y}"/>
+    </path>`:'';
+  return `<div class="spv-wrap" style="min-height:130px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;animation:spv-float 2.5s ease-in-out infinite">
+      <svg width="130" height="148" viewBox="0 0 100 148">
+        <defs>
+          <clipPath id="bagclip2"><rect x="22" y="22" width="56" height="70" rx="12"/></clipPath>
+          <linearGradient id="rightblood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e85c5c"/>
+            <stop offset="100%" stop-color="#8b0000"/>
+          </linearGradient>
+          <linearGradient id="wrongblood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3a0000"/>
+            <stop offset="100%" stop-color="#1a0000"/>
+          </linearGradient>
+        </defs>
+        <!-- IV lines -->
+        <line x1="35" y1="22" x2="30" y2="6"  stroke="#ccc" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="50" y1="22" x2="50" y2="4"  stroke="#ccc" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="65" y1="22" x2="70" y2="6"  stroke="#ccc" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- bag body -->
+        <rect x="22" y="22" width="56" height="70" rx="12" fill="white" stroke="#ddd" stroke-width="2"/>
+        <!-- fills -->
+        <g clip-path="url(#bagclip2)">
+          ${wrongH>0?`<rect x="22" y="${wrongY}" width="56" height="${wrongH}" fill="url(#wrongblood)" opacity=".9" style="transition:all .6s ease"/>${wavePath(wrongY,'#ff8888')}`:''}
+          ${rightH>0?`<rect x="22" y="${rightY}" width="56" height="${rightH}" fill="url(#rightblood)" opacity=".88" style="transition:all .6s ease"/>${wavePath(rightY,'#ff9999')}`:''}
+        </g>
+        <rect x="22" y="22" width="56" height="70" rx="12" fill="none" stroke="#ddd" stroke-width="2"/>
+        <!-- highlight -->
+        <rect x="26" y="26" width="9" height="28" rx="4.5" fill="rgba(255,255,255,0.28)"/>
+        <!-- tube + cap -->
+        <line x1="50" y1="92" x2="50" y2="112" stroke="#ccc" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="50" cy="116" r="5.5" fill="#c0392b"/>
+        <!-- face -->
+        <circle cx="42" cy="58" r="3" fill="#333" opacity=".5"/>
+        <circle cx="58" cy="58" r="3" fill="#333" opacity=".5"/>
+        <path d="${smile}" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+        <text x="50" y="134" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+      </svg>
+    </div>
+  </div>`;
+}
+
+// ── CHEMISTRY ── Erlenmeyer flask filling with blue reagent (right=blue, wrong=dark navy)
+function renderChemVisual(r,w){
+  // Flask interior fill region: neck y=14-38, body y=38-96, total H=82
+  // We fill from the bottom up through body then neck
+  const H=82; // total fillable height (body=58 + neck=24)
+  const rightH=Math.round(r/100*H);
+  const wrongH=Math.round(w/100*H);
+  // y coords in SVG: body bottom=96, body top=38, neck top=14
+  const totalFillH=rightH+wrongH;
+  const fillBottom=96;
+  const fillTop=fillBottom-totalFillH;
+  const rightTop=fillTop;
+  const wrongTop=fillTop+rightH;
+  // wave at top of fill
+  const waveY=fillTop;
+  const smile=(r+w)>=98?'M32,74 Q40,82 48,74':'M33,72 Q40,78 47,72';
+  const hasLiquid=totalFillH>2;
+  const waveAnim=(y,col)=>hasLiquid?`
+    <path fill="none" stroke="${col}" stroke-width="1.8" opacity=".55">
+      <animate attributeName="d" dur="2s" repeatCount="indefinite"
+        values="M10,${y} Q25,${y-5} 40,${y} Q55,${y+5} 70,${y};
+                M10,${y} Q25,${y+4} 40,${y} Q55,${y-4} 70,${y};
+                M10,${y} Q25,${y-5} 40,${y} Q55,${y+5} 70,${y}"/>
+    </path>`:'';
+  // Bubble when right liquid present
+  const bubble=rightH>14?`
+    <circle cx="32" cy="${rightTop+10}" r="3" fill="rgba(255,255,255,0.55)">
+      <animate attributeName="cy" dur="1.6s" repeatCount="indefinite"
+        values="${rightTop+10};${rightTop-4};${rightTop+10}" calcMode="ease-out"/>
+      <animate attributeName="opacity" dur="1.6s" repeatCount="indefinite" values=".55;0;.55"/>
+    </circle>`:'';
+  return `<div class="spv-wrap" style="min-height:130px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;animation:spv-float 2.8s ease-in-out infinite">
+      <svg width="120" height="148" viewBox="0 0 80 148">
+        <defs>
+          <clipPath id="flaskclip">
+            <path d="M28,14 L28,38 L6,96 Q4,100 8,102 L72,102 Q76,100 74,96 L52,38 L52,14 Z"/>
+          </clipPath>
+          <linearGradient id="chemright" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#74c8f5"/>
+            <stop offset="100%" stop-color="#1a5276"/>
+          </linearGradient>
+          <linearGradient id="chemwrong" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a2a5c"/>
+            <stop offset="100%" stop-color="#0a0f2a"/>
+          </linearGradient>
+        </defs>
+        <!-- stopper/cork at top -->
+        <rect x="24" y="8" width="32" height="8" rx="3" fill="#c8a86a"/>
+        <rect x="26" y="6" width="28" height="5" rx="2.5" fill="#b8986a"/>
+        <!-- flask body outline -->
+        <path d="M28,14 L28,38 L6,96 Q4,100 8,102 L72,102 Q76,100 74,96 L52,38 L52,14 Z"
+              fill="rgba(200,235,255,0.12)" stroke="#90cce8" stroke-width="2" stroke-linejoin="round"/>
+        <!-- liquid fills clipped to flask shape -->
+        <g clip-path="url(#flaskclip)">
+          ${wrongH>0?`<rect x="4" y="${wrongTop}" width="72" height="${wrongH+4}" fill="url(#chemwrong)" opacity=".9" style="transition:all .6s ease"/>`:''}
+          ${rightH>0?`<rect x="4" y="${rightTop}" width="72" height="${rightH+4}" fill="url(#chemright)" opacity=".88" style="transition:all .6s ease"/>
+            ${waveAnim(waveY,'#aaddff')}${bubble}`:''}
+        </g>
+        <!-- flask outline on top -->
+        <path d="M28,14 L28,38 L6,96 Q4,100 8,102 L72,102 Q76,100 74,96 L52,38 L52,14 Z"
+              fill="none" stroke="#90cce8" stroke-width="2" stroke-linejoin="round"/>
+        <!-- neck lines -->
+        <line x1="28" y1="14" x2="52" y2="14" stroke="#90cce8" stroke-width="2"/>
+        <!-- highlight streak on flask -->
+        <path d="M20,42 Q18,60 16,82" stroke="rgba(255,255,255,0.3)" stroke-width="5"
+              stroke-linecap="round" fill="none"/>
+        <!-- bubbles/measurement lines -->
+        <line x1="55" y1="55" x2="62" y2="55" stroke="#90cce8" stroke-width="1" opacity=".5"/>
+        <line x1="57" y1="68" x2="65" y2="68" stroke="#90cce8" stroke-width="1" opacity=".5"/>
+        <line x1="55" y1="81" x2="62" y2="81" stroke="#90cce8" stroke-width="1" opacity=".5"/>
+        <!-- face -->
+        <circle cx="34" cy="72" r="2.8" fill="#1a5276" opacity=".45"/>
+        <circle cx="46" cy="72" r="2.8" fill="#1a5276" opacity=".45"/>
+        <path d="${smile}" fill="none" stroke="#1a5276" stroke-width="1.8" stroke-linecap="round" opacity=".45"/>
+        <!-- base stand lines -->
+        <line x1="8" y1="104" x2="72" y2="104" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
+        <text x="40" y="122" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+      </svg>
+    </div>
+  </div>`;
+}
+
+// ── URINALYSIS ── specimen cup with blue lid
+function renderUAVisual(r,w){
+  const H=58;
+  const rightH=Math.round(r/100*H);
+  const wrongH=Math.round(w/100*H);
+  const wrongY=82-wrongH;
+  const rightY=wrongY-rightH;
+  const smile=(r+w)>=98?'M32,60 Q40,68 48,60':'M33,58 Q40,64 47,58';
+  const wave=(y,col)=>rightH+wrongH>3?`
+    <path fill="none" stroke="${col}" stroke-width="1.5" opacity=".5">
+      <animate attributeName="d" dur="2.2s" repeatCount="indefinite"
+        values="M14,${y} Q27,${y-4} 40,${y} Q53,${y+4} 66,${y};
+                M14,${y} Q27,${y+3} 40,${y} Q53,${y-3} 66,${y};
+                M14,${y} Q27,${y-4} 40,${y} Q53,${y+4} 66,${y}"/>
+    </path>`:'';
+  return `<div class="spv-wrap" style="min-height:130px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;animation:spv-float 3s ease-in-out infinite">
+      <svg width="120" height="145" viewBox="0 0 80 145">
+        <defs>
+          <clipPath id="cupclip2"><polygon points="14,24 66,24 61,84 19,84"/></clipPath>
+          <linearGradient id="uaright" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffe066"/>
+            <stop offset="100%" stop-color="#c8a800"/>
+          </linearGradient>
+          <linearGradient id="uawrong" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8b6914"/>
+            <stop offset="100%" stop-color="#4a3500"/>
+          </linearGradient>
+        </defs>
+        <!-- lid -->
+        <rect x="9" y="10" width="62" height="16" rx="6" fill="#3a5fcd" opacity=".85"/>
+        <rect x="13" y="14" width="54" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <!-- cup body -->
+        <polygon points="14,24 66,24 61,84 19,84" fill="rgba(240,240,200,0.1)" stroke="#ccc" stroke-width="1.5"/>
+        <g clip-path="url(#cupclip2)">
+          ${wrongH>0?`<rect x="14" y="${wrongY}" width="52" height="${wrongH+8}" fill="url(#uawrong)" opacity=".9" style="transition:all .6s ease"/>${wave(wrongY,'#ff9999')}`:''}
+          ${rightH>0?`<rect x="14" y="${rightY}" width="52" height="${rightH+8}" fill="url(#uaright)" opacity=".88" style="transition:all .6s ease"/>${wave(rightY,'#fff0a0')}`:''}
+        </g>
+        <polygon points="14,24 66,24 61,84 19,84" fill="none" stroke="#ccc" stroke-width="1.5"/>
+        <!-- highlight -->
+        <line x1="17" y1="30" x2="17" y2="72" stroke="rgba(255,255,255,0.38)" stroke-width="4.5" stroke-linecap="round"/>
+        <!-- face -->
+        <circle cx="35" cy="56" r="2.5" fill="#5d4a00" opacity=".45"/>
+        <circle cx="45" cy="56" r="2.5" fill="#5d4a00" opacity=".45"/>
+        <path d="${smile}" fill="none" stroke="#5d4a00" stroke-width="1.8" stroke-linecap="round" opacity=".45"/>
+        <text x="40" y="102" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+      </svg>
+    </div>
+  </div>`;
+}
+
+// ── MICROBIOLOGY ── petri dish, green colonies = right, red/orange = wrong
+function renderMicroVisual(r,w){
+  const rightColonies=Math.round(r/10);
+  const wrongColonies=Math.round(w/10);
+  const positions=[
+    {cx:52,cy:54,r:7},{cx:72,cy:46,r:6},{cx:34,cy:62,r:8},
+    {cx:66,cy:68,r:6},{cx:44,cy:40,r:5},{cx:60,cy:76,r:7},
+    {cx:78,cy:60,r:5},{cx:36,cy:46,r:6},{cx:52,cy:74,r:6},{cx:70,cy:40,r:5}
+  ];
+  const wPos=[
+    {cx:62,cy:56,r:5},{cx:40,cy:68,r:6},{cx:74,cy:72,r:5},
+    {cx:46,cy:48,r:4},{cx:68,cy:50,r:5}
+  ];
+  const greens=['#4a9e3f','#6abf5e','#27ae60','#2ecc71','#58d68d','#27ae60','#1e8449','#82e0aa','#52be80','#239b56'];
+  const reds=['#e05a5a','#c0392b','#e74c3c','#ff6b6b','#c0392b'];
+  const gc=positions.slice(0,rightColonies).map((p,i)=>`
+    <circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${greens[i]}" opacity=".85" style="animation:spv-colony .4s ease-out ${(i*0.1).toFixed(1)}s both"/>
+    <circle cx="${p.cx-1}" cy="${p.cy-1}" r="${p.r*0.38}" fill="rgba(255,255,255,0.32)"/>
+  `).join('');
+  const wc=wPos.slice(0,wrongColonies).map((p,i)=>`
+    <circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${reds[i]}" opacity=".75" style="animation:spv-colony .4s ease-out ${(i*0.12).toFixed(2)}s both"/>
+    <circle cx="${p.cx-1}" cy="${p.cy-1}" r="${p.r*0.38}" fill="rgba(255,255,255,0.25)"/>
+  `).join('');
+  const smile=(rightColonies+wrongColonies)>=9?'M45,88 Q52,96 59,88':'M46,86 Q52,92 58,86';
+  return `<div class="spv-wrap" style="min-height:130px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;animation:spv-float 3.2s ease-in-out infinite">
+      <svg width="135" height="145" viewBox="0 0 105 145">
+        <defs>
+          <clipPath id="petriclip2"><ellipse cx="52" cy="60" rx="40" ry="36"/></clipPath>
+          <radialGradient id="agargrad2" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#f5f0e8"/>
+            <stop offset="100%" stop-color="#e8e0d0"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="52" cy="66" rx="42" ry="12" fill="rgba(0,0,0,0.06)"/>
+        <ellipse cx="52" cy="58" rx="42" ry="38" fill="#e8e4dc" stroke="#ccc" stroke-width="1.5"/>
+        <ellipse cx="52" cy="60" rx="40" ry="36" fill="url(#agargrad2)"/>
+        <g clip-path="url(#petriclip2)">${gc}${wc}</g>
+        <ellipse cx="41" cy="42" rx="13" ry="8" fill="rgba(255,255,255,0.26)"/>
+        <!-- face -->
+        <circle cx="45" cy="86" r="2.5" fill="#333" opacity=".38"/>
+        <circle cx="59" cy="86" r="2.5" fill="#333" opacity=".38"/>
+        <path d="${smile}" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round" opacity=".38"/>
+        <text x="52" y="108" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+      </svg>
+    </div>
+  </div>`;
+}
+
+// ── GENERIC (all other subjects) ── simple vial/test tube
+function renderGenericVisual(r,w){
+  const H=64;
+  const rightH=Math.round(r/100*H);
+  const wrongH=Math.round(w/100*H);
+  const wrongY=84-wrongH;
+  const rightY=wrongY-rightH;
+  return `<div class="spv-wrap" style="min-height:110px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;animation:spv-float 2.8s ease-in-out infinite">
+      <svg width="80" height="135" viewBox="0 0 60 135">
+        <defs>
+          <clipPath id="vialclip"><rect x="14" y="18" width="32" height="68" rx="10 10 14 14"/></clipPath>
+          <linearGradient id="vrgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3ddc84"/><stop offset="100%" stop-color="#1a7a44"/></linearGradient>
+          <linearGradient id="vwgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e05a5a"/><stop offset="100%" stop-color="#8b1a1a"/></linearGradient>
+        </defs>
+        <rect x="14" y="18" width="32" height="68" rx="10" fill="rgba(200,220,255,0.15)" stroke="#aac" stroke-width="2"/>
+        <g clip-path="url(#vialclip)">
+          ${wrongH>0?`<rect x="14" y="${wrongY}" width="32" height="${wrongH+4}" fill="url(#vwgrad)" opacity=".88" style="transition:all .6s ease"/>`:''}
+          ${rightH>0?`<rect x="14" y="${rightY}" width="32" height="${rightH+4}" fill="url(#vrgrad)" opacity=".88" style="transition:all .6s ease"/>`:''}
+        </g>
+        <rect x="14" y="18" width="32" height="68" rx="10" fill="none" stroke="#aac" stroke-width="2"/>
+        <rect x="17" y="22" width="6" height="20" rx="3" fill="rgba(255,255,255,0.3)"/>
+        <text x="30" y="104" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}%✓${w>0?' '+w+'%✗':''}</text>
+      </svg>
+    </div>
+  </div>`;
+}
+
+// ─── GENERIC CASE SYSTEM FACTORY ─────────────────────────────────────────────
+// Shared renderer for immunology, chemistry, parasitology, mycology cases
+// config: {subject, table, dbTable, answerKey, collapsedKey, label, desc, quizMode, quizItems, quizIdx, quizChosen, quizAnswered, quizScore, quizDone, quizAnswers, exportTitle}
+// Each subject gets its own Supabase table and state keys
+
+// ── STATE additions ────────────────────────────────────────────────────────────
+// appState.immCaseAnswers, appState.immCaseCollapsed
+// appState.chemCaseAnswers, appState.chemCaseCollapsed
+// appState.paraCaseAnswers, appState.paraCaseCollapsed
+// appState.mycoCaseAnswers, appState.mycoCaseCollapsed
+// appState.immQuizMode, appState.chemQuizMode, etc.
+
 // Generic cases
 async function renderGenericCases(el){
   const {data}=await sb.from('mlsboc_cases').select('*').eq('subject',appState.subject).order('created_at');
@@ -5645,7 +6074,7 @@ async function deleteClassSet(id){
 }
 
 // ── Class Quiz (Kahoot style) ────────────────────────────────────────────────
-async function startClassQuiz(id,forceNew=false){
+async function startClassQuiz(id,forceNew=false,count=null){
   const {data}=await sb.from('mlsboc_class_sets').select('*').eq('id',id).single();
   if(!data||(data.questions||[]).length===0){alert('No questions in this set.');return;}
 
@@ -5655,8 +6084,7 @@ async function startClassQuiz(id,forceNew=false){
     && appState.classQuizIdx>0
     && appState.classQuizIdx<(window._classQuizQs||[]).length;
 
-  if(inProgress&&!forceNew){
-    // Show resume prompt via renderClassQuiz
+  if(inProgress&&!forceNew&&count===null){
     appState.classSet=data;
     appState.classView='quiz';
     window._classShowQuizResume=true;
@@ -5664,7 +6092,15 @@ async function startClassQuiz(id,forceNew=false){
     return;
   }
 
-  // Fresh start
+  // If no count specified yet, show picker
+  if(count===null){
+    openClassQuizCountPicker(id,data);
+    return;
+  }
+
+  // Fresh start with chosen count
+  const allQs=shuffle(data.questions||[]);
+  const chosen=Math.min(Math.max(1,count),allQs.length);
   appState.classSet=data;
   appState.classView='quiz';
   appState.classQuizIdx=0;
@@ -5672,12 +6108,44 @@ async function startClassQuiz(id,forceNew=false){
   appState.classQuizDone=false;
   appState.classMissed=[];
   appState._quizAttempt=1;
-  window._classQuizQs=shuffle(data.questions||[]);
+  appState._quizStartNum=1;
+  appState.classQuizStreak=0;
+  appState.classQuizBestStreak=0;
+  appState._quizResultMap={};
+  appState._quizOriginalTotal=chosen; // remember full set size for visual %
+  window._classQuizQs=allQs.slice(0,chosen);
   window._classQuizQs._setId=id;
   window._classQuizSetId=id;
   window._kqOpts={};
   window._classShowQuizResume=false;
   renderView();
+}
+
+function openClassQuizCountPicker(id,data){
+  const total=(data.questions||[]).length;
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+      <div style="font-size:16px;font-weight:600">How many questions?</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:20px">${esc(data.name)} — ${total} total</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <input type="number" id="quiz-count-input" min="1" max="${total}" placeholder="e.g. 30"
+        style="flex:1;font-size:18px;padding:12px 16px;border-radius:var(--r2);border:2px solid var(--border);background:var(--bg3);color:var(--text)"
+        onkeydown="if(event.key==='Enter'){const v=parseInt(this.value);if(v>0){document.getElementById('condition-modal').classList.add('hidden');startClassQuiz('${id}',true,Math.min(v,${total}));}}">
+      <button class="btn btn-primary" style="padding:12px 22px;font-size:15px"
+        onclick="const v=parseInt(document.getElementById('quiz-count-input').value);if(!v||v<1){alert('Enter a number.');return;}document.getElementById('condition-modal').classList.add('hidden');startClassQuiz('${id}',true,Math.min(v,${total}))">
+        Start →
+      </button>
+    </div>
+    <button class="btn btn-ghost" style="width:100%;padding:12px;font-size:14px;border:1px solid var(--border)"
+      onclick="document.getElementById('condition-modal').classList.add('hidden');startClassQuiz('${id}',true,${total})">
+      All ${total} questions
+    </button>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px">Questions are randomly selected from the set.</div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('quiz-count-input')?.focus(),100);
 }
 
 // alias — kept so any stale references work
@@ -5839,13 +6307,14 @@ function renderClassQuiz(v){
             <div class="bbq-score-big">${pct}%</div>
             <div style="font-size:16px;color:var(--text2)">${correct} of ${questions.length} correct</div>
           </div>
-          <div class="result-grid" style="margin-bottom:24px">
+          <div class="result-grid" style="margin-bottom:24px;grid-template-columns:repeat(4,1fr)">
             <div class="stat-card"><div class="stat-num text-success">${correct}</div><div class="stat-label">Correct</div></div>
             <div class="stat-card"><div class="stat-num text-danger">${questions.length-correct}</div><div class="stat-label">Missed</div></div>
             <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
+            <div class="stat-card"><div class="stat-num" style="color:#f5a623">${appState.classQuizBestStreak||0}</div><div class="stat-label">Best Streak</div></div>
           </div>
           <div class="flex gap-8 mb-20 flex-wrap">
-            <button class="btn btn-primary" onclick="startClassQuiz('${s.id}',true)">🔄 Restart All</button>
+            <button class="btn btn-primary" onclick="startClassQuiz('${s.id}',true,${questions.length})">🔄 Restart All</button>
             ${missed.length?`<button class="btn btn-warn" onclick="retryClassWrongOnly()">⚡ Quiz Wrong Only (${missed.length})</button>`:''}
             <button class="btn btn-ghost" onclick="appState.classView='subject';renderView()">Back</button>
             ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="exportClassMissed()">📥 Export Missed</button>`:''}
@@ -5892,12 +6361,60 @@ function renderClassQuiz(v){
       </div>`;
   }
 
+  const streak=appState.classQuizStreak||0;
+  const streakHot=streak>=3;
+  const streakWarm=streak>=1&&streak<3;
+  const streakWrapClass='streak-wrap'+(streak===0?' streak-0':streakHot?' streak-hot':streakWarm?' streak-warm':'');
+  const subj=appState.classSubject||'';
+  const tintClass=subj==='blood_bank'?'tint-bb':subj==='clinical_chemistry'?'tint-chem':subj==='urinalysis'?'tint-ua':subj==='microbiology'?'tint-micro':'tint-default';
+  // Compute right/wrong fill percentages based on question outcomes
+  const resultMap=appState._quizResultMap||{};
+  // Use original total so retries don't inflate the %
+  const origTotal=appState._quizOriginalTotal||questions.length;
+  const rightCount=Object.values(resultMap).filter(v=>v==='right').length;
+  const wrongCount=Object.values(resultMap).filter(v=>v==='wrong').length;
+  const rightPct=Math.round(rightCount/origTotal*100);
+  const wrongPct=Math.round(wrongCount/origTotal*100);
+  const isDone100=appState.classQuizDone&&(rightCount===origTotal);
+  const subjectVisual=renderProgressVisual(subj,rightPct,wrongPct,isDone100);
   v.innerHTML=`
     <div class="bbq-overlay">
-      <div class="bbq-header">
-        <button class="btn btn-ghost btn-sm" onclick="appState.classView='subject';renderView()">✕ Exit</button>
-        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <span class="question-num" style="white-space:nowrap">${displayNum} / ${displayTotal}</span>
+      <div class="bbq-header" style="gap:8px">
+        <button class="btn btn-ghost btn-sm" style="flex-shrink:0" onclick="appState.classView='subject';renderView()">✕ Exit</button>
+        <div class="progress-bar" style="margin:0 4px">
+          <div class="progress-fill ${tintClass}" style="width:${pct}%"></div>
+        </div>
+        <span class="question-num" style="white-space:nowrap;font-size:12px">${displayNum}/${displayTotal}</span>
+        <div class="${streakWrapClass}" title="Streak: ${streak} in a row">
+          <svg class="streak-flame" viewBox="0 0 56 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="fgo" cx="50%" cy="70%" r="60%">
+                <stop offset="0%" stop-color="#ffe44d"/>
+                <stop offset="45%" stop-color="#f5a623"/>
+                <stop offset="100%" stop-color="#d43a0a"/>
+              </radialGradient>
+              <radialGradient id="igo" cx="50%" cy="80%" r="50%">
+                <stop offset="0%" stop-color="#fffde0"/>
+                <stop offset="100%" stop-color="#f5c842" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="glow" cx="50%" cy="90%" r="60%">
+                <stop offset="0%" stop-color="#ff6a00" stop-opacity=".5"/>
+                <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <!-- glow base -->
+            <ellipse cx="28" cy="62" rx="18" ry="8" fill="url(#glow)"/>
+            <!-- outer flame -->
+            <path d="M28 3C28 3 40 16 40 29C40 39 34 44 28 44C22 44 16 39 16 29C16 22 19 17 22 13C22 13 18 32 28 32C38 32 34 17 28 3Z" fill="url(#fgo)"/>
+            <!-- inner highlight -->
+            <path d="M28 20C28 20 34 28 34 36C34 42 31 46 28 47C25 46 22 42 22 36C22 30 25 25 28 20Z" fill="url(#igo)" opacity=".85"/>
+            <!-- small side sparks when hot (always rendered, opacity controlled by CSS) -->
+            <path class="spark" d="M12 18 Q8 12 12 8" stroke="#ffe44d" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/>
+            <path class="spark" d="M44 22 Q50 16 46 10" stroke="#ffe44d" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/>
+            <path class="spark" d="M20 6 Q17 1 20 0" stroke="#f5a623" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".6"/>
+          </svg>
+          <span class="streak-num">${streak}</span>
+        </div>
       </div>
       <div class="bbq-body">
         ${attemptLabel?`<div style="font-size:11px;color:var(--warn);text-align:center;margin-bottom:4px;font-weight:600">${attemptLabel}</div>`:''}
@@ -5915,6 +6432,7 @@ function renderClassQuiz(v){
         <div class="bbq-question">${esc(q.question)}</div>
         <div class="bbq-options">${optsHtml}</div>
         ${afterHtml}
+        ${subjectVisual}
       </div>
     </div>`;
 }
@@ -5922,6 +6440,21 @@ function renderClassQuiz(v){
 function classQuizAnswer(letter){
   if(appState.classQuizAns[appState.classQuizIdx]!==undefined)return;
   appState.classQuizAns[appState.classQuizIdx]=letter;
+  const q=(window._classQuizQs||[])[appState.classQuizIdx];
+  if(q){
+    const isRight=letter===q.correct;
+    if(isRight){
+      appState.classQuizStreak=(appState.classQuizStreak||0)+1;
+      appState.classQuizBestStreak=Math.max(appState.classQuizBestStreak||0,appState.classQuizStreak);
+    }else{
+      appState.classQuizStreak=0;
+    }
+    // Only mark wrong if not already right from a previous attempt
+    if(!appState._quizResultMap) appState._quizResultMap={};
+    if(appState._quizResultMap[appState.classQuizIdx]!=='right'){
+      appState._quizResultMap[appState.classQuizIdx]=isRight?'right':'wrong';
+    }
+  }
   renderView();
 }
 function classQuizNext(){appState.classQuizIdx++;renderView();}
@@ -5943,7 +6476,9 @@ function retryClassWrongOnly(){
   appState.classQuizDone=false;
   appState.classMissed=[];
   appState._quizAttempt=nextAttempt;
-  appState._quizStartNum=prevCorrect+1; // e.g. 61 if 60 correct out of 80
+  appState._quizStartNum=prevCorrect+1;
+  appState.classQuizStreak=0; // reset streak for new attempt
+  // _quizResultMap and _quizOriginalTotal intentionally kept — visual accumulates across attempts
   window._classShowQuizResume=false;
   window._kqOpts={};
   appState.classView='quiz';
@@ -6082,10 +6617,10 @@ function renderClassFlashcard(v){
     <div style="padding:20px 16px;overflow-y:auto">
       <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;text-align:center">Card ${idx+1} of ${qs.length}</div>
       ${qtrHtml}
-      <div style="font-size:19px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:20px;text-align:center">${esc(q.question)}</div>
+      <div class="flash-q-text" style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:16px;text-align:center">${esc(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;text-align:left">
         ${letters.filter(l=>q[l]).map(l=>`
-          <div style="padding:12px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);font-size:15px;color:var(--text);font-weight:500">
+          <div class="flash-opt-item" style="padding:12px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);font-size:15px;color:var(--text);font-weight:500">
             <span style="font-weight:700;margin-right:8px;font-family:var(--mono)">${l.toUpperCase()}.</span>${esc(q[l])}
           </div>`).join('')}
       </div>
@@ -6094,21 +6629,20 @@ function renderClassFlashcard(v){
   const backContent=`
     <div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px;overflow-y:auto">
       <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Answer</div>
-      <div style="font-size:36px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${q.explanation?'18px':'0'};max-width:540px">${esc(q[q.correct]||'')}</div>
+      <div class="flash-answer-text" style="font-size:22px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${q.explanation?'16px':'0'};max-width:480px">${esc(q[q.correct]||'')}</div>
       ${q.explanation?`<div style="font-size:14px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:480px;line-height:1.6">${esc(q.explanation)}</div>`:''}
     </div>`;
 
   const buildActionBar=(isFlipped)=>`
-    <div id="flash-action-bar" style="border-top:1px solid var(--border);padding:16px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
-      <button class="btn btn-ghost" style="color:var(--text);min-width:180px;font-size:15px;padding:11px 24px" onclick="window._flashFlip()">
+    <div id="flash-action-bar" style="border-top:1px solid var(--border);padding:14px 12px 10px;display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0">
+      <button class="btn btn-ghost" style="color:var(--text);min-width:160px;font-size:14px;padding:10px 20px" onclick="window._flashFlip()">
         ${isFlipped?'↑ Flip back':'↓ Flip to answer'}
       </button>
-      <div style="min-height:52px;display:flex;align-items:center">
-        ${isFlipped
-          ?(idx<qs.length-1
-            ?`<button class="btn btn-primary" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="window._flashNext()">Next →</button>`
-            :`<button class="btn btn-success" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="appState.classFlashIdx=qs.length;renderView()">Finish ✓</button>`)
-          :''}
+      <div style="display:flex;gap:10px;align-items:center">
+        ${idx>0?`<button class="btn btn-ghost" style="font-size:14px;padding:10px 18px" onclick="window._flashPrev()">← Back</button>`:'<div style="width:90px"></div>'}
+        ${idx<qs.length-1
+          ?`<button class="btn btn-primary" style="font-size:14px;padding:10px 22px" onclick="window._flashNext()">Next →</button>`
+          :`<button class="btn btn-success" style="font-size:14px;padding:10px 22px" onclick="appState.classFlashIdx=qs.length;renderView()">Finish ✓</button>`}
       </div>
     </div>`;
 
@@ -6126,6 +6660,12 @@ function renderClassFlashcard(v){
   };
   window._flashNext=()=>{
     appState.classFlashIdx++;
+    appState.classFlashFlipped=false;
+    renderView();
+  };
+  window._flashPrev=()=>{
+    if(appState.classFlashIdx<=0)return;
+    appState.classFlashIdx--;
     appState.classFlashFlipped=false;
     renderView();
   };
