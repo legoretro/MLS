@@ -169,6 +169,13 @@ select option{background:var(--bg3)}
 }
 
 /* ── Subject progress visual (cartoon, bottom of question area) ──────────── */
+.btn-active{
+  background:var(--accent)!important;
+  color:#fff!important;
+  border-color:var(--accent)!important;
+}
+.tbl-editor table td, .tbl-editor table th{ min-width:80px; }
+
 .spv-wrap{
   display:flex;justify-content:center;align-items:flex-end;
   padding:10px 0 4px;
@@ -480,7 +487,10 @@ body.light-mode .option-letter{color:var(--text3) !important}
 
 <script>
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
-const ADMIN_PW = 'cats';
+// Admin password stored as SHA-256 hash — change this hash to change the password.
+// To generate a new hash: https://emn178.github.io/online-tools/sha256.html
+// Current password hash (do NOT store the plaintext password here):
+const ADMIN_PW_HASH = 'd936608baaacc6b762c14b0c356026fba3b84e77d5b22e86f2fc29d3da09c675';
 const SB_URL = 'https://rbdvjwipedbxfbedjgoa.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
 
@@ -502,10 +512,10 @@ const SUBJECTS = [
   {key:'immunology',name:'Immunology',icon:'🔬'},
   {key:'lab_operations',name:'Lab Operations',icon:'📊'},
   {key:'microbiology',name:'Microbiology',icon:'🦠'},
-  {key:'mycology',name:'Mycology',icon:'🍄'},
-  {key:'parasitology',name:'Parasitology',icon:'🪱'},
+  {key:'para_myco',name:'Parasitology / Mycology',icon:'🍄🪱',_combined:['parasitology','mycology']},
   {key:'urinalysis',name:'Urinalysis',icon:'🧪'}
 ];
+const PARA_MYCO_KEYS=['parasitology','mycology'];
 
 const HEME_FOLDERS = [
   {key:'anemias',name:'Anemias',icon:'💉'},
@@ -719,8 +729,13 @@ async function seedIfEmpty(){
 // ─── ADMIN ────────────────────────────────────────────────────────────────────
 function openAdminModal(){document.getElementById('admin-modal').classList.remove('hidden');}
 function closeAdminModal(){document.getElementById('admin-modal').classList.add('hidden');document.getElementById('admin-err').textContent='';document.getElementById('admin-pw').value='';}
-function checkAdmin(){
-  if(document.getElementById('admin-pw').value===ADMIN_PW){
+async function checkAdmin(){
+  const input=document.getElementById('admin-pw').value;
+  if(!input){document.getElementById('admin-err').textContent='Enter a password.';return;}
+  const msgBuf=new TextEncoder().encode(input);
+  const hashBuf=await crypto.subtle.digest('SHA-256',msgBuf);
+  const hashHex=Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(hashHex===ADMIN_PW_HASH){
     isAdmin=true;
     document.getElementById('admin-bar-el').classList.remove('hidden');
     closeAdminModal();renderView();
@@ -810,10 +825,28 @@ function getSubjectIcon(key,fallback){
 }
 
 async function renderHome(v){
-  const cards = SUBJECTS.map(s=>{
-    const uploadBtn = isAdmin
+  const cards = SUBJECTS.filter(s=>!s._hidden).map(s=>{
+    const isCombined=s._combined&&s._combined.length;
+    const uploadBtn = isAdmin && !isCombined
       ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'' + s.key + '\')"></label>'
       : '';
+    // Combined card (Parasitology / Mycology) — dual icon, click goes to parasitology by default
+    if(isCombined){
+      const pmIcon=getSubjectIcon('para_myco','');
+      const pmUpload=isAdmin?'<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'para_myco\')"></label>':'';
+      const pmIconHtml=iconCache['para_myco']
+        ?pmIcon
+        :'<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0"><div style="font-size:36px">🍄</div><div style="font-size:36px">🪱</div></div>';
+      return '<div style="position:relative">'
+        + '<div class="subject-card" onclick="goSubject(\'para_myco\')" style="cursor:pointer">'
+        + '<div id="sicon-para_myco">' + pmIconHtml + '</div>'
+        + '<div style="padding:8px 12px 6px">'
+        + '<div class="subject-name">' + s.name + '</div>'
+        + '<div id="cnt-para_myco" class="subject-count">loading...</div>'
+        + '</div></div>'
+        + pmUpload
+        + '</div>';
+    }
     return '<div style="position:relative">'
       + '<div class="subject-card" onclick="goSubject(\'' + s.key + '\')">'
       + '<div id="sicon-' + s.key + '">' + getSubjectIcon(s.key, s.icon) + '</div>'
@@ -838,7 +871,7 @@ async function renderHome(v){
     + '<div style="position:relative">'
     + '<div class="subject-card" style="border-color:#f5a62344" onclick="goFormulas()">'
     + '<div id="sicon-formulas">' + getSubjectIcon('formulas','📐') + '</div>'
-    + '<div style="padding:10px 12px 12px"><div class="subject-name">Formulas / Equations</div><div class="subject-count" id="cnt-formulas">loading...</div></div>'
+    + '<div style="padding:10px 12px 12px"><div class="subject-name">Calculations / Reference Ranges</div><div class="subject-count" id="cnt-formulas">loading...</div></div>'
     + '</div>'
     + fmlAdminDrop + '</div>'
     + '</div>'
@@ -867,7 +900,15 @@ async function renderHome(v){
     + '</div>'
     + '<div class="mt-24" id="attempts-home"></div>';
 
-  SUBJECTS.forEach(async s=>{
+  SUBJECTS.filter(s=>!s._hidden).forEach(async s=>{
+    if(s._combined){
+      // Count questions from both combined subjects
+      const counts=await Promise.all(s._combined.map(sub=>sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',sub)));
+      const total=counts.reduce((sum,r)=>sum+(r.count||0),0);
+      const el=document.getElementById('cnt-'+s.key);
+      if(el)el.textContent=total+' questions';
+      return;
+    }
     const {count}=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',s.key);
     const el=document.getElementById('cnt-'+s.key);
     if(el)el.textContent=(count||0)+' questions';
@@ -1047,6 +1088,7 @@ async function loadAttemptsHome(){
 
 // ─── SUBJECT VIEW ─────────────────────────────────────────────────────────────
 function goSubject(key){
+  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='quiz';appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;renderView();return;}
   appState.view='subject';appState.subject=key;appState.subjectTab='quiz';
   appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;
   appState.microCasesPage=null;appState.caseSelections={};
@@ -1060,12 +1102,20 @@ function goClass(){appState.view='class';appState.classView=null;appState.classS
 
 function renderSubjectView(v){
   const s=SUBJECTS.find(x=>x.key===appState.subject);
+  if(!s){goHome();return;}
+  const iconHtml=appState.subject==='para_myco'
+    ?(iconCache['para_myco']
+      ?'<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="'+iconCache['para_myco']+'" style="width:100%;height:100%;object-fit:cover"></div>'
+      :'<span class="subject-icon">🍄🪱</span>')
+    :'<span class="subject-icon">'+s.icon+'</span>';
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16 flex-wrap">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
-      <span class="subject-icon">${s.icon}</span>
+      ${iconHtml}
       <div class="section-title">${s.name}</div>
+      ${appState.subject==='para_myco'&&isAdmin?`<label style="margin-left:auto;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;font-size:11px;cursor:pointer">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
     </div>
+    ${appState.subject==='para_myco'?'<div style="font-size:11px;color:var(--accent);margin-bottom:12px;font-style:italic">* Per ASCP BOC 2025, Parasitology &amp; Mycology are subcategories of Microbiology.</div>':''}
     <div class="tabs">
       <button class="tab ${appState.subjectTab==='quiz'?'active':''}" data-tab="quiz" onclick="switchTab('quiz')">Quiz</button>
       <button class="tab ${appState.subjectTab==='images'?'active':''}" data-tab="images" onclick="switchTab('images')">Learn by Images</button>
@@ -1113,7 +1163,17 @@ async function renderTab(){
 async function renderQuizTab(el){
   if(appState.quizDone){renderQuizResults(el,false);return;}
   if(!appState.quizStarted){
-    const {count}=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',appState.subject);
+    let count=0;
+    if(appState.subject==='para_myco'){
+      const [c1,c2]=await Promise.all([
+        sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject','parasitology'),
+        sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject','mycology')
+      ]);
+      count=(c1.count||0)+(c2.count||0);
+    }else{
+      const res=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',appState.subject);
+      count=res.count||0;
+    }
     el.innerHTML=`
       <div class="card" style="max-width:480px">
         <div class="section-title" style="font-size:15px">Subject Quiz</div>
@@ -1145,7 +1205,7 @@ async function renderQuizTab(el){
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
       </div>
       <div class="bbq-body">
-        <div class="bbq-question">${q.question}</div>
+        <div class="bbq-question">${escNL(q.question)}</div>
         <div class="bbq-options">
           ${opts.map((opt,oi)=>`
             <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
@@ -1172,7 +1232,17 @@ async function renderQuizTab(el){
 
 async function startSubjectQuiz(){
   const cnt=parseInt(document.getElementById('q-count').value)||10;
-  const {data}=await sb.from('mlsboc_questions').select('*').eq('subject',appState.subject);
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_questions').select('*').eq('subject','parasitology'),
+      sb.from('mlsboc_questions').select('*').eq('subject','mycology')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_questions').select('*').eq('subject',appState.subject);
+    data=res.data||[];
+  }
   if(!data||!data.length){alert('No questions found.');return;}
   window._kqOpts={};appState.quizQ=shuffle(data).slice(0,cnt);
   appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;
@@ -1189,26 +1259,142 @@ function renderQuizResults(el,isAll){
   let correct=0,missed=[];
   qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;else missed.push({q,given:ans[i]});});
   const pct=Math.round(correct/qs.length*100);
+  const timeStr=isAll?fmtTime(appState.allSeconds):'';
+  // Per-subject breakdown
+  const subjStats={};
+  qs.forEach((q,i)=>{
+    const s=q.subject||'unknown';
+    if(!subjStats[s])subjStats[s]={correct:0,total:0};
+    subjStats[s].total++;
+    if(ans[i]===q.correct_answer)subjStats[s].correct++;
+  });
+  // Merge parasitology & mycology into microbiology for suggestion display
+  const MICRO_GROUP=['microbiology','parasitology','mycology'];
+  const microCombined={correct:0,total:0,subs:[]};
+  MICRO_GROUP.forEach(k=>{if(subjStats[k]){microCombined.correct+=subjStats[k].correct;microCombined.total+=subjStats[k].total;if(k!=='microbiology'&&subjStats[k].total>0)microCombined.subs.push({k,pct:Math.round(subjStats[k].correct/subjStats[k].total*100)});}});
+  const mergedStats={};
+  Object.entries(subjStats).forEach(([s,st])=>{if(!MICRO_GROUP.includes(s))mergedStats[s]=st;});
+  if(microCombined.total>0)mergedStats['microbiology']=microCombined;
+
+  const weakSubjects=Object.entries(mergedStats)
+    .map(([s,st])=>{
+      const pct=Math.round(st.correct/st.total*100);
+      // build sub-note for micro if para/myco dragging it down
+      let subNote='';
+      if(s==='microbiology'&&st.subs&&st.subs.length){
+        const weakSubs=st.subs.filter(x=>x.pct<75);
+        if(weakSubs.length)subNote=' (particularly: '+weakSubs.map(x=>x.k+' '+x.pct+'%').join(', ')+')';
+      }
+      return {s,pct,total:st.total,correct:st.correct,subNote};
+    })
+    .filter(x=>x.pct<75&&x.total>=2)
+    .sort((a,b)=>a.pct-b.pct);
   el.innerHTML=`
-    <div class="result-grid">
+    <div class="result-grid" style="grid-template-columns:repeat(${isAll?4:3},1fr)">
       <div class="stat-card"><div class="stat-num" style="color:${pct>=60?'var(--success)':'var(--danger)'}">${pct}%</div><div class="stat-label">Score</div></div>
       <div class="stat-card"><div class="stat-num text-success">${correct}</div><div class="stat-label">Correct</div></div>
       <div class="stat-card"><div class="stat-num text-danger">${qs.length-correct}</div><div class="stat-label">Missed</div></div>
+      ${isAll?`<div class="stat-card"><div class="stat-num" style="color:var(--accent);font-size:16px">${timeStr}</div><div class="stat-label">Time</div></div>`:''}
     </div>
-    ${isAll?`<div class="card-sm mb-16 flex-center gap-12"><span class="text-muted" style="font-size:13px">Time used:</span><span class="timer">${fmtTime(appState.allSeconds)}</span></div>`:''}
+    ${isAll?`<div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">⚠ Results are not saved. Export a PDF now to keep a record of this attempt.</div>`:''}
+    ${isAll&&weakSubjects.length?`
+      <div class="card-sm mb-16" style="border-left:3px solid var(--danger)">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📌 Suggested Focus Areas</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Sections below 75% — prioritize these before your next attempt.</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${weakSubjects.map(x=>`
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:var(--text)">${x.s==='microbiology'?'Microbiology (incl. Parasitology & Mycology)':x.s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</div>
+                <div style="font-size:11px;color:var(--text3)">${x.correct}/${x.total} correct${x.subNote||''}</div>
+              </div>
+              <div style="width:120px;background:var(--bg3);border-radius:99px;height:7px;overflow:hidden">
+                <div style="width:${x.pct}%;height:100%;border-radius:99px;background:${x.pct<50?'var(--danger)':x.pct<65?'#f5a623':'#d4b800'};transition:width .4s"></div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:${x.pct<50?'var(--danger)':x.pct<65?'#f5a623':'#c8a800'};min-width:34px;text-align:right">${x.pct}%</div>
+            </div>`).join('')}
+        </div>
+      </div>`:''}
     <div class="flex gap-8 mb-16 flex-wrap">
       ${isAll?`<button class="btn btn-primary" onclick="startAllExam()">Retake Exam</button>`:`<button class="btn btn-primary" onclick="switchTab('quiz')">New Quiz</button>`}
-      ${isAll?`<button class="btn btn-ghost" onclick="exportFromResults()">Export Missed CSV</button>`:''}
+      ${isAll&&missed.length?`<button class="btn btn-warn" onclick="exportResultsPDF()">📄 Export Missed Questions PDF</button>`:''}
+      ${isAll?`<button class="btn btn-ghost btn-sm" onclick="exportFromResults()">📊 Export CSV</button>`:''}
     </div>
     ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
     ${missed.map(({q,given})=>`
       <div class="missed-item">
-        <div class="missed-q">${q.question}</div>
-        <div class="missed-wrong">Your answer: ${given?q['option_'+given]:'(unanswered)'}</div>
-        <div class="missed-a">Correct: ${q['option_'+q.correct_answer]}</div>
-        ${q.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px">${q.explanation}</div>`:''}
+        <div class="missed-q">${escNL(q.question)}</div>
+        ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:6px 0">${renderDataTable(q.table_data,{small:true})}</div>`:''}
+        <div class="missed-wrong">Your answer: ${given?esc(q['option_'+given]):'(unanswered)'}</div>
+        <div class="missed-a">Correct: ${esc(q['option_'+q.correct_answer])}</div>
+        ${q.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px">${esc(q.explanation)}</div>`:''}
       </div>`).join('')}
   `;
+}
+
+function exportResultsPDF(){
+  const qs=appState.allQ,ans=appState.allAns;
+  let correct=0,missed=[];
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;else missed.push({q,given:ans[i]});});
+  const pct=Math.round(correct/qs.length*100);
+  const timeStr=fmtTime(appState.allSeconds);
+  if(!missed.length){alert('No missed questions — perfect score!');return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin;
+    const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const writeText=(text,opts={})=>{
+      const {size=10,bold=false,color=[30,30,30],indent=0}=opts;
+      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
+      doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.5;});
+    };
+    // Header
+    doc.setFillColor(30,30,30);doc.rect(margin,y,cW,14,'F');
+    doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text('MLS BOC Prep — Practice Exam Results',margin+4,y+9);y+=18;
+    // Score summary box
+    doc.setFillColor(245,245,245);doc.rect(margin,y,cW,18,'F');doc.setDrawColor(200,200,200);doc.rect(margin,y,cW,18,'S');
+    doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+    doc.text(`Score: ${correct}/${qs.length} (${pct}%)`,margin+4,y+7);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
+    doc.text(`Time: ${timeStr}   |   Date: ${new Date().toLocaleDateString()}`,margin+4,y+13);
+    doc.text(`Missed: ${missed.length} of ${qs.length} questions`,margin+cW/2,y+13);
+    y+=22;
+    // Section header
+    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(20,20,80);
+    doc.text('Questions to Review',margin,y);y+=6;
+    doc.setDrawColor(20,20,80);doc.setLineWidth(0.5);doc.line(margin,y,pageW-margin,y);y+=6;
+    // Missed questions
+    missed.forEach(({q,given},mi)=>{
+      checkPage(36);
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(100,100,140);
+      doc.text((q.subject||'').replace(/_/g,' ').toUpperCase()+' · Q'+(mi+1),margin,y);y+=5;
+      writeText(q.question,{size:10,bold:true,color:[20,20,20]});
+      const opts=['a','b','c','d'];
+      opts.forEach(l=>{
+        const opt=q['option_'+l];if(!opt)return;
+        const isCorrect=l===q.correct_answer,isGiven=l===given;
+        doc.setFontSize(9);doc.setFont('helvetica',isCorrect?'bold':'normal');
+        doc.setTextColor(...(isCorrect?[20,120,60]:isGiven?[180,40,40]:[50,50,50]));
+        checkPage(5);doc.text(l.toUpperCase()+'. '+opt+(isCorrect?' ✓':isGiven?' ✗':''),margin+4,y);y+=5;
+      });
+      if(q.explanation){
+        y+=1;doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+        doc.splitTextToSize('Note: '+q.explanation,cW-6).forEach(l=>{checkPage(5);doc.text(l,margin+4,y);y+=4.5;});
+      }
+      y+=6;
+    });
+    // Footer on each page
+    const tot=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tot;p++){
+      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+      doc.text('MLS BOC Prep — Practice Exam · Items to Improve · Page '+p+' of '+tot,margin,pageH-8);
+      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
+    }
+    doc.save('boc_exam_missed_'+new Date().toISOString().slice(0,10)+'.pdf');
+  }catch(err){alert('PDF export failed: '+err.message);}
 }
 
 // ─── IMAGES TAB ───────────────────────────────────────────────────────────────
@@ -1327,7 +1513,17 @@ async function renderImagesTab(el){
 
 // Generic images (non-hematology/micro/ua) — mycology, parasitology, etc.
 async function renderGenericImages(el){
-  const {data}=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),
+      sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+    data=res.data||[];
+  }
   const valid=(data||[]).filter(img=>img.image_url);
 
   el.innerHTML=`
@@ -1360,7 +1556,17 @@ async function renderGenericImages(el){
 }
 
 async function startGenericImgQuiz(){
-  const {data}=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),
+      sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+    data=res.data||[];
+  }
   const valid=(data||[]).filter(img=>img.image_url).map(img=>({
     id:img.id, name:img.title, key_features:img.description?[img.description]:[], notes:'', images:[img.image_url]
   }));
@@ -1374,7 +1580,17 @@ async function startGenericImgQuiz(){
 }
 
 async function startGenericFlashcard(){
-  const {data}=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),
+      sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+    data=res.data||[];
+  }
   const valid=(data||[]).filter(img=>img.image_url).map(img=>({
     id:img.id, name:img.title, key_features:img.description?[img.description]:[], notes:'', images:[img.image_url]
   }));
@@ -2647,18 +2863,31 @@ async function renderCasesTab(el){
     await renderImmunologyCases(el);
   }else if(appState.subject==='clinical_chemistry'){
     await renderChemistryCases(el);
-  }else if(appState.subject==='parasitology'){
-    await renderParasitologyCases(el);
-  }else if(appState.subject==='mycology'){
-    await renderMycologyCases(el);
+  }else if(appState.subject==='para_myco'||appState.subject==='parasitology'||appState.subject==='mycology'){
+    await renderParaMycoAllCases(el);
   }else{
     await renderGenericCases(el);
   }
 }
 
+async function renderParaMycoAllCases(el){
+  // Show parasitology cases then mycology cases together on one page
+  const wrapper=document.createElement('div');
+  wrapper.innerHTML='<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">Parasitology Cases</div>';
+  el.innerHTML='';el.appendChild(wrapper);
+  const pDiv=document.createElement('div');el.appendChild(pDiv);
+  await renderParasitologyCases(pDiv);
+  const sep=document.createElement('div');
+  sep.innerHTML='<div class="divider" style="margin:24px 0"></div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">Mycology Cases</div>';
+  el.appendChild(sep);
+  const mDiv=document.createElement('div');el.appendChild(mDiv);
+  await renderMycologyCases(mDiv);
+}
+
 // ── Hematology Cases: BB-style with results table ───────────────────────────
 async function renderHematologyCases(el){
-  const {data}=await sb.from('mlsboc_heme_cases').select('*').order('created_at');
+  const {data:_hcRaw}=await sb.from('mlsboc_heme_cases').select('*').order('created_at');
+  const data=(_hcRaw||[]).map(withTableData);
   if(!appState.hemeCaseCollapsed)appState.hemeCaseCollapsed={};
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminHemeCaseControls()}</div>`:''}
@@ -2677,7 +2906,7 @@ async function renderHematologyCases(el){
 function renderHemeCase(c,idx){
   const qs=c.questions||[];
   const selState=appState.hemeCaseAnswers&&appState.hemeCaseAnswers[c.id]||{};
-  const table=c.results_table||[];
+  // table_data rendered via renderDataTable below
   const imgs=c.images||[];
   const collapsed=!appState.hemeCaseCollapsed||appState.hemeCaseCollapsed[c.id]!==false;
   return `
@@ -2694,17 +2923,8 @@ function renderHemeCase(c,idx){
       </div>
       ${collapsed?'':`
         <div style="margin-top:16px">
-          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
-          ${table.length?`
-            <div style="margin-bottom:24px">
-              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Lab Results</div>
-              <div style="overflow-x:auto">
-                <table style="border-collapse:collapse;width:100%">
-                  <thead><tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;text-align:center;font-weight:600;font-size:14px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-                  <tbody><tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:600;color:${col.flag==='high'?'var(--danger)':col.flag==='low'?'var(--accent2)':'var(--text)'};background:var(--bg3)">${col.value}${col.flag?`<span style="font-size:10px;margin-left:4px;opacity:.7">${col.flag==='high'?'↑':'↓'}</span>`:''}</td>`).join('')}</tr></tbody>
-                </table>
-              </div>
-            </div>`:''}
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
+          ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data):''}  
           ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
           ${qs.length?`
             <div class="divider"></div>
@@ -2731,7 +2951,7 @@ function renderHemeCaseQuestion(caseId,q,qi,selState){
   return `
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
       <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono)">Q${qi+1}</div>
-      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${escNL(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:7px">
         ${(q.options||[]).map((opt,oi)=>{
           if(!opt)return '';
@@ -2802,15 +3022,15 @@ function adminHemeCaseControls(){
 }
 
 async function openHemeCaseEditor(caseId){
-  let c={title:'',scenario:'',results_table:[],questions:[],images:[],is_draft:false};
+  let c={title:'',scenario:'',table_data:null,questions:[],images:[],is_draft:false};
   if(caseId){
     const {data}=await sb.from('mlsboc_heme_cases').select('*').eq('id',caseId).single();
-    if(data)c=data;
+    if(data)c=withTableData(data);
   }
   const qs=c.questions||[];
-  const table=c.results_table||[];
+  const tableD=c.table_data||null;
   window._hemeCaseQCount=qs.length;
-  window._hemeCaseTableCount=table.length;
+  window._hemeCaseTableCount=0;
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">${caseId?'Edit':'New'} Hematology Case</div>
@@ -2819,16 +3039,9 @@ async function openHemeCaseEditor(caseId){
     <div class="form-group"><label>Title</label><input type="text" id="hc-title" value="${esc(c.title||'')}" placeholder="e.g. Microcytic Anemia Case"></div>
     <div class="form-group"><label>Scenario</label><textarea id="hc-scenario" style="min-height:100px">${c.scenario||''}</textarea></div>
     <div class="form-group">
-      <label>Lab Results Table Columns</label>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Each column = one lab value. Optionally flag as high/low.</div>
-      <div style="display:grid;grid-template-columns:1fr 80px 80px auto;gap:6px;margin-bottom:6px">
-        <div style="font-size:11px;color:var(--text3)">Label</div>
-        <div style="font-size:11px;color:var(--text3)">Value</div>
-        <div style="font-size:11px;color:var(--text3)">Flag</div>
-        <div></div>
-      </div>
-      <div id="hc-table-rows">${table.map((col,i)=>hemeCaseTableRow(i,col.label,col.value,col.flag||'')).join('')}</div>
-      <button class="btn btn-ghost btn-sm mt-8" onclick="addHemeCaseTableCol()">+ Add Column</button>
+      <label>Lab Results Table</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Up to 5 columns × 5 rows. Set column headers, fill cells. Bold/color per cell for flags.</div>
+      ${renderTableEditor('heme', tableD)}
     </div>
     <div class="divider"></div>
     <div class="flex-center gap-8 mb-12">
@@ -2908,13 +3121,8 @@ async function saveHemeCase(caseId){
   const scenario=document.getElementById('hc-scenario')?.value.trim();
   const isDraft=document.getElementById('hc-draft')?.value==='true';
   if(!title){alert('Title required.');return;}
-  const results_table=[];
-  for(let i=0;i<(window._hemeCaseTableCount||0);i++){
-    const lbl=document.getElementById('hc-tl-'+i);
-    const val=document.getElementById('hc-tv-'+i);
-    const flag=document.getElementById('hc-tf-'+i);
-    if(lbl&&lbl.isConnected&&lbl.value.trim())results_table.push({label:lbl.value.trim(),value:val?val.value.trim():'',flag:flag?flag.value:''});
-  }
+  const rawT=tblReadData('heme');
+  const table_data=tblHasContent(rawT)?rawT:null;
   const questions=[];
   for(let i=0;i<(window._hemeCaseQCount||0);i++){
     const qEl=document.getElementById('hc-q-'+i);if(!qEl||!qEl.isConnected)continue;
@@ -2924,7 +3132,7 @@ async function saveHemeCase(caseId){
     const explanation=document.getElementById('hc-qe-'+i)?.value.trim()||'';
     questions.push({question,options,correct,explanation});
   }
-  const payload={title,scenario:scenario||'',results_table,questions,is_draft:isDraft,images:[]};
+  const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images:[]};
   let error;
   if(caseId){({error}=await sb.from('mlsboc_heme_cases').update(payload).eq('id',caseId));}
   else{({error}=await sb.from('mlsboc_heme_cases').insert(payload));}
@@ -2951,6 +3159,213 @@ async function deleteHemeCase(id){
 // appState.paraCaseAnswers, appState.paraCaseCollapsed
 // appState.mycoCaseAnswers, appState.mycoCaseCollapsed
 // appState.immQuizMode, appState.chemQuizMode, etc.
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHARED TABLE UTILITY — 5×5 grid with per-cell bold/color, used everywhere
+// Data format: {headers:['Col1',...], rows:[['val',...], ...], meta:[[{bold,color}...],...]}
+// headers = array of column header strings (up to 5)
+// rows    = 2D array of cell strings (up to 5 rows × 5 cols)
+// meta    = 2D array matching rows, each cell: {bold:bool, color:string|null}
+// ═══════════════════════════════════════════════════════════════════════════════
+
+
+// ─── LEGACY TABLE MIGRATION ─────────────────────────────────────────────────
+function migrateTableData(c){
+  if(c.table_data&&c.table_data.headers) return c.table_data;
+  const legacy=c.typing_table||c.results_table||c.test_results;
+  if(!legacy||!Array.isArray(legacy)||!legacy.length) return null;
+  const headers=legacy.map(col=>col.label||'');
+  const row=legacy.map(col=>col.value||'');
+  const meta=legacy.map(col=>{
+    let color='';
+    if(col.flag==='high') color='#e05a5a';
+    else if(col.flag==='low') color='#2980b9';
+    return {bold:!!col.flag,color};
+  });
+  return {headers,rows:[row],meta:[meta]};
+}
+function withTableData(c){
+  if(c.table_data&&c.table_data.headers) return c;
+  const td=migrateTableData(c);
+  return td?{...c,table_data:td}:c;
+}
+
+const TABLE_COLORS = [
+  {label:'Default', value:''},
+  {label:'Red',     value:'#e05a5a'},
+  {label:'Blue',    value:'#2980b9'},
+  {label:'Green',   value:'#27ae60'},
+  {label:'Orange',  value:'#e67e22'},
+  {label:'Purple',  value:'#8e44ad'},
+  {label:'Teal',    value:'#16a085'},
+  {label:'Gray',    value:'#7f8c8d'},
+];
+
+// Render a table for display (view/quiz/flashcard)
+function renderDataTable(tableData, opts={}){
+  if(!tableData||!tableData.headers||!tableData.headers.length) return '';
+  const {headers, rows=[], meta=[]} = tableData;
+  const colCount = headers.length;
+  const fontSize = opts.small ? '12px' : '14px';
+  const padH = opts.small ? '6px 10px' : '10px 16px';
+  const padC = opts.small ? '7px 10px' : '11px 16px';
+  let html = '<div style="overflow-x:auto;margin:10px 0">';
+  html += '<table style="border-collapse:collapse;width:100%;min-width:'+Math.max(280,colCount*110)+'px">';
+  // Header row
+  html += '<thead><tr>';
+  headers.forEach(h=>{
+    html += `<th style="background:var(--bg4);border:1px solid var(--border2);padding:${padH};text-align:center;font-weight:700;font-size:${fontSize};color:var(--text);white-space:nowrap">${esc(h)}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  // Data rows
+  (rows||[]).forEach((row,ri)=>{
+    html += '<tr>';
+    (row||[]).forEach((cell,ci)=>{
+      const m = (meta[ri]||[])[ci]||{};
+      const bold = m.bold ? 'font-weight:800;' : 'font-weight:500;';
+      const color = m.color ? `color:${m.color};` : 'color:var(--text);';
+      html += `<td style="border:1px solid var(--border);padding:${padC};text-align:center;font-family:var(--mono);font-size:${opts.small?'13px':'15px'};${bold}${color}background:var(--bg3)">${esc(cell||'')}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+// Render the table editor UI (shared by all case editors + class question editor)
+// prefix: unique string to namespace input IDs (e.g. 'sc', 'heme', 'csq-0')
+// tableData: existing data object or null
+function renderTableEditor(prefix, tableData){
+  const headers = (tableData&&tableData.headers)||[''];
+  const rows    = (tableData&&tableData.rows)||[['']];
+  const meta    = (tableData&&tableData.meta)||[[{}]];
+  const numCols = Math.min(5, Math.max(1, headers.length));
+  const numRows = Math.min(5, Math.max(1, rows.length));
+
+  let html = `
+    <div class="tbl-editor" id="tbl-${prefix}" data-cols="${numCols}" data-rows="${numRows}">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;font-weight:600;color:var(--text2)">Columns:</span>
+        ${Array.from({length:5},(_,i)=>`<button class="btn btn-ghost btn-xs tbl-col-btn ${i<numCols?'btn-active':''}" onclick="tblSetCols('${prefix}',${i+1})">${i+1}</button>`).join('')}
+        <span style="font-size:12px;font-weight:600;color:var(--text2);margin-left:8px">Rows:</span>
+        ${Array.from({length:5},(_,i)=>`<button class="btn btn-ghost btn-xs tbl-row-btn ${i<numRows?'btn-active':''}" onclick="tblSetRows('${prefix}',${i+1})">${i+1}</button>`).join('')}
+      </div>
+      <div id="tbl-${prefix}-grid" style="overflow-x:auto">
+        ${buildTableEditorGrid(prefix,numCols,numRows,headers,rows,meta)}
+      </div>
+    </div>`;
+  return html;
+}
+
+function buildTableEditorGrid(prefix,numCols,numRows,headers,rows,meta){
+  let html='<table style="border-collapse:collapse;width:100%">';
+  // Header row
+  html+='<thead><tr>';
+  for(let c=0;c<numCols;c++){
+    html+=`<th style="padding:4px 2px"><input type="text" id="tbl-${prefix}-h${c}" value="${esc((headers[c]||''))}" placeholder="Header ${c+1}" style="width:100%;font-size:12px;font-weight:600;padding:6px 8px;text-align:center;border-radius:var(--r);border:1px solid var(--accent);background:var(--bg4);color:var(--text)"></th>`;
+  }
+  html+='</tr></thead><tbody>';
+  // Data rows
+  for(let r=0;r<numRows;r++){
+    html+='<tr>';
+    for(let c=0;c<numCols;c++){
+      const val=(rows[r]||[])[c]||'';
+      const m=((meta[r]||[])[c])||{};
+      const colorVal=m.color||'';
+      const isBold=m.bold?'checked':'';
+      html+=`<td style="padding:3px 2px;vertical-align:top">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <input type="text" id="tbl-${prefix}-r${r}c${c}" value="${esc(val)}" placeholder="…"
+            style="width:100%;font-size:12px;padding:6px 8px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:${colorVal||'var(--text)'};"
+            oninput="tblUpdateCellStyle('${prefix}',${r},${c})">
+          <div style="display:flex;gap:4px;align-items:center">
+            <label style="font-size:10px;display:flex;align-items:center;gap:3px;cursor:pointer;color:var(--text2)">
+              <input type="checkbox" id="tbl-${prefix}-b${r}c${c}" ${isBold} style="margin:0" onchange="tblUpdateCellStyle('${prefix}',${r},${c})">B
+            </label>
+            <select id="tbl-${prefix}-color${r}c${c}" style="font-size:10px;padding:1px 2px;border-radius:3px;border:1px solid var(--border);background:var(--bg3);color:var(--text);flex:1" onchange="tblUpdateCellStyle('${prefix}',${r},${c})">
+              ${TABLE_COLORS.map(tc=>`<option value="${tc.value}" ${colorVal===tc.value?'selected':''}>${tc.label}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</tbody></table>';
+  return html;
+}
+
+function tblUpdateCellStyle(prefix,r,c){
+  const inp=document.getElementById('tbl-'+prefix+'-r'+r+'c'+c);
+  const colorSel=document.getElementById('tbl-'+prefix+'-color'+r+'c'+c);
+  if(!inp||!colorSel)return;
+  const color=colorSel.value;
+  inp.style.color=color||'var(--text)';
+}
+
+function tblSetCols(prefix,n){
+  const editor=document.getElementById('tbl-'+prefix);if(!editor)return;
+  const curRows=parseInt(editor.dataset.rows)||1;
+  editor.dataset.cols=n;
+  // update button active state
+  editor.querySelectorAll('.tbl-col-btn').forEach((b,i)=>b.classList.toggle('btn-active',i<n));
+  _tblRebuild(prefix,n,curRows);
+}
+function tblSetRows(prefix,n){
+  const editor=document.getElementById('tbl-'+prefix);if(!editor)return;
+  const curCols=parseInt(editor.dataset.cols)||1;
+  editor.dataset.rows=n;
+  editor.querySelectorAll('.tbl-row-btn').forEach((b,i)=>b.classList.toggle('btn-active',i<n));
+  _tblRebuild(prefix,curCols,n);
+}
+function _tblRebuild(prefix,numCols,numRows){
+  // Save current values before rebuild
+  const cur=tblReadData(prefix);
+  const grid=document.getElementById('tbl-'+prefix+'-grid');if(!grid)return;
+  grid.innerHTML=buildTableEditorGrid(prefix,numCols,numRows,
+    cur.headers, cur.rows, cur.meta);
+}
+
+// Read current table data from DOM inputs
+function tblReadData(prefix){
+  const editor=document.getElementById('tbl-'+prefix);
+  if(!editor)return{headers:[],rows:[],meta:[]};
+  const numCols=parseInt(editor.dataset.cols)||1;
+  const numRows=parseInt(editor.dataset.rows)||1;
+  const headers=[];
+  for(let c=0;c<numCols;c++){
+    const el=document.getElementById('tbl-'+prefix+'-h'+c);
+    headers.push(el?el.value.trim():'');
+  }
+  const rows=[];const meta=[];
+  for(let r=0;r<numRows;r++){
+    const row=[];const metaRow=[];
+    for(let c=0;c<numCols;c++){
+      const inp=document.getElementById('tbl-'+prefix+'-r'+r+'c'+c);
+      const bold=document.getElementById('tbl-'+prefix+'-b'+r+'c'+c);
+      const color=document.getElementById('tbl-'+prefix+'-color'+r+'c'+c);
+      row.push(inp?inp.value.trim():'');
+      metaRow.push({bold:bold?bold.checked:false, color:color?color.value:''});
+    }
+    rows.push(row);meta.push(metaRow);
+  }
+  return {headers,rows,meta};
+}
+
+// Check if a table has any content worth saving
+function hexToRgb(hex){
+  if(!hex)return [30,30,30];
+  const r=parseInt(hex.slice(1,3),16)||30;
+  const g=parseInt(hex.slice(3,5),16)||30;
+  const b=parseInt(hex.slice(5,7),16)||30;
+  return [r,g,b];
+}
+function tblHasContent(td){
+  if(!td||!td.headers)return false;
+  if(td.headers.some(h=>h))return true;
+  return (td.rows||[]).some(row=>row.some(cell=>cell));
+}
 
 // ─── IMMUNOLOGY CASES ──────────────────────────────────────────────────────────
 const IMMUNO_TESTS = ['ANA', 'Anti-dsDNA', 'RF', 'C3', 'C4', 'CH50', 'IgG', 'IgM', 'IgA', 'IgE', 'ESR', 'CRP', 'WBC', 'Lymphocytes', 'Other'];
@@ -3059,7 +3474,7 @@ async function renderSubjectCases(el, cfg){
 function renderSubjectCase(c, idx, cfg){
   const qs=c.questions||[];
   const selState=(appState[cfg.answerKey]||{})[c.id]||{};
-  const table=c[cfg.tableField]||[];
+  // table_data used via renderDataTable
   const imgs=c.images||[];
   const collapsed=!appState[cfg.collapsedKey]||appState[cfg.collapsedKey][c.id]!==false;
   return `
@@ -3076,16 +3491,11 @@ function renderSubjectCase(c, idx, cfg){
       </div>
       ${collapsed?'':`
         <div style="margin-top:16px">
-          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
-          ${table.length?`
-            <div style="margin-bottom:24px">
-              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">${cfg.tableLabel}</div>
-              <div style="overflow-x:auto">
-                <table style="border-collapse:collapse;width:100%">
-                  <thead><tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:12px 18px;text-align:center;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-                  <tbody><tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:12px 18px;text-align:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
-                </table>
-              </div>
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
+          ${c.table_data&&tblHasContent(c.table_data)?`
+            <div style="margin-bottom:20px">
+              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">${cfg.tableLabel}</div>
+              ${renderDataTable(c.table_data)}
             </div>`:''}
           ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
           ${qs.length?`
@@ -3113,7 +3523,7 @@ function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
   return `
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
       <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono)">Q${qi+1}</div>
-      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${escNL(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:7px">
         ${(q.options||[]).map((opt,oi)=>{
           if(!opt)return '';
@@ -3179,7 +3589,7 @@ function resetSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId])delete appS
 // ─── SUBJECT CASE QUIZ MODE ────────────────────────────────────────────────────
 async function startSubjectCaseQuiz(qmKey,dbTable,tableField){
   const {data}=await sb.from(dbTable).select('*').order('created_at');
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c[tableField]||[],_imgs:c.images||[]})));
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
   if(!allQs.length){alert('No questions found yet.');return;}
   appState[qmKey]=true;
   appState[qmKey+'Items']=shuffle(allQs);
@@ -3207,15 +3617,10 @@ function renderSubjectCaseQuiz(el,cfg){
   const emojis=['🔴','🔵','🟡','🟢'];
   const pct=Math.round((idx+1)/items.length*100);
 
-  const tableHtml=(item._table||[]).length?`
+  const tableHtml=item._tableData&&tblHasContent(item._tableData)?`
     <div style="margin-bottom:12px">
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">${cfg.tableLabel}</div>
-      <div style="overflow-x:auto">
-        <table style="border-collapse:collapse;font-size:14px">
-          <thead><tr>${(item._table||[]).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-          <tbody><tr>${(item._table||[]).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
-        </table>
-      </div>
+      ${renderDataTable(item._tableData,{small:true})}
     </div>`:'';
 
   const optsHtml=(item.options||[]).map((opt,oi)=>{
@@ -3259,7 +3664,7 @@ function renderSubjectCaseQuiz(el,cfg){
           ${item._scenario?`<div class="bbq-context-scenario">${item._scenario}</div>`:''}
           ${tableHtml}
         </div>
-        <div class="bbq-question">${item.question}</div>
+        <div class="bbq-question">${escNL(item.question)}</div>
         <div class="bbq-options">${optsHtml}</div>
         ${afterHtml}
       </div>
@@ -3369,7 +3774,7 @@ function renderSubjectCaseQuizResults(el,cfg){
             const chosenIdx=ans?letters.indexOf(ans):-1;
             return `<div style="background:var(--bg2);border:1px solid #f0647433;border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
               <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${item._caseTitle||''}</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${item.question}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${escNL(item.question)}</div>
               <div style="font-size:12px;color:var(--danger)">✗ ${ans&&chosenIdx>=0?'Your answer: '+((item.options||[])[chosenIdx]||''):'(unanswered)'}</div>
               <div style="font-size:12px;color:var(--success);margin-top:2px">Correct: ${(item.options||[])[correctIdx]||''}</div>
               ${item.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">${item.explanation}</div>`:''}
@@ -3424,9 +3829,8 @@ async function openSubjectCaseEditor(subject,caseId){
     if(data)c=data;
   }
   const qs=c.questions||[];
-  const table=c.test_results||[];
-  window._scQCount=qs.length;
-  window._scTableCount=table.length;
+  const tableD=c.table_data||null;  window._scQCount=qs.length;
+  window._scTableCount=0;
   window._scSubject=subject;
   window._scCaseId=caseId||null;
 
@@ -3440,16 +3844,9 @@ async function openSubjectCaseEditor(subject,caseId){
     <div class="form-group"><label>Case Title</label><input type="text" id="sc-title" value="${esc(c.title||'')}" placeholder="e.g. Elevated ANA Case"></div>
     <div class="form-group"><label>Case Scenario / Patient Info</label><textarea id="sc-scenario" style="min-height:100px">${c.scenario||''}</textarea></div>
     <div class="form-group">
-      <label>${cfg.tableLabel} Columns</label>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Add columns for each test result. Use presets or add custom.</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;padding:8px;background:var(--bg3);border-radius:var(--r)">${presetHtml}</div>
-      <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
-        <div style="font-size:11px;color:var(--text3)">Test / Label</div>
-        <div style="font-size:11px;color:var(--text3)">Result</div>
-        <div></div>
-      </div>
-      <div id="sc-table-rows">${table.map((col,i)=>scTableRow(i,col.label,col.value)).join('')}</div>
-      <button class="btn btn-ghost btn-sm mt-8" onclick="addSCTableCol()">+ Add Custom Column</button>
+      <label>${cfg.tableLabel}</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Up to 5 columns × 5 rows. Set headers, fill cells, apply bold or color per cell.</div>
+      ${renderTableEditor('sc', c.table_data||null)}
     </div>
     <div class="divider"></div>
     <div class="flex-center gap-8 mb-12">
@@ -3541,12 +3938,8 @@ async function saveSubjectCase(){
   const scenario=document.getElementById('sc-scenario')?.value.trim();
   const isDraft=document.getElementById('sc-draft')?.value==='true';
   if(!title){alert('Title required.');return;}
-  const test_results=[];
-  for(let i=0;i<(window._scTableCount||0);i++){
-    const lbl=document.getElementById('sc-tl-'+i);
-    const val=document.getElementById('sc-tv-'+i);
-    if(lbl&&lbl.isConnected&&lbl.value.trim())test_results.push({label:lbl.value.trim(),value:val?val.value.trim():''});
-  }
+  const tableData=tblReadData('sc');
+  const table_data=tblHasContent(tableData)?tableData:null;
   const questions=[];
   for(let i=0;i<(window._scQCount||0);i++){
     const qEl=document.getElementById('sc-q-'+i);if(!qEl||!qEl.isConnected)continue;
@@ -3556,7 +3949,7 @@ async function saveSubjectCase(){
     const explanation=document.getElementById('sc-qe-'+i)?.value.trim()||'';
     questions.push({question,options,correct,explanation});
   }
-  const payload={title,scenario:scenario||'',test_results,questions,is_draft:isDraft,images:[]};
+  const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images:[]};
   let error;
   if(caseId){({error}=await sb.from(cfg.dbTable).update(payload).eq('id',caseId));}
   else{({error}=await sb.from(cfg.dbTable).insert(payload));}
@@ -3651,16 +4044,26 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
       doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
       doc.text(exportTitle+' — Case '+(ci+1)+': '+(c.title||'Untitled'),margin+3,y+7);y+=14;
       if(c.scenario){writeText('Patient Scenario',{size:10,bold:true,color:[40,40,40]});writeText(c.scenario,{size:10,indent:2});y+=3;}
-      const table=c[tableField]||[];
-      if(table.length){
+      const tableD=c.table_data;
+      if(tableD&&tableD.headers&&tableD.headers.length){
         checkPage(20);writeText(tableLabel,{size:10,bold:true,color:[40,40,40]});
-        const colW=Math.min(cW/table.length,38);const tableW=colW*table.length;
+        const hdrs=tableD.headers;const rows=tableD.rows||[];const meta=tableD.meta||[];
+        const colW=Math.min(cW/hdrs.length,44);const tableW=colW*hdrs.length;
+        // header row
         doc.setFillColor(220,220,220);doc.rect(margin,y,tableW,8,'F');doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);doc.rect(margin,y,tableW,8,'S');
         doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
-        table.forEach((col,i)=>doc.text(String(col.label||'').substring(0,12),margin+i*colW+2,y+5.5));y+=8;
-        doc.setFillColor(245,245,245);doc.rect(margin,y,tableW,9,'F');doc.rect(margin,y,tableW,9,'S');
-        doc.setFontSize(11);doc.setFont('helvetica','bold');
-        table.forEach((col,i)=>doc.text(String(col.value||'').substring(0,10),margin+i*colW+2,y+6.5));y+=12;
+        hdrs.forEach((h,i)=>doc.text(String(h||'').substring(0,14),margin+i*colW+2,y+5.5));y+=8;
+        // data rows
+        rows.forEach((row,ri)=>{
+          checkPage(9);
+          doc.setFillColor(245,245,245);doc.rect(margin,y,tableW,9,'F');doc.rect(margin,y,tableW,9,'S');
+          row.forEach((cell,ci)=>{
+            const m=(meta[ri]||[])[ci]||{};
+            const rgb=m.color?hexToRgb(m.color):[30,30,30];
+            doc.setFontSize(10);doc.setFont('helvetica',m.bold?'bold':'normal');doc.setTextColor(...rgb);
+            doc.text(String(cell||'').substring(0,12),margin+ci*colW+2,y+6.2);
+          });y+=9;
+        });y+=3;
       }
       const qs=c.questions||[];
       if(qs.length){
@@ -4021,7 +4424,7 @@ function renderCaseCard(c,idx){
         <span style="font-size:14px;font-weight:600">${c.title}</span>
         ${c.is_draft?`<span class="draft-badge">Draft</span>`:''}
       </div>
-      <div class="case-scenario">${c.scenario}</div>
+      <div class="case-scenario">${escNL(c.scenario)}</div>
       ${c.case_data?`<div class="case-data">${c.case_data}</div>`:''}
       ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
       ${steps.map((step,si)=>renderCaseStep(c.id,step,si,fb)).join('')}
@@ -4081,7 +4484,8 @@ function submitGenericCase(caseId,answer){
 
 // ─── MICROBIOLOGY CASES ───────────────────────────────────────────────────────
 async function renderMicroCases(el){
-  const {data}=await sb.from('mlsboc_micro_cases').select('*').order('created_at');
+  const {data:_mcRaw}=await sb.from('mlsboc_micro_cases').select('*').order('created_at');
+  const data=(_mcRaw||[]).map(withTableData);
   if(!appState.microCaseCollapsed)appState.microCaseCollapsed={};
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminMicroCaseControls()}</div>`:''}
@@ -4120,17 +4524,8 @@ function renderMicroCase(c,idx){
       </div>
       ${collapsed?'':`
         <div style="margin-top:16px">
-          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
-          ${table.length?`
-            <div style="margin-bottom:24px">
-              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Test Results</div>
-              <div style="overflow-x:auto">
-                <table style="border-collapse:collapse;width:100%">
-                  <thead><tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:12px 18px;text-align:center;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-                  <tbody><tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:12px 18px;text-align:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
-                </table>
-              </div>
-            </div>`:''}
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
+          ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data):''}  
           ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
           ${qs.length?`
             <div class="divider"></div>
@@ -4157,7 +4552,7 @@ function renderMicroCaseQuestion(caseId,q,qi,selState){
   return `
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
       <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono)">Q${qi+1}</div>
-      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${escNL(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:7px">
         ${(q.options||[]).map((opt,oi)=>{
           if(!opt)return '';
@@ -4231,12 +4626,11 @@ async function openMicroCaseEditor(caseId){
   let c={title:'',scenario:'',test_results:[],questions:[],images:[],group_label:'gram_positive',is_draft:false};
   if(caseId){
     const {data}=await sb.from('mlsboc_micro_cases').select('*').eq('id',caseId).single();
-    if(data)c=data;
+    if(data)c=withTableData(data);
   }
   const qs=c.questions||[];
-  const table=c.test_results||[];
-  window._mcQCount=qs.length;
-  window._mcTableCount=table.length;
+  const tableD=c.table_data||null;  window._mcQCount=qs.length;
+  window._mcTableCount=0;
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">${caseId?'Edit':'New'} Microbiology Case</div>
@@ -4254,12 +4648,7 @@ async function openMicroCaseEditor(caseId){
     <div class="form-group">
       <label>Test Results Table</label>
       <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Each column = one test. e.g. "Catalase" / "+"</div>
-      <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
-        <div style="font-size:11px;color:var(--text3)">Test Name</div>
-        <div style="font-size:11px;color:var(--text3)">Result</div>
-        <div></div>
-      </div>
-      <div id="mc-table-rows">${table.map((col,i)=>mcTableRow(i,col.label,col.value)).join('')}</div>
+      ${renderTableEditor('mc', tableD)}
       <button class="btn btn-ghost btn-sm mt-8" onclick="addMCTableCol()">+ Add Test</button>
     </div>
     <div class="divider"></div>
@@ -4336,12 +4725,8 @@ async function saveMicroCase(caseId){
   const group_label=document.getElementById('mc-group')?.value||'';
   const isDraft=document.getElementById('mc-draft')?.value==='true';
   if(!title){alert('Title required.');return;}
-  const test_results=[];
-  for(let i=0;i<(window._mcTableCount||0);i++){
-    const lbl=document.getElementById('mc-tl-'+i);
-    const val=document.getElementById('mc-tv-'+i);
-    if(lbl&&lbl.isConnected&&lbl.value.trim())test_results.push({label:lbl.value.trim(),value:val?val.value.trim():''});
-  }
+  const rawMC=tblReadData('mc');
+  const table_data=tblHasContent(rawMC)?rawMC:null;
   const questions=[];
   for(let i=0;i<(window._mcQCount||0);i++){
     const qEl=document.getElementById('mc-q-'+i);if(!qEl||!qEl.isConnected)continue;
@@ -4351,7 +4736,7 @@ async function saveMicroCase(caseId){
     const explanation=document.getElementById('mc-qe-'+i)?.value.trim()||'';
     questions.push({question,options,correct,explanation});
   }
-  const payload={title,scenario:scenario||'',test_results,questions,group_label,is_draft:isDraft,images:[]};
+  const payload={title,scenario:scenario||'',table_data,questions,group_label,is_draft:isDraft,images:[]};
   let error;
   if(caseId){({error}=await sb.from('mlsboc_micro_cases').update(payload).eq('id',caseId));}
   else{({error}=await sb.from('mlsboc_micro_cases').insert(payload));}
@@ -4371,10 +4756,11 @@ async function deleteMicroCase(id){
 // ─── BLOOD BANK CASES (MC question system) ────────────────────────────────────
 async function renderBloodBankCases(el){
   if(appState.bbQuizMode){renderBBQuiz(el);return;}
-  const {data}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
+  const {data:_bbRaw}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
+  const data=(_bbRaw||[]).map(withTableData);
 
   // Flatten all questions across all cases for the quiz button
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c.typing_table||[],_imgs:c.images||[]})));
+  const allQs=data.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
 
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminBBCaseControls()}</div>`:''}
@@ -4395,8 +4781,9 @@ async function renderBloodBankCases(el){
 
 // ─── BLOOD BANK QUIZ MODE ─────────────────────────────────────────────────────
 async function startBBQuiz(){
-  const {data}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c.typing_table||[],_imgs:c.images||[]})));
+  const {data:_bq1}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
+  const data=(_bq1||[]).map(withTableData);
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
   if(!allQs.length){alert('No questions found in any case yet.');return;}
   appState.bbQuizMode=true;
   appState.bbQuizItems=shuffle(allQs);
@@ -4430,13 +4817,13 @@ function renderBBQuiz(el){
   const emojis=['🔴','🔵','🟡','🟢'];
   const pct=Math.round((idx+1)/items.length*100);
 
-  const tableHtml=item._table&&item._table.length?`
+  const tableHtml=item._tableData&&tblHasContent(item._tableData)?`
     <div style="margin-bottom:12px">
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Typing Results</div>
       <div style="overflow-x:auto">
         <table style="border-collapse:collapse;font-size:14px">
-          <thead><tr>${item._table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-          <tbody><tr>${item._table.map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
+          <thead><tr>${(item._tableData.rows||[]).flat().map(v=>({value:v})).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
+          <tbody><tr>${(item._tableData.rows||[]).flat().map(v=>({value:v})).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
         </table>
       </div>
     </div>`:'' ;
@@ -4487,7 +4874,7 @@ function renderBBQuiz(el){
           ${item._scenario?`<div class="bbq-context-scenario">${item._scenario}</div>`:''}
           ${tableHtml}${imgHtml}
         </div>
-        <div class="bbq-question">${item.question}</div>
+        <div class="bbq-question">${escNL(item.question)}</div>
         <div class="bbq-options">${optsHtml}</div>
         ${afterHtml}
       </div>
@@ -4532,7 +4919,7 @@ function renderBBQuizResults(el){
     reviewHtml+=`
       <div style="background:var(--bg2);border:1px solid ${wasCorrect?'var(--border)':'#f0647433'};border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
         <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${item._caseTitle||''}</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${item.question}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${escNL(item.question)}</div>
         ${wasCorrect
           ?`<div style="font-size:12px;color:var(--success)">✓ Correct — ${(item.options||[])[correctIdx]||''}</div>`
           :`<div style="font-size:12px;color:var(--danger)">✗ ${ans&&chosenIdx>=0?'Your answer: '+((item.options||[])[chosenIdx]||''):'(unanswered)'}</div>
@@ -4617,7 +5004,7 @@ function renderBBCase(c,idx){
   const qs=c.questions||[];
   const selState=appState.bbAnswers[c.id]||{};
   const imgs=c.images||[];
-  const table=c.typing_table||[];
+  // table_data rendered via renderDataTable
   const collapsed=!appState.bbCollapsed||appState.bbCollapsed[c.id]!==false;
   return `
     <div class="case-card" id="bbcase-${c.id}" style="margin-bottom:12px">
@@ -4633,21 +5020,8 @@ function renderBBCase(c,idx){
       </div>
       ${collapsed?'':`
         <div style="margin-top:16px">
-          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${c.scenario}</div>`:''}
-          ${table.length?`
-            <div style="margin-bottom:24px">
-              <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Typing Results</div>
-              <div style="overflow-x:auto">
-                <table style="border-collapse:collapse;width:100%">
-                  <thead>
-                    <tr>${table.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:12px 18px;text-align:center;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr>
-                  </thead>
-                  <tbody>
-                    <tr>${table.map(col=>`<td style="border:1px solid var(--border);padding:12px 18px;text-align:center;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>`:''}
+          ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
+          ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data,{small:true}):''}  
           ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
           ${qs.length?`
             <div class="divider"></div>
@@ -4674,7 +5048,7 @@ function renderBBQuestion(caseId,q,qi,selState){
   return `
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
       <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:var(--mono);letter-spacing:.5px">Q${qi+1}</div>
-      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${q.question}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.65">${escNL(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:7px">
         ${(q.options||[]).map((opt,oi)=>{
           if(!opt)return '';
@@ -4748,15 +5122,15 @@ function adminBBCaseControls(){
 }
 
 async function openBBCaseEditor(caseId){
-  let c={title:'',scenario:'',typing_table:[],questions:[],images:[],is_draft:false};
+  let c={title:'',scenario:'',table_data:null,questions:[],images:[],is_draft:false};
   if(caseId){
     const {data}=await sb.from('mlsboc_bb_cases').select('*').eq('id',caseId).single();
-    if(data)c=data;
+    if(data)c=withTableData(data);
   }
   const qs=c.questions||[];
-  const table=c.typing_table||[];
+  const tableD=c.table_data||null;
   window._bbQCount=qs.length;
-  window._bbTableCount=table.length;
+  window._bbTableCount=0;
 
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
@@ -4773,16 +5147,8 @@ async function openBBCaseEditor(caseId){
     </div>
     <div class="form-group">
       <label>Typing Results Table Columns</label>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Each column = one reagent/cell. Add as many as needed.</div>
-      <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-bottom:6px">
-        <div style="font-size:11px;color:var(--text3)">Column Label</div>
-        <div style="font-size:11px;color:var(--text3)">Result</div>
-        <div></div>
-      </div>
-      <div id="bb-table-rows">
-        ${table.map((col,i)=>bbTableRow(i,col.label,col.value)).join('')}
-      </div>
-      <button class="btn btn-ghost btn-sm mt-8" onclick="addBBTableCol()">+ Add Column</button>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Up to 5 columns × 5 rows. Set headers, fill cells. Bold/color per cell for 4+, W, etc.</div>
+      ${renderTableEditor('bb', tableD)}
     </div>
     <div class="divider"></div>
     <div class="flex-center gap-8 mb-12">
@@ -4885,13 +5251,8 @@ async function saveBBCase(caseId){
   const isDraft=document.getElementById('bb-draft')?.value==='true';
   if(!title){alert('Case title is required.');return;}
 
-  const typing_table=[];
-  for(let i=0;i<(window._bbTableCount||0);i++){
-    const lbl=document.getElementById('bb-tl-'+i);
-    const val=document.getElementById('bb-tv-'+i);
-    if(lbl&&lbl.closest&&!lbl.closest('[id^="bb-tr-"]')?.isConnected)continue;
-    if(lbl&&lbl.isConnected&&lbl.value.trim())typing_table.push({label:lbl.value.trim(),value:val?val.value.trim():''});
-  }
+  const rawBB=tblReadData('bb');
+  const table_data=tblHasContent(rawBB)?rawBB:null;
 
   const questions=[];
   for(let i=0;i<(window._bbQCount||0);i++){
@@ -4905,7 +5266,7 @@ async function saveBBCase(caseId){
     questions.push({question,options,correct,explanation});
   }
 
-  const payload={title,scenario:scenario||'',typing_table,questions,is_draft:isDraft,images:[]};
+  const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images:[]};
 
   let error;
   if(caseId){
@@ -4928,80 +5289,191 @@ async function deleteBBCase(id){
 
 
 // ─── FORMULAS VIEW ────────────────────────────────────────────────────────────
+// ─── CALCULATIONS / REFERENCE RANGES ─────────────────────────────────────────
+// Two types stored in mlsboc_formulas:
+//   type='calc'  → name, category, numerator, denominator, steps[], notes, example
+//   type='rr'    → name, category, conventional_value, conventional_unit,
+//                  si_value, si_unit, notes
+
 async function renderFormulasView(v){
-  const {data}=await sb.from('mlsboc_formulas').select('*').order('category,name');
-  const cats={};
-  (data||[]).forEach(f=>{
-    const c=f.category||'General';
-    if(!cats[c])cats[c]=[];
-    cats[c].push(f);
-  });
+  const [calcRes,rrRes]=await Promise.all([
+    sb.from('mlsboc_formulas').select('*').eq('type','calc').order('category,name').catch(()=>({data:[]})),
+    sb.from('mlsboc_formulas').select('*').eq('type','rr').order('category,name').catch(()=>({data:[]}))
+  ]);
+  const calcData=calcRes.data||[];
+  const rrData=rrRes.data||[];
+
+  // Group by category
+  const groupBy=(arr)=>{const g={};arr.forEach(f=>{const c=f.category||'General';if(!g[c])g[c]=[];g[c].push(f);});return g;};
+  const calcCats=groupBy(calcData);
+  const rrCats=groupBy(rrData);
+  const activeTab=appState._fmTab||'calc';
+
   v.innerHTML=`
-    <div class="flex-center gap-12 mb-16">
+    <div class="flex-center gap-12 mb-16 flex-wrap">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
-      <div class="section-title">Formulas / Equations</div>
-      ${isAdmin?`<button class="btn btn-primary btn-sm ml-auto" onclick="openFormulaEditor(null)">+ Add Formula</button>`:''}
+      <div class="section-title">Calculations / Reference Ranges</div>
+      <div class="flex gap-8 ml-auto flex-wrap">
+        <button class="btn btn-ghost btn-sm" onclick="openFormulasExport()">📄 Export</button>
+        ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="openFormulaEditor(null,'${activeTab}')">+ Add ${activeTab==='calc'?'Calculation':'Reference Range'}</button>`:''}
+      </div>
     </div>
-    ${!data||!data.length?'<div class="empty">No formulas yet. Use Admin mode to add some.</div>':''}
-    ${Object.entries(cats).map(([cat,items])=>`
-      <div class="mb-24">
-        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${cat}</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${items.map(f=>renderFormulaCard(f)).join('')}
-        </div>
-      </div>`).join('')}
+    <div class="tabs mb-16">
+      <button class="tab ${activeTab==='calc'?'active':''}" onclick="appState._fmTab='calc';renderView()">Calculations</button>
+      <button class="tab ${activeTab==='rr'?'active':''}" onclick="appState._fmTab='rr';renderView()">Reference Ranges</button>
+    </div>
+    ${activeTab==='calc'?renderCalcTab(calcCats,calcData):renderRRTab(rrCats,rrData)}
   `;
 }
 
-function renderFormulaCard(f){
+function renderCalcTab(cats,all){
+  if(!all.length)return '<div class="empty">No calculations yet. Use Admin mode to add some.</div>';
+  return Object.entries(cats).map(([cat,items])=>`
+    <div class="mb-24">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${esc(cat)}</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${items.map(f=>renderCalcCard(f)).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderCalcCard(f){
+  const steps=(f.steps||[]).filter(Boolean);
+  const hasFraction=f.numerator||f.denominator;
   return `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px">
-      <div class="flex-center gap-8 mb-8">
-        <span style="font-size:15px;font-weight:700;color:var(--text)">${f.name}</span>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px">
+      <div class="flex-center gap-8 mb-12">
+        <span style="font-size:15px;font-weight:700;color:var(--text)">${esc(f.name)}</span>
         ${isAdmin?`<div class="ml-auto flex gap-6">
-          <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}')">Edit</button>
+          <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>
           <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
         </div>`:''}
       </div>
-      <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);padding:12px 16px;margin-bottom:${f.notes?'10px':'0'};font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent2);letter-spacing:.3px;overflow-x:auto;white-space:pre-wrap">${f.formula}</div>
-      ${f.notes?`<div style="font-size:13px;color:var(--text2);line-height:1.7">${f.notes}</div>`:''}
-      ${f.example?`<div style="margin-top:8px;background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;font-size:13px;color:var(--text2)"><strong style="color:var(--text)">Example:</strong> ${f.example}</div>`:''}
-    </div>
-  `;
+      ${hasFraction?`
+        <div style="display:flex;align-items:center;justify-content:flex-start;gap:16px;margin-bottom:14px;overflow-x:auto">
+          ${f.result_label?`<div style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap">${esc(f.result_label)} =</div>`:''}
+          <div style="display:inline-flex;flex-direction:column;align-items:center;gap:0">
+            <div style="font-size:16px;font-weight:700;color:var(--accent2);font-family:var(--mono);padding:6px 14px;border-bottom:2px solid var(--accent2);white-space:nowrap">${esc(f.numerator||'…')}</div>
+            <div style="font-size:16px;font-weight:700;color:var(--accent2);font-family:var(--mono);padding:6px 14px;white-space:nowrap">${esc(f.denominator||'…')}</div>
+          </div>
+          ${f.multiplier?`<div style="font-size:15px;font-weight:700;color:var(--text)">× ${esc(f.multiplier)}</div>`:''}
+        </div>`:''}
+      ${steps.length?`
+        <div style="margin-bottom:12px">
+          ${steps.map((s,i)=>`
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);margin-bottom:6px;overflow-x:auto">
+              <div style="font-size:11px;font-weight:700;color:var(--text3);min-width:20px">Step ${i+1}</div>
+              <div style="font-size:14px;font-family:var(--mono);font-weight:600;color:var(--accent2);white-space:nowrap">${esc(s)}</div>
+            </div>`).join('')}
+        </div>`:''}
+      ${f.notes?`<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px">${escNL(f.notes)}</div>`:''}
+      ${f.example?`<div style="background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;font-size:13px;color:var(--text2)"><strong style="color:var(--text)">Example:</strong> ${esc(f.example)}</div>`:''}
+    </div>`;
 }
 
-async function openFormulaEditor(id){
-  let f={name:'',category:'',formula:'',notes:'',example:''};
+function renderRRTab(cats,all){
+  if(!all.length)return '<div class="empty">No reference ranges yet. Use Admin mode to add some.</div>';
+  return Object.entries(cats).map(([cat,items])=>`
+    <div class="mb-24">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">${esc(cat)}</div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse;width:100%;min-width:400px">
+          <thead>
+            <tr>
+              <th style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;text-align:left;font-weight:700;font-size:13px;color:var(--text)">Analyte</th>
+              <th style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;text-align:center;font-weight:700;font-size:13px;color:var(--text)">Conventional Units</th>
+              <th style="background:var(--bg4);border:1px solid var(--border2);padding:10px 14px;text-align:center;font-weight:700;font-size:13px;color:var(--text)">SI Units</th>
+              ${isAdmin?'<th style="background:var(--bg4);border:1px solid var(--border2);padding:6px;width:80px"></th>':''}
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((f,ri)=>`
+              <tr style="background:${ri%2===0?'var(--bg3)':'var(--bg2)'}">
+                <td style="border:1px solid var(--border);padding:10px 14px;font-weight:600;font-size:14px;color:var(--text)">${esc(f.name)}</td>
+                <td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:14px;color:var(--text)">${esc(f.conventional_value||'—')}${f.conventional_unit?'<span style="font-size:11px;color:var(--text3);margin-left:4px">'+esc(f.conventional_unit)+'</span>':''}</td>
+                <td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:14px;color:var(--text)">${esc(f.si_value||'—')}${f.si_unit?'<span style="font-size:11px;color:var(--text3);margin-left:4px">'+esc(f.si_unit)+'</span>':''}</td>
+                ${isAdmin?`<td style="border:1px solid var(--border);padding:6px;text-align:center">
+                  <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','rr')">Edit</button>
+                  <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
+                </td>`:''}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${items.some(f=>f.notes)?`<div style="margin-top:8px;font-size:12px;color:var(--text3)">${items.filter(f=>f.notes).map(f=>'* '+esc(f.name)+': '+esc(f.notes)).join(' · ')}</div>`:''}
+    </div>`).join('');
+}
+
+async function openFormulaEditor(id,type){
+  type=type||appState._fmTab||'calc';
+  let f={name:'',category:'',type,numerator:'',denominator:'',multiplier:'',result_label:'',steps:[],notes:'',example:'',conventional_value:'',conventional_unit:'',si_value:'',si_unit:''};
   if(id){
     const {data}=await sb.from('mlsboc_formulas').select('*').eq('id',id).single();
-    if(data)f=data;
+    if(data){f=data;type=data.type||'calc';}
   }
+  const steps=(f.steps||['','','']).concat(['','','']).slice(0,5);
+  const isRR=type==='rr';
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
-      <div style="font-size:16px;font-weight:600">${id?'Edit':'New'} Formula</div>
+      <div style="font-size:16px;font-weight:600">${id?'Edit':'New'} ${isRR?'Reference Range':'Calculation'}</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
-    <div class="form-group"><label>Name</label><input type="text" id="fm-name" value="${esc(f.name||'')}" placeholder="e.g. Creatinine Clearance"></div>
-    <div class="form-group"><label>Category</label><input type="text" id="fm-cat" value="${esc(f.category||'')}" placeholder="e.g. Chemistry, Hematology"></div>
-    <div class="form-group"><label>Formula</label><textarea id="fm-formula" style="min-height:70px;font-family:var(--mono)">${f.formula||''}</textarea></div>
-    <div class="form-group"><label>Notes / Explanation (optional)</label><textarea id="fm-notes" style="min-height:70px">${f.notes||''}</textarea></div>
-    <div class="form-group"><label>Example (optional)</label><textarea id="fm-example" style="min-height:60px">${f.example||''}</textarea></div>
+    <div class="form-group"><label>Name</label><input type="text" id="fm-name" value="${esc(f.name||'')}" placeholder="${isRR?'e.g. Sodium':'e.g. Creatinine Clearance'}"></div>
+    <div class="form-group"><label>Category</label><input type="text" id="fm-cat" value="${esc(f.category||'')}" placeholder="e.g. Chemistry, Hematology, Blood Bank"></div>
+    ${isRR?`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Conventional Value</label><input type="text" id="fm-conv-val" value="${esc(f.conventional_value||'')}" placeholder="e.g. 136–145"></div>
+        <div class="form-group"><label>Conventional Unit</label><input type="text" id="fm-conv-unit" value="${esc(f.conventional_unit||'')}" placeholder="e.g. mmol/L"></div>
+        <div class="form-group"><label>SI Value</label><input type="text" id="fm-si-val" value="${esc(f.si_value||'')}" placeholder="e.g. 136–145"></div>
+        <div class="form-group"><label>SI Unit</label><input type="text" id="fm-si-unit" value="${esc(f.si_unit||'')}" placeholder="e.g. mmol/L"></div>
+      </div>
+      <div class="form-group"><label>Notes (optional)</label><input type="text" id="fm-notes" value="${esc(f.notes||'')}" placeholder="e.g. Critical: <120 or >160"></div>
+    `:`
+      <div style="background:var(--bg3);border-radius:var(--r2);padding:14px 16px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Fraction / Equation Display</div>
+        <div class="form-group"><label>Result Label (left of =)</label><input type="text" id="fm-result-label" value="${esc(f.result_label||'')}" placeholder="e.g. % Saturation"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label>Numerator</label><input type="text" id="fm-numerator" value="${esc(f.numerator||'')}" placeholder="e.g. Serum Iron"></div>
+          <div class="form-group"><label>Denominator</label><input type="text" id="fm-denominator" value="${esc(f.denominator||'')}" placeholder="e.g. TIBC"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:0"><label>× Multiplier (optional)</label><input type="text" id="fm-multiplier" value="${esc(f.multiplier||'')}" placeholder="e.g. 100"></div>
+      </div>
+      <div class="form-group">
+        <label>Steps (optional — each step shown in sequence)</label>
+        ${steps.map((s,i)=>`<input type="text" id="fm-step-${i}" value="${esc(s||'')}" placeholder="Step ${i+1} (leave blank to skip)" style="margin-bottom:6px;font-family:var(--mono)">`).join('')}
+      </div>
+      <div class="form-group"><label>Notes / Explanation (optional)</label><textarea id="fm-notes" style="min-height:60px">${f.notes||''}</textarea></div>
+      <div class="form-group"><label>Example (optional)</label><textarea id="fm-example" style="min-height:50px">${f.example||''}</textarea></div>
+    `}
     <div class="flex gap-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveFormula('${id||''}')">Save</button>
+      <button class="btn btn-primary" onclick="saveFormula('${id||''}','${type}')">Save</button>
     </div>
   `;
   document.getElementById('condition-modal').classList.remove('hidden');
 }
 
-async function saveFormula(id){
+async function saveFormula(id,type){
+  type=type||'calc';
   const name=document.getElementById('fm-name')?.value.trim();
-  const category=document.getElementById('fm-cat')?.value.trim();
-  const formula=document.getElementById('fm-formula')?.value.trim();
-  const notes=document.getElementById('fm-notes')?.value.trim();
-  const example=document.getElementById('fm-example')?.value.trim();
-  if(!name||!formula){alert('Name and formula required.');return;}
-  const payload={name,category:category||'General',formula,notes:notes||'',example:example||''};
+  const category=document.getElementById('fm-cat')?.value.trim()||'General';
+  if(!name){alert('Name required.');return;}
+  let payload={name,category,type};
+  if(type==='rr'){
+    payload.conventional_value=document.getElementById('fm-conv-val')?.value.trim()||'';
+    payload.conventional_unit=document.getElementById('fm-conv-unit')?.value.trim()||'';
+    payload.si_value=document.getElementById('fm-si-val')?.value.trim()||'';
+    payload.si_unit=document.getElementById('fm-si-unit')?.value.trim()||'';
+    payload.notes=document.getElementById('fm-notes')?.value.trim()||'';
+  }else{
+    payload.result_label=document.getElementById('fm-result-label')?.value.trim()||'';
+    payload.numerator=document.getElementById('fm-numerator')?.value.trim()||'';
+    payload.denominator=document.getElementById('fm-denominator')?.value.trim()||'';
+    payload.multiplier=document.getElementById('fm-multiplier')?.value.trim()||'';
+    payload.steps=Array.from({length:5},(_,i)=>document.getElementById('fm-step-'+i)?.value.trim()||'').filter(Boolean);
+    payload.notes=document.getElementById('fm-notes')?.value.trim()||'';
+    payload.example=document.getElementById('fm-example')?.value.trim()||'';
+  }
   let error;
   if(id){({error}=await sb.from('mlsboc_formulas').update(payload).eq('id',id));}
   else{({error}=await sb.from('mlsboc_formulas').insert(payload));}
@@ -5011,10 +5483,125 @@ async function saveFormula(id){
 }
 
 async function deleteFormula(id){
-  if(!confirm('Delete this formula?'))return;
+  if(!confirm('Delete this?'))return;
   await sb.from('mlsboc_formulas').delete().eq('id',id);
   renderView();
 }
+
+async function openFormulasExport(){
+  const [calcRes,rrRes]=await Promise.all([
+    sb.from('mlsboc_formulas').select('*').eq('type','calc').order('category,name').catch(()=>({data:[]})),
+    sb.from('mlsboc_formulas').select('*').eq('type','rr').order('category,name').catch(()=>({data:[]}))
+  ]);
+  const calcData=calcRes.data||[];
+  const rrData=rrRes.data||[];
+  if(!calcData.length&&!rrData.length){alert('Nothing to export yet.');return;}
+
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
+        <input type="checkbox" id="exp-calc" ${calcData.length?'checked':''} ${!calcData.length?'disabled':''} style="width:16px;height:16px">
+        <span>Calculations (${calcData.length} items)</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
+        <input type="checkbox" id="exp-rr" ${rrData.length?'checked':''} ${!rrData.length?'disabled':''} style="width:16px;height:16px">
+        <span>Reference Ranges (${rrData.length} items)</span>
+      </label>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="generateFormulasPDF(${JSON.stringify(calcData).replace(/</g,'&lt;')},${JSON.stringify(rrData).replace(/</g,'&lt;')})">📄 Generate PDF</button>
+    </div>
+  `;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function generateFormulasPDF(calcData,rrData){
+  const inclCalc=document.getElementById('exp-calc')?.checked;
+  const inclRR=document.getElementById('exp-rr')?.checked;
+  if(!inclCalc&&!inclRR){alert('Select at least one section.');return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin;
+    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const sectionHeader=(title)=>{checkPage(14);doc.setFillColor(40,60,100);doc.rect(margin,y,cW,10,'F');doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text(title,margin+4,y+7);y+=14;};
+    const catHeader=(title)=>{checkPage(8);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(60,80,140);doc.text(title.toUpperCase(),margin,y);y+=2;doc.setDrawColor(60,80,140);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=5;};
+    const writeText=(text,opts={})=>{const{size=10,bold=false,color=[30,30,30],indent=0}=opts;doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.5;});};
+
+    if(inclCalc&&calcData.length){
+      sectionHeader('Calculations');
+      const cats={};calcData.forEach(f=>{const c=f.category||'General';if(!cats[c])cats[c]=[];cats[c].push(f);});
+      Object.entries(cats).forEach(([cat,items])=>{
+        catHeader(cat);
+        items.forEach(f=>{
+          checkPage(30);
+          writeText(f.name,{size:11,bold:true,color:[20,20,20]});
+          if(f.result_label||f.numerator||f.denominator){
+            const label=f.result_label?f.result_label+' = ':'';
+            const num=f.numerator||'…';const den=f.denominator||'…';
+            const mult=f.multiplier?' × '+f.multiplier:'';
+            const fracW=Math.max(num.length,den.length)*3.2+8;
+            checkPage(20);
+            doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,60,120);
+            if(label)doc.text(label,margin+4,y+6);
+            const fx=margin+4+(label.length*2.8);
+            doc.text(num,fx,y+3);
+            doc.setLineWidth(0.5);doc.setDrawColor(30,60,120);doc.line(fx,y+5,fx+fracW,y+5);
+            doc.text(den,fx,y+10);
+            if(mult)doc.text(mult,fx+fracW+3,y+7);
+            y+=16;
+          }
+          (f.steps||[]).filter(Boolean).forEach((s,i)=>{
+            checkPage(6);doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(50,50,80);
+            doc.text('Step '+(i+1)+': '+s,margin+4,y);y+=5.5;
+          });
+          if(f.notes)writeText(f.notes,{size:9.5,color:[80,80,80],indent:4});
+          if(f.example)writeText('Example: '+f.example,{size:9,color:[60,100,60],indent:4});
+          y+=5;
+        });
+      });
+    }
+    if(inclRR&&rrData.length){
+      sectionHeader('Reference Ranges');
+      const cats={};rrData.forEach(f=>{const c=f.category||'General';if(!cats[c])cats[c]=[];cats[c].push(f);});
+      Object.entries(cats).forEach(([cat,items])=>{
+        catHeader(cat);
+        checkPage(20);
+        const colW=[cW*0.38,cW*0.31,cW*0.31];
+        ['Analyte','Conventional Units','SI Units'].forEach((h,i)=>{
+          const x=margin+colW.slice(0,i).reduce((a,b)=>a+b,0);
+          doc.setFillColor(220,225,240);doc.rect(x,y,colW[i],8,'F');doc.setDrawColor(180,185,210);doc.setLineWidth(0.2);doc.rect(x,y,colW[i],8,'S');
+          doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);doc.text(h,x+2,y+5.5);
+        });y+=8;
+        items.forEach((f,ri)=>{
+          checkPage(8);
+          const bg=ri%2===0?[245,246,250]:[255,255,255];
+          doc.setFillColor(...bg);
+          colW.forEach((w,ci)=>{const x=margin+colW.slice(0,ci).reduce((a,b)=>a+b,0);doc.rect(x,y,w,8,'F');doc.setDrawColor(200,205,220);doc.rect(x,y,w,8,'S');});
+          doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);doc.text(f.name||'',margin+2,y+5.5);
+          doc.setFont('helvetica','normal');doc.setTextColor(40,40,80);
+          const cv=(f.conventional_value||'—')+(f.conventional_unit?' '+f.conventional_unit:'');
+          const sv=(f.si_value||'—')+(f.si_unit?' '+f.si_unit:'');
+          doc.text(cv,margin+colW[0]+2,y+5.5);
+          doc.text(sv,margin+colW[0]+colW[1]+2,y+5.5);
+          y+=8;
+        });
+        y+=6;
+      });
+    }
+    const tot=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tot;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep — Calculations & Reference Ranges · Page '+p+' of '+tot,margin,pageH-8);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});}
+    doc.save('mls_calc_rr.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){alert('PDF export failed: '+err.message);}
+}
+
 
 // ─── ALL SUBJECTS ─────────────────────────────────────────────────────────────
 async function renderAllView(v){
@@ -5024,38 +5611,24 @@ async function renderAllView(v){
 }
 
 async function renderAllStart(v){
-  const {data:attempts}=await sb.from('mlsboc_attempts').select('*').eq('user_id',getUID()).order('completed_at',{ascending:false}).limit(3);
-  appState.attempts=attempts||[];
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
       <div class="section-title">Practice Exam — All Subjects</div>
     </div>
     <div class="card" style="max-width:560px;margin-bottom:24px">
-      <p style="font-size:13px;color:var(--text2);line-height:1.8">100-question mixed exam following ASCP BOC subject weighting. Timer runs but no time limit. Last 3 attempts are saved.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8">100-question mixed exam following ASCP BOC subject weighting. Timer runs but no time limit.</p>
+      <p style="font-size:12px;color:var(--text3);margin-top:4px">⚠ Results are not saved. Export your missed questions as a PDF before leaving.</p>
       <div class="divider"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
         ${Object.entries(BOC_WEIGHTS).map(([s,w])=>`
           <div class="flex-center gap-8">
-            <span style="font-size:12px;color:var(--text2)">${s.replace(/_/g,' ')}</span>
+            <span style="font-size:12px;color:var(--text2)">${s==='microbiology'?'microbiology (incl. parasitology & mycology)':s.replace(/_/g,' ')}</span>
             <span class="text-mono ml-auto" style="font-size:11px;color:var(--text3)">${w}%</span>
           </div>`).join('')}
       </div>
       <button class="btn btn-primary" onclick="startAllExam()">Start Exam</button>
     </div>
-    ${appState.attempts.length?`
-      <div style="font-size:15px;font-weight:600;margin-bottom:12px">Previous Attempts</div>
-      ${appState.attempts.map((a,i)=>`
-        <div class="attempt-card">
-          <div>
-            <span class="score-badge ${a.score/a.total>=0.6?'score-pass':'score-fail'}">${a.score}/${a.total} (${Math.round(a.score/a.total*100)}%)</span>
-            <div class="attempt-meta">${new Date(a.completed_at).toLocaleDateString()} · ${fmtTime(a.time_seconds)}</div>
-          </div>
-          <div class="flex gap-8 flex-wrap">
-            <button class="btn btn-ghost btn-sm" onclick="exportAttempt('${a.id}')">Export CSV</button>
-            <button class="btn btn-ghost btn-sm" onclick="reviewAttemptFromAll(${i})">Review</button>
-          </div>
-        </div>`).join('')}`:''}
   `;
 }
 
@@ -5063,11 +5636,24 @@ async function startAllExam(){
   const total=100;
   const allQ=[];
   for(const s of SUBJECTS){
-    const w=BOC_WEIGHTS[s.key]||0;
+    if(s._combined)continue; // skip UI-only card
+    const key=s.key;
+    const w=BOC_WEIGHTS[key]||0;
     if(!w)continue;
     const count=Math.round(total*w/100);
-    const {data}=await sb.from('mlsboc_questions').select('*').eq('subject',s.key);
-    if(data&&data.length)allQ.push(...shuffle(data).slice(0,count));
+    if(key==='microbiology'){
+      // Microbiology weight pool includes parasitology & mycology (ASCP BOC 2025)
+      const [mRes,pRes,myRes]=await Promise.all([
+        sb.from('mlsboc_questions').select('*').eq('subject','microbiology'),
+        sb.from('mlsboc_questions').select('*').eq('subject','parasitology'),
+        sb.from('mlsboc_questions').select('*').eq('subject','mycology')
+      ]);
+      const microPool=shuffle([...(mRes.data||[]),...(pRes.data||[]),...(myRes.data||[])]);
+      if(microPool.length)allQ.push(...microPool.slice(0,count));
+    }else{
+      const {data}=await sb.from('mlsboc_questions').select('*').eq('subject',key);
+      if(data&&data.length)allQ.push(...shuffle(data).slice(0,count));
+    }
   }
   // Also pull lab_operations if exists
   const labW=BOC_WEIGHTS['lab_operations']||7.5;
@@ -5106,7 +5692,7 @@ function renderAllExam(v){
         <div class="timer ml-auto" id="all-timer" style="font-size:12px">${fmtTime(appState.allSeconds)}</div>
       </div>
       <div class="bbq-body">
-        <div class="bbq-question">${q.question}</div>
+        <div class="bbq-question">${escNL(q.question)}</div>
         <div class="bbq-options">
           ${opts.map((opt,oi)=>`
             <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
@@ -5135,18 +5721,10 @@ function answerAll(opt){appState.allAns[appState.allIdx]=opt;renderView();}
 function allNext(){appState.allIdx++;renderView();}
 function allPrev(){appState.allIdx--;renderView();}
 
-async function finishAll(){
+function finishAll(){
   clearInterval(appState.allTimer);
   appState.allDone=true;
-  const qs=appState.allQ,ans=appState.allAns;
-  let correct=0,correctIds=[],incorrectIds=[];
-  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer){correct++;correctIds.push(q.id);}else{incorrectIds.push(q.id);}});
-  const uid=getUID();
-  await sb.from('mlsboc_attempts').insert({user_id:uid,score:correct,total:qs.length,correct_ids:correctIds,incorrect_ids:incorrectIds,time_seconds:appState.allSeconds});
-  const {data:all}=await sb.from('mlsboc_attempts').select('id,completed_at').eq('user_id',uid).order('completed_at',{ascending:false});
-  if(all&&all.length>3){
-    await sb.from('mlsboc_attempts').delete().in('id',all.slice(3).map(a=>a.id));
-  }
+  // Results are NOT saved to the database — export PDF to keep a record
   renderView();
 }
 
@@ -5475,77 +6053,80 @@ async function deleteCondition(id){
 let _exportCases = []; // {source, cases} loaded when modal opens
 
 async function openExportModal(){
-  document.getElementById('condition-modal-body').innerHTML=`
-    <div class="flex-center gap-8 mb-16">
-      <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
-      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
-    </div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Loading cases...</div>
-  `;
-  document.getElementById('condition-modal').classList.remove('hidden');
+  // Show loading state
+  const modal=document.getElementById('condition-modal');
+  const modalBody=document.getElementById('condition-modal-body');
+  if(!modal||!modalBody){console.error('Export modal not found');return;}
 
-  // Load all case sources in parallel
-  const [bbRes, hcRes, mcRes, immRes, chemRes, paraRes, mycoRes] = await Promise.all([
-    sb.from('mlsboc_bb_cases').select('*').order('created_at'),
-    sb.from('mlsboc_heme_cases').select('*').order('created_at'),
-    sb.from('mlsboc_micro_cases').select('*').order('created_at'),
-    sb.from('mlsboc_immuno_cases').select('*').order('created_at').catch(()=>({data:[]})),
-    sb.from('mlsboc_chem_cases').select('*').order('created_at').catch(()=>({data:[]})),
-    sb.from('mlsboc_para_cases').select('*').order('created_at').catch(()=>({data:[]})),
-    sb.from('mlsboc_myco_cases').select('*').order('created_at').catch(()=>({data:[]}))
+  const closeBtn=`<button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>`;
+  modalBody.innerHTML=`<div class="flex-center gap-8 mb-16"><div style="font-size:16px;font-weight:600">Export Cases to PDF</div>${closeBtn}</div><div style="color:var(--text2);font-size:13px">Loading cases...</div>`;
+  modal.classList.remove('hidden');
+
+  // Safe fetch helper — always returns array
+  const safeFetch=async(table)=>{
+    try{
+      const res=await sb.from(table).select('*').order('created_at');
+      return Array.isArray(res.data)?res.data.map(withTableData):[];
+    }catch(e){return [];}
+  };
+
+  const [bbD,hcD,mcD,immD,chemD,paraD,mycoD]=await Promise.all([
+    safeFetch('mlsboc_bb_cases'),
+    safeFetch('mlsboc_heme_cases'),
+    safeFetch('mlsboc_micro_cases'),
+    safeFetch('mlsboc_immuno_cases'),
+    safeFetch('mlsboc_chem_cases'),
+    safeFetch('mlsboc_para_cases'),
+    safeFetch('mlsboc_myco_cases'),
   ]);
 
-  const sources = [
-    {label:'Blood Bank', key:'bb', data: bbRes.data||[], tableField:'typing_table', tableLabel:'Typing Results'},
-    {label:'Hematology', key:'hc', data: hcRes.data||[], tableField:'results_table', tableLabel:'Lab Results'},
-    {label:'Microbiology', key:'mc', data: mcRes.data||[], tableField:'test_results', tableLabel:'Test Results'},
-    {label:'Immunology', key:'imm', data: immRes.data||[], tableField:'test_results', tableLabel:'Immunology Results'},
-    {label:'Clinical Chemistry', key:'chem', data: chemRes.data||[], tableField:'test_results', tableLabel:'Chemistry Results'},
-    {label:'Parasitology', key:'para', data: paraRes.data||[], tableField:'test_results', tableLabel:'Parasitology Results'},
-    {label:'Mycology', key:'myco', data: mycoRes.data||[], tableField:'test_results', tableLabel:'Mycology Results'}
+  const sources=[
+    {label:'Blood Bank',        key:'bb',   data:bbD,   tableLabel:'Typing Results'},
+    {label:'Hematology',        key:'hc',   data:hcD,   tableLabel:'Lab Results'},
+    {label:'Microbiology',      key:'mc',   data:mcD,   tableLabel:'Test Results'},
+    {label:'Immunology',        key:'imm',  data:immD,  tableLabel:'Immunology Results'},
+    {label:'Clinical Chemistry',key:'chem', data:chemD, tableLabel:'Chemistry Results'},
+    {label:'Parasitology',      key:'para', data:paraD, tableLabel:'Parasitology Results'},
+    {label:'Mycology',          key:'myco', data:mycoD, tableLabel:'Mycology Results'},
   ].filter(s=>s.data.length>0);
 
   if(!sources.length){
-    document.getElementById('condition-modal-body').innerHTML=`
-      <div class="flex-center gap-8 mb-16">
-        <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
-        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
-      </div>
-      <div class="empty">No cases found to export.</div>`;
+    modalBody.innerHTML=`<div class="flex-center gap-8 mb-16"><div style="font-size:16px;font-weight:600">Export Cases to PDF</div>${closeBtn}</div><div class="empty">No cases to export yet.</div>`;
     return;
   }
 
-  _exportCases = sources;
+  _exportCases=sources;
 
-  let html = `
+  let html=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
-      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      ${closeBtn}
     </div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select the cases to include. All selected cases go into one PDF.</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Select cases to include — all go into one PDF.</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(false)">Deselect All</button>
     </div>`;
 
   sources.forEach(s=>{
-    html += `<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">${s.label}</div>`;
+    html+=`<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin:12px 0 6px">${esc(s.label)}</div>`;
     s.data.forEach(c=>{
-      html += `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
-        <input type="checkbox" class="export-cb" data-key="${s.key}" data-id="${c.id}" checked style="width:16px;height:16px;flex-shrink:0">
-        <span style="font-weight:600">${c.title||'Untitled'}</span>
-        ${c.questions&&c.questions.length?`<span style="font-size:11px;color:var(--text3);margin-left:auto">${c.questions.length} Q</span>`:''}
+      const qCount=(c.questions||[]).length;
+      html+=`<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:5px;cursor:pointer;font-size:13px">
+        <input type="checkbox" class="export-cb" data-key="${esc(s.key)}" data-id="${esc(c.id)}" checked style="width:16px;height:16px;flex-shrink:0">
+        <span style="font-weight:600;flex:1">${esc(c.title||'Untitled')}</span>
+        ${qCount?`<span style="font-size:11px;color:var(--text3)">${qCount} Q</span>`:''}
       </label>`;
     });
   });
 
-  html += `
+  html+=`
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
       <button class="btn btn-primary" onclick="generateCasePDF()">📄 Generate PDF</button>
     </div>`;
 
-  document.getElementById('condition-modal-body').innerHTML = html;
+  modalBody.innerHTML=html;
 }
 
 function exportSelectAll(checked){
@@ -5625,31 +6206,25 @@ async function generateCasePDF(){
       }
 
       // Table (typing / lab results / test results)
-      const table = c[src.tableField]||[];
-      if(table.length){
+      const tableD2=c.table_data;
+      if(tableD2&&tableD2.headers&&tableD2.headers.length){
         checkPage(20);
-        writeText(src.tableLabel, {size:10, bold:true, color:[40,40,40]});
-        const colW = Math.min(contentW/table.length, 38);
-        const tableW = colW * table.length;
-        const startX = margin;
-        doc.setFillColor(220,220,220);
-        doc.rect(startX, y, tableW, 8, 'F');
-        doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);
-        doc.rect(startX, y, tableW, 8, 'S');
+        writeText(src.tableLabel,{size:10,bold:true,color:[40,40,40]});
+        const hdrs2=tableD2.headers;const rows2=tableD2.rows||[];const meta2=tableD2.meta||[];
+        const colW2=Math.min(contentW/hdrs2.length,44);const tableW2=colW2*hdrs2.length;
+        doc.setFillColor(220,220,220);doc.rect(margin,y,tableW2,8,'F');doc.setDrawColor(160,160,160);doc.setLineWidth(0.2);doc.rect(margin,y,tableW2,8,'S');
         doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
-        table.forEach((col,i)=>{
-          doc.text(String(col.label||'').substring(0,10), startX+i*colW+2, y+5.5);
-        });
-        y += 8;
-        doc.setFillColor(245,245,245);
-        doc.rect(startX, y, tableW, 9, 'F');
-        doc.rect(startX, y, tableW, 9, 'S');
-        doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
-        table.forEach((col,i)=>{
-          const val = String(col.value||'')+(col.flag==='high'?' ↑':col.flag==='low'?' ↓':'');
-          doc.text(val.substring(0,8), startX+i*colW+2, y+6.5);
-        });
-        y += 12;
+        hdrs2.forEach((h,i)=>doc.text(String(h||'').substring(0,14),margin+i*colW2+2,y+5.5));y+=8;
+        rows2.forEach((row,ri)=>{
+          checkPage(9);
+          doc.setFillColor(245,245,245);doc.rect(margin,y,tableW2,9,'F');doc.rect(margin,y,tableW2,9,'S');
+          row.forEach((cell,ci)=>{
+            const m2=(meta2[ri]||[])[ci]||{};
+            const rgb2=m2.color?hexToRgb(m2.color):[30,30,30];
+            doc.setFontSize(10);doc.setFont('helvetica',m2.bold?'bold':'normal');doc.setTextColor(...rgb2);
+            doc.text(String(cell||'').substring(0,12),margin+ci*colW2+2,y+6.2);
+          });y+=9;
+        });y+=3;
       }
 
       // Questions — no answers, plain black
@@ -5835,17 +6410,10 @@ async function renderClassSetView(v){
     ${!qs.length?'<div class="empty">No questions in this set.</div>':''}
     <div style="display:flex;flex-direction:column;gap:8px">
       ${qs.map((q,i)=>{
-        const qtr=q.test_results||[];
         return `
         <div class="card-sm">
-          ${qtr.length?`
-            <div style="overflow-x:auto;margin-bottom:10px">
-              <table style="border-collapse:collapse;font-size:13px">
-                <thead><tr>${qtr.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:7px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
-                <tbody><tr>${qtr.map(col=>`<td style="border:1px solid var(--border);padding:7px 12px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
-              </table>
-            </div>`:''}
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Q${i+1}. ${esc(q.question)}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;white-space:pre-wrap">Q${i+1}. ${escNL(q.question)}</div>
+          ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin-bottom:8px">${renderDataTable(q.table_data,{small:true})}</div>`:''}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
             ${['a','b','c','d'].map(l=>`<div style="font-size:12px;padding:4px 6px;border-radius:4px;background:${q.correct===l?'#3ddc8420':'var(--bg3)'};color:${q.correct===l?'var(--success)':'var(--text2)'}"><strong>${l.toUpperCase()}.</strong> ${esc(q[l]||'')}</div>`).join('')}
           </div>
@@ -5870,13 +6438,7 @@ async function openClassSetEditor(id){
     if(!container)return;
     if(!window._csQs.length){container.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px">No questions yet.</div>';return;}
     container.innerHTML=window._csQs.map((q,i)=>{
-      const tr=q.test_results||[];
-      const trRows=tr.map((col,ti)=>`
-        <div class="flex-center gap-6 mb-4" id="csqtr-${i}-${ti}">
-          <input type="text" placeholder="Label" value="${esc(col.label||'')}" id="csqtl-${i}-${ti}" style="flex:1;font-size:12px;padding:6px 8px">
-          <input type="text" placeholder="Result" value="${esc(col.value||'')}" id="csqtv-${i}-${ti}" style="width:90px;font-size:12px;padding:6px 8px">
-          <button class="btn btn-danger btn-xs" onclick="csqRemoveTR(${i},${ti})">✕</button>
-        </div>`).join('');
+      const qTableData=q.table_data||null;
       return `
       <div class="card-sm mb-8" id="csq-${i}">
         <div class="flex-center gap-8 mb-8">
@@ -5894,11 +6456,10 @@ async function openClassSetEditor(id){
           <input type="text" id="csqe-${i}" value="${esc(q.explanation||'')}">
         </div>
         <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
-          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
-            Test Results <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — attach up to 5 results to this question)</span>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+            Table <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — attach a result table to this question)</span>
           </div>
-          <div id="csqtr-rows-${i}">${trRows}</div>
-          <button class="btn btn-ghost btn-xs mt-6" id="csqtr-add-${i}" onclick="csqAddTR(${i})" ${tr.length>=5?'style="display:none"':''}>+ Add Result</button>
+          ${renderTableEditor('csq-'+i, qTableData)}
         </div>
       </div>`;
     }).join('');
@@ -5933,19 +6494,9 @@ async function openClassSetEditor(id){
   };
   window.csSaveQState=()=>{
     window._csQs=window._csQs.map((_,i)=>{
-      // collect per-question test_results
-      const tr=[];
-      const rows=document.getElementById('csqtr-rows-'+i);
-      if(rows){
-        let ti=0;
-        while(true){
-          const lbl=document.getElementById('csqtl-'+i+'-'+ti);
-          const val=document.getElementById('csqtv-'+i+'-'+ti);
-          if(!lbl)break;
-          if(lbl.isConnected&&lbl.value.trim())tr.push({label:lbl.value.trim(),value:val?val.value.trim():''});
-          ti++;
-        }
-      }
+      // collect per-question table data
+      const qTblRaw=tblReadData('csq-'+i);
+      const qTableData=tblHasContent(qTblRaw)?qTblRaw:null;
       return {
         question:document.getElementById('csqq-'+i)?.value.trim()||'',
         a:document.getElementById('csqo-'+i+'-a')?.value.trim()||'',
@@ -5954,7 +6505,7 @@ async function openClassSetEditor(id){
         d:document.getElementById('csqo-'+i+'-d')?.value.trim()||'',
         correct:document.getElementById('csqc-'+i)?.value||'a',
         explanation:document.getElementById('csqe-'+i)?.value.trim()||'',
-        test_results:tr
+        table_data:qTableData
       };
     });
   };
@@ -6290,7 +6841,7 @@ function renderClassQuiz(v){
     const startNum=appState._quizStartNum||1;
     let reviewHtml=missed.map(({q,given},mi)=>`
       <div style="background:var(--bg2);border:1px solid #f0647433;border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">${esc(q.question)}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">${escNL(q.question)}</div>
         <div style="font-size:12px;color:var(--danger)">✗ Your answer: ${esc(q[given]||'(none)')}</div>
         <div style="font-size:12px;color:var(--success);margin-top:2px">✓ Correct: ${esc(q[q.correct]||'')}</div>
         ${q.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px">${esc(q.explanation)}</div>`:''}
@@ -6419,17 +6970,8 @@ function renderClassQuiz(v){
       <div class="bbq-body">
         ${attemptLabel?`<div style="font-size:11px;color:var(--warn);text-align:center;margin-bottom:4px;font-weight:600">${attemptLabel}</div>`:''}
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">${esc(s.topic||s.name)}</div>
-        ${(q.test_results||[]).length?`
-          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px">
-            <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Test Results</div>
-            <div style="overflow-x:auto">
-              <table style="border-collapse:collapse;font-size:14px">
-                <thead><tr>${(q.test_results||[]).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
-                <tbody><tr>${(q.test_results||[]).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
-              </table>
-            </div>
-          </div>`:''}
-        <div class="bbq-question">${esc(q.question)}</div>
+        <div class="bbq-question" style="white-space:pre-wrap">${escNL(q.question)}</div>
+        ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:0 auto 14px;max-width:680px">${renderDataTable(q.table_data,{small:false})}</div>`:''}
         <div class="bbq-options">${optsHtml}</div>
         ${afterHtml}
         ${subjectVisual}
@@ -6605,19 +7147,12 @@ function renderClassFlashcard(v){
   const q=qs[idx];
   const letters=['a','b','c','d'];
 
-  const qtr=q.test_results||[];
-  const qtrHtml=qtr.length?`
-    <div style="overflow-x:auto;margin-bottom:18px">
-      <table style="border-collapse:collapse;font-size:13px;margin:0 auto">
-        <thead><tr>${qtr.map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:7px 14px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${esc(col.label)}</th>`).join('')}</tr></thead>
-        <tbody><tr>${qtr.map(col=>`<td style="border:1px solid var(--border);padding:8px 14px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${esc(col.value)}</td>`).join('')}</tr></tbody>
-      </table>
-    </div>`:'';
+  const qtrHtml=q.table_data&&tblHasContent(q.table_data)?`<div style="margin-bottom:16px">${renderDataTable(q.table_data,{small:true})}</div>`:'';
   const frontContent=`
     <div style="padding:20px 16px;overflow-y:auto">
       <div style="font-size:13px;color:var(--text);opacity:.55;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;text-align:center">Card ${idx+1} of ${qs.length}</div>
+      <div class="flash-q-text" style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:${qtrHtml?'12px':'16px'};text-align:center;white-space:pre-wrap">${escNL(q.question)}</div>
       ${qtrHtml}
-      <div class="flash-q-text" style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:16px;text-align:center">${esc(q.question)}</div>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;text-align:left">
         ${letters.filter(l=>q[l]).map(l=>`
           <div class="flash-opt-item" style="padding:12px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);font-size:15px;color:var(--text);font-weight:500">
@@ -6695,6 +7230,8 @@ function renderClassFlashcard(v){
 function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
 function fmtTime(s){const m=Math.floor(s/60),sec=s%60;return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function esc(s){return String(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+// escNL: same as esc but preserves newlines as <br> tags — used for question/scenario text
+function escNL(s){return esc(s).replace(/\n/g,'<br>');} 
 function csvEsc(s){s=String(s||'');if(s.includes(',')||s.includes('"')||s.includes('\n'))s='"'+s.replace(/"/g,'""')+'"';return s;}
 function dlCSV(rows,filename){
   const csv=rows.map(r=>r.map(csvEsc).join(',')).join('\n');
