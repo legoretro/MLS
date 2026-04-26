@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Urine Color & Clarity – MLS 449</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap');
+
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #f0ede8;
+    --surface: #faf8f5;
+    --surface2: #f4f1ec;
+    --header-bg: #1e1c1a;
+    --accent: #c8601a;
+    --accent2: #8b4513;
+    --text: #1a1816;
+    --muted: #7a7068;
+    --border: #ddd8d0;
+    --border2: #c8c0b4;
+    --good: #2d6a4f;
+    --good-bg: #e8f5ee;
+    --bad: #9b2335;
+    --bad-bg: #fdf0f1;
+    --drop-bg: #f7f4ef;
+    --drop-border: #c8c0b4;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 16px rgba(0,0,0,.08);
+    --shadow-sm: 0 1px 6px rgba(0,0,0,.06);
+  }
+
+  body {
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .wrap { max-width: 1260px; margin: 0 auto 32px; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: var(--header-bg);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .page-header-text h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f5c04a;
+    letter-spacing: .3px;
+  }
+  .page-header-text p {
+    margin: 3px 0 0;
+    font-size: .72rem;
+    color: #b0a89e;
+    line-height: 1.4;
+  }
+  .section-tag {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: .64rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1.5px solid var(--border);
+  }
+  button {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: .78rem;
+    transition: .12s ease;
+  }
+  button:hover { filter: brightness(1.08); }
+  .checkBtn { background: #1e1c1a; color: #fff; }
+  .resetBtn { background: #e8e2da; color: #444; }
+  .seeAnswersBtn { background: var(--accent2); color: #fff; }
+
+  .score {
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: .78rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .score.good { background: var(--good-bg); color: var(--good); }
+  .score.bad  { background: var(--bad-bg);  color: var(--bad); }
+
+  /* ── SKIP BUTTON ── */
+  .skip-btn {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 18px;
+    background: var(--header-bg);
+    color: #f5c04a;
+    border: 2px solid #f5c04a;
+    border-radius: 20px;
+    padding: 8px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .3px;
+    transition: .15s ease;
+  }
+  .skip-btn:hover { background: #f5c04a; color: #1e1c1a; }
+
+  /* ── COLOR LAYOUT: sticky left bank + table ── */
+  .color-activity-layout {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  /* Left sticky bank */
+  .sticky-bank {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 10px 10px;
+    box-shadow: var(--shadow-sm);
+    border: 1.5px solid var(--border);
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+  }
+  .sticky-bank h2 {
+    margin: 0 0 4px;
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+  }
+  .sticky-bank .hint { font-size: .63rem; color: var(--muted); margin-bottom: 6px; line-height: 1.3; }
+
+  /* ── CLARITY LAYOUT: left bank | table | right bank ── */
+  .clarity-activity-layout {
+    display: grid;
+    grid-template-columns: 190px 1fr 190px;
+    gap: 12px;
+    align-items: start;
+  }
+  .clarity-bank {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 10px;
+    box-shadow: var(--shadow-sm);
+    border: 1.5px solid var(--border);
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+  }
+  .clarity-bank h2 {
+    margin: 0 0 4px;
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+  }
+  .clarity-bank .hint { font-size: .63rem; color: var(--muted); margin-bottom: 6px; line-height: 1.3; }
+
+  /* Chips: shared */
+  .chip {
+    background: #fff;
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    margin-bottom: 5px;
+    cursor: grab;
+    user-select: none;
+    transition: .12s ease;
+    font-weight: 600;
+    font-size: .68rem;
+    line-height: 1.25;
+    color: var(--text);
+    display: block;
+  }
+  .chip:last-child { margin-bottom: 0; }
+  .chip.dragging { opacity: .35; transform: scale(.97); }
+  .chip.used { opacity: .18; pointer-events: none; text-decoration: line-through; }
+  .chip:hover:not(.used) { border-color: var(--accent); background: #fff8f3; }
+
+  /* ── TABLE SECTION ── */
+  .col-section {
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1.5px solid var(--border);
+  }
+  .col-title {
+    background: var(--header-bg);
+    color: #f5c04a;
+    text-align: center;
+    font-size: .9rem;
+    font-weight: 700;
+    padding: 10px 8px;
+    letter-spacing: .3px;
+  }
+
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th, td {
+    border: 1.5px solid var(--border);
+    padding: 5px 4px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  th {
+    background: #2c2926;
+    color: #e8dece;
+    font-size: .67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  td { background: var(--surface); }
+  tbody tr:nth-child(even) td { background: var(--surface2); }
+
+  .row-label {
+    font-size: .79rem;
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1.2;
+    padding: 2px 4px;
+  }
+  .static-cell {
+    font-size: .69rem;
+    font-weight: 500;
+    color: #5a4a38;
+    line-height: 1.3;
+    text-align: left;
+    padding: 7px;
+  }
+
+  /* ── DROPZONE ── */
+  .dropzone {
+    min-height: 46px;
+    background: var(--drop-bg);
+    border: 2px dashed var(--drop-border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .12s ease;
+    padding: 5px;
+    text-align: center;
+    font-weight: 600;
+    font-size: .69rem;
+    line-height: 1.2;
+    cursor: default;
+  }
+  .dropzone.drag-over { border-color: var(--accent); background: #fff3ea; transform: scale(1.02); }
+  .dropzone.filled { border-style: solid; background: #fff; cursor: pointer; color: var(--text); }
+  .dropzone.correct { background: var(--good-bg); border-color: var(--good); color: var(--good); border-style: solid; }
+  .dropzone.wrong   { background: var(--bad-bg);  border-color: var(--bad);  color: var(--bad);  border-style: solid; }
+  .placeholder { color: #b0a48a; font-weight: 600; font-size: .6rem; text-align: center; width: 100%; }
+
+  /* ── CUP CELL ── */
+  .cup-cell { padding: 5px 3px !important; }
+  .cup-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  /* ── ANSWERS PANEL ── */
+  .answers-panel {
+    display: none;
+    margin: 0 0 12px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+    border: 1.5px solid var(--border);
+  }
+  .answers-panel.show { display: block; }
+  .answers-panel h3 { margin: 0 0 10px; font-size: .8rem; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+  .answers-panel table { margin-top: 4px; }
+  .answers-panel th, .answers-panel td {
+    border: 1.5px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    background: #fff;
+    font-size: .72rem;
+  }
+  .answers-panel th { background: #2c2926; color: #e8dece; }
+
+  @media (max-width: 900px) {
+    .color-activity-layout { grid-template-columns: 1fr; }
+    .clarity-activity-layout { grid-template-columns: 1fr; }
+    .sticky-bank, .clarity-bank { position: static; max-height: none; }
+    .section-tag { display: none; }
+    table { table-layout: auto; }
+  }
+</style>
+</head>
+<body>
+  <a href="https://legoretro.github.io/MLS/" style="display:block; margin:20px;">← Back</a>
+  
+<button class="skip-btn" onclick="document.getElementById('clarity-section').scrollIntoView({behavior:'smooth'})">↓ Skip to Urine Clarity</button>
+
+<!-- ============ COLOR ACTIVITY ============ -->
+<div class="wrap" id="color-section">
+
+  <div class="page-header">
+    <!-- Decorative urine cups in the header -->
+    <svg width="68" height="78" viewBox="0 0 68 78" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cup 1: pale yellow -->
+      <g transform="translate(0,0)">
+        <rect x="4" y="32" width="18" height="30" rx="2" fill="#e8d550" opacity="0.95"/>
+        <path d="M2,30 L20,30 L18,62 L4,62 Z" fill="#e8d550" opacity="0.9"/>
+        <path d="M2,30 L20,30 L18,62 L4,62 Z" fill="none" stroke="#a89030" stroke-width="1.2"/>
+        <rect x="1" y="28" width="20" height="3" rx="1.5" fill="#c0a828" opacity="0.6"/>
+        <rect x="4" y="33" width="3" height="20" rx="1.5" fill="rgba(255,255,255,0.22)"/>
+      </g>
+      <!-- Cup 2: amber -->
+      <g transform="translate(24,0)">
+        <path d="M2,30 L20,30 L18,62 L4,62 Z" fill="#c87800" opacity="0.9"/>
+        <path d="M2,30 L20,30 L18,62 L4,62 Z" fill="none" stroke="#805000" stroke-width="1.2"/>
+        <rect x="1" y="28" width="20" height="3" rx="1.5" fill="#a06000" opacity="0.7"/>
+        <rect x="4" y="33" width="3" height="20" rx="1.5" fill="rgba(255,255,255,0.18)"/>
+      </g>
+      <!-- Cup 3: red -->
+      <g transform="translate(48,0)">
+        <path d="M2,30 L20,30 L18,62 L4,62 Z" fill="#c0002a" opacity="0.9"/>
+        <path d="M2,30 L20,30 L18,62 L4,62 Z" fill="none" stroke="#800020" stroke-width="1.2"/>
+        <rect x="1" y="28" width="20" height="3" rx="1.5" fill="#900018" opacity="0.7"/>
+        <rect x="4" y="33" width="3" height="20" rx="1.5" fill="rgba(255,255,255,0.18)"/>
+      </g>
+      <!-- Labels -->
+      <text x="11" y="74" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#e8d060" font-weight="700">normal</text>
+      <text x="35" y="74" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#d4a030" font-weight="700">amber</text>
+      <text x="58" y="74" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#e06070" font-weight="700">blood</text>
+    </svg>
+
+    <div class="page-header-text">
+      <h1>Urine Color</h1>
+      <p>Drag the correct cause into each color row. Click a filled box to clear it.</p>
+    </div>
+    <span class="section-tag">Color</span>
+  </div>
+
+  <div class="controls">
+    <button class="checkBtn" id="colorCheckBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="colorResetBtn">↺ Reset</button>
+    <button class="seeAnswersBtn" id="colorAnswersBtn">See All Answers</button>
+    <div class="score" id="colorScoreMsg"></div>
+  </div>
+
+  <div class="answers-panel" id="colorAnswersPanel">
+    <h3>Answers — Urine Color</h3>
+    <table>
+      <thead><tr><th>Color</th><th>Cause</th></tr></thead>
+      <tbody id="colorAnswerBody"></tbody>
+    </table>
+  </div>
+
+  <div class="color-activity-layout">
+    <div class="sticky-bank">
+      <h2>Causes</h2>
+      <p class="hint">Drag into a row · click to return</p>
+      <div id="colorBank"></div>
+    </div>
+
+    <div class="col-section">
+      <div class="col-title">Urine Color → Cause</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:9%;">Cup</th>
+            <th style="width:17%;">Color</th>
+            <th style="width:24%;">Cause</th>
+            <th style="width:9%;">Cup</th>
+            <th style="width:17%;">Color</th>
+            <th style="width:24%;">Cause</th>
+          </tr>
+        </thead>
+        <tbody id="colorTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ CLARITY ACTIVITY ============ -->
+<div class="wrap" id="clarity-section">
+
+  <div class="page-header">
+    <!-- Clarity gradient cups in header -->
+    <svg width="110" height="78" viewBox="0 0 110 78" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0,0)">
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="#ddb800" opacity="1"/>
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="none" stroke="#8a7020" stroke-width="1.2"/>
+        <rect x="1" y="26" width="20" height="3" rx="1.5" fill="#a08010" opacity="0.7"/>
+        <text x="11" y="72" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#d4a000" font-weight="700">clear</text>
+      </g>
+      <g transform="translate(22,0)">
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="#ddb800" opacity="0.72"/>
+        <circle cx="8" cy="46" r="1.3" fill="rgba(160,130,60,0.6)"/>
+        <circle cx="13" cy="38" r="1" fill="rgba(160,130,60,0.5)"/>
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="none" stroke="#8a7020" stroke-width="1.2"/>
+        <rect x="1" y="26" width="20" height="3" rx="1.5" fill="#a08010" opacity="0.7"/>
+        <text x="11" y="72" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#b09010" font-weight="700">hazy</text>
+      </g>
+      <g transform="translate(44,0)">
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="#c4a200" opacity="0.52"/>
+        <circle cx="7" cy="42" r="1.5" fill="rgba(140,110,40,0.7)"/>
+        <circle cx="13" cy="35" r="1.2" fill="rgba(140,110,40,0.6)"/>
+        <circle cx="10" cy="50" r="1" fill="rgba(140,110,40,0.5)"/>
+        <circle cx="15" cy="44" r="1.3" fill="rgba(140,110,40,0.6)"/>
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="none" stroke="#8a7020" stroke-width="1.2"/>
+        <rect x="1" y="26" width="20" height="3" rx="1.5" fill="#a08010" opacity="0.7"/>
+        <text x="11" y="72" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#8a7010" font-weight="700">cloudy</text>
+      </g>
+      <g transform="translate(66,0)">
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="#a88800" opacity="0.38"/>
+        <circle cx="6" cy="40" r="1.8" fill="rgba(120,90,20,0.75)"/>
+        <circle cx="13" cy="33" r="1.5" fill="rgba(120,90,20,0.65)"/>
+        <circle cx="9" cy="50" r="1.4" fill="rgba(120,90,20,0.7)"/>
+        <circle cx="15" cy="45" r="1.6" fill="rgba(120,90,20,0.65)"/>
+        <circle cx="8" cy="36" r="1.2" fill="rgba(120,90,20,0.6)"/>
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="none" stroke="#8a7020" stroke-width="1.2"/>
+        <rect x="1" y="26" width="20" height="3" rx="1.5" fill="#a08010" opacity="0.7"/>
+        <text x="11" y="72" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#706010" font-weight="700">turbid</text>
+      </g>
+      <g transform="translate(88,0)">
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="#f0e8c8" opacity="0.95"/>
+        <rect x="4" y="50" width="12" height="8" rx="1" fill="rgba(180,160,100,0.4)"/>
+        <path d="M2,28 L20,28 L18,60 L4,60 Z" fill="none" stroke="#8a7020" stroke-width="1.2"/>
+        <rect x="1" y="26" width="20" height="3" rx="1.5" fill="#a08010" opacity="0.7"/>
+        <text x="11" y="72" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#8a7a50" font-weight="700">milky</text>
+      </g>
+    </svg>
+
+    <div class="page-header-text">
+      <h1>Urine Clarity</h1>
+      <p>Descriptions are shown. Drag the correct non-path and pathological cause into each row.</p>
+    </div>
+    <span class="section-tag">Clarity</span>
+  </div>
+
+  <div class="controls">
+    <button class="checkBtn" id="clarityCheckBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="clarityResetBtn">↺ Reset</button>
+    <button class="seeAnswersBtn" id="clarityAnswersBtn">See All Answers</button>
+    <div class="score" id="clarityScoreMsg"></div>
+  </div>
+
+  <div class="answers-panel" id="clarityAnswersPanel">
+    <h3>Answers — Urine Clarity</h3>
+    <table>
+      <thead><tr><th>Clarity</th><th>Description</th><th>Non-pathological</th><th>Pathological</th></tr></thead>
+      <tbody id="clarityAnswerBody"></tbody>
+    </table>
+  </div>
+
+  <div class="clarity-activity-layout">
+    <div class="clarity-bank">
+      <h2>Non-path Causes</h2>
+      <p class="hint">Use each once</p>
+      <div id="clarityNonPathBank"></div>
+    </div>
+
+    <div class="col-section">
+      <div class="col-title">Urine Clarity Correlation</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:10%;">Cup</th>
+            <th style="width:15%;">Clarity</th>
+            <th style="width:25%;">Description</th>
+            <th>Non-path Causes</th>
+            <th>Pathological Causes</th>
+          </tr>
+        </thead>
+        <tbody id="clarityTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="clarity-bank">
+      <h2>Pathological Causes</h2>
+      <p class="hint">Use each once</p>
+      <div id="clarityPathBank"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ========= SVG HELPERS ========= */
+let _uid = 0;
+function uid(){ return 'u' + (_uid++); }
+
+/* Draw a simple urine cup as an SVG string
+   opts: { liq, foam, opacity, particles, w, h, icto, ictoColor, tag, plasmaColor }
+*/
+function cupSVG(opts){
+  const w = opts.w || 44;
+  const h = opts.h || 58;
+  const id = uid();
+
+  const topW = w * 0.84;
+  const botW = w * 0.60;
+  const cupTop = h * 0.05;
+  const cupH   = h * 0.68;
+  const cupBot = cupTop + cupH;
+  const cx = w / 2;
+  const cr = w * 0.05;
+
+  // trapezoid points
+  const tx1 = cx - topW/2, tx2 = cx + topW/2;
+  const bx1 = cx - botW/2, bx2 = cx + botW/2;
+
+  // liquid fill (bottom 80% of cup)
+  const liqFrac = 0.80;
+  const liqTop = cupTop + cupH * (1 - liqFrac);
+  const liqTopW = botW + (topW - botW) * liqFrac;
+  const lx1 = cx - liqTopW/2, lx2 = cx + liqTopW/2;
+
+  const op = typeof opts.opacity === 'number' ? opts.opacity : 1;
+  const liqColor = opts.liq || '#ddb800';
+  const foamColor = opts.foam;
+
+  // foam height
+  const foamFrac = foamColor ? 0.14 : 0;
+  const foamH = cupH * foamFrac;
+  const foamBot = liqTop + foamH;
+
+  let d = `<defs>
+    <clipPath id="clip-${id}">
+      <path d="M${tx1},${cupTop} L${tx2},${cupTop} L${bx2},${cupBot-cr} Q${bx2},${cupBot} ${bx2-cr},${cupBot} L${bx1+cr},${cupBot} Q${bx1},${cupBot} ${bx1},${cupBot-cr} Z"/>
+    </clipPath>
+  </defs>`;
+
+  // main liquid
+  const liqY = foamColor ? foamBot : liqTop;
+  d += `<rect x="${lx1}" y="${liqY}" width="${lx2-lx1}" height="${cupBot-liqY}" fill="${liqColor}" opacity="${op}" clip-path="url(#clip-${id})"/>`;
+
+  // foam
+  if(foamColor){
+    d += `<rect x="${lx1}" y="${liqTop}" width="${lx2-lx1}" height="${foamH}" fill="${foamColor}" opacity="0.9" clip-path="url(#clip-${id})"/>`;
+    for(let i=0;i<5;i++){
+      const bbx = lx1 + (lx2-lx1)*(0.1+i*0.18);
+      const bby = liqTop + foamH*0.45;
+      d += `<circle cx="${bbx}" cy="${bby}" r="${w*0.05}" fill="rgba(255,255,255,0.5)" clip-path="url(#clip-${id})"/>`;
+    }
+  }
+
+  // particles for turbidity
+  if(opts.particles){
+    const pts = opts.particles;
+    const seed = id.charCodeAt(1)||7;
+    for(let i=0;i<pts;i++){
+      const px = lx1+3 + ((seed*(i+3)*37)%(lx2-lx1-6));
+      const py = liqTop+3 + ((seed*(i+7)*53)%(cupBot-liqTop-6));
+      d += `<circle cx="${px}" cy="${py}" r="${1+((i%3)*0.6)}" fill="rgba(180,150,80,0.65)" clip-path="url(#clip-${id})"/>`;
+    }
+  }
+
+  // pellet at bottom
+  if(opts.pellet){
+    const pelletW = (bx2-bx1)*0.55;
+    const pelletH = cupH*0.09;
+    d += `<ellipse cx="${cx}" cy="${cupBot-pelletH*0.6}" rx="${pelletW/2}" ry="${pelletH/2}" fill="${opts.pelletColor||'#c0002a'}" opacity="0.92" clip-path="url(#clip-${id})"/>`;
+  }
+
+  // shine
+  d += `<rect x="${bx1+2}" y="${liqTop+3}" width="${(bx2-bx1)*0.16}" height="${(cupBot-liqTop)*0.5}" rx="2" fill="rgba(255,255,255,0.20)"/>`;
+
+  // cup outline
+  d += `<path d="M${tx1},${cupTop} L${tx2},${cupTop} L${bx2},${cupBot-cr} Q${bx2},${cupBot} ${bx2-cr},${cupBot} L${bx1+cr},${cupBot} Q${bx1},${cupBot} ${bx1},${cupBot-cr} Z" fill="none" stroke="#7a6a5a" stroke-width="1.4"/>`;
+  d += `<line x1="${tx1-1}" y1="${cupTop}" x2="${tx2+1}" y2="${cupTop}" stroke="#7a6a5a" stroke-width="2" stroke-linecap="round"/>`;
+
+  let totalH = cupBot + h*0.04;
+
+  // ictotest pad below cup
+  if(opts.icto){
+    const padW = w*0.70;
+    const padH = w*0.20;
+    const padX = cx - padW/2;
+    const padY = cupBot + h*0.04;
+    const padColor = opts.ictoColor === 'purple' ? '#7b2fa3' : '#c8aa00';
+    d += `<rect x="${padX}" y="${padY}" width="${padW}" height="${padH}" rx="3" fill="${padColor}" opacity="0.92"/>`;
+    d += `<text x="${cx}" y="${padY + padH*0.72}" text-anchor="middle" font-family="'DM Mono',monospace" font-weight="700" font-size="${padH*0.60}" fill="#fff">${opts.icto}</text>`;
+    totalH = padY + padH + h*0.03;
+  }
+
+  // tag label
+  if(opts.tag){
+    const tagY = totalH + h*0.06;
+    d += `<text x="${cx}" y="${tagY}" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="${w*0.13}" fill="#6b5040" font-style="italic">${opts.tag}</text>`;
+    totalH = tagY + w*0.04;
+  }
+
+  return `<svg width="${w}" height="${Math.round(totalH)}" viewBox="0 0 ${w} ${Math.round(totalH)}" xmlns="http://www.w3.org/2000/svg">${d}</svg>`;
+}
+
+/* Draw a plasma tube (tall thin rectangle with rounded bottom) */
+function plasmaSVG(color, label, h){
+  h = h || 52;
+  const w = 16;
+  const cx = w/2;
+  const tubeH = h*0.70;
+  const tubeTop = h*0.05;
+  const tubeBot = tubeTop + tubeH;
+  const cr = 3;
+
+  let d = '';
+  // tube fill
+  d += `<rect x="3" y="${tubeTop+tubeH*0.2}" width="${w-6}" height="${tubeH*0.8}" rx="${cr}" fill="${color}" opacity="0.88"/>`;
+  // stopper top
+  d += `<rect x="2" y="${tubeTop}" width="${w-4}" height="${tubeH*0.12}" rx="2" fill="#444"/>`;
+  // tube outline
+  d += `<rect x="3" y="${tubeTop}" width="${w-6}" height="${tubeH}" rx="${cr}" fill="none" stroke="#7a7060" stroke-width="1.2"/>`;
+  // shine
+  d += `<rect x="5" y="${tubeTop+tubeH*0.22}" width="2.5" height="${tubeH*0.45}" rx="1" fill="rgba(255,255,255,0.30)"/>`;
+  // label
+  if(label){
+    d += `<text x="${cx}" y="${tubeBot + h*0.14}" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#6b5040" font-style="italic">${label}</text>`;
+  }
+  const totalH = tubeBot + (label ? h*0.20 : h*0.04);
+  return `<svg width="${w}" height="${Math.round(totalH)}" viewBox="0 0 ${w} ${Math.round(totalH)}" xmlns="http://www.w3.org/2000/svg">${d}</svg>`;
+}
+
+/* arrow between elements */
+function arrowSVG(h){
+  h = h||36;
+  return `<svg width="12" height="${h}" viewBox="0 0 12 ${h}" xmlns="http://www.w3.org/2000/svg"><line x1="6" y1="4" x2="6" y2="${h-8}" stroke="#9a8a78" stroke-width="1.5"/><polygon points="6,${h-4} 3,${h-10} 9,${h-10}" fill="#9a8a78"/></svg>`;
+}
+
+/* Build the cup HTML for a row — may be multiple cups + plasma tubes */
+function buildCupHTML(row){
+  if(row.cups){
+    // multi-cup row: array of cup/plasma specs
+    const parts = row.cups.map(c => {
+      if(c.type === 'cup') return cupSVG(c);
+      if(c.type === 'plasma') return plasmaSVG(c.color, c.label, 52);
+      if(c.type === 'arrow') return arrowSVG(c.h||36);
+      return '';
+    });
+    return `<div class="cup-wrap" style="flex-wrap:wrap;gap:2px;">${parts.join('')}</div>`;
+  }
+  return `<div class="cup-wrap">${cupSVG(row.cup||{})}</div>`;
+}
+
+/* ========= COLOR DATA ========= */
+/*
+  For hematuria: show a red cup with a pellet, then arrow, then clear cup with red pellet
+  For hemoglobin: red cup + plasma tube (red plasma)
+  For myoglobin: red cup + plasma tube (clear/yellow plasma)
+*/
+const colorRows = [
+  // Slide 27: colorless = Low specific gravity or Water
+  { id:"colorless",    color:"Colorless",                                     cause:"Low specific gravity or Water",
+    cup:{liq:"#f0eee8", opacity:1, w:44} },
+  // Slide 27: pale yellow = low SG (polyuria, DI) OR high SG (diabetes mellitus) — two separate causes, both on slide 27
+  { id:"paleyellowlow",   color:"Pale yellow (low SG)",                       cause:"Dilute urine – polyuria, diabetes insipidus",
+    cup:{liq:"#f2e870", opacity:1, w:44} },
+  { id:"paleyellowhigh",  color:"Pale yellow (high SG)",                      cause:"Diabetes mellitus",
+    cup:{liq:"#e8dc50", opacity:1, w:44} },
+  // Slides 6/8: normal yellow = urochrome; concentrated = dark yellow
+  { id:"yellow",       color:"Yellow",                                        cause:"Normal (urochrome)",
+    cup:{liq:"#ddb800", opacity:1, w:44} },
+  { id:"darkyellowamber", color:"Dark yellow / Amber",                        cause:"Concentrated urine OR bilirubin",
+    cup:{liq:"#b87800", opacity:1, w:44} },
+  // Slides 12/14/29: orange + yellow foam
+  { id:"orange1",      color:"Orange + yellow foam (bilirubin POSITIVE)",     cause:"Bilirubin – liver or biliary disease",
+    cup:{liq:"#e86a00", foam:"#d4b800", opacity:1, icto:"+", ictoColor:"purple", w:44} },
+  { id:"orange2",      color:"Orange + yellow foam (bilirubin NEGATIVE)",     cause:"Pyridium (phenazopyridine) – UTI drug",
+    cup:{liq:"#e86a00", foam:"#d4b800", opacity:1, icto:"-", ictoColor:"yellow", w:44} },
+  // Slides 10/13: urobilin, photo-oxidation, no foam
+  { id:"orangebrown",  color:"Orange-brown (no foam)",                        cause:"Urobilin – photo-oxidation of urobilinogen",
+    cup:{liq:"#9a4a00", opacity:1, w:44} },
+  // Slide 15: yellow-green = biliverdin
+  { id:"yellowgreen",  color:"Yellow-green",                                  cause:"Biliverdin – photo-oxidation of bilirubin",
+    cup:{liq:"#8ab800", opacity:1, w:44} },
+
+  /* Slides 17/110: Hematuria = red + cloudy, RBCs produce pellet when spun */
+  { id:"red1", color:"Red + CLOUDY, pellet when spun",  cause:"Hematuria (intact RBCs)",
+    cups:[
+      {type:'cup', liq:"#c0002a", opacity:0.52, particles:14, w:40},
+      {type:'arrow', h:32},
+      {type:'cup', liq:"#f2e870", opacity:1, pellet:true, pelletColor:"#c0002a", w:40}
+    ]},
+
+  /* Slides 18/19/118: Hemoglobinuria = red + clear, red plasma */
+  { id:"red2", color:"Red + clear + RED plasma when spun", cause:"Hemoglobinuria – in vivo hemolysis",
+    cups:[
+      {type:'cup', liq:"#c0002a", opacity:1, w:40},
+      {type:'plasma', color:"#c0002a", label:"red plasma"}
+    ]},
+
+  /* Slides 18/19/118: Myoglobinuria = red + clear, clear/normal plasma */
+  { id:"red3", color:"Red + clear + NORMAL plasma when spun", cause:"Myoglobinuria – skeletal muscle breakdown",
+    cups:[
+      {type:'cup', liq:"#b00030", opacity:1, w:40},
+      {type:'plasma', color:"#f0e070", label:"nml plasma"}
+    ]},
+
+  // Slide 21: port wine red = porphyrins (oxidation of porphobilinogen)
+  { id:"red4",         color:"Port wine red",                                 cause:"Porphyrins – oxidation of porphobilinogen",
+    cup:{liq:"#6b0030", opacity:1, w:44} },
+  // Slide 22: non-path red — rifampin listed as antibacterial, phenothiazine added from slide
+  { id:"red5",         color:"Red (non-pathological)",                        cause:"Menstruation, beets, blackberries, rifampin, phenothiazine",
+    cup:{liq:"#c0003a", opacity:1, w:44} },
+  // Slides 16/28: brown = hemoglobin oxidized to methemoglobin
+  { id:"brown",        color:"Brown",                                         cause:"Methemoglobin – hemoglobin oxidized in acid urine",
+    cup:{liq:"#5a2800", opacity:1, w:44} },
+  // Slide 23: brown/black on standing
+  { id:"brownblack1",  color:"Brown/black on standing (blood negative)",      cause:"Melanin – melanogen oxidizes (malignant melanoma)",
+    cup:{liq:"#241208", opacity:1, w:44} },
+  { id:"brownblack2",  color:"Brown/black on standing (blood negative)",      cause:"Homogentisic acid – alkaptonuria (alkaline urine)",
+    cup:{liq:"#1a0e06", opacity:1, w:44} },
+  // Slide 24: brown/black medications
+  { id:"brownblack3",  color:"Brown/black (medications)",                     cause:"Levodopa (Parkinson's), phenol derivatives, metronidazole",
+    cup:{liq:"#1e1208", opacity:1, w:44} },
+  // Slide 25: green-blue = Pseudomonas
+  { id:"greenblue",    color:"Green-blue",                                    cause:"Pseudomonas aeruginosa infection",
+    cup:{liq:"#006b6b", opacity:1, w:44} },
+  // Slide 25: blue = indican, intestinal infection, Tryptophan → indole → indican
+  { id:"blue1",        color:"Blue",                                          cause:"Indican – intestinal infection (Tryptophan → indole → indican)",
+    cup:{liq:"#1a48b0", opacity:1, w:44} },
+  // Slide 26: blue/green = medications
+  { id:"bluegreen",    color:"Blue-green (medications)",                      cause:"Methocarbamol, amitriptyline, breath mints (Clorets/chlorophyll)",
+    cup:{liq:"#007b6b", opacity:1, w:44} },
+  // Slide 25: purple = Klebsiella/Providencia in catheter bag
+  { id:"purple",       color:"Purple (catheter bag only)",                    cause:"Klebsiella or Providencia sp. – chemical in catheter bag",
+    cup:{liq:"#6b1ab0", opacity:1, w:44} }
+];
+
+// Slide 32: clarity definitions. Slide 33: non-path causes. Slide 34: pathological causes.
+// Slides 33/34 give a general list not tiered by clarity level — nonpath/path answers reflect the slide lists.
+const clarityRows = [
+  { id:"clear",  label:"Clear",   description:"No visible particulates, transparent",
+    // Slide 31: normal freshly voided is clear. Slide 34: clear is not always normal
+    nonpath:"Normal freshly voided urine",
+    path:"Chemical abnormalities (glucose, bilirubin) – no particulates",
+    cup:{liq:"#ddb800", opacity:1, w:40} },
+  { id:"hazy",   label:"Hazy / Slightly cloudy", description:"Few particulates, print easily seen through",
+    // Slide 33: squamous epithelial cells, mucus, crystals. Slide 34: RBC, WBC, bacteria
+    nonpath:"Squamous epithelial cells, mucus, few crystals",
+    path:"Few RBCs, WBCs, or bacteria",
+    cup:{liq:"#ddb800", opacity:0.78, particles:4, w:40} },
+  { id:"cloudy", label:"Cloudy",  description:"Many particulates, print blurred",
+    // Slide 33: semen, fecal contamination, crystals, radiographic contrast media
+    nonpath:"Crystals (amorphous), semen, fecal contamination",
+    path:"RBCs, WBCs, bacteria, yeast",
+    cup:{liq:"#c4a200", opacity:0.52, particles:10, w:40} },
+  { id:"turbid", label:"Turbid",  description:"Print cannot be seen through urine",
+    // Slide 33: crystals, talcum powder, medications. Slide 34: abnormal crystals, lipids, lymph fluid
+    nonpath:"Heavy amorphous crystal precipitation, radiographic contrast media",
+    path:"Non-squamous epithelial cells, abnormal crystals, lymph fluid, lipids",
+    cup:{liq:"#a88800", opacity:0.32, particles:18, w:40} },
+  { id:"milky",  label:"Milky",   description:"May precipitate or be clotted",
+    // Slide 32: "may precipitate or be clotted". Slide 34: lipids, lymph fluid
+    nonpath:"Amorphous phosphates or carbonates in alkaline urine",
+    path:"Lipids (lipiduria), lymph fluid (chyluria), heavy pus",
+    cup:{liq:"#e8deb8", opacity:0.95, particles:22, w:40} }
+];
+
+/* ========= SHARED HELPERS ========= */
+function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
+function setupToggle(btnId, panelId){
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  btn.addEventListener("click", () => {
+    panel.classList.toggle("show");
+    btn.textContent = panel.classList.contains("show") ? "Hide Answers" : "See All Answers";
+  });
+}
+
+/* ========= COLOR ACTIVITY ========= */
+const colorState = {};
+let colorDragItem = null;
+let colorDragFrom = null;
+
+function colorSlotKey(id){ return `color__${id}`; }
+function colorGetState(key){ return colorState[key] || null; }
+function colorSetState(key, value){ if(value==null) delete colorState[key]; else colorState[key]=value; }
+function colorCount(value){ return Object.values(colorState).filter(v=>v&&v.value===value).length; }
+function colorMax(value){ return colorRows.filter(r=>r.cause===value).length; }
+
+function buildColorBank(){
+  const values = [...new Set(colorRows.map(r=>r.cause))];
+  const wrap = document.getElementById("colorBank");
+  wrap.innerHTML = "";
+  shuffle(values).forEach(value => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.dataset.value = value;
+    chip.draggable = true;
+    chip.textContent = value;
+    chip.addEventListener("dragstart", e => {
+      if(colorCount(value) >= colorMax(value)){ e.preventDefault(); return; }
+      colorDragItem = { value };
+      colorDragFrom = null;
+      chip.classList.add("dragging");
+    });
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    wrap.appendChild(chip);
+  });
+}
+function renderColorBankUsage(){
+  document.querySelectorAll("#colorBank .chip").forEach(chip => {
+    chip.classList.toggle("used", colorCount(chip.dataset.value) >= colorMax(chip.dataset.value));
+  });
+}
+function makeColorDropzone(rowId){
+  const key = colorSlotKey(rowId);
+  const dz = document.createElement("div");
+  dz.className = "dropzone";
+  dz.id = `slot-${key}`;
+  dz.draggable = true;
+  renderColorSlotContent(dz, null);
+  dz.addEventListener("dragover", e => { if(colorDragItem){ e.preventDefault(); dz.classList.add("drag-over"); }});
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("drag-over");
+    if(!colorDragItem) return;
+    const existing = colorGetState(key);
+    const movingSame = colorDragFrom && colorGetState(colorDragFrom)?.value === colorDragItem.value;
+    if(colorCount(colorDragItem.value) >= colorMax(colorDragItem.value) && !movingSame){ colorDragItem=null; colorDragFrom=null; return; }
+    if(colorDragFrom && colorDragFrom !== key){
+      colorSetState(colorDragFrom, existing || null);
+      renderColorSlot(colorDragFrom);
+    }
+    colorSetState(key, { value: colorDragItem.value });
+    renderColorSlot(key);
+    colorDragItem = null; colorDragFrom = null;
+    clearColorMarks(); renderColorBankUsage();
+  });
+  dz.addEventListener("click", () => { if(!colorGetState(key)) return; colorSetState(key, null); renderColorSlot(key); clearColorMarks(); renderColorBankUsage(); });
+  dz.addEventListener("dragstart", e => { const cur=colorGetState(key); if(!cur){ e.preventDefault(); return; } colorDragItem={...cur}; colorDragFrom=key; });
+  return dz;
+}
+function renderColorSlotContent(el, value){
+  if(!value){ el.innerHTML=`<div class="placeholder">— drop —</div>`; el.classList.remove("filled"); }
+  else { el.textContent=value.value; el.classList.add("filled"); }
+}
+function renderColorSlot(key){ const el=document.getElementById(`slot-${key}`); if(!el) return; el.classList.remove("correct","wrong"); renderColorSlotContent(el, colorGetState(key)); }
+function clearColorMarks(){ document.querySelectorAll("#colorTableBody .dropzone").forEach(z=>z.classList.remove("correct","wrong")); const msg=document.getElementById("colorScoreMsg"); msg.textContent=""; msg.className="score"; }
+
+function buildColorTable(){
+  const body = document.getElementById("colorTableBody");
+  body.innerHTML = "";
+  // 3-column layout: leftCol rows [0..10], rightCol rows [11..20]
+  const mid = Math.ceil(colorRows.length / 2);
+  const leftRows  = colorRows.slice(0, mid);
+  const rightRows = colorRows.slice(mid);
+  for(let i=0; i<mid; i++){
+    const tr = document.createElement("tr");
+    const left = leftRows[i];
+
+    const lCup = document.createElement("td"); lCup.className="cup-cell";
+    lCup.innerHTML = buildCupHTML(left); tr.appendChild(lCup);
+
+    const lLabel = document.createElement("td");
+    lLabel.innerHTML = `<div class="row-label">${left.color}</div>`; tr.appendChild(lLabel);
+
+    const lDrop = document.createElement("td");
+    lDrop.appendChild(makeColorDropzone(left.id)); tr.appendChild(lDrop);
+
+    const right = rightRows[i];
+    if(right){
+      const rCup = document.createElement("td"); rCup.className="cup-cell";
+      rCup.innerHTML = buildCupHTML(right); tr.appendChild(rCup);
+
+      const rLabel = document.createElement("td");
+      rLabel.innerHTML = `<div class="row-label">${right.color}</div>`; tr.appendChild(rLabel);
+
+      const rDrop = document.createElement("td");
+      rDrop.appendChild(makeColorDropzone(right.id)); tr.appendChild(rDrop);
+    } else {
+      tr.appendChild(document.createElement("td"));
+      tr.appendChild(document.createElement("td"));
+      tr.appendChild(document.createElement("td"));
+    }
+    body.appendChild(tr);
+  }
+}
+function buildColorAnswers(){
+  document.getElementById("colorAnswerBody").innerHTML =
+    colorRows.map(r=>`<tr><td>${r.color}</td><td>${r.cause}</td></tr>`).join("");
+}
+function checkColorAnswers(){
+  let correct=0, total=0;
+  colorRows.forEach(row => {
+    total++; const key=colorSlotKey(row.id); const el=document.getElementById(`slot-${key}`); const cur=colorGetState(key);
+    el.classList.remove("correct","wrong");
+    if(cur && cur.value===row.cause){ el.classList.add("correct"); correct++; } else el.classList.add("wrong");
+  });
+  const msg=document.getElementById("colorScoreMsg"); msg.textContent=`${correct}/${total} correct`; msg.className=`score ${correct===total?"good":"bad"}`;
+}
+function resetColor(){
+  Object.keys(colorState).forEach(k=>delete colorState[k]);
+  buildColorBank();
+  colorRows.forEach(row=>renderColorSlot(colorSlotKey(row.id)));
+  clearColorMarks(); renderColorBankUsage();
+}
+
+/* ========= CLARITY ACTIVITY ========= */
+const clarityNonState = {};
+const clarityPathState = {};
+let clarityDragItem = null;
+let clarityDragFrom = null;
+
+function cSlotKey(type, id){ return `clarity__${type}__${id}`; }
+function cObj(type){ return type==="non" ? clarityNonState : clarityPathState; }
+function cGet(type, key){ return cObj(type)[key] || null; }
+function cSet(type, key, value){ const obj=cObj(type); if(value==null) delete obj[key]; else obj[key]=value; }
+function cCount(type, value){ return Object.values(cObj(type)).filter(v=>v&&v.value===value).length; }
+
+function buildClarityBank(type, wrapperId){
+  const wrap = document.getElementById(wrapperId); wrap.innerHTML="";
+  const values = clarityRows.map(r => type==="non" ? r.nonpath : r.path);
+  shuffle(values).forEach(value => {
+    const chip = document.createElement("div");
+    chip.className="chip"; chip.dataset.type=type; chip.dataset.value=value; chip.draggable=true; chip.textContent=value;
+    chip.addEventListener("dragstart", e => {
+      if(cCount(type, value)>=1){ e.preventDefault(); return; }
+      clarityDragItem={type,value}; clarityDragFrom=null; chip.classList.add("dragging");
+    });
+    chip.addEventListener("dragend", ()=>chip.classList.remove("dragging"));
+    wrap.appendChild(chip);
+  });
+}
+function renderClarityBankUsage(){
+  document.querySelectorAll("#clarityNonPathBank .chip, #clarityPathBank .chip").forEach(chip=>{
+    chip.classList.toggle("used", cCount(chip.dataset.type, chip.dataset.value)>=1);
+  });
+}
+function makeClarityDZ(type, rowId){
+  const key = cSlotKey(type, rowId);
+  const dz = document.createElement("div");
+  dz.className="dropzone"; dz.id=`cslot-${type}-${rowId}`; dz.draggable=true;
+  renderClaritySlotContent(dz, null);
+  dz.addEventListener("dragover", e => { if(clarityDragItem && clarityDragItem.type===type){ e.preventDefault(); dz.classList.add("drag-over"); }});
+  dz.addEventListener("dragleave", ()=>dz.classList.remove("drag-over"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("drag-over");
+    if(!clarityDragItem || clarityDragItem.type!==type) return;
+    const existing=cGet(type,key);
+    const movingSame=clarityDragFrom && cGet(type,clarityDragFrom)?.value===clarityDragItem.value;
+    if(cCount(type,clarityDragItem.value)>=1 && !movingSame){ clarityDragItem=null; clarityDragFrom=null; return; }
+    if(clarityDragFrom && clarityDragFrom!==key){
+      cSet(type, clarityDragFrom, existing||null);
+      renderClaritySlot(type, clarityDragFrom.split("__")[2]);
+    }
+    cSet(type, key, {value:clarityDragItem.value});
+    renderClaritySlot(type, rowId);
+    clarityDragItem=null; clarityDragFrom=null;
+    clearClarityMarks(); renderClarityBankUsage();
+  });
+  dz.addEventListener("click", ()=>{ if(!cGet(type,key)) return; cSet(type,key,null); renderClaritySlot(type,rowId); clearClarityMarks(); renderClarityBankUsage(); });
+  dz.addEventListener("dragstart", e=>{ const cur=cGet(type,key); if(!cur){ e.preventDefault(); return; } clarityDragItem={type,...cur}; clarityDragFrom=key; });
+  return dz;
+}
+function renderClaritySlotContent(el, value){
+  if(!value){ el.innerHTML=`<div class="placeholder">— drop —</div>`; el.classList.remove("filled"); }
+  else { el.textContent=value.value; el.classList.add("filled"); }
+}
+function renderClaritySlot(type, rowId){
+  const el=document.getElementById(`cslot-${type}-${rowId}`); if(!el) return;
+  el.classList.remove("correct","wrong");
+  renderClaritySlotContent(el, cGet(type, cSlotKey(type, rowId)));
+}
+function clearClarityMarks(){
+  document.querySelectorAll("#clarityTableBody .dropzone").forEach(z=>z.classList.remove("correct","wrong"));
+  const msg=document.getElementById("clarityScoreMsg"); msg.textContent=""; msg.className="score";
+}
+function buildClarityTable(){
+  const body=document.getElementById("clarityTableBody"); body.innerHTML="";
+  clarityRows.forEach(row=>{
+    const tr=document.createElement("tr");
+
+    const cupTd=document.createElement("td"); cupTd.className="cup-cell";
+    cupTd.innerHTML=`<div class="cup-wrap">${cupSVG(row.cup)}</div>`; tr.appendChild(cupTd);
+
+    const labelTd=document.createElement("td");
+    labelTd.innerHTML=`<div class="row-label">${row.label}</div>`; tr.appendChild(labelTd);
+
+    const descTd=document.createElement("td");
+    descTd.innerHTML=`<div class="static-cell">${row.description}</div>`; tr.appendChild(descTd);
+
+    const nonTd=document.createElement("td"); nonTd.appendChild(makeClarityDZ("non", row.id)); tr.appendChild(nonTd);
+    const pathTd=document.createElement("td"); pathTd.appendChild(makeClarityDZ("path", row.id)); tr.appendChild(pathTd);
+
+    body.appendChild(tr);
+  });
+}
+function buildClarityAnswers(){
+  document.getElementById("clarityAnswerBody").innerHTML =
+    clarityRows.map(r=>`<tr><td>${r.label}</td><td>${r.description}</td><td>${r.nonpath}</td><td>${r.path}</td></tr>`).join("");
+}
+function checkClarityAnswers(){
+  let correct=0, total=0;
+  clarityRows.forEach(row=>{
+    [{type:"non",answer:row.nonpath},{type:"path",answer:row.path}].forEach(item=>{
+      total++;
+      const key=cSlotKey(item.type, row.id);
+      const el=document.getElementById(`cslot-${item.type}-${row.id}`);
+      const cur=cGet(item.type, key);
+      el.classList.remove("correct","wrong");
+      if(cur && cur.value===item.answer){ el.classList.add("correct"); correct++; } else el.classList.add("wrong");
+    });
+  });
+  const msg=document.getElementById("clarityScoreMsg"); msg.textContent=`${correct}/${total} correct`; msg.className=`score ${correct===total?"good":"bad"}`;
+}
+function resetClarity(){
+  Object.keys(clarityNonState).forEach(k=>delete clarityNonState[k]);
+  Object.keys(clarityPathState).forEach(k=>delete clarityPathState[k]);
+  buildClarityBank("non","clarityNonPathBank");
+  buildClarityBank("path","clarityPathBank");
+  clarityRows.forEach(row=>{ renderClaritySlot("non",row.id); renderClaritySlot("path",row.id); });
+  clearClarityMarks();
+}
+
+/* ========= INIT ========= */
+buildColorTable();
+buildColorAnswers();
+resetColor();
+document.getElementById("colorCheckBtn").addEventListener("click", checkColorAnswers);
+document.getElementById("colorResetBtn").addEventListener("click", resetColor);
+setupToggle("colorAnswersBtn","colorAnswersPanel");
+
+buildClarityBank("non","clarityNonPathBank");
+buildClarityBank("path","clarityPathBank");
+buildClarityTable();
+buildClarityAnswers();
+document.getElementById("clarityCheckBtn").addEventListener("click", checkClarityAnswers);
+document.getElementById("clarityResetBtn").addEventListener("click", resetClarity);
+setupToggle("clarityAnswersBtn","clarityAnswersPanel");
+</script>
+</body>
+</html>
