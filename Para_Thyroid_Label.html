@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Parathyroid + Hypercalcemia Drag-and-Drop Study Tool</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
+
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #eef2f7;
+    --panel: #f5f8fc;
+    --header: #2d5fa6;
+    --accent: #f0a500;
+    --border: #c5d3e8;
+    --text: #111;
+    --muted: #556;
+    --drop: #f8faff;
+    --drop-border: #2d5fa6;
+    --good: #1a8c50;
+    --bad: #c0392b;
+    --shadow: 0 2px 14px rgba(30,60,120,.10);
+    --strip-bg: #e8e0d5;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 12px;
+  }
+
+  .wrap { max-width: 1300px; margin: 0 auto; }
+
+  header {
+    background: var(--header);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+
+  header h1 { margin: 0; font-size: 1.3rem; font-weight: 900; color: #ffd166; }
+  header p  { margin: 3px 0 0; font-size: .71rem; color: #c5d8f5; line-height: 1.4; }
+
+  .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #1a1a1a;
+    font-weight: 900;
+    font-size: .68rem;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: var(--shadow);
+    align-items: center;
+  }
+
+  button {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: .82rem;
+  }
+
+  .checkBtn { background: #1f3a6e; color: #fff; }
+  .resetBtn { background: #d9dfe8; color: #333; }
+  .keyBtn   { background: #5a3a00; color: #ffd599; }
+
+  /* ── ANSWER KEY ── */
+  .answer-key {
+    display: none;
+    margin-top: 16px;
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .answer-key.visible { display: block; }
+
+  .answer-key-header {
+    background: #2c1a00;
+    color: #ffd599;
+    padding: 10px 18px;
+    font-weight: 900;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .key-close-btn {
+    background: transparent;
+    color: #ffd599;
+    border: 1.5px solid #ffd599;
+    border-radius: 7px;
+    padding: 4px 10px;
+    font-size: .75rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .key-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .82rem;
+  }
+
+  .key-table th {
+    background: #3d2600;
+    color: #ffd599;
+    padding: 8px 14px;
+    text-align: left;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+
+  .key-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #dde4ee;
+    font-weight: 700;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+
+  .key-table tbody tr:nth-child(even) td { background: #f0f5fb; }
+  .key-table tbody tr:hover td { background: #fffbf0; }
+
+  .key-pad-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 900;
+    font-size: .75rem;
+    color: rgba(0,0,0,.65);
+  }
+
+  .score {
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    min-height: 32px;
+    font-size: .82rem;
+  }
+  .score.good { background: #e2f5eb; color: var(--good); }
+  .score.bad  { background: #fff0ee; color: var(--bad); }
+
+  /* ── MAIN LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 190px 1fr 190px;
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* ── BANK ── */
+  .bank-panel {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 10px;
+  }
+
+  .bank-panel.reagent-bank { border-top: 4px solid #2d5fa6; }
+  .bank-panel.reaction-bank { border-top: 4px solid #d17a00; }
+
+  .bank-panel h2 {
+    margin: 0 0 4px;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--header);
+  }
+
+  .hint {
+    font-size: .63rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+
+  .chip {
+    background: #fff;
+    border: 2px solid #c5d3e8;
+    border-radius: 9px;
+    padding: 7px 9px;
+    margin-bottom: 6px;
+    cursor: grab;
+    user-select: none;
+    transition: .15s ease;
+    text-align: center;
+    font-weight: 800;
+    font-size: .76rem;
+    line-height: 1.35;
+    color: #1a2a4a;
+  }
+  .chip[data-col="condition"] { border-color: #8ab0dc; color: #1a3560; }
+  .chip[data-col="cause"] { border-color: #e0aa60; color: #5a3000; }
+  .chip:last-child { margin-bottom: 0; }
+  .chip.dragging   { opacity: .4; }
+  .chip.used       { opacity: .22; pointer-events: none; }
+
+  /* ── STUDY SECTION ── */
+  .strip-section {
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .section-title {
+    background: var(--header);
+    color: #fff;
+    text-align: center;
+    font-size: .95rem;
+    font-weight: 900;
+    padding: 10px 8px;
+    letter-spacing: .4px;
+  }
+
+  .strip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    align-items: stretch;
+    background: #dde4ef;
+  }
+
+  .mini-bank {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid #2d5fa6;
+  }
+
+  .mini-bank.bottom-bank { border-top-color: #d17a00; }
+
+  .mini-bank h2 {
+    margin: 0 0 4px;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--header);
+  }
+
+  .bank-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 6px;
+  }
+
+  .bank-grid .chip { margin-bottom: 0; }
+
+  .study-card {
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .study-subtitle {
+    background: #1f3a6e;
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 900;
+    padding: 8px 14px;
+    letter-spacing: .35px;
+  }
+
+  .match-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .82rem;
+  }
+
+  .match-table th {
+    background: #3d5f90;
+    color: #fff;
+    padding: 9px 12px;
+    text-align: left;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+
+  .match-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #dde4ee;
+    font-weight: 800;
+    vertical-align: middle;
+    line-height: 1.35;
+  }
+
+  .match-table tbody tr:nth-child(even) td { background: #f0f5fb; }
+  .match-table tbody tr:hover td { background: #fffbf0; }
+
+  .lab-pattern {
+    color: #1a2a4a;
+  }
+
+  .dropzone {
+    min-height: 44px;
+    background: var(--drop);
+    border: 2px dashed #b0c0da;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .15s ease;
+    padding: 4px 6px;
+    text-align: center;
+    line-height: 1.3;
+    font-weight: 800;
+    font-size: .72rem;
+    cursor: default;
+  }
+
+  .dropzone.drag-over {
+    border-color: var(--drop-border);
+    background: #ddeeff;
+    transform: scale(1.02);
+  }
+
+  .dropzone.filled {
+    border-style: solid;
+    background: #fff;
+    cursor: pointer;
+    color: #111;
+  }
+
+  .dropzone.correct {
+    background: #e2f5eb;
+    border-color: var(--good);
+    color: var(--good);
+  }
+
+  .dropzone.wrong {
+    background: #fff0ee;
+    border-color: var(--bad);
+    color: var(--bad);
+  }
+
+  .placeholder {
+    color: #8899bb;
+    font-weight: 800;
+    font-size: .57rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .multi-dropzone {
+    min-height: 150px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .multi-dropzone .chip {
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  .game-instructions {
+    font-size: .82rem;
+    color: #1a2a4a;
+    font-weight: 900;
+    margin: 0 0 10px;
+    line-height: 1.35;
+  }
+
+  .side-note {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid #2d5fa6;
+  }
+
+  .side-note.orange { border-top-color: #d17a00; }
+
+  .side-note h2 {
+    margin: 0 0 4px;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--header);
+  }
+
+  .side-note p {
+    margin: 0;
+    font-size: .68rem;
+    color: var(--muted);
+    line-height: 1.4;
+    font-weight: 800;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>🧪 Parathyroid + Hypercalcemia – Match It!</h1>
+      <p>Drag the correct chips into each section. Click a filled slot or chip in the box to remove it.</p>
+    </div>
+    <span class="badge">MATCH IT!</span>
+  </header>
+
+  <div class="controls">
+    <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="resetBtn">↺ Reset</button>
+    <button class="keyBtn" id="keyBtn">🔑 Show Answer Key</button>
+    <div class="score" id="scoreMsg"></div>
+  </div>
+
+  <div class="layout">
+
+    <div class="bank-panel reagent-bank">
+      <h2>📌 Section 1</h2>
+      <p class="hint">Match each parathyroid lab pattern to the correct condition.</p>
+      <div class="side-note">
+        <h2>Tip</h2>
+        <p>Focus on calcium first, then PTH, then phosphate.</p>
+      </div>
+    </div>
+
+    <div class="strip-section">
+      <div class="section-title">Parathyroid Match + Hypercalcemia Game</div>
+      <div class="strip-body">
+
+        <div class="mini-bank">
+          <h2>🔬 Condition Bank</h2>
+          <p class="hint">Drag to the <strong>Drop Condition</strong> column. Each chip used once.</p>
+          <div class="bank-grid" id="conditionBank"></div>
+        </div>
+
+        <div class="study-card">
+          <div class="study-subtitle">Section 1: Parathyroid Match</div>
+          <table class="match-table">
+            <thead>
+              <tr>
+                <th>Lab Pattern</th>
+                <th>Drop Condition</th>
+              </tr>
+            </thead>
+            <tbody id="parathyroidRows"></tbody>
+          </table>
+        </div>
+
+        <div class="study-card">
+          <div class="study-subtitle">Section 2: Hypercalcemia Game</div>
+          <div style="padding:14px;">
+            <p class="game-instructions">Drag ALL causes of hypercalcemia into the box</p>
+            <div class="dropzone multi-dropzone" id="causeDropzone">
+              <div class="placeholder">— drop all correct causes here —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-bank bottom-bank">
+          <h2>⚗️ Hypercalcemia Cause Bank</h2>
+          <p class="hint">Drag all correct causes into the large box. Wrong options are included.</p>
+          <div class="bank-grid" id="causeBank"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bank-panel reaction-bank">
+      <h2>📌 Section 2</h2>
+      <p class="hint">Only true causes should be inside the hypercalcemia box.</p>
+      <div class="side-note orange">
+        <h2>Goal</h2>
+        <p>All 6 correct causes present, with no wrong causes added.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="answer-key" id="answerKey">
+    <div class="answer-key-header">
+      <span>🔑 Answer Key</span>
+      <button class="key-close-btn" id="keyCloseBtn">✕ Hide</button>
+    </div>
+    <table class="key-table">
+      <thead>
+        <tr>
+          <th>Section</th>
+          <th>Prompt</th>
+          <th>Correct Answer</th>
+        </tr>
+      </thead>
+      <tbody id="keyTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
+const SECTION1 = [
+  {
+    id: "s1r1",
+    pattern: "High calcium, High PTH, Low phosphate",
+    answer: "Primary hyperparathyroidism"
+  },
+  {
+    id: "s1r2",
+    pattern: "Low or normal calcium, High PTH, Low phosphate",
+    answer: "Secondary hyperparathyroidism"
+  },
+  {
+    id: "s1r3",
+    pattern: "High calcium, Very high PTH, High phosphate",
+    answer: "Tertiary hyperparathyroidism"
+  },
+  {
+    id: "s1r4",
+    pattern: "Mild high calcium, Mild high PTH, Normal phosphate",
+    answer: "Familial hypocalciuric hypercalcemia"
+  },
+  {
+    id: "s1r5",
+    pattern: "Low calcium, Low PTH, High phosphate",
+    answer: "Hypoparathyroidism"
+  }
+];
+
+const CONDITIONS = [
+  "Primary hyperparathyroidism",
+  "Secondary hyperparathyroidism",
+  "Tertiary hyperparathyroidism",
+  "Familial hypocalciuric hypercalcemia",
+  "Hypoparathyroidism"
+];
+
+const CORRECT_CAUSES = [
+  "Hyperthyroidism",
+  "Addison disease",
+  "Diuretics",
+  "Lithium",
+  "Hypervitaminosis D",
+  "Cancer / PTHrP"
+];
+
+const WRONG_CAUSES = [
+  "Iron deficiency anemia",
+  "Hypoglycemia",
+  "Asthma"
+];
+
+const CAUSES = [...CORRECT_CAUSES, ...WRONG_CAUSES];
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const state = { section1: {}, section2: [] };
+let dragItem = null;
+let dragFrom = null;
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - .5); }
+function countConditionUse(value) { return Object.values(state.section1).filter(v => v === value).length; }
+function countCauseUse(value) { return state.section2.filter(v => v === value).length; }
+
+/* ═══════════════════════════════════════════
+   BUILD BANKS
+═══════════════════════════════════════════ */
+function buildConditionBank() {
+  const bank = document.getElementById("conditionBank");
+  bank.innerHTML = "";
+  shuffle(CONDITIONS).forEach(value => {
+    const chip = makeBankChip(value, "condition");
+    bank.appendChild(chip);
+  });
+}
+
+function buildCauseBank() {
+  const bank = document.getElementById("causeBank");
+  bank.innerHTML = "";
+  shuffle(CAUSES).forEach(value => {
+    const chip = makeBankChip(value, "cause");
+    bank.appendChild(chip);
+  });
+}
+
+function makeBankChip(value, col) {
+  const chip = document.createElement("div");
+  chip.className = "chip";
+  chip.dataset.col = col;
+  chip.dataset.val = value;
+  chip.draggable = true;
+  chip.textContent = value;
+
+  chip.addEventListener("dragstart", e => {
+    if (col === "condition" && countConditionUse(value) >= 1) { e.preventDefault(); return; }
+    if (col === "cause" && countCauseUse(value) >= 1) { e.preventDefault(); return; }
+    dragItem = { col, value };
+    dragFrom = null;
+    chip.classList.add("dragging");
+  });
+
+  chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+  return chip;
+}
+
+function refreshBankUsage() {
+  document.querySelectorAll(".chip").forEach(chip => {
+    const col = chip.dataset.col;
+    const val = chip.dataset.val;
+    const used = col === "condition" ? countConditionUse(val) : countCauseUse(val);
+    chip.classList.toggle("used", used >= 1 && chip.closest(".bank-grid"));
+  });
+}
+
+/* ═══════════════════════════════════════════
+   SECTION 1
+═══════════════════════════════════════════ */
+function buildParathyroidRows() {
+  const tbody = document.getElementById("parathyroidRows");
+  tbody.innerHTML = "";
+
+  SECTION1.forEach(row => {
+    const tr = document.createElement("tr");
+
+    const tdPattern = document.createElement("td");
+    tdPattern.className = "lab-pattern";
+    tdPattern.textContent = row.pattern;
+
+    const tdDrop = document.createElement("td");
+    const dz = makeSingleDropzone(row.id);
+    tdDrop.appendChild(dz);
+
+    tr.appendChild(tdPattern);
+    tr.appendChild(tdDrop);
+    tbody.appendChild(tr);
+  });
+}
+
+function makeSingleDropzone(rowId) {
+  const dz = document.createElement("div");
+  dz.className = "dropzone";
+  dz.id = `slot-${rowId}`;
+  dz.draggable = true;
+  renderSingleSlot(rowId);
+
+  dz.addEventListener("dragover", e => {
+    if (dragItem && dragItem.col === "condition") { e.preventDefault(); dz.classList.add("drag-over"); }
+  });
+
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    if (!dragItem || dragItem.col !== "condition") return;
+
+    const value = dragItem.value;
+    const existing = state.section1[rowId] || null;
+    const movingSame = dragFrom && dragFrom.type === "section1" && state.section1[dragFrom.id] === value;
+    const atMax = countConditionUse(value) >= 1;
+    if (atMax && !movingSame) { dragItem = null; dragFrom = null; return; }
+
+    if (dragFrom && dragFrom.type === "section1" && dragFrom.id !== rowId) {
+      if (existing) state.section1[dragFrom.id] = existing;
+      else delete state.section1[dragFrom.id];
+      renderSingleSlot(dragFrom.id);
+    }
+
+    state.section1[rowId] = value;
+    renderSingleSlot(rowId);
+    clearMarks(); refreshBankUsage();
+    dragItem = null; dragFrom = null;
+  });
+
+  dz.addEventListener("click", () => {
+    if (!state.section1[rowId]) return;
+    delete state.section1[rowId];
+    renderSingleSlot(rowId);
+    clearMarks(); refreshBankUsage();
+  });
+
+  dz.addEventListener("dragstart", e => {
+    const value = state.section1[rowId];
+    if (!value) { e.preventDefault(); return; }
+    dragItem = { col: "condition", value };
+    dragFrom = { type: "section1", id: rowId };
+  });
+
+  return dz;
+}
+
+function renderSingleSlot(rowId) {
+  const el = document.getElementById(`slot-${rowId}`);
+  if (!el) return;
+  el.classList.remove("correct", "wrong", "filled");
+  const value = state.section1[rowId];
+  if (!value) el.innerHTML = `<div class="placeholder">— drop here —</div>`;
+  else { el.textContent = value; el.classList.add("filled"); }
+}
+
+/* ═══════════════════════════════════════════
+   SECTION 2
+═══════════════════════════════════════════ */
+function setupCauseDropzone() {
+  const dz = document.getElementById("causeDropzone");
+
+  dz.addEventListener("dragover", e => {
+    if (dragItem && dragItem.col === "cause") { e.preventDefault(); dz.classList.add("drag-over"); }
+  });
+
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    if (!dragItem || dragItem.col !== "cause") return;
+    const value = dragItem.value;
+    if (countCauseUse(value) >= 1 && !(dragFrom && dragFrom.type === "section2")) { dragItem = null; dragFrom = null; return; }
+    if (!state.section2.includes(value)) state.section2.push(value);
+    renderCauseBox();
+    clearMarks(); refreshBankUsage();
+    dragItem = null; dragFrom = null;
+  });
+}
+
+function renderCauseBox() {
+  const dz = document.getElementById("causeDropzone");
+  dz.classList.remove("correct", "wrong", "filled");
+  dz.innerHTML = "";
+
+  if (state.section2.length === 0) {
+    dz.innerHTML = `<div class="placeholder">— drop all correct causes here —</div>`;
+    return;
+  }
+
+  dz.classList.add("filled");
+  state.section2.forEach(value => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.dataset.col = "cause";
+    chip.dataset.val = value;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("click", () => {
+      state.section2 = state.section2.filter(v => v !== value);
+      renderCauseBox(); clearMarks(); refreshBankUsage();
+    });
+
+    chip.addEventListener("dragstart", () => {
+      dragItem = { col: "cause", value };
+      dragFrom = { type: "section2", value };
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    dz.appendChild(chip);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CHECK / RESET
+═══════════════════════════════════════════ */
+function clearMarks() {
+  document.querySelectorAll(".dropzone").forEach(z => z.classList.remove("correct", "wrong"));
+  const msg = document.getElementById("scoreMsg");
+  msg.textContent = ""; msg.className = "score";
+}
+
+function checkAnswers() {
+  let s1Correct = 0;
+  SECTION1.forEach(row => {
+    const el = document.getElementById(`slot-${row.id}`);
+    el.classList.remove("correct", "wrong");
+    if (state.section1[row.id] === row.answer) {
+      el.classList.add("correct");
+      s1Correct++;
+    } else {
+      el.classList.add("wrong");
+    }
+  });
+
+  const dz = document.getElementById("causeDropzone");
+  dz.classList.remove("correct", "wrong");
+  const hasAllCorrect = CORRECT_CAUSES.every(c => state.section2.includes(c));
+  const hasWrong = state.section2.some(c => !CORRECT_CAUSES.includes(c));
+  const s2Correct = hasAllCorrect && !hasWrong;
+  dz.classList.add(s2Correct ? "correct" : "wrong");
+
+  const msg = document.getElementById("scoreMsg");
+  msg.textContent = `Section 1: ${s1Correct} / 5 correct | Section 2: ${s2Correct ? "Correct" : "Incorrect"}`;
+  msg.className = `score ${s1Correct === 5 && s2Correct ? "good" : "bad"}`;
+}
+
+function reset() {
+  state.section1 = {};
+  state.section2 = [];
+  SECTION1.forEach(row => renderSingleSlot(row.id));
+  renderCauseBox();
+  clearMarks(); refreshBankUsage();
+}
+
+/* ═══════════════════════════════════════════
+   ANSWER KEY
+═══════════════════════════════════════════ */
+function buildAnswerKey() {
+  const tbody = document.getElementById("keyTableBody");
+  tbody.innerHTML = "";
+
+  SECTION1.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="key-pad-badge" style="background:#d7e8ff;color:#1a3560">Section 1</span></td>
+      <td>${row.pattern}</td>
+      <td style="color:#1a3560">${row.answer}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><span class="key-pad-badge" style="background:#ffe0aa;color:#5a3000">Section 2</span></td>
+    <td>Correct hypercalcemia causes</td>
+    <td style="color:#5a3000">${CORRECT_CAUSES.join("<br>")}</td>
+  `;
+  tbody.appendChild(tr);
+}
+
+const keyBtn      = document.getElementById("keyBtn");
+const keyPanel    = document.getElementById("answerKey");
+const keyCloseBtn = document.getElementById("keyCloseBtn");
+
+keyBtn.addEventListener("click", () => {
+  buildAnswerKey();
+  keyPanel.classList.add("visible");
+  keyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  keyBtn.textContent = "🔑 Answer Key ✓";
+});
+
+keyCloseBtn.addEventListener("click", () => {
+  keyPanel.classList.remove("visible");
+  keyBtn.textContent = "🔑 Show Answer Key";
+});
+
+document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+document.getElementById("resetBtn").addEventListener("click", reset);
+
+buildConditionBank();
+buildCauseBank();
+buildParathyroidRows();
+setupCauseDropzone();
+reset();
+</script>
+</body>
+</html>
