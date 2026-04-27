@@ -768,8 +768,10 @@ let folderIconCache = {}; // 'heme_KEY' or 'micro_KEY' -> base64
 let classIconCache = {}; // class subject key -> base64
 
 async function loadIconCache(){
-  const {data} = await sb.from('mlsboc_subject_icons').select('key,image_url');
-  if(data) data.forEach(row=>{ iconCache[row.key]=row.image_url; });
+  try{
+    const {data,error}=await sb.from('mlsboc_subject_icons').select('key,image_url');
+    if(!error&&data) data.forEach(row=>{ iconCache[row.key]=row.image_url; });
+  }catch(e){ console.warn('Icon cache load failed:',e); }
 }
 
 async function loadFolderIconCache(){
@@ -5296,12 +5298,15 @@ async function deleteBBCase(id){
 //                  si_value, si_unit, notes
 
 async function renderFormulasView(v){
-  const [calcRes,rrRes]=await Promise.all([
-    sb.from('mlsboc_formulas').select('*').eq('type','calc').order('category,name').catch(()=>({data:[]})),
-    sb.from('mlsboc_formulas').select('*').eq('type','rr').order('category,name').catch(()=>({data:[]}))
-  ]);
-  const calcData=calcRes.data||[];
-  const rrData=rrRes.data||[];
+  // Fetch all rows then split by type — works even if 'type' column not yet added to Supabase
+  let calcData=[],rrData=[];
+  try{
+    const {data:allRows}=await sb.from('mlsboc_formulas').select('*').order('category,name');
+    (allRows||[]).forEach(f=>{
+      if(f.type==='rr') rrData.push(f);
+      else calcData.push(f); // default everything to calc if type missing
+    });
+  }catch(e){ console.warn('Formulas fetch failed:',e); }
 
   // Group by category
   const groupBy=(arr)=>{const g={};arr.forEach(f=>{const c=f.category||'General';if(!g[c])g[c]=[];g[c].push(f);});return g;};
@@ -5460,6 +5465,7 @@ async function saveFormula(id,type){
   if(!name){alert('Name required.');return;}
   let payload={name,category,type};
   if(type==='rr'){
+    payload.formula=''; // required by DB constraint, not used for RR
     payload.conventional_value=document.getElementById('fm-conv-val')?.value.trim()||'';
     payload.conventional_unit=document.getElementById('fm-conv-unit')?.value.trim()||'';
     payload.si_value=document.getElementById('fm-si-val')?.value.trim()||'';
@@ -5473,6 +5479,8 @@ async function saveFormula(id,type){
     payload.steps=Array.from({length:5},(_,i)=>document.getElementById('fm-step-'+i)?.value.trim()||'').filter(Boolean);
     payload.notes=document.getElementById('fm-notes')?.value.trim()||'';
     payload.example=document.getElementById('fm-example')?.value.trim()||'';
+    // Keep formula column satisfied (build from numerator/denominator or use name)
+    payload.formula=[payload.numerator,payload.denominator].filter(Boolean).join(' / ')||payload.result_label||payload.name||'';
   }
   let error;
   if(id){({error}=await sb.from('mlsboc_formulas').update(payload).eq('id',id));}
@@ -5489,12 +5497,11 @@ async function deleteFormula(id){
 }
 
 async function openFormulasExport(){
-  const [calcRes,rrRes]=await Promise.all([
-    sb.from('mlsboc_formulas').select('*').eq('type','calc').order('category,name').catch(()=>({data:[]})),
-    sb.from('mlsboc_formulas').select('*').eq('type','rr').order('category,name').catch(()=>({data:[]}))
-  ]);
-  const calcData=calcRes.data||[];
-  const rrData=rrRes.data||[];
+  let calcData=[],rrData=[];
+  try{
+    const {data:allRows}=await sb.from('mlsboc_formulas').select('*').order('category,name');
+    (allRows||[]).forEach(f=>{ if(f.type==='rr') rrData.push(f); else calcData.push(f); });
+  }catch(e){}
   if(!calcData.length&&!rrData.length){alert('Nothing to export yet.');return;}
 
   document.getElementById('condition-modal-body').innerHTML=`
@@ -7297,7 +7304,7 @@ async function handleSubjectIconFile(e,key){
       const {error}=await sb.from('mlsboc_subject_icons').upsert({key,image_url:url},{onConflict:'key'});
       if(error){alert('Upload failed: '+error.message);return;}
       iconCache[key]=url;
-      renderHome(document.getElementById('view-main'));
+      renderView();
     };
     t.src=ev.target.result;
   };
