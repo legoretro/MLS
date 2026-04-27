@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reagent Strip – Match the Reagent!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
+
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #eef2f7;
+    --panel: #f5f8fc;
+    --header: #2d5fa6;
+    --accent: #f0a500;
+    --border: #c5d3e8;
+    --text: #111;
+    --muted: #556;
+    --drop: #f8faff;
+    --drop-border: #2d5fa6;
+    --good: #1a8c50;
+    --bad: #c0392b;
+    --shadow: 0 2px 14px rgba(30,60,120,.10);
+    --strip-bg: #e8e0d5;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 12px;
+  }
+
+  .wrap { max-width: 1300px; margin: 0 auto; }
+
+  header {
+    background: var(--header);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+
+  header h1 { margin: 0; font-size: 1.3rem; font-weight: 900; color: #ffd166; }
+  header p  { margin: 3px 0 0; font-size: .71rem; color: #c5d8f5; line-height: 1.4; }
+
+  .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #1a1a1a;
+    font-weight: 900;
+    font-size: .68rem;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: var(--shadow);
+    align-items: center;
+  }
+
+  button {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: .82rem;
+  }
+
+  .checkBtn { background: #1f3a6e; color: #fff; }
+  .resetBtn { background: #d9dfe8; color: #333; }
+  .keyBtn   { background: #5a3a00; color: #ffd599; }
+
+  /* ── ANSWER KEY ── */
+  .answer-key {
+    display: none;
+    margin-top: 16px;
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .answer-key.visible { display: block; }
+
+  .answer-key-header {
+    background: #2c1a00;
+    color: #ffd599;
+    padding: 10px 18px;
+    font-weight: 900;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .key-close-btn {
+    background: transparent;
+    color: #ffd599;
+    border: 1.5px solid #ffd599;
+    border-radius: 7px;
+    padding: 4px 10px;
+    font-size: .75rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .key-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .82rem;
+  }
+
+  .key-table th {
+    background: #3d2600;
+    color: #ffd599;
+    padding: 8px 14px;
+    text-align: left;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+
+  .key-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #dde4ee;
+    font-weight: 700;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+
+  .key-table tbody tr:nth-child(even) td { background: #f0f5fb; }
+  .key-table tbody tr:hover td { background: #fffbf0; }
+
+  .key-pad-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 900;
+    font-size: .75rem;
+    color: rgba(0,0,0,.65);
+  }
+
+  .score {
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    min-height: 32px;
+    font-size: .82rem;
+  }
+  .score.good { background: #e2f5eb; color: var(--good); }
+  .score.bad  { background: #fff0ee; color: var(--bad); }
+
+  /* ── MAIN LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 190px 1fr 190px;
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* ── BANK ── */
+  .bank-panel {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 10px;
+  }
+
+  .bank-panel.reagent-bank { border-top: 4px solid #2d5fa6; }
+  .bank-panel.reaction-bank { border-top: 4px solid #d17a00; }
+
+  .bank-panel h2 {
+    margin: 0 0 4px;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--header);
+  }
+
+  .hint {
+    font-size: .63rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+
+  .chip {
+    background: #fff;
+    border: 2px solid #c5d3e8;
+    border-radius: 9px;
+    padding: 7px 9px;
+    margin-bottom: 6px;
+    cursor: grab;
+    user-select: none;
+    transition: .15s ease;
+    text-align: center;
+    font-weight: 800;
+    font-size: .76rem;
+    line-height: 1.35;
+    color: #1a2a4a;
+  }
+  .chip[data-col="reagent"] { border-color: #8ab0dc; color: #1a3560; }
+  .chip[data-col="reaction"] { border-color: #e0aa60; color: #5a3000; }
+  .chip:last-child { margin-bottom: 0; }
+  .chip.dragging   { opacity: .4; }
+  .chip.used       { opacity: .22; pointer-events: none; }
+
+  /* ── STRIP SECTION ── */
+  .strip-section {
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .section-title {
+    background: var(--header);
+    color: #fff;
+    text-align: center;
+    font-size: .95rem;
+    font-weight: 900;
+    padding: 10px 8px;
+    letter-spacing: .4px;
+  }
+
+  /* ── STRIP VISUAL LAYOUT ── */
+  .strip-body {
+    display: flex;
+    gap: 0;
+    padding: 16px;
+    align-items: stretch;
+    background: #dde4ef;
+  }
+
+  /* The physical strip */
+  .strip-stick {
+    width: 80px;
+    min-width: 80px;
+    background: var(--strip-bg);
+    border-radius: 8px 8px 12px 12px;
+    border: 2px solid #b8ad9e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px 16px;
+    gap: 4px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,.18);
+    position: relative;
+  }
+
+  .strip-label {
+    font-size: .58rem;
+    font-weight: 900;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 2px;
+  }
+
+  .pad {
+    width: 62px;
+    height: 42px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(0,0,0,.12);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pad-name {
+    font-size: .56rem;
+    font-weight: 900;
+    color: rgba(0,0,0,.6);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    text-align: center;
+    line-height: 1.2;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(255,255,255,.5);
+  }
+
+  /* Pad colors from the photo */
+  .pad-leu  { background: #e8edbc; }
+  .pad-nit  { background: #f2efcd; }
+  .pad-uro  { background: #f0c8a0; }
+  .pad-pro  { background: #d2e88a; }
+  .pad-ph   { background: #e87820; }
+  .pad-blo  { background: #d4b000; }
+  .pad-sg   { background: #1a4a1a; }
+  .pad-ket  { background: #e8a890; }
+  .pad-bil  { background: #f0d890; }
+  .pad-glu  { background: #78c8b8; }
+
+  /* Right side: rows of drop zones */
+  .rows-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 12px;
+  }
+
+  .strip-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr;
+    gap: 6px;
+    align-items: center;
+    min-height: 50px;
+  }
+
+  .row-label {
+    font-size: .75rem;
+    font-weight: 900;
+    color: #1a2a4a;
+    text-align: right;
+    padding-right: 6px;
+    line-height: 1.3;
+  }
+
+  .row-label .timing {
+    display: block;
+    font-size: .6rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .col-header {
+    font-size: .62rem;
+    font-weight: 900;
+    color: var(--header);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    text-align: center;
+  }
+
+  /* drop zones */
+  .dropzone {
+    min-height: 44px;
+    background: var(--drop);
+    border: 2px dashed #b0c0da;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .15s ease;
+    padding: 4px 6px;
+    text-align: center;
+    line-height: 1.3;
+    font-weight: 800;
+    font-size: .72rem;
+    cursor: default;
+  }
+
+  .dropzone.drag-over {
+    border-color: var(--drop-border);
+    background: #ddeeff;
+    transform: scale(1.02);
+  }
+
+  .dropzone.filled {
+    border-style: solid;
+    background: #fff;
+    cursor: pointer;
+    color: #111;
+  }
+
+  .dropzone.correct {
+    background: #e2f5eb;
+    border-color: var(--good);
+    color: var(--good);
+  }
+
+  .dropzone.wrong {
+    background: #fff0ee;
+    border-color: var(--bad);
+    color: var(--bad);
+  }
+
+  .placeholder {
+    color: #8899bb;
+    font-weight: 800;
+    font-size: .57rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .col-headers-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 2px;
+    padding-left: 12px;
+  }
+
+  /* legend under strip */
+  .strip-stick-top-cap {
+    width: 68px;
+    height: 10px;
+    background: #f0ebe4;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    border: 1px solid #c8bfb2;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>🧪 Urinalysis Reagent Strip – Match It!</h1>
+      <p>Drag from the <strong style="color:#a8c8ff">Reagent bank (left)</strong> and <strong style="color:#ffd599">Reaction bank (right)</strong> into the correct pad rows. Click a filled slot to return it.</p>
+    </div>
+    <span class="badge">MATCH IT!</span>
+  </header>
+
+  <div class="controls">
+    <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
+    <button class="resetBtn" id="resetBtn">↺ Reset</button>
+    <button class="keyBtn" id="keyBtn">🔑 Show Answer Key</button>
+    <div class="score" id="scoreMsg"></div>
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT BANK: Reagent / Chemistry -->
+    <div class="bank-panel reagent-bank">
+      <h2>🔬 Reagent / Chemistry</h2>
+      <p class="hint">Drag to the <strong>Reagent</strong> column. Each chip used once.</p>
+      <div id="reagentBank"></div>
+    </div>
+
+    <!-- STRIP + ROWS -->
+    <div class="strip-section">
+      <div class="section-title">Urine Reagent Strip – Match Each Pad to Its Reagent &amp; Reaction</div>
+      <div class="strip-body">
+
+        <!-- Visual strip -->
+        <div class="strip-stick">
+          <div class="strip-label">Strip</div>
+          <div class="strip-stick-top-cap"></div>
+          <div class="pad pad-leu"><span class="pad-name">LEU</span></div>
+          <div class="pad pad-nit"><span class="pad-name">NIT</span></div>
+          <div class="pad pad-uro"><span class="pad-name">URO</span></div>
+          <div class="pad pad-pro"><span class="pad-name">PRO</span></div>
+          <div class="pad pad-ph"><span class="pad-name">pH</span></div>
+          <div class="pad pad-blo"><span class="pad-name">BLO</span></div>
+          <div class="pad pad-sg"><span class="pad-name">SG</span></div>
+          <div class="pad pad-ket"><span class="pad-name">KET</span></div>
+          <div class="pad pad-bil"><span class="pad-name">BIL</span></div>
+          <div class="pad pad-glu"><span class="pad-name">GLU</span></div>
+        </div>
+
+        <!-- Drop zone rows -->
+        <div class="rows-area">
+          <div class="col-headers-row">
+            <div></div>
+            <div class="col-header">Reagent / Chemistry</div>
+            <div class="col-header">Reaction Type</div>
+          </div>
+          <div id="stripRows"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT BANK: Reaction Type -->
+    <div class="bank-panel reaction-bank">
+      <h2>⚗️ Reaction Type</h2>
+      <p class="hint">Drag to the <strong>Reaction</strong> column. Each chip used once.</p>
+      <div id="reactionBank"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ANSWER KEY -->
+<div class="wrap">
+  <div class="answer-key" id="answerKey">
+    <div class="answer-key-header">
+      <span>🔑 Answer Key</span>
+      <button class="key-close-btn" id="keyCloseBtn">✕ Hide</button>
+    </div>
+    <table class="key-table">
+      <thead>
+        <tr>
+          <th>Pad</th>
+          <th>Full Name</th>
+          <th>Reagent / Chemistry</th>
+          <th>Reaction Type</th>
+        </tr>
+      </thead>
+      <tbody id="keyTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
+const PADS = [
+  {
+    id: "leu",
+    name: "Leukocyte Esterase",
+    abbr: "LEU",
+    timing: "120 s",
+    reagent: "Indoxyl ester or pyrrole substrate",
+    reaction: "Granulocytic esterase cleaves ester → indoxyl → color"
+  },
+  {
+    id: "nit",
+    name: "Nitrite",
+    abbr: "NIT",
+    timing: "60 s",
+    reagent: "Aromatic amine + diazo salt",
+    reaction: "Nitrite + aromatic amine = diazo salt; diazo salt + color indicator = azodye"
+  },
+  {
+    id: "uro",
+    name: "Urobilinogen",
+    abbr: "URO",
+    timing: "60 s",
+    reagent: "Ehrlich's reagent (p-dimethylaminobenzaldehyde)",
+    reaction: "Urobilinogen + p-dimethylaminobenzaldehyde → red/pink"
+  },
+  {
+    id: "pro",
+    name: "Protein",
+    abbr: "PRO",
+    timing: "60 s",
+    reagent: "Tetrabromphenol blue",
+    reaction: "Protein error of indicators"
+  },
+  {
+    id: "ph",
+    name: "pH",
+    abbr: "pH",
+    timing: "60 s",
+    reagent: "Methyl red & Bromthymol blue (double indicator)",
+    reaction: "Double indicator color shift (pH 4.0–9.0)"
+  },
+  {
+    id: "blo",
+    name: "Blood",
+    abbr: "BLO",
+    timing: "60 s",
+    reagent: "RBC/Hgb/Myoglobin pseudoperoxidase",
+    reaction: "H₂O₂ + chromogen → oxidized chromogen (color) + H₂O"
+  },
+  {
+    id: "sg",
+    name: "Specific Gravity",
+    abbr: "SG",
+    timing: "45 s",
+    reagent: "Polyelectrolyte & bromothymol blue",
+    reaction: "Ion displacement → pH shift → color change"
+  },
+  {
+    id: "ket",
+    name: "Ketones",
+    abbr: "KET",
+    timing: "40 s",
+    reagent: "Sodium nitroprusside (nitroferricyanide)",
+    reaction: "Acetoacetic acid + sodium nitroprusside → dark pink/purple"
+  },
+  {
+    id: "bil",
+    name: "Bilirubin",
+    abbr: "BIL",
+    timing: "30 s",
+    reagent: "Diazonium salt (acid medium)",
+    reaction: "Bilirubin + diazonium salt → azodye (diazo reaction)"
+  },
+  {
+    id: "glu",
+    name: "Glucose",
+    abbr: "GLU",
+    timing: "30 s",
+    reagent: "Glucose oxidase (enzyme) → gluconic acid, hydrogen peroxide;  peroxidase (enzyme) → oxidized color compound",
+    reaction: "Double sequential enzyme reaction → oxidized color"
+  },
+];
+
+/* Separate chip pools for each column */
+const REAGENT_OPTIONS = [
+  "Indoxyl ester or pyrrole substrate",
+  "Aromatic amine + diazo salt",
+  "Ehrlich's reagent (p-dimethylaminobenzaldehyde)",
+  "Tetrabromphenol blue",
+  "Methyl red & Bromthymol blue (double indicator)",
+  "RBC/Hgb/Myoglobin pseudoperoxidase",
+  "Polyelectrolyte & bromothymol blue",
+  "Sodium nitroprusside (nitroferricyanide)",
+  "Diazonium salt (acid medium)",
+  "Glucose oxidase (enzyme) → gluconic acid, hydrogen peroxide;  peroxidase (enzyme) → oxidized color compound",
+];
+
+const REACTION_OPTIONS = [
+  "Granulocytic esterase cleaves ester → indoxyl → color",
+  "Nitrite + aromatic amine = diazo salt; diazo salt + color indicator = azodye",
+  "Urobilinogen + p-dimethylaminobenzaldehyde → red/pink",
+  "Protein error of indicators",
+  "Double indicator color shift (pH 4.0–9.0)",
+  "H₂O₂ + chromogen → oxidized chromogen (color) + H₂O",
+  "Ion displacement → pH shift → color change",
+  "Acetoacetic acid + sodium nitroprusside → dark pink/purple",
+  "Bilirubin + diazonium salt → azodye (diazo reaction)",
+  "Double sequential enzyme reaction → oxidized color",
+];
+
+const COL_DEFS = [
+  { col: "reagent",  options: REAGENT_OPTIONS,  label: "Reagent / Chemistry" },
+  { col: "reaction", options: REACTION_OPTIONS, label: "Reaction Type" },
+];
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const state = {};
+let dragItem = null;
+let dragFrom = null;
+
+function slotKey(padId, col) { return `${padId}__${col}`; }
+function getState(k)    { return state[k] || null; }
+function setState(k, v) { if (v == null) delete state[k]; else state[k] = v; }
+
+function countUses(col, value) {
+  return Object.values(state).filter(v => v && v.col === col && v.value === value).length;
+}
+
+/* ═══════════════════════════════════════════
+   BUILD CHIP BANK
+═══════════════════════════════════════════ */
+function buildBank() {
+  COL_DEFS.forEach(({ col, options }) => {
+    const bankId = col === "reagent" ? "reagentBank" : "reactionBank";
+    const wrap = document.getElementById(bankId);
+    wrap.innerHTML = "";
+
+    const shuffled = [...options].sort(() => Math.random() - .5);
+    shuffled.forEach(value => {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.dataset.col = col;
+      chip.dataset.val = value;
+      chip.draggable = true;
+      chip.textContent = value;
+      chip.addEventListener("dragstart", e => {
+        if (countUses(col, value) >= 1) { e.preventDefault(); return; }
+        dragItem = { col, value }; dragFrom = null;
+        chip.classList.add("dragging");
+      });
+      chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+      wrap.appendChild(chip);
+    });
+  });
+}
+
+function refreshBankUsage() {
+  COL_DEFS.forEach(({ col, options }) => {
+    options.forEach(value => {
+      const used = countUses(col, value);
+      document.querySelectorAll(".chip").forEach(chip => {
+        if (chip.dataset.col === col && chip.dataset.val === value) {
+          chip.classList.toggle("used", used >= 1);
+        }
+      });
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════
+   BUILD STRIP ROWS
+═══════════════════════════════════════════ */
+function buildRows() {
+  const container = document.getElementById("stripRows");
+  container.innerHTML = "";
+
+  PADS.forEach(pad => {
+    const row = document.createElement("div");
+    row.className = "strip-row";
+
+    // label cell
+    const lbl = document.createElement("div");
+    lbl.className = "row-label";
+    lbl.innerHTML = `${pad.name}<span class="timing">${pad.abbr} · ${pad.timing}</span>`;
+    row.appendChild(lbl);
+
+    // drop zones
+    COL_DEFS.forEach(({ col }) => {
+      const dz = makeDropzone(pad.id, col);
+      row.appendChild(dz);
+    });
+
+    container.appendChild(row);
+  });
+}
+
+function makeDropzone(padId, col) {
+  const key = slotKey(padId, col);
+  const dz = document.createElement("div");
+  dz.className = "dropzone";
+  dz.id = `slot-${key}`;
+  dz.draggable = true;
+  renderSlotContent(dz, null);
+
+  dz.addEventListener("dragover", e => {
+    if (dragItem && dragItem.col === col) { e.preventDefault(); dz.classList.add("drag-over"); }
+  });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    if (!dragItem || dragItem.col !== col) return;
+    const { col: c, value } = dragItem;
+    const existing = getState(key);
+
+    // if already at max usage and not moving from another slot
+    const movingSame = dragFrom && getState(dragFrom) && getState(dragFrom).value === value;
+    const atMax = countUses(c, value) >= 1;
+    if (atMax && !movingSame) { dragItem = null; dragFrom = null; return; }
+
+    // if dragging from another slot, clear that slot
+    if (dragFrom && dragFrom !== key) {
+      if (existing) { setState(dragFrom, existing); renderSlot(dragFrom); }
+      else { setState(dragFrom, null); renderSlot(dragFrom); }
+    }
+    setState(key, { col: c, value });
+    renderSlot(key);
+    dragItem = null; dragFrom = null;
+    clearMarks(); refreshBankUsage();
+  });
+
+  dz.addEventListener("click", () => {
+    if (!getState(key)) return;
+    setState(key, null); renderSlot(key); clearMarks(); refreshBankUsage();
+  });
+
+  dz.addEventListener("dragstart", e => {
+    const cur = getState(key);
+    if (!cur) { e.preventDefault(); return; }
+    dragItem = { ...cur }; dragFrom = key;
+  });
+
+  return dz;
+}
+
+function renderSlotContent(el, val) {
+  if (!val) {
+    el.innerHTML = `<div class="placeholder">— drop here —</div>`;
+    el.classList.remove("filled");
+  } else {
+    el.textContent = val.value;
+    el.classList.add("filled");
+  }
+}
+
+function renderSlot(key) {
+  const el = document.getElementById(`slot-${key}`);
+  if (!el) return;
+  el.classList.remove("correct", "wrong");
+  renderSlotContent(el, getState(key));
+}
+
+/* ═══════════════════════════════════════════
+   CHECK / RESET
+═══════════════════════════════════════════ */
+function clearMarks() {
+  document.querySelectorAll(".dropzone").forEach(z => z.classList.remove("correct", "wrong"));
+  const msg = document.getElementById("scoreMsg");
+  msg.textContent = ""; msg.className = "score";
+}
+
+function checkAnswers() {
+  let correct = 0, total = 0;
+  PADS.forEach(pad => {
+    COL_DEFS.forEach(({ col }) => {
+      total++;
+      const key = slotKey(pad.id, col);
+      const el = document.getElementById(`slot-${key}`);
+      const cur = getState(key);
+      el.classList.remove("correct", "wrong");
+      const answer = pad[col];
+      if (cur && cur.value === answer) {
+        el.classList.add("correct"); correct++;
+      } else {
+        el.classList.add("wrong");
+      }
+    });
+  });
+  const msg = document.getElementById("scoreMsg");
+  msg.textContent = `${correct} / ${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+function reset() {
+  Object.keys(state).forEach(k => delete state[k]);
+  PADS.forEach(pad => COL_DEFS.forEach(({ col }) => renderSlot(slotKey(pad.id, col))));
+  clearMarks(); refreshBankUsage();
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+document.getElementById("resetBtn").addEventListener("click", reset);
+
+/* ── ANSWER KEY ── */
+const PAD_COLORS = {
+  leu: "#e8edbc", nit: "#f2efcd", uro: "#f0c8a0", pro: "#d2e88a",
+  ph:  "#e87820", blo: "#d4b000", sg:  "#1a4a1a", ket: "#e8a890",
+  bil: "#f0d890", glu: "#78c8b8"
+};
+const PAD_TEXT_DARK = new Set(["sg"]);
+
+function buildAnswerKey() {
+  const tbody = document.getElementById("keyTableBody");
+  tbody.innerHTML = "";
+  PADS.forEach(pad => {
+    const tr = document.createElement("tr");
+    const badgeBg = PAD_COLORS[pad.id] || "#eee";
+    const badgeColor = PAD_TEXT_DARK.has(pad.id) ? "#ccc" : "rgba(0,0,0,.65)";
+    tr.innerHTML = `
+      <td><span class="key-pad-badge" style="background:${badgeBg};color:${badgeColor}">${pad.abbr}</span></td>
+      <td>${pad.name}<br><small style="color:var(--muted);font-weight:600">${pad.timing}</small></td>
+      <td style="color:#1a3560">${pad.reagent}</td>
+      <td style="color:#5a3000">${pad.reaction}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+const keyBtn      = document.getElementById("keyBtn");
+const keyPanel    = document.getElementById("answerKey");
+const keyCloseBtn = document.getElementById("keyCloseBtn");
+
+keyBtn.addEventListener("click", () => {
+  buildAnswerKey();
+  keyPanel.classList.add("visible");
+  keyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  keyBtn.textContent = "🔑 Answer Key ✓";
+});
+
+keyCloseBtn.addEventListener("click", () => {
+  keyPanel.classList.remove("visible");
+  keyBtn.textContent = "🔑 Show Answer Key";
+});
+
+buildBank();
+buildRows();
+reset();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     ACTIVITY 2: FP / FN / CLINICAL SIGNIFICANCE
+     Layout: Strip Table | FP Bank | FN Bank | CS Bank
+════════════════════════════════════════════════════════ -->
+<style>
+  /* ── A2 OUTER ── */
+  .a2-wrap {
+    max-width: 1400px;
+    margin: 28px auto 0;
+    padding: 0 12px 48px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .a2-header {
+    background: linear-gradient(135deg, #1a3a5c 0%, #0d2238 100%);
+    border-radius: 14px 14px 0 0;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .a2-header h1 { margin: 0; font-size: 1rem; color: #fff; font-weight: 900; }
+  .a2-header p  { margin: 3px 0 0; font-size: .68rem; color: #a8c8ff; font-weight: 700; }
+  .a2-badge {
+    background: #e74c3c; color: #fff; border-radius: 8px;
+    padding: 5px 12px; font-weight: 900; font-size: .72rem; white-space: nowrap;
+  }
+
+  .a2-controls {
+    background: #f0f5fb;
+    border: 1px solid #dde4ee; border-top: none;
+    padding: 8px 16px;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .a2-controls button {
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: .75rem; padding: 6px 13px; border: none; border-radius: 7px; cursor: pointer;
+  }
+  .a2-checkBtn { background: #1f3a6e; color: #fff; }
+  .a2-resetBtn { background: #d9dfe8; color: #333; }
+  .a2-keyBtn   { background: #5a0000; color: #ffb3b3; }
+  .a2-score    { font-weight: 800; font-size: .78rem; margin-left: auto; }
+
+  /* ── HORIZONTAL 4-PANEL LAYOUT ── */
+  .a2-body {
+    display: grid;
+    grid-template-columns: 1fr 160px 160px 160px;
+    gap: 10px;
+    background: #e6edf5;
+    border: 1px solid #dde4ee; border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 10px;
+    align-items: start;
+  }
+
+  /* ── BANKS ── */
+  .a2-bank {
+    background: #f5f9fc;
+    border-radius: 11px;
+    padding: 8px;
+    box-shadow: 0 2px 10px rgba(30,60,100,.10);
+    position: sticky;
+    top: 8px;
+  }
+  .a2-bank h2 {
+    margin: 0 0 3px; font-size: .68rem; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .6px;
+  }
+  .a2-bank .a2-hint {
+    font-size: .58rem; color: #778; margin: 0 0 6px; font-weight: 700; line-height: 1.3;
+  }
+  .a2-bank.fp-bank { border-top: 3px solid #c0392b; }
+  .a2-bank.fn-bank { border-top: 3px solid #2471a3; }
+  .a2-bank.cs-bank { border-top: 3px solid #1a7a50; }
+
+  /* ── CHIPS ── */
+  .a2-chip {
+    background: #fff;
+    border-radius: 7px;
+    padding: 4px 7px;
+    margin-bottom: 4px;
+    cursor: grab;
+    user-select: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: .62rem;
+    line-height: 1.25;
+    transition: .12s;
+    display: block;
+  }
+  .a2-chip[data-col="fp"] { border: 1.5px solid #e8a0a0; color: #6b0000; }
+  .a2-chip[data-col="fn"] { border: 1.5px solid #8ab0dc; color: #0a2a60; }
+  .a2-chip[data-col="cs"] { border: 1.5px solid #7acca0; color: #0a4030; }
+  .a2-chip.a2-dragging { opacity: .35; transform: scale(.93); }
+  .a2-chip.a2-used     { opacity: .28; cursor: not-allowed; }
+
+  /* ── TABLE PANEL ── */
+  .a2-table-panel {
+    background: #fff;
+    border-radius: 11px;
+    box-shadow: 0 2px 10px rgba(30,60,100,.10);
+    overflow: hidden;
+  }
+
+  .a2-table-title {
+    background: #1a3a5c; color: #fff;
+    font-size: .72rem; font-weight: 900;
+    padding: 7px 12px; text-align: center; letter-spacing: .3px;
+  }
+
+  /* ── TABLE INSIDE PANEL ── */
+  .a2-tbl {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .a2-tbl thead th {
+    background: #eaf1f8;
+    font-size: .6rem; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .4px;
+    padding: 5px 6px; border-bottom: 2px solid #c8d8ea;
+    text-align: center;
+  }
+  .a2-tbl thead th.hd-pad  { text-align: left; width: 80px; background: #dde8f5; }
+  .a2-tbl thead th.hd-fp   { color: #c0392b; }
+  .a2-tbl thead th.hd-fn   { color: #2471a3; }
+  .a2-tbl thead th.hd-cs   { color: #1a7a50; }
+
+  .a2-tbl tbody tr { border-bottom: 1px solid #eaeff7; }
+  .a2-tbl tbody tr:last-child { border-bottom: none; }
+  .a2-tbl tbody tr:nth-child(even) td { background: #f8fafd; }
+
+  /* pad label cell */
+  .a2-tbl td.td-pad {
+    padding: 4px 6px;
+    font-size: .64rem; font-weight: 900; color: #1a3a5c;
+    background: #f2f6fb; border-right: 1.5px solid #d8e4f0;
+    white-space: nowrap;
+  }
+  .a2-pad-dot {
+    display: inline-block; width: 9px; height: 9px;
+    border-radius: 2px; margin-right: 4px; vertical-align: middle;
+  }
+
+  /* drop cells */
+  .a2-tbl td.td-drop {
+    padding: 3px;
+    vertical-align: middle;
+    min-width: 90px;
+  }
+  .a2-tbl td.td-drop.fp-col { background: #fff8f8; border-right: 1px solid #f0e0e0; }
+  .a2-tbl td.td-drop.fn-col { background: #f8fbff; border-right: 1px solid #dce8f5; }
+  .a2-tbl td.td-drop.cs-col { background: #f4fbf8; }
+
+  .a2-drop {
+    min-height: 28px;
+    border: 1.5px dashed #ccd8e8;
+    border-radius: 6px;
+    padding: 2px 3px;
+    display: flex;
+    align-items: center;
+    transition: background .13s;
+  }
+  .a2-drop.empty::after {
+    content: "drop here";
+    font-size: .52rem; color: #aab; font-weight: 700;
+    margin: auto;
+  }
+  .a2-drop.fp-drop { border-color: #e8b8b8; }
+  .a2-drop.fn-drop { border-color: #b8cce8; }
+  .a2-drop.cs-drop { border-color: #a0d4bc; }
+  .a2-drop.a2-drag-over { background: #fff8c0; border-color: #d4a800; border-style: solid; }
+  .a2-drop.a2-correct   { background: #e6f9ee !important; border-color: #27ae60; border-style: solid; }
+  .a2-drop.a2-wrong     { background: #fde8e8 !important; border-color: #c0392b; border-style: solid; }
+
+  /* chip inside drop — slightly smaller */
+  .a2-drop .a2-chip {
+    margin: 0; cursor: pointer;
+    font-size: .6rem; padding: 3px 6px;
+    width: 100%;
+  }
+
+  /* ── ANSWER KEY ── */
+  .a2-answer-key {
+    display: none; margin-top: 14px;
+    background: #f5f9fc; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(30,60,100,.12); overflow: hidden;
+  }
+  .a2-answer-key.visible { display: block; }
+  .a2-answer-key-header {
+    background: #5a0000; color: #ffb3b3;
+    padding: 9px 16px; font-weight: 900; font-size: .9rem;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Nunito', sans-serif;
+  }
+  .a2-key-close-btn {
+    background: transparent; color: #ffb3b3; border: 1.5px solid #ffb3b3;
+    border-radius: 6px; padding: 3px 9px; font-size: .7rem;
+    font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer;
+  }
+  .a2-key-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .72rem; font-family: 'Nunito', sans-serif;
+  }
+  .a2-key-table th {
+    padding: 6px 12px; text-align: left;
+    font-size: .67rem; text-transform: uppercase; letter-spacing: .5px;
+  }
+  .a2-key-table th:first-child { background: #3a1a1a; color: #ffb3b3; }
+  .a2-key-table th.fp-th       { background: #6b0000; color: #ffd0d0; }
+  .a2-key-table th.fn-th       { background: #0a2a60; color: #b3cfff; }
+  .a2-key-table th.cs-th       { background: #0a4030; color: #b3ffd8; }
+  .a2-key-table td {
+    padding: 6px 12px; border-bottom: 1px solid #dde4ee;
+    font-weight: 700; vertical-align: top; line-height: 1.4;
+  }
+  .a2-key-table tbody tr:nth-child(even) td { background: #f0f5fb; }
+  .a2-key-table td.fp-td { color: #6b0000; }
+  .a2-key-table td.fn-td { color: #0a2a60; }
+  .a2-key-table td.cs-td { color: #0a4030; }
+  .a2-mini-badge {
+    display: inline-block; padding: 2px 6px; border-radius: 4px;
+    font-weight: 900; font-size: .68rem;
+  }
+</style>
+
+<div class="a2-wrap">
+
+  <div class="a2-header">
+    <div>
+      <h1>⚠️ False Positives, False Negatives &amp; Clinical Significance</h1>
+      <p>Drag each chip from the banks (right) into the correct pad row. Click a placed chip to return it.</p>
+    </div>
+    <span class="a2-badge">ACTIVITY 2</span>
+  </div>
+
+  <div class="a2-controls">
+    <button class="a2-checkBtn" id="a2CheckBtn">✔ Check Answers</button>
+    <button class="a2-resetBtn" id="a2ResetBtn">↺ Reset</button>
+    <button class="a2-keyBtn"   id="a2KeyBtn">🔑 Show Answer Key</button>
+    <div class="a2-score" id="a2ScoreMsg"></div>
+  </div>
+
+  <div class="a2-body">
+
+    <!-- COL 1: MATCHING TABLE -->
+    <div class="a2-table-panel">
+      <div class="a2-table-title">Match Each Cause &amp; Significance to the Correct Pad</div>
+      <table class="a2-tbl">
+        <thead>
+          <tr>
+            <th class="hd-pad">Pad</th>
+            <th class="hd-fp">🔴 False Positive</th>
+            <th class="hd-fn">🔵 False Negative</th>
+            <th class="hd-cs">🟢 Clinical Significance</th>
+          </tr>
+        </thead>
+        <tbody id="a2Rows"></tbody>
+      </table>
+    </div>
+
+    <!-- COL 2: FALSE POSITIVE BANK -->
+    <div class="a2-bank fp-bank">
+      <h2 style="color:#c0392b">🔴 False Positive</h2>
+      <p class="a2-hint">Drag to the red column</p>
+      <div id="a2FpBank"></div>
+    </div>
+
+    <!-- COL 3: FALSE NEGATIVE BANK -->
+    <div class="a2-bank fn-bank">
+      <h2 style="color:#2471a3">🔵 False Negative</h2>
+      <p class="a2-hint">Drag to the blue column</p>
+      <div id="a2FnBank"></div>
+    </div>
+
+    <!-- COL 4: CLINICAL SIGNIFICANCE BANK -->
+    <div class="a2-bank cs-bank">
+      <h2 style="color:#1a7a50">🟢 Clinical Sig.</h2>
+      <p class="a2-hint">Drag to the green column</p>
+      <div id="a2CsBank"></div>
+    </div>
+
+  </div>
+
+  <!-- ANSWER KEY -->
+  <div class="a2-answer-key" id="a2AnswerKey">
+    <div class="a2-answer-key-header">
+      <span>🔑 Answer Key – False Positives, Negatives &amp; Clinical Significance</span>
+      <button class="a2-key-close-btn" id="a2KeyCloseBtn">✕ Hide</button>
+    </div>
+    <table class="a2-key-table">
+      <thead>
+        <tr>
+          <th>Pad</th>
+          <th class="fp-th">🔴 False Positive</th>
+          <th class="fn-th">🔵 False Negative</th>
+          <th class="cs-th">🟢 Clinical Significance</th>
+        </tr>
+      </thead>
+      <tbody id="a2KeyBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   ACTIVITY 2 DATA  — 1–3 word chips
+   fp / fn / cs = the exact draggable text
+   fp_full / fn_full / cs_full = answer key descriptions
+═══════════════════════════════════════ */
+const A2_PADS = [
+  {
+    id:"leu", abbr:"LEU", name:"Leukocyte Esterase",
+    fp:"Formalin; pigmented urine",
+    fn:"Ascorbic acid; antibiotics; crenated WBCs; high protein/glucose",
+    cs:"Detects lysed WBCs; screens UTI & inflammation"
+  },
+  {
+    id:"nit", abbr:"NIT", name:"Nitrite",
+    fp:"Old sample; color interference",
+    fn:"No reductase enzyme; Gram+/yeast; ascorbic acid; antibiotics",
+    cs:"Rapid UTI screen; best with LEU result"
+  },
+  {
+    id:"uro", abbr:"URO", name:"Urobilinogen",
+    fp:"Ehrlich-reactive compounds",
+    fn:"Absence not detected",
+    cs:"↑ = liver disease / hemolysis; ↓ = bile obstruction"
+  },
+  {
+    id:"pro", abbr:"PRO", name:"Protein",
+    fp:"Pigmented urine; ammonia contamination; high SG; alkaline urine",
+    fn:"Non-albumin proteins (too small)",
+    cs:"Key marker of renal disease; early glomerular/tubular damage"
+  },
+  {
+    id:"ph", abbr:"pH", name:"pH",
+    fp:"Protein pad runover",
+    fn:"No known interferences",
+    cs:"Acid-base balance; crystal ID; UTI monitoring; reject pH >9"
+  },
+  {
+    id:"blo", abbr:"BLO", name:"Blood",
+    fp:"Oxidizing detergents; vegetable/bacterial peroxidases",
+    fn:"Ascorbic acid; formalin; unmixed specimen",
+    cs:"Detects hematuria, hemoglobinuria & myoglobinuria"
+  },
+  {
+    id:"sg", abbr:"SG", name:"Specific Gravity",
+    fp:"Buffered alkaline urine",
+    fn:"High glucose/urea inaccuracy",
+    cs:"Measures concentration; assesses tubular function & hydration"
+  },
+  {
+    id:"ket", abbr:"KET", name:"Ketones",
+    fp:"Levodopa; sulfhydryl drugs; red pigmented urine",
+    fn:"Improper preservation/storage",
+    cs:"Monitors DM Type 1; detects DKA, starvation & vomiting"
+  },
+  {
+    id:"bil", abbr:"BIL", name:"Bilirubin",
+    fp:"Phenazopyridine; indican; bloody urine",
+    fn:"Light exposure; ascorbic acid",
+    cs:"Early liver disease/bile obstruction; determines jaundice cause"
+  },
+  {
+    id:"glu", abbr:"GLU", name:"Glucose",
+    fp:"Peroxide/oxidizing agents",
+    fn:"Ascorbic acid; high SG; bacterial overgrowth",
+    cs:"Screens for DM & gestational diabetes; detects renal glycosuria"
+  },
+];
+
+/* Short bank labels (≤3 words each) — what appears on the draggable chip */
+const A2_CHIP_LABELS = {
+  leu: { fp:"Formalin / pigmented urine",         fn:"Ascorbic acid / antibiotics / crenated WBCs",  cs:"Detects WBCs; UTI screen"       },
+  nit: { fp:"Old sample / color",                 fn:"No reductase / Gram+ / ascorbic acid",         cs:"Rapid UTI screen"               },
+  uro: { fp:"Ehrlich reactants",                  fn:"Absence undetected",                           cs:"Liver / hemolysis / obstruction" },
+  pro: { fp:"Pigmented / alkaline / contaminated",fn:"Non-albumin proteins",                         cs:"Renal disease marker"           },
+  ph:  { fp:"Protein pad runover",                fn:"None known",                                   cs:"Acid-base / crystal ID"         },
+  blo: { fp:"Detergents / peroxidases",           fn:"Ascorbic acid / formalin",                     cs:"Hematuria / hemoglobinuria"     },
+  sg:  { fp:"Buffered alkaline urine",            fn:"High glucose / urea",                          cs:"Concentration / hydration"      },
+  ket: { fp:"Levodopa / sulfhydryl / red urine",  fn:"Improper storage",           cs:"DKA / DM Type 1 / starvation"   },
+  bil: { fp:"Phenazopyridine / indican",          fn:"Light / ascorbic acid",                        cs:"Liver / jaundice cause"         },
+  glu: { fp:"Oxidizing agents",                  fn:"Ascorbic acid / high SG / bacteria",           cs:"DM / gestational diabetes"      },
+};
+
+const PAD_COLORS_A2 = {
+  leu:"#e8edbc",nit:"#f2efcd",uro:"#f0c8a0",pro:"#d2e88a",
+  ph:"#e87820",blo:"#d4b000",sg:"#1a4a1a",ket:"#e8a890",
+  bil:"#f0d890",glu:"#78c8b8"
+};
+const PAD_DARK_A2 = new Set(["sg","ph","blo"]);
+
+/* ── STATE: padId → {fp, fn, cs} each = placed label string | null ── */
+const state2 = {};
+A2_PADS.forEach(p => { state2[p.id] = { fp:null, fn:null, cs:null }; });
+
+let a2DragItem = null; // {col, padId, label}
+let a2DragFrom = null; // {col, padId} | null
+
+/* ── BUILD TABLE ROWS ── */
+function a2BuildRows() {
+  const tbody = document.getElementById("a2Rows");
+  tbody.innerHTML = "";
+  A2_PADS.forEach(pad => {
+    const tr = document.createElement("tr");
+    const bg    = PAD_COLORS_A2[pad.id];
+    const tcol  = PAD_DARK_A2.has(pad.id) ? "rgba(255,255,255,.85)" : "rgba(0,0,0,.65)";
+
+    // Pad label cell
+    const tdPad = document.createElement("td");
+    tdPad.className = "td-pad";
+    tdPad.innerHTML = `<span class="a2-pad-dot" style="background:${bg};${PAD_DARK_A2.has(pad.id)?'border:1px solid #666':''}"></span><strong>${pad.abbr}</strong><br><span style="font-size:.55rem;color:#778;font-weight:700">${pad.name}</span>`;
+    tr.appendChild(tdPad);
+
+    // Three drop cells
+    ["fp","fn","cs"].forEach(col => {
+      const tdDrop = document.createElement("td");
+      tdDrop.className = `td-drop ${col}-col`;
+
+      const drop = document.createElement("div");
+      drop.className = `a2-drop ${col}-drop empty`;
+      drop.dataset.padId = pad.id;
+      drop.dataset.col   = col;
+
+      drop.addEventListener("dragover", e => {
+        if (a2DragItem?.col === col && state2[pad.id][col] === null) {
+          e.preventDefault();
+          drop.classList.add("a2-drag-over");
+        }
+      });
+      drop.addEventListener("dragleave", () => drop.classList.remove("a2-drag-over"));
+      drop.addEventListener("drop", e => {
+        e.preventDefault();
+        drop.classList.remove("a2-drag-over");
+        if (!a2DragItem || a2DragItem.col !== col || state2[pad.id][col] !== null) return;
+
+        if (a2DragFrom) {
+          state2[a2DragFrom.padId][a2DragFrom.col] = null;
+          renderA2Drop(a2DragFrom.padId, a2DragFrom.col);
+        }
+        state2[pad.id][col] = a2DragItem.label;
+        renderA2Drop(pad.id, col);
+        a2RefreshBankUsage();
+        a2DragItem = null; a2DragFrom = null;
+      });
+
+      tdDrop.appendChild(drop);
+      tr.appendChild(tdDrop);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderA2Drop(padId, col) {
+  const drop = document.querySelector(`.a2-drop[data-pad-id="${padId}"][data-col="${col}"]`);
+  if (!drop) return;
+  drop.innerHTML = "";
+  drop.classList.remove("a2-correct","a2-wrong","a2-drag-over");
+  const val = state2[padId][col];
+  if (val) {
+    drop.classList.remove("empty");
+    drop.appendChild(makeA2Chip(col, padId, val, true));
+  } else {
+    drop.classList.add("empty");
+  }
+}
+
+/* ── CHIPS ── */
+function makeA2Chip(col, padId, label, inSlot) {
+  const chip = document.createElement("div");
+  chip.className = "a2-chip";
+  chip.dataset.col   = col;
+  chip.dataset.padId = padId;
+  chip.dataset.label = label;
+  chip.draggable = true;
+  chip.textContent = label;
+
+  chip.addEventListener("dragstart", e => {
+    if (!inSlot && state2[padId][col] !== null) { e.preventDefault(); return; }
+    a2DragItem = { col, padId, label };
+    a2DragFrom = inSlot ? { col, padId } : null;
+    chip.classList.add("a2-dragging");
+  });
+  chip.addEventListener("dragend", () => chip.classList.remove("a2-dragging"));
+
+  if (inSlot) {
+    chip.addEventListener("click", () => {
+      state2[padId][col] = null;
+      renderA2Drop(padId, col);
+      a2RefreshBankUsage();
+    });
+  }
+  return chip;
+}
+
+/* ── BUILD BANKS ── */
+function a2BuildBanks() {
+  ["fp","fn","cs"].forEach(col => {
+    const bankId = col === "fp" ? "a2FpBank" : col === "fn" ? "a2FnBank" : "a2CsBank";
+    const wrap = document.getElementById(bankId);
+    wrap.innerHTML = "";
+    const chips = A2_PADS.map(p => ({ padId: p.id, label: A2_CHIP_LABELS[p.id][col] }))
+                         .sort(() => Math.random() - .5);
+    chips.forEach(({ padId, label }) => wrap.appendChild(makeA2Chip(col, padId, label, false)));
+  });
+}
+
+function a2RefreshBankUsage() {
+  document.querySelectorAll("#a2FpBank .a2-chip, #a2FnBank .a2-chip, #a2CsBank .a2-chip").forEach(chip => {
+    const used = state2[chip.dataset.padId][chip.dataset.col] !== null;
+    chip.classList.toggle("a2-used", used);
+    chip.draggable = !used;
+  });
+}
+
+/* ── CHECK ── */
+function a2Check() {
+  let correct = 0, total = 0;
+  A2_PADS.forEach(pad => {
+    ["fp","fn","cs"].forEach(col => {
+      const drop = document.querySelector(`.a2-drop[data-pad-id="${pad.id}"][data-col="${col}"]`);
+      if (!drop) return;
+      drop.classList.remove("a2-correct","a2-wrong");
+      const placed = state2[pad.id][col];
+      if (placed !== null) {
+        const correct_label = A2_CHIP_LABELS[pad.id][col];
+        const isRight = placed === correct_label;
+        drop.classList.add(isRight ? "a2-correct" : "a2-wrong");
+        if (isRight) correct++;
+      }
+      total++;
+    });
+  });
+  const pct = Math.round(correct / total * 100);
+  const msg = document.getElementById("a2ScoreMsg");
+  msg.textContent = `Score: ${correct}/${total} (${pct}%)`;
+  msg.style.color = pct >= 80 ? "#1e8449" : pct >= 50 ? "#b7770d" : "#922b21";
+}
+
+function a2Reset() {
+  A2_PADS.forEach(p => { state2[p.id] = { fp:null, fn:null, cs:null }; });
+  document.querySelectorAll(".a2-drop").forEach(d => {
+    d.innerHTML = ""; d.classList.remove("a2-correct","a2-wrong");
+    d.classList.add("empty");
+  });
+  a2BuildBanks();
+  document.getElementById("a2ScoreMsg").textContent = "";
+}
+
+/* ── ANSWER KEY ── */
+function a2BuildKey() {
+  const tbody = document.getElementById("a2KeyBody");
+  tbody.innerHTML = "";
+  A2_PADS.forEach(pad => {
+    const bg    = PAD_COLORS_A2[pad.id];
+    const tcol  = PAD_DARK_A2.has(pad.id) ? "#ddd" : "rgba(0,0,0,.7)";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="a2-mini-badge" style="background:${bg};color:${tcol}">${pad.abbr}</span><br>
+          <small style="color:#889;font-weight:700;font-size:.6rem">${pad.name}</small></td>
+      <td class="fp-td">${pad.fp}</td>
+      <td class="fn-td">${pad.fn}</td>
+      <td class="cs-td">${pad.cs}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ── INIT ── */
+document.getElementById("a2CheckBtn").addEventListener("click", a2Check);
+document.getElementById("a2ResetBtn").addEventListener("click", a2Reset);
+
+const a2KeyBtn      = document.getElementById("a2KeyBtn");
+const a2KeyPanel    = document.getElementById("a2AnswerKey");
+const a2KeyCloseBtn = document.getElementById("a2KeyCloseBtn");
+
+a2KeyBtn.addEventListener("click", () => {
+  a2BuildKey();
+  a2KeyPanel.classList.add("visible");
+  a2KeyPanel.scrollIntoView({ behavior:"smooth", block:"start" });
+  a2KeyBtn.textContent = "🔑 Answer Key ✓";
+});
+a2KeyCloseBtn.addEventListener("click", () => {
+  a2KeyPanel.classList.remove("visible");
+  a2KeyBtn.textContent = "🔑 Show Answer Key";
+});
+
+a2BuildBanks();
+a2BuildRows();
+</script>
+</body>
+</html>
