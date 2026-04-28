@@ -27,6 +27,7 @@
 #pwa-splash .sp-dot:nth-child(2){animation-delay:.2s}
 #pwa-splash .sp-dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <style>
@@ -257,10 +258,10 @@ select option{background:var(--bg3)}
 .folder-name{font-size:13px;font-weight:600;color:var(--text)}
 .folder-count{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px}
 .condition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.condition-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s}
-.condition-card:hover{border-color:#4f8ef766;transform:translateY(-1px)}
-.condition-imgs{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:130px;background:var(--bg3)}
-.condition-imgs img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:var(--bg3)}
+.condition-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s;display:flex;flex-direction:column}
+.condition-card:hover{border-color:#4f8ef766;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.condition-imgs{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;height:160px;background:var(--bg3);flex-shrink:0}
+.condition-imgs img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:var(--bg3);display:block}
 .condition-imgs .img-ph{width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px}
 /* UA single-image card — full width, taller */
 .ua-single-img{height:160px;background:var(--bg3);overflow:hidden}
@@ -271,9 +272,9 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 #img-viewer{position:fixed;inset:0;background:#000d;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
 #img-viewer img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:var(--r);box-shadow:0 4px 32px #0008}
 #img-viewer-close{position:absolute;top:16px;right:16px;background:#fff2;border:none;border-radius:50%;width:36px;height:36px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.condition-body{padding:12px}
-.condition-name{font-size:12px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.4;overflow-wrap:anywhere}
-.condition-features{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
+.condition-body{padding:10px 12px;background:var(--bg2);flex:1}
+.condition-name{font-size:13px;font-weight:700;color:var(--text);word-break:break-word;line-height:1.4;margin-bottom:4px}
+.condition-features{font-size:11px;color:var(--text2);line-height:1.5}
 
 /* Cases */
 .case-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px}
@@ -962,12 +963,12 @@ async function renderHome(v){
     + '</div>'
     + fmlAdminDrop + '</div>'
     + '</div>'
-    + '<div class="mt-24">'
-    + '<div class="section-title" style="font-size:16px;margin-bottom:4px">Interactive Learning</div>'
-    + '<div class="section-sub" style="margin-bottom:14px">External tools and simulations</div>'
-    + '<div id="interactive-links-grid"></div>'
-    + (isAdmin ? '<div class="mt-12" id="interactive-admin"></div>' : '')
-    + '</div>'
+    + '<div class="mt-16">'
+    + '<div onclick="goInteractive()" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s">'
+    + '<div style="font-size:28px;flex-shrink:0">🔗</div>'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Interactive Learning</div><div style="font-size:11px;color:var(--text3);margin-top:2px">External tools, simulations and resources</div></div>'
+    + '<div style="font-size:18px;color:var(--text3)">›</div>'
+    + '</div></div>'
     + '<div class="mt-24">'
     + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
     + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
@@ -1521,7 +1522,7 @@ function renderImageFlashcard(el){
     el.innerHTML=`
       <div class="bbq-overlay">
         <div class="bbq-header">
-          <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;renderTab()">← Back</button>
+          <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">← Back</button>
           <div class="ml-auto" style="color:var(--text);font-size:13px">Done!</div>
         </div>
         <div class="bbq-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center">
@@ -1529,7 +1530,7 @@ function renderImageFlashcard(el){
           <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:24px">All cards reviewed!</div>
           <div class="flex gap-8 flex-wrap" style="justify-content:center">
             <button class="btn btn-primary" onclick="startImageFlashcard(appState.imgFlashItems)">Shuffle & Restart</button>
-            <button class="btn btn-ghost" onclick="appState.imgFlashMode=false;renderTab()">Back</button>
+            <button class="btn btn-ghost" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">Back</button>
           </div>
         </div>
       </div>`;
@@ -1583,7 +1584,7 @@ function renderImageFlashcard(el){
   el.innerHTML=`
     <div class="bbq-overlay">
       <div class="bbq-header">
-        <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;renderTab()">✕ Exit</button>
+        <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">✕ Exit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         <span style="white-space:nowrap;font-size:13px;color:var(--text);font-family:var(--mono)">${idx+1} / ${items.length}</span>
       </div>
@@ -1617,6 +1618,7 @@ async function renderImagesTab(el){
 
 // Generic images (non-hematology/micro/ua) — mycology, parasitology, etc.
 async function renderGenericImages(el){
+  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images...</div>';
   let data;
   if(appState.subject==='para_myco'){
     const [r1,r2]=await Promise.all([
@@ -1705,8 +1707,14 @@ async function startGenericFlashcard(){
 // ─── URINALYSIS IMAGES — flat list with bulk upload + quiz (no folders) ───────
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
-  const {data:items}=await sb.from('mlsboc_ua_images').select('*').order('name');
-  const all=items||[];
+  // Show skeleton immediately
+  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
+  // Use cache
+  if(!window._uaCache){
+    try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}
+    catch(e){window._uaCache=[];}
+  }
+  const all=window._uaCache||[];
 
   el.innerHTML=`
     <div class="flex-center gap-8 mb-16 flex-wrap">
@@ -1860,7 +1868,7 @@ async function saveUAEdit(id){
   const featText=document.getElementById('uaedit-features')?.value||'';
   const notes=document.getElementById('uaedit-notes')?.value.trim()||'';
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes}).eq('id',id);
+  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes}).eq('id',id);window._uaCache=null;
   if(error){alert('Save failed: '+error.message);return;}
   document.getElementById('condition-modal').classList.add('hidden');
   renderTab();
@@ -1969,7 +1977,7 @@ async function adminAddUAImage(){
   const notes=document.getElementById('ua-notes')?.value.trim();
   if(!name){alert('Name required.');return;}
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:notes||'',images:[]});
+  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:notes||'',images:[]});window._uaCache=null;
   if(error){alert('Error: '+error.message);return;}
   document.getElementById('ua-name').value='';
   document.getElementById('ua-features').value='';
@@ -2005,7 +2013,7 @@ async function processUABulkFiles(files){
 
 async function deleteUAImage(id){
   if(!confirm('Delete this image entry?'))return;
-  await sb.from('mlsboc_ua_images').delete().eq('id',id);
+  await sb.from('mlsboc_ua_images').delete().eq('id',id);window._uaCache=null;
   renderTab();
 }
 
@@ -2019,8 +2027,8 @@ async function startUAQuiz(forceNew=false){
     window._uaShowResume=true;
     renderTab();return;
   }
-  const {data}=await sb.from('mlsboc_ua_images').select('*').not('images','is',null);
-  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!window._uaCache){try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}catch(e){}}
+  const valid=(window._uaCache||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
   if(!valid.length){alert('No images to quiz on yet.');return;}
   appState.uaImgMode='quiz';
   window._uaShowResume=false;
@@ -2210,9 +2218,16 @@ async function renderHemeImages(el){
   if(appState.hemeImgMode==='quiz'){
     renderHemeImageQuiz(el);return;
   }
-
+  // Show skeleton immediately
+  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
+  // Use cache
+  if(!window._hemeCondsCache){
+    try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=r.data||[];}
+    catch(e){window._hemeCondsCache=[];}
+  }
   // Flat view — load all conditions, group by folder inline
-  const {data:allConditions}=await sb.from('mlsboc_heme_conditions').select('*').order('name');
+  const allConditions=window._hemeCondsCache||[];
+  const _dummy=null; // placeholder to avoid unused var warning
   const conditions=allConditions||[];
 
   // Group by folder preserving HEME_FOLDER_GROUPS order
@@ -2447,9 +2462,9 @@ async function startHemeQuiz(){
 }
 
 async function startHemeFlashcard(){
-  const {data}=await sb.from('mlsboc_heme_conditions').select('*').order('name');
-  if(!data||!data.length){alert('No conditions to study yet.');return;}
-  startImageFlashcard(data);
+  if(!window._hemeCondsCache){try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=r.data||[];}catch(e){}}
+  if(!window._hemeCondsCache||!window._hemeCondsCache.length){alert('No conditions to study yet.');return;}
+  startImageFlashcard(window._hemeCondsCache);
 }
 
 async function startMicroFlashcard(){
@@ -2460,9 +2475,9 @@ async function startMicroFlashcard(){
 }
 
 async function startUAFlashcard(){
-  const {data}=await sb.from('mlsboc_ua_images').select('*').order('name');
-  if(!data||!data.length){alert('No images to study yet.');return;}
-  startImageFlashcard(data);
+  if(!window._uaCache){try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}catch(e){}}
+  if(!window._uaCache||!window._uaCache.length){alert('No images to study yet.');return;}
+  startImageFlashcard(window._uaCache);
 }
 
 async function startHemeQuizFolder(folder){
@@ -2932,6 +2947,8 @@ async function renderCasesTab(el){
     await renderImmunologyCases(el);
   }else if(appState.subject==='clinical_chemistry'){
     await renderChemistryCases(el);
+  }else if(appState.subject==='urinalysis'){
+    await renderUACases(el);
   }else if(appState.subject==='para_myco'||appState.subject==='parasitology'||appState.subject==='mycology'){
     await renderParaMycoAllCases(el);
   }else{
@@ -3439,6 +3456,41 @@ function tblHasContent(td){
 // ─── IMMUNOLOGY CASES ──────────────────────────────────────────────────────────
 const IMMUNO_TESTS = ['ANA', 'Anti-dsDNA', 'RF', 'C3', 'C4', 'CH50', 'IgG', 'IgM', 'IgA', 'IgE', 'ESR', 'CRP', 'WBC', 'Lymphocytes', 'Other'];
 const IMMUNO_TABLE_LABEL = 'Immunology Results';
+
+
+async function renderUACases(el){
+  await renderSubjectCases(el,{
+    subject:'urinalysis',
+    dbTable:'mlsboc_ua_cases',
+    tableField:'test_results',
+    tableLabel:'UA Results',
+    answerKey:'uaCaseAnswers',
+    collapsedKey:'uaCaseCollapsed',
+    quizModeKey:'uaQuizMode',
+    quizStateKey:'uaQuiz',
+    label:'Urinalysis Cases',
+    desc:'Read the scenario and urinalysis results, then answer each question.',
+    exportTitle:'Urinalysis Cases',
+    adminFn:'openUACaseEditor',
+    deleteFn:'deleteUACase',
+    editorFn:openUACaseEditor
+  });
+}
+
+async function openUACaseEditor(caseId){
+  let c={title:'',scenario:'',test_results:[],questions:[],is_draft:false,images:[]};
+  if(caseId){
+    const {data}=await sb.from('mlsboc_ua_cases').select('*').eq('id',caseId).single();
+    if(data)c=data;
+  }
+  openSubjectCaseEditor(caseId,'mlsboc_ua_cases',c,'urinalysis','UA Results');
+}
+
+async function deleteUACase(id){
+  if(!confirm('Delete this case?'))return;
+  await sb.from('mlsboc_ua_cases').delete().eq('id',id);
+  renderTab();
+}
 
 async function renderImmunologyCases(el){
   await renderSubjectCases(el,{
