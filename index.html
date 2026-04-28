@@ -603,10 +603,14 @@ window.__appInit = async function(){
   window.__appInitDone=true;
   try{
     sb = supabase.createClient(SB_URL, SB_KEY);
-    await seedIfEmpty();
-    await loadIconCache();
-    await loadFolderIconCache();
-    await loadClassIconCache();
+    const _t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('to'),ms));
+    if(!localStorage.getItem('mlsboc_seeded')){
+      seedIfEmpty().then(()=>localStorage.setItem('mlsboc_seeded','1')).catch(()=>{});
+    }
+    await Promise.race([
+      Promise.all([loadIconCache(),loadFolderIconCache(),loadClassIconCache()]),
+      _t(5000)
+    ]).catch(()=>{});
     // Restore last navigation position
     try{
       const saved=sessionStorage.getItem('mlsboc_nav');
@@ -649,6 +653,86 @@ function getUID(){
 }
 
 // ─── SEEDING ──────────────────────────────────────────────────────────────────
+
+// ─── SHARED IMAGE SECTION PDF GENERATOR ──────────────────────────────────────
+// Layout: 2x2 image grid on top (like the app cards), name + key features below
+async function generateImageSectionPDF(items, title, filename){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const margin=14,gap=5;
+  // Grid takes upper ~60% of page, text below
+  const gridW=(pageW-margin*2-gap)/2;
+  const gridH=gridW*0.68;
+  const gridY=margin;
+  const textY=gridY+2*(gridH+gap)+6; // text starts below 2x2 grid
+  const getImgDims=(src)=>new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});
+    img.onerror=()=>res({w:4,h:3});
+    img.src=src;
+  });
+  let first=true;
+  for(const item of items){
+    if(!first)doc.addPage(); first=false;
+    // ── 2x2 image grid (top of page, like the card)
+    const imgs=(item.images||[]).filter(Boolean).slice(0,4);
+    for(let i=0;i<4;i++){
+      const col=i%2,row=Math.floor(i/2);
+      const cx=margin+col*(gridW+gap);
+      const cy=gridY+row*(gridH+gap);
+      doc.setFillColor(245,245,245);doc.rect(cx,cy,gridW,gridH,'F');
+      doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(cx,cy,gridW,gridH,'S');
+      if(imgs[i]){
+        try{
+          let dims={w:4,h:3};
+          try{dims=await getImgDims(imgs[i]);}catch(e){}
+          const ar=dims.w/dims.h,car=gridW/gridH;
+          let dw,dh;
+          if(ar>car){dw=gridW;dh=gridW/ar;}else{dh=gridH;dw=gridH*ar;}
+          const ox=cx+(gridW-dw)/2,oy=cy+(gridH-dh)/2;
+          const fmt=(imgs[i].startsWith('data:image/png')||imgs[i].toLowerCase().includes('.png'))?'PNG':'JPEG';
+          doc.addImage(imgs[i],fmt,ox,oy,dw,dh,'','NONE');
+        }catch(e){}
+      }
+    }
+    // ── Divider line between images and text
+    doc.setDrawColor(200,200,200);doc.setLineWidth(0.4);
+    doc.line(margin,textY-3,pageW-margin,textY-3);
+    // ── Name (bold, larger) — below images like the app card
+    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
+    doc.text(item.name||'',margin,textY+3);
+    // ── Key features
+    const feats=(item.key_features||[]).filter(Boolean);
+    let ty=textY+10;
+    if(feats.length){
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);
+      doc.text('Key Features',margin,ty);ty+=5;
+      doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);
+      const featLines=doc.splitTextToSize(feats.join('  |  '),pageW-margin*2);
+      featLines.forEach(l=>{doc.text(l,margin,ty);ty+=4.5;});
+      ty+=3;
+    }
+    // ── Notes
+    if(item.notes&&item.notes.trim()){
+      doc.setFontSize(8.5);doc.setFont('helvetica','italic');doc.setTextColor(70,70,70);
+      const noteLines=doc.splitTextToSize(item.notes,pageW-margin*2);
+      noteLines.slice(0,4).forEach(l=>{doc.text(l,margin,ty);ty+=4.2;});
+    }
+  }
+  // Footer
+  const tot=doc.internal.getNumberOfPages();
+  for(let p=1;p<=tot;p++){
+    doc.setPage(p);
+    doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+    doc.text('MLS BOC Prep - '+title+' | Page '+p+' of '+tot,margin,pageH-6);
+    doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});
+  }
+  doc.save(filename);
+  document.getElementById('condition-modal').classList.add('hidden');
+}
+
 async function seedIfEmpty(){
   try{
     const {data}=await sb.from('mlsboc_questions').select('id').limit(1);
@@ -756,6 +840,7 @@ function renderView(){
   const v=document.getElementById('view-main');
   if(appState.view==='home')renderHome(v);
   else if(appState.view==='subject')renderSubjectView(v);
+  else if(appState.view==='interactive')renderInteractiveView(v);
   else if(appState.view==='all')renderAllView(v);
   else if(appState.view==='formulas')renderFormulasView(v);
   else if(appState.view==='class')renderClassView(v);
@@ -928,6 +1013,19 @@ async function renderHome(v){
   loadInteractiveLinks();
 }
 
+async function renderInteractiveView(v){
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
+      <div class="section-title">Interactive Learning</div>
+      ${isAdmin?`<button class="btn btn-primary btn-sm ml-auto" onclick="addInteractiveLink()">+ Add Link</button>`:''}
+    </div>
+    <p class="text-muted" style="font-size:13px;margin-bottom:20px">External tools, simulations and study resources.</p>
+    <div id="interactive-links-grid"><div style="color:var(--text3);font-size:13px;padding:20px">Loading...</div></div>
+    ${isAdmin?'<div class="mt-16" id="interactive-admin"></div>':''}
+  `;
+  loadInteractiveLinks();
+}
 async function loadInteractiveLinks(){
   const {data:links} = await sb.from('mlsboc_interactive_links').select('*').order('created_at',{ascending:true});
   const grid = document.getElementById('interactive-links-grid');
@@ -1100,6 +1198,7 @@ function goSubject(key){
 function goAll(){appState.view='all';appState.allStarted=false;appState.allDone=false;appState.allSeconds=0;renderView();}
 function goFormulas(){appState.view='formulas';renderView();}
 function goHome(){appState.view='home';clearInterval(appState.allTimer);renderView();}
+function goInteractive(){appState.view='interactive';renderView();}
 function goClass(){appState.view='class';appState.classView=null;appState.classSubject=null;appState.classSet=null;renderView();}
 
 function renderSubjectView(v){
@@ -1151,6 +1250,9 @@ function switchTab(tab){
   appState.uaImgMode='browse';
   appState.uaQuizItems=[];appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
   appState.imgFlashMode=false;appState.imgFlashIdx=0;appState.imgFlashFlipped=false;
+  // Show loading immediately, then render
+  const tc=document.getElementById('tab-content');
+  if(tc)tc.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3);font-size:14px">Loading...</div>';
   renderTab();
 }
 
@@ -1674,33 +1776,8 @@ async function generateUAPDF(){
   try{
     const {data:all}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
     if(!all||!all.length){return;}
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
-    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
-    let y=margin,first=true;
-    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
-    const getImgDims=(src)=>new Promise(res=>{const img=new Image();img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});img.onerror=()=>res({w:4,h:3});img.src=src;});
-    for(const item of all){
-      if(!first){doc.addPage();y=margin;}first=false;
-      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
-      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
-      doc.text(item.name,margin+3,y+7);y+=14;
-      if(item.key_features&&item.key_features.length){
-        doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
-        doc.text('Key features: '+item.key_features.join(' · '),margin,y);y+=7;
-      }
-      if(item.notes){doc.setFontSize(9.5);doc.setTextColor(60,60,60);doc.splitTextToSize(item.notes,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5;});y+=3;}
-      for(const src of (item.images||[]).filter(Boolean).slice(0,4)){
-        let dims={w:4,h:3};try{dims=await getImgDims(src);}catch(e){}
-        const dw=cW,dh=Math.min(dw*(dims.h/dims.w),120);
-        checkPage(dh+6);
-        try{doc.addImage(src,src.startsWith('data:image/png')?'PNG':'JPEG',margin,y,dw,dh,'','NONE');y+=dh+6;}catch(e){}
-      }
-    }
-    const total=doc.internal.getNumberOfPages();
-    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — UA Findings · Page ${p} of ${total}`,margin,pageH-8);}
-    doc.save('urinalysis_findings.pdf');
-    document.getElementById('condition-modal').classList.add('hidden');
+
+    await generateImageSectionPDF(all,'Urinalysis Findings','urinalysis_findings.pdf');
   }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
 }
 
@@ -2252,65 +2329,8 @@ async function generateHemeConditionsPDF(){
     const {data:all}=await sb.from('mlsboc_heme_conditions').select('*').in('id',selectedIds);
     if(!all||!all.length){alert('Could not load conditions.');return;}
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const pageW=doc.internal.pageSize.getWidth();
-    const pageH=doc.internal.pageSize.getHeight();
-    const margin=18;const contentW=pageW-margin*2;
-    let y=margin;let first=true;
-    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
-    const write=(text,opts={})=>{
-      const{size=11,bold=false,color=[30,30,30],indent=0}=opts;
-      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
-      doc.splitTextToSize(String(text||''),contentW-indent).forEach(line=>{checkPage(6);doc.text(line,margin+indent,y);y+=size*0.4+1.2;});
-    };
-    for(const c of all){
-      if(!first){doc.addPage();y=margin;}first=false;
-      // Header
-      doc.setFillColor(210,210,210);doc.rect(margin,y,contentW,10,'F');
-      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
-      doc.text(c.name,margin+3,y+7);y+=14;
-      // Key features
-      if(c.key_features&&c.key_features.length){
-        write('Key Features',{size:10,bold:true,color:[40,40,40]});
-        write(c.key_features.join('  ·  '),{size:10,indent:2,color:[30,30,30]});
-        y+=3;
-      }
-      if(c.notes){write('Notes',{size:10,bold:true,color:[40,40,40]});write(c.notes,{size:10,indent:2,color:[40,40,40]});y+=3;}
-      // Images — preserve actual aspect ratio, one per row at full width
-      const imgs=(c.images||[]).filter(Boolean);
-      if(imgs.length){
-        const getImgDims=(src)=>new Promise(res=>{
-          const img=new Image();
-          img.onload=()=>res({w:img.naturalWidth||1,h:img.naturalHeight||1});
-          img.onerror=()=>res({w:4,h:3});
-          img.src=src;
-        });
 
-        for(let i=0;i<Math.min(imgs.length,4);i++){
-          let dims={w:4,h:3};
-          try{dims=await getImgDims(imgs[i]);}catch(e){}
-          const aspect=dims.h/dims.w;
-          const drawW=contentW;
-          const drawH=Math.min(drawW*aspect, 120); // cap at 120mm tall
-          checkPage(drawH+6);
-          try{
-            const fmt=imgs[i].startsWith('data:image/png')?'PNG':'JPEG';
-            doc.addImage(imgs[i],fmt,margin,y,drawW,drawH,'','NONE');
-            y+=drawH+6;
-          }catch(e){}
-        }
-        y+=4;
-      }
-    }
-    // Footer
-    const total=doc.internal.getNumberOfPages();
-    for(let p=1;p<=total;p++){
-      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
-      doc.text(`MLS BOC Prep — Hematology Conditions · Page ${p} of ${total}`,margin,pageH-8);
-      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
-    }
-    doc.save('hematology_conditions.pdf');
-    document.getElementById('condition-modal').classList.add('hidden');
+    await generateImageSectionPDF(all,'Hematology Conditions','hematology_conditions.pdf');
   }catch(err){
     console.error(err);alert('PDF generation failed: '+err.message);
     if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
@@ -2433,8 +2453,9 @@ async function startHemeFlashcard(){
 }
 
 async function startMicroFlashcard(){
-  const {data}=await sb.from('mlsboc_micro_organisms').select('*').order('name');
-  if(!data||!data.length){alert('No organisms to study yet.');return;}
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  const data=window._microOrgsCache||[];
+  if(!data.length){alert('No organisms to study yet.');return;}
   startImageFlashcard(data);
 }
 
@@ -2488,11 +2509,14 @@ function hemeQuizNext(){appState.hemeQuizIdx++;renderTab();}
 async function renderMicroImages(el){
   if(appState.microImgMode==='quiz'){renderMicroImageQuiz(el);return;}
 
-  // Flat view — load all organisms grouped by gram stain section
-  const {data:allOrgs}=await sb.from('mlsboc_micro_organisms').select('*').order('name');
-  const all=allOrgs||[];
+  // Flat view — cache organisms to avoid refetch on tab switch
+  if(!window._microOrgsCache||window._microOrgsCache.length===0){
+    try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');
+      window._microOrgsCache=r.data||[];}catch(e){window._microOrgsCache=[];}
+  }
+  const all=window._microOrgsCache||[];
   const byFolder={};
-  all.forEach(o=>{if(!byFolder[o.folder])byFolder[o.folder]=[];byFolder[o.folder].push(o);});
+  all.forEach(o=>{const f=o.folder||'misc';if(!byFolder[f])byFolder[f]=[];byFolder[f].push(o);});
 
   const folderOrder=MICRO_FOLDER_GROUPS.flatMap(g=>g.keys);
   Object.keys(byFolder).forEach(k=>{if(!folderOrder.includes(k))folderOrder.push(k);});
@@ -2537,6 +2561,8 @@ async function renderMicroImages(el){
     </div>
     ${isAdmin?`<div class="mt-16">${adminMicroImageControls()}</div>`:''}
   `;
+  // Clear the cache entry if it seems stale (will refetch next time)
+  if(!all.length) window._microOrgsCache=null;
 }
 
 function filterMicroItems(query){
@@ -2551,8 +2577,9 @@ function filterMicroItems(query){
 }
 
 async function openMicroExportModal(){
-  const {data:all}=await sb.from('mlsboc_micro_organisms').select('*').order('name');
-  if(!all||!all.length){alert('No organisms to export.');return;}
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  const all=window._microOrgsCache||[];
+  if(!all.length){alert('No organisms to export.');return;}
   const byFolder={};
   all.forEach(o=>{if(!byFolder[o.folder])byFolder[o.folder]=[];byFolder[o.folder].push(o);});
   let html=`
@@ -2580,32 +2607,72 @@ async function generateMicroPDF(){
   const btn=document.querySelector('#condition-modal-body .btn-primary');
   if(btn){btn.textContent='Generating...';btn.disabled=true;}
   try{
-    const {data:all}=await sb.from('mlsboc_micro_organisms').select('*').in('id',ids);
+    const rawAll=(window._microOrgsCache||[]).filter(o=>ids.includes(o.id));
+    // Normalize micro organisms to match shared PDF format
+    const all=rawAll.map(o=>({name:o.name,key_features:o.key_features||[],notes:o.notes||'',images:o.images||[]}));
+    // Use shared generator
+    await generateImageSectionPDF(all,'Microbiology Organisms','microbiology_organisms.pdf');
+    return;
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
-    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
-    let y=margin,first=true;
-    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    // Landscape A4 for 2x2 grid of images
+    const doc=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
+    const margin=12,gap=8;
+    const cellW=(pageW-margin*2-gap)/2;
+    const cellH=(pageH-margin*2-gap)/2;
     const getImgDims=(src)=>new Promise(res=>{const img=new Image();img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});img.onerror=()=>res({w:4,h:3});img.src=src;});
+    let first=true;
     for(const o of (all||[])){
-      if(!first){doc.addPage();y=margin;}first=false;
-      doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
-      doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
-      doc.text(o.name,margin+3,y+7);y+=14;
-      if(o.key_features&&o.key_features.length){doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);doc.text('Key features: '+o.key_features.join(' · '),margin,y);y+=7;}
-      if(o.notes){doc.setFontSize(9.5);doc.setTextColor(60,60,60);doc.splitTextToSize(o.notes,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5;});y+=3;}
-      for(const src of (o.images||[]).filter(Boolean).slice(0,4)){
-        let dims={w:4,h:3};try{dims=await getImgDims(src);}catch(e){}
-        const dw=cW,dh=Math.min(dw*(dims.h/dims.w),120);
-        checkPage(dh+6);
-        try{doc.addImage(src,src.startsWith('data:image/png')?'PNG':'JPEG',margin,y,dw,dh,'','NONE');y+=dh+6;}catch(e){}
+      if(!first)doc.addPage();first=false;
+      // Organism name header
+      doc.setFillColor(30,30,30);doc.rect(margin,margin,pageW-margin*2,10,'F');
+      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+      doc.text(o.name,margin+4,margin+7);
+      // Key features on same line if space
+      if(o.key_features&&o.key_features.length){
+        doc.setFontSize(9);doc.setFont('helvetica','normal');
+        const feat=o.key_features.slice(0,4).join(' | ');
+        doc.text(feat,margin+4,margin+14);
+      }
+      const imgY=margin+18;
+      const imgs=(o.images||[]).filter(Boolean).slice(0,4);
+      for(let i=0;i<4;i++){
+        const col=i%2,row=Math.floor(i/2);
+        const x=margin+col*(cellW+gap);
+        const y=imgY+row*(cellH+gap);
+        // Draw cell border (empty placeholder)
+        doc.setDrawColor(200,200,200);doc.setLineWidth(0.3);
+        doc.rect(x,y,cellW,cellH,'S');
+        if(imgs[i]){
+          try{
+            let dims={w:4,h:3};
+            try{dims=await getImgDims(imgs[i]);}catch(e){}
+            // Fit image inside cell preserving aspect ratio (no crop, no distort)
+            const imgAr=dims.w/dims.h;
+            const cellAr=cellW/cellH;
+            let dw,dh;
+            if(imgAr>cellAr){dw=cellW;dh=cellW/imgAr;}
+            else{dh=cellH;dw=cellH*imgAr;}
+            const ox=x+(cellW-dw)/2;
+            const oy=y+(cellH-dh)/2;
+            const fmt=imgs[i].startsWith('data:image/png')?'PNG':'JPEG';
+            doc.addImage(imgs[i],fmt,ox,oy,dw,dh,'','NONE');
+          }catch(e){}
+        }else{
+          // Empty cell label
+          doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,180,180);
+          doc.text('(no image)',x+cellW/2,y+cellH/2,{align:'center'});
+        }
       }
     }
     const total=doc.internal.getNumberOfPages();
-    for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — Microbiology · Page ${p} of ${total}`,margin,pageH-8);}
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+      doc.text('MLS BOC Prep - Microbiology | Page '+p+' of '+total,margin,pageH-5);
+    }
     doc.save('microbiology_organisms.pdf');
     document.getElementById('condition-modal').classList.add('hidden');
-  }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
+  }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='Generate PDF';btn.disabled=false;}}
 }
 
 function openMicroFolder(key){appState.microImgPage=key;renderTab();}
@@ -2706,7 +2773,7 @@ async function saveOrganismEdit(id){
   const notes=document.getElementById('oedit-notes')?.value.trim()||'';
   const folder=document.getElementById('oedit-folder')?.value||'gram_positive';
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_micro_organisms').update({name,key_features:features,notes,folder}).eq('id',id);
+  const {error}=await sb.from('mlsboc_micro_organisms').update({name,key_features:features,notes,folder}).eq('id',id);window._microOrgsCache=null;
   if(error){alert('Save failed: '+error.message);return;}
   document.getElementById('condition-modal').classList.add('hidden');
   renderTab();
@@ -2748,8 +2815,8 @@ async function handleOrganismImgDrop(e,orgId,slot){
 }
 
 async function startMicroQuiz(){
-  const {data}=await sb.from('mlsboc_micro_organisms').select('*').not('images','is',null);
-  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  const valid=(window._microOrgsCache||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
   if(!valid.length){alert('No organisms with images to quiz on yet.');return;}
   appState.microImgMode='quiz';
   window._kqOpts={};appState.microQuizItems=shuffle(valid);
@@ -2834,7 +2901,7 @@ async function adminAddOrganism(){
   const notes=document.getElementById('org-notes')?.value.trim();
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
   if(!name||!folder){alert('Name and folder required.');return;}
-  const {error}=await sb.from('mlsboc_micro_organisms').insert({name,folder,key_features:features,notes:notes||'',images:[]});
+  const {error}=await sb.from('mlsboc_micro_organisms').insert({name,folder,key_features:features,notes:notes||'',images:[]});window._microOrgsCache=null;
   if(error)alert('Error: '+error.message);
   else{document.getElementById('condition-modal').classList.add('hidden');renderTab();}
 }
@@ -7363,4 +7430,3 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgView
 </div>
 </body>
 </html>
-
