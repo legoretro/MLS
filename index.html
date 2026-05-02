@@ -3477,7 +3477,7 @@ async function renderUACases(el){
   });
 }
 
-async function openUACaseEditor(null){
+async function openUACaseEditor('mlsboc_ua_cases'){
   let c={title:'',scenario:'',test_results:[],questions:[],is_draft:false,images:[]};
   if(caseId){
     const {data}=await sb.from('mlsboc_ua_cases').select('*').eq('id',caseId).single();
