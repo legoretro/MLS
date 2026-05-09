@@ -104,6 +104,15 @@ select option{background:var(--bg3)}
 .subject-icon{font-size:22px}
 .subject-name{font-size:14px;font-weight:600;color:var(--text)}
 .subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
+.class-material-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--cm-accent,var(--accent));opacity:.9}
+.class-material-card:hover{border-color:color-mix(in srgb,var(--cm-accent,var(--accent)) 55%,var(--border));background:var(--bg3);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.16)}
+.class-material-bubble{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,var(--cm-accent,var(--accent)),color-mix(in srgb,var(--cm-accent,var(--accent)) 65%,#ffffff));color:#fff;font-family:var(--mono);font-size:17px;font-weight:800;letter-spacing:.3px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 16px rgba(0,0,0,.22)}
+.class-material-bubble img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.class-material-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
+.class-material-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px}
+.class-material-arrow{margin-left:auto;color:var(--text3);font-size:18px;line-height:1}
 
 /* Quiz */
 .quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
@@ -975,6 +984,33 @@ function getClassSubjectIcon(key,fallback){
   return '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0">'+fallback+'</div>';
 }
 
+function getClassMaterialAccent(key){
+  const colors={blood_bank:'#c74656',chemistry:'#2f7dd1',urinalysis:'#d0a126',microbiology:'#2fa66a'};
+  return colors[key]||'#4f8ef7';
+}
+
+function getClassMaterialShort(name){
+  const words=String(name||'').replace(/\s*\/\s*/g,' ').split(/\s+/).filter(Boolean);
+  return (words.length>1 ? words.map(w=>w[0]).join('') : (words[0]||'?').slice(0,2)).slice(0,2).toUpperCase();
+}
+
+function getClassMaterialBubble(s){
+  const stored=classIconCache[s.key];
+  if(stored) return '<div class="class-material-bubble"><img src="'+stored+'" alt=""></div>';
+  return '<div class="class-material-bubble">'+getClassMaterialShort(s.name)+'</div>';
+}
+
+function renderClassMaterialCard(s,countId,iconId){
+  return '<div class="class-material-card" onclick="goClassSubject(\''+s.key+'\')" style="--cm-accent:'+getClassMaterialAccent(s.key)+'">'
+    + '<div id="'+iconId+'">'+getClassMaterialBubble(s)+'</div>'
+    + '<div style="min-width:0;flex:1">'
+    + '<div class="class-material-title">'+s.name+'</div>'
+    + (countId?'<div class="class-material-sub" id="'+countId+'">loading...</div>':'<div class="class-material-sub">Question sets</div>')
+    + '</div>'
+    + '<div class="class-material-arrow">›</div>'
+    + '</div>';
+}
+
 async function handleClassIconFile(e,key){
   const file=e.target.files[0];if(!file)return;
   const img=new Image();
@@ -1073,16 +1109,13 @@ async function renderHome(v){
     + '<div class="mt-24">'
     + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
     + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
-    + '<div class="subject-grid" id="class-material-grid">'
+    + '<div class="class-material-grid" id="class-material-grid">'
     + CLASS_SUBJECTS.map(s=>{
         const uploadBtn = isAdmin
           ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleClassIconFile(event,\''+s.key+'\')" onclick="event.stopPropagation()"></label>'
           : '';
         return '<div style="position:relative">'
-          + '<div class="subject-card" onclick="goClassSubject(\''+s.key+'\')" style="cursor:pointer">'
-          + '<div id="csicon-'+s.key+'">'+getClassSubjectIcon(s.key,s.icon)+'</div>'
-          + '<div style="padding:10px 12px 12px"><div class="subject-name">'+s.name+'</div><div class="subject-count" id="ccnt-'+s.key+'">loading...</div></div>'
-          + '</div>'
+          + renderClassMaterialCard(s,'ccnt-'+s.key,'csicon-'+s.key)
           + uploadBtn + '</div>';
       }).join('')
     + '</div>'
@@ -6584,18 +6617,14 @@ async function renderClassView(v){
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
       <div class="section-title">Class Material</div>
     </div>
-    <div class="subject-grid">
+    <div class="class-material-grid">
       ${CLASS_SUBJECTS.map(s=>{
         const uploadBtn = isAdmin
           ? `<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleClassIconFile(event,'${s.key}')" onclick="event.stopPropagation()"></label>`
           : '';
         return `<div style="position:relative">
-          <div class="subject-card" onclick="goClassSubject('${s.key}')" style="cursor:pointer">
-            <div id="csicon2-${s.key}">${getClassSubjectIcon(s.key,s.icon)}</div>
-            <div style="padding:10px 12px 12px">
-              <div class="subject-name">${s.name}</div>
-            </div>
-          </div>${uploadBtn}</div>`;
+          ${renderClassMaterialCard(s,null,'csicon2-'+s.key)}
+          ${uploadBtn}</div>`;
       }).join('')}
     </div>`;
 }
