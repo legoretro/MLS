@@ -741,14 +741,13 @@ async function generateUASingleImagePDF(items, title, filename){
   const pageW=doc.internal.pageSize.getWidth();
   const pageH=doc.internal.pageSize.getHeight();
   const margin=12;
-  const gap=4;
-  const rowsPerPage=4;
-  const usableH=pageH-margin*2-10;
-  const rowH=usableH/rowsPerPage;
-  const imgW=58;
-  const imgH=rowH-gap*2;
-  const textX=margin+imgW+7;
-  const textW=pageW-textX-margin;
+  const gap=5;
+  const cols=2;
+  const rows=3;
+  const itemsPerPage=cols*rows;
+  const cardW=(pageW-margin*2-gap*(cols-1))/cols;
+  const cardH=(pageH-margin*2-10-gap*(rows-1))/rows;
+  const imgH=cardH-16;
   const getImgDims=(src)=>new Promise(res=>{
     const img=new Image();
     img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});
@@ -756,17 +755,17 @@ async function generateUASingleImagePDF(items, title, filename){
     img.src=src;
   });
   for(let idx=0;idx<items.length;idx++){
-    if(idx>0&&idx%rowsPerPage===0)doc.addPage();
+    if(idx>0&&idx%itemsPerPage===0)doc.addPage();
     const item=items[idx];
-    const row=idx%rowsPerPage;
-    const y=margin+row*rowH;
-    const imgX=margin;
-    const imgY=y+gap;
+    const pos=idx%itemsPerPage;
+    const col=pos%cols,row=Math.floor(pos/cols);
+    const x=margin+col*(cardW+gap);
+    const y=margin+row*(cardH+gap);
+    const imgX=x+3,imgY=y+3,imgW=cardW-6;
     const img=(item.images||[]).filter(Boolean)[0];
-    doc.setDrawColor(220,220,220);doc.setLineWidth(0.3);
-    if(row>0)doc.line(margin,y,pageW-margin,y);
+    doc.setFillColor(248,248,248);doc.rect(x,y,cardW,cardH,'F');
+    doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(x,y,cardW,cardH,'S');
     doc.setFillColor(245,245,245);doc.rect(imgX,imgY,imgW,imgH,'F');
-    doc.setDrawColor(210,210,210);doc.rect(imgX,imgY,imgW,imgH,'S');
     if(img){
       try{
         let dims={w:4,h:3};
@@ -776,23 +775,12 @@ async function generateUASingleImagePDF(items, title, filename){
         if(ar>car){dw=imgW;dh=imgW/ar;}else{dh=imgH;dw=imgH*ar;}
         const ox=imgX+(imgW-dw)/2,oy=imgY+(imgH-dh)/2;
         const fmt=(img.startsWith('data:image/png')||img.toLowerCase().includes('.png'))?'PNG':'JPEG';
-        doc.addImage(img,fmt,ox,oy,dw,dh,'','NONE');
+        doc.addImage(img,fmt,ox,oy,dw,dh,'','FAST');
       }catch(e){}
     }
-    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
-    doc.text(item.name||'',textX,imgY+6);
-    const feats=(item.key_features||[]).filter(Boolean);
-    let ty=imgY+14;
-    if(feats.length){
-      doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);
-      const featLines=doc.splitTextToSize(feats.join('  |  '),textW);
-      featLines.slice(0,6).forEach(l=>{doc.text(l,textX,ty);ty+=4.2;});
-    }
-    if(item.notes&&item.notes.trim()){
-      doc.setFontSize(8);doc.setFont('helvetica','italic');doc.setTextColor(80,80,80);
-      const noteLines=doc.splitTextToSize(item.notes,textW);
-      noteLines.slice(0,3).forEach(l=>{doc.text(l,textX,ty);ty+=4;});
-    }
+    doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
+    const nameLines=doc.splitTextToSize(item.name||'',cardW-6);
+    doc.text(nameLines.slice(0,2),x+3,y+cardH-10);
   }
   const tot=doc.internal.getNumberOfPages();
   for(let p=1;p<=tot;p++){
@@ -1636,17 +1624,23 @@ function renderImageFlashcard(el){
       ${item.notes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;max-width:480px;line-height:1.6">${item.notes}</div>`:''}
     </div>`;
 
+  const uaNav=appState.subject==='urinalysis';
   const buildActionBar=(isFlipped)=>`
     <div id="img-flash-bar" style="border-top:1px solid var(--border);padding:16px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
       <button class="btn btn-ghost" style="color:var(--text);min-width:180px;font-size:15px;padding:11px 24px" onclick="window._imgFlashFlip()">
         ${isFlipped?'↑ Flip back':'↓ Flip to answer'}
       </button>
-      <div style="min-height:52px;display:flex;align-items:center">
-        ${isFlipped
+      <div style="min-height:52px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+        ${uaNav
+          ?`<button class="btn btn-ghost" style="min-width:120px;font-size:15px;padding:12px 20px" ${idx<=0?'disabled':''} onclick="appState.imgFlashIdx=Math.max(0,appState.imgFlashIdx-1);appState.imgFlashFlipped=false;renderTab()">← Previous</button>
+            ${idx<items.length-1
+              ?`<button class="btn btn-primary" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="appState.imgFlashIdx++;appState.imgFlashFlipped=false;renderTab()">Next →</button>`
+              :`<button class="btn btn-success" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="appState.imgFlashIdx=items.length;renderTab()">Finish ✓</button>`}`
+          :(isFlipped
           ?(idx<items.length-1
             ?`<button class="btn btn-primary" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="appState.imgFlashIdx++;appState.imgFlashFlipped=false;renderTab()">Next →</button>`
             :`<button class="btn btn-success" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="appState.imgFlashIdx=items.length;renderTab()">Finish ✓</button>`)
-          :''}
+          :'')}
       </div>
     </div>`;
 
