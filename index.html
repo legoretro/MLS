@@ -11,6 +11,9 @@
 <meta name="apple-mobile-web-app-title" content="MLS BOC">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0d0f12">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <!-- Apple touch icon (shown on home screen) -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230d0f12'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle' fill='%234f8ef7'%3E🩸%3C/text%3E%3C/svg%3E">
@@ -603,6 +606,7 @@ window.__appInit = async function(){
   // Guard: only run once even if called multiple times
   if(window.__appInitDone)return;
   window.__appInitDone=true;
+  clearStaleAppCaches();
   try{
     sb = supabase.createClient(SB_URL, SB_KEY);
     const _t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('to'),ms));
@@ -639,6 +643,17 @@ window.__appInit = async function(){
   if(splash)splash.style.display='none';
   renderView();
 };
+
+function clearStaleAppCaches(){
+  try{
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(reg=>reg.unregister())).catch(()=>{});
+    }
+    if(window.caches){
+      caches.keys().then(keys=>keys.forEach(key=>caches.delete(key))).catch(()=>{});
+    }
+  }catch(e){}
+}
 
 // Also hook DOMContentLoaded in case supabase was already loaded inline
 window.addEventListener('DOMContentLoaded',function(){
@@ -743,15 +758,37 @@ async function generateUASingleImagePDF(items, title, filename){
   const margin=12;
   const gap=5;
   const cols=2;
-  const rows=3;
+  const rows=4;
   const itemsPerPage=cols*rows;
   const cardW=(pageW-margin*2-gap*(cols-1))/cols;
   const cardH=(pageH-margin*2-10-gap*(rows-1))/rows;
   const imgH=cardH-16;
-  const getImgDims=(src)=>new Promise(res=>{
+  const makePDFImage=(src)=>new Promise(res=>{
+    let done=false;
+    const fmt=(src&&src.startsWith('data:image/png'))?'PNG':'JPEG';
+    const finish=(val)=>{if(done)return;done=true;res(val);};
     const img=new Image();
-    img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});
-    img.onerror=()=>res({w:4,h:3});
+    img.onload=()=>{
+      try{
+        const maxW=720,maxH=480;
+        const nw=img.naturalWidth||4,nh=img.naturalHeight||3;
+        const scale=Math.min(maxW/nw,maxH/nh,1);
+        const w=Math.max(1,Math.round(nw*scale));
+        const h=Math.max(1,Math.round(nh*scale));
+        const cv=document.createElement('canvas');
+        cv.width=w;cv.height=h;
+        const ctx=cv.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+        ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
+        ctx.drawImage(img,0,0,w,h);
+        finish({src:cv.toDataURL('image/jpeg',0.72),fmt:'JPEG',w,h});
+      }catch(e){
+        finish({src,fmt,w:img.naturalWidth||4,h:img.naturalHeight||3});
+      }
+    };
+    img.onerror=()=>finish({src:null,fmt:'JPEG',w:4,h:3});
+    setTimeout(()=>finish({src,fmt,w:4,h:3}),5000);
+    if(src&&!src.startsWith('data:'))img.crossOrigin='anonymous';
     img.src=src;
   });
   for(let idx=0;idx<items.length;idx++){
@@ -768,14 +805,13 @@ async function generateUASingleImagePDF(items, title, filename){
     doc.setFillColor(245,245,245);doc.rect(imgX,imgY,imgW,imgH,'F');
     if(img){
       try{
-        let dims={w:4,h:3};
-        try{dims=await getImgDims(img);}catch(e){}
-        const ar=dims.w/dims.h,car=imgW/imgH;
+        const pdfImg=await makePDFImage(img);
+        if(!pdfImg.src)throw new Error('Image could not be loaded');
+        const ar=pdfImg.w/pdfImg.h,car=imgW/imgH;
         let dw,dh;
         if(ar>car){dw=imgW;dh=imgW/ar;}else{dh=imgH;dw=imgH*ar;}
         const ox=imgX+(imgW-dw)/2,oy=imgY+(imgH-dh)/2;
-        const fmt=(img.startsWith('data:image/png')||img.toLowerCase().includes('.png'))?'PNG':'JPEG';
-        doc.addImage(img,fmt,ox,oy,dw,dh,'','FAST');
+        doc.addImage(pdfImg.src,pdfImg.fmt,ox,oy,dw,dh,'','FAST');
       }catch(e){}
     }
     doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
@@ -1632,18 +1668,37 @@ function renderImageFlashcard(el){
       </button>
       <div style="min-height:52px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
         ${uaNav
-          ?`<button class="btn btn-ghost" style="min-width:120px;font-size:15px;padding:12px 20px" ${idx<=0?'disabled':''} onclick="appState.imgFlashIdx=Math.max(0,appState.imgFlashIdx-1);appState.imgFlashFlipped=false;renderTab()">← Previous</button>
+          ?`<button class="btn btn-ghost" style="min-width:120px;font-size:15px;padding:12px 20px" ${idx<=0?'disabled':''} onclick="window._imgFlashGo(-1)">← Previous</button>
             ${idx<items.length-1
-              ?`<button class="btn btn-primary" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="appState.imgFlashIdx++;appState.imgFlashFlipped=false;renderTab()">Next →</button>`
-              :`<button class="btn btn-success" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="appState.imgFlashIdx=items.length;renderTab()">Finish ✓</button>`}`
+              ?`<button class="btn btn-primary" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="window._imgFlashGo(1)">Next →</button>`
+              :`<button class="btn btn-success" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="window._imgFlashFinish()">Finish ✓</button>`}`
           :(isFlipped
           ?(idx<items.length-1
-            ?`<button class="btn btn-primary" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="appState.imgFlashIdx++;appState.imgFlashFlipped=false;renderTab()">Next →</button>`
-            :`<button class="btn btn-success" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="appState.imgFlashIdx=items.length;renderTab()">Finish ✓</button>`)
+            ?`<button class="btn btn-primary" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="window._imgFlashGo(1)">Next →</button>`
+            :`<button class="btn btn-success" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="window._imgFlashFinish()">Finish ✓</button>`)
           :'')}
       </div>
     </div>`;
 
+  const redrawFlashcard=()=>{
+    const target=document.getElementById('tab-content');
+    if(target)renderImageFlashcard(target);
+    else renderTab();
+  };
+  window._imgFlashGo=(delta)=>{
+    if(window._imgFlashNavBusy)return;
+    window._imgFlashNavBusy=true;
+    appState.imgFlashIdx=Math.max(0,Math.min(items.length-1,appState.imgFlashIdx+delta));
+    appState.imgFlashFlipped=false;
+    requestAnimationFrame(()=>{window._imgFlashNavBusy=false;redrawFlashcard();});
+  };
+  window._imgFlashFinish=()=>{
+    if(window._imgFlashNavBusy)return;
+    window._imgFlashNavBusy=true;
+    appState.imgFlashIdx=items.length;
+    appState.imgFlashFlipped=false;
+    requestAnimationFrame(()=>{window._imgFlashNavBusy=false;redrawFlashcard();});
+  };
   window._imgFlashFlip=()=>{
     appState.imgFlashFlipped=!appState.imgFlashFlipped;
     const card=document.getElementById('img-flip-card');
@@ -1848,17 +1903,25 @@ async function openUAExportModal(){
 }
 
 async function generateUAPDF(){
+  if(window._uaExportBusy)return;
   const ids=[...document.querySelectorAll('.ua-exp-cb:checked')].map(cb=>cb.dataset.id);
   if(!ids.length){alert('Select at least one.');return;}
+  window._uaExportBusy=true;
   const btn=document.querySelector('#condition-modal-body .btn-primary');
   if(btn){btn.textContent='Generating...';btn.disabled=true;}
   try{
+    await new Promise(r=>setTimeout(r,30));
     const {data:all,error}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
     if(error)throw error;
     if(!all||!all.length){alert('No selected images found.');return;}
     const ordered=ids.map(id=>all.find(item=>item.id===id)).filter(Boolean);
     await generateUASingleImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf');
-  }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
+  }catch(err){
+    alert('PDF failed: '+err.message);
+    if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
+  }finally{
+    window._uaExportBusy=false;
+  }
 }
 
 function buildUAThumbs(img){
