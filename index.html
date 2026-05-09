@@ -740,54 +740,58 @@ async function generateUASingleImagePDF(items, title, filename){
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const pageW=doc.internal.pageSize.getWidth();
   const pageH=doc.internal.pageSize.getHeight();
-  const margin=14;
-  const imageX=margin;
-  const imageY=margin;
-  const imageW=pageW-margin*2;
-  const imageH=128;
-  const textY=imageY+imageH+10;
+  const margin=12;
+  const gap=4;
+  const rowsPerPage=4;
+  const usableH=pageH-margin*2-10;
+  const rowH=usableH/rowsPerPage;
+  const imgW=58;
+  const imgH=rowH-gap*2;
+  const textX=margin+imgW+7;
+  const textW=pageW-textX-margin;
   const getImgDims=(src)=>new Promise(res=>{
     const img=new Image();
     img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});
     img.onerror=()=>res({w:4,h:3});
     img.src=src;
   });
-  let first=true;
-  for(const item of items){
-    if(!first)doc.addPage(); first=false;
+  for(let idx=0;idx<items.length;idx++){
+    if(idx>0&&idx%rowsPerPage===0)doc.addPage();
+    const item=items[idx];
+    const row=idx%rowsPerPage;
+    const y=margin+row*rowH;
+    const imgX=margin;
+    const imgY=y+gap;
     const img=(item.images||[]).filter(Boolean)[0];
-    doc.setFillColor(245,245,245);doc.rect(imageX,imageY,imageW,imageH,'F');
-    doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(imageX,imageY,imageW,imageH,'S');
+    doc.setDrawColor(220,220,220);doc.setLineWidth(0.3);
+    if(row>0)doc.line(margin,y,pageW-margin,y);
+    doc.setFillColor(245,245,245);doc.rect(imgX,imgY,imgW,imgH,'F');
+    doc.setDrawColor(210,210,210);doc.rect(imgX,imgY,imgW,imgH,'S');
     if(img){
       try{
         let dims={w:4,h:3};
         try{dims=await getImgDims(img);}catch(e){}
-        const ar=dims.w/dims.h,car=imageW/imageH;
+        const ar=dims.w/dims.h,car=imgW/imgH;
         let dw,dh;
-        if(ar>car){dw=imageW;dh=imageW/ar;}else{dh=imageH;dw=imageH*ar;}
-        const ox=imageX+(imageW-dw)/2,oy=imageY+(imageH-dh)/2;
+        if(ar>car){dw=imgW;dh=imgW/ar;}else{dh=imgH;dw=imgH*ar;}
+        const ox=imgX+(imgW-dw)/2,oy=imgY+(imgH-dh)/2;
         const fmt=(img.startsWith('data:image/png')||img.toLowerCase().includes('.png'))?'PNG':'JPEG';
         doc.addImage(img,fmt,ox,oy,dw,dh,'','NONE');
       }catch(e){}
     }
-    doc.setDrawColor(200,200,200);doc.setLineWidth(0.4);
-    doc.line(margin,textY-4,pageW-margin,textY-4);
     doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
-    doc.text(item.name||'',margin,textY);
+    doc.text(item.name||'',textX,imgY+6);
     const feats=(item.key_features||[]).filter(Boolean);
-    let ty=textY+8;
+    let ty=imgY+14;
     if(feats.length){
-      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);
-      doc.text('Key Features',margin,ty);ty+=5;
-      doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);
-      const featLines=doc.splitTextToSize(feats.join('  |  '),pageW-margin*2);
-      featLines.forEach(l=>{doc.text(l,margin,ty);ty+=4.5;});
-      ty+=3;
+      doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);
+      const featLines=doc.splitTextToSize(feats.join('  |  '),textW);
+      featLines.slice(0,6).forEach(l=>{doc.text(l,textX,ty);ty+=4.2;});
     }
     if(item.notes&&item.notes.trim()){
-      doc.setFontSize(8.5);doc.setFont('helvetica','italic');doc.setTextColor(70,70,70);
-      const noteLines=doc.splitTextToSize(item.notes,pageW-margin*2);
-      noteLines.slice(0,8).forEach(l=>{doc.text(l,margin,ty);ty+=4.2;});
+      doc.setFontSize(8);doc.setFont('helvetica','italic');doc.setTextColor(80,80,80);
+      const noteLines=doc.splitTextToSize(item.notes,textW);
+      noteLines.slice(0,3).forEach(l=>{doc.text(l,textX,ty);ty+=4;});
     }
   }
   const tot=doc.internal.getNumberOfPages();
@@ -1855,10 +1859,11 @@ async function generateUAPDF(){
   const btn=document.querySelector('#condition-modal-body .btn-primary');
   if(btn){btn.textContent='Generating...';btn.disabled=true;}
   try{
-    const {data:all}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
-    if(!all||!all.length){return;}
-
-    await generateUASingleImagePDF(all,'Urinalysis Findings','urinalysis_findings.pdf');
+    const {data:all,error}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
+    if(error)throw error;
+    if(!all||!all.length){alert('No selected images found.');return;}
+    const ordered=ids.map(id=>all.find(item=>item.id===id)).filter(Boolean);
+    await generateUASingleImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf');
   }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
 }
 
