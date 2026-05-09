@@ -735,6 +735,72 @@ async function generateImageSectionPDF(items, title, filename){
   document.getElementById('condition-modal').classList.add('hidden');
 }
 
+async function generateUASingleImagePDF(items, title, filename){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const margin=14;
+  const imageX=margin;
+  const imageY=margin;
+  const imageW=pageW-margin*2;
+  const imageH=128;
+  const textY=imageY+imageH+10;
+  const getImgDims=(src)=>new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});
+    img.onerror=()=>res({w:4,h:3});
+    img.src=src;
+  });
+  let first=true;
+  for(const item of items){
+    if(!first)doc.addPage(); first=false;
+    const img=(item.images||[]).filter(Boolean)[0];
+    doc.setFillColor(245,245,245);doc.rect(imageX,imageY,imageW,imageH,'F');
+    doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(imageX,imageY,imageW,imageH,'S');
+    if(img){
+      try{
+        let dims={w:4,h:3};
+        try{dims=await getImgDims(img);}catch(e){}
+        const ar=dims.w/dims.h,car=imageW/imageH;
+        let dw,dh;
+        if(ar>car){dw=imageW;dh=imageW/ar;}else{dh=imageH;dw=imageH*ar;}
+        const ox=imageX+(imageW-dw)/2,oy=imageY+(imageH-dh)/2;
+        const fmt=(img.startsWith('data:image/png')||img.toLowerCase().includes('.png'))?'PNG':'JPEG';
+        doc.addImage(img,fmt,ox,oy,dw,dh,'','NONE');
+      }catch(e){}
+    }
+    doc.setDrawColor(200,200,200);doc.setLineWidth(0.4);
+    doc.line(margin,textY-4,pageW-margin,textY-4);
+    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
+    doc.text(item.name||'',margin,textY);
+    const feats=(item.key_features||[]).filter(Boolean);
+    let ty=textY+8;
+    if(feats.length){
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);
+      doc.text('Key Features',margin,ty);ty+=5;
+      doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);
+      const featLines=doc.splitTextToSize(feats.join('  |  '),pageW-margin*2);
+      featLines.forEach(l=>{doc.text(l,margin,ty);ty+=4.5;});
+      ty+=3;
+    }
+    if(item.notes&&item.notes.trim()){
+      doc.setFontSize(8.5);doc.setFont('helvetica','italic');doc.setTextColor(70,70,70);
+      const noteLines=doc.splitTextToSize(item.notes,pageW-margin*2);
+      noteLines.slice(0,8).forEach(l=>{doc.text(l,margin,ty);ty+=4.2;});
+    }
+  }
+  const tot=doc.internal.getNumberOfPages();
+  for(let p=1;p<=tot;p++){
+    doc.setPage(p);
+    doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+    doc.text('MLS BOC Prep - '+title+' | Page '+p+' of '+tot,margin,pageH-6);
+    doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});
+  }
+  doc.save(filename);
+  document.getElementById('condition-modal').classList.add('hidden');
+}
+
 async function seedIfEmpty(){
   try{
     const {data}=await sb.from('mlsboc_questions').select('id').limit(1);
@@ -1792,7 +1858,7 @@ async function generateUAPDF(){
     const {data:all}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
     if(!all||!all.length){return;}
 
-    await generateImageSectionPDF(all,'Urinalysis Findings','urinalysis_findings.pdf');
+    await generateUASingleImagePDF(all,'Urinalysis Findings','urinalysis_findings.pdf');
   }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}}
 }
 
