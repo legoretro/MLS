@@ -3646,12 +3646,7 @@ async function renderUACases(el){
 }
 
 async function openUACaseEditor(caseId){
-  let c={title:'',scenario:'',test_results:[],questions:[],is_draft:false,images:[]};
-  if(caseId){
-    const {data}=await sb.from('mlsboc_ua_cases').select('*').eq('id',caseId).single();
-    if(data)c=data;
-  }
-  openSubjectCaseEditor(caseId,'mlsboc_ua_cases',c,'urinalysis','UA Results');
+  openSubjectCaseEditor('urinalysis',caseId);
 }
 
 async function deleteUACase(id){
@@ -3741,8 +3736,9 @@ async function renderSubjectCases(el, cfg){
   const qmKey=cfg.quizModeKey;
   if(appState[qmKey]){renderSubjectCaseQuiz(el,cfg);return;}
   const {data}=await sb.from(cfg.dbTable).select('*').order('created_at');
+  const cases=(data||[]).map(withTableData);
   if(!appState[cfg.collapsedKey])appState[cfg.collapsedKey]={};
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_table:c[cfg.tableField]||[],_imgs:c.images||[]})));
+  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16"><div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: ${cfg.label}</div><button class="btn btn-primary" onclick="${cfg.adminFn}(null)">+ New Case</button></div></div>`:''}
     <div class="flex-center gap-12 mb-16 flex-wrap">
@@ -3755,8 +3751,8 @@ async function renderSubjectCases(el, cfg){
         ${allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
-    ${!data||!data.length?`<div class="empty">No ${cfg.label} yet. Use Admin mode to add one.</div>`:''}
-    ${(data||[]).map((c,i)=>renderSubjectCase(c,i,cfg)).join('')}
+    ${!cases.length?`<div class="empty">No ${cfg.label} yet. Use Admin mode to add one.</div>`:''}
+    ${cases.map((c,i)=>renderSubjectCase(c,i,cfg)).join('')}
   `;
 }
 
@@ -3878,7 +3874,8 @@ function resetSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId])delete appS
 // ─── SUBJECT CASE QUIZ MODE ────────────────────────────────────────────────────
 async function startSubjectCaseQuiz(qmKey,dbTable,tableField){
   const {data}=await sb.from(dbTable).select('*').order('created_at');
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
+  const cases=(data||[]).map(withTableData);
+  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
   if(!allQs.length){alert('No questions found yet.');return;}
   appState[qmKey]=true;
   appState[qmKey+'Items']=shuffle(allQs);
@@ -4078,6 +4075,13 @@ function renderSubjectCaseQuizResults(el,cfg){
 // config for each subject specifies table presets and labels
 
 const SUBJECT_CASE_CONFIGS = {
+  urinalysis: {
+    dbTable:'mlsboc_ua_cases', tableField:'test_results',
+    tableLabel:'UA Results',
+    presetTests:['Color','Appearance','Specific Gravity','pH','Protein','Glucose','Ketones','Blood','Bilirubin','Urobilinogen','Nitrite','Leukocyte Esterase','WBC','RBC','Casts','Crystals','Bacteria','Other'],
+    answerKey:'uaCaseAnswers', collapsedKey:'uaCaseCollapsed',
+    saveFn:'saveSubjectCase', label:'Urinalysis'
+  },
   immunology: {
     dbTable:'mlsboc_immuno_cases', tableField:'test_results',
     tableLabel:'Immunology Results',
@@ -4112,10 +4116,10 @@ function getSubjectCaseConfig(subj){ return SUBJECT_CASE_CONFIGS[subj]||SUBJECT_
 
 async function openSubjectCaseEditor(subject,caseId){
   const cfg=getSubjectCaseConfig(subject);
-  let c={title:'',scenario:'',test_results:[],questions:[],images:[],is_draft:false};
+  let c={title:'',scenario:'',table_data:null,test_results:[],questions:[],images:[],is_draft:false};
   if(caseId){
     const {data}=await sb.from(cfg.dbTable).select('*').eq('id',caseId).single();
-    if(data)c=data;
+    if(data)c=withTableData(data);
   }
   const qs=c.questions||[];
   const tableD=c.table_data||null;  window._scQCount=qs.length;
@@ -4275,7 +4279,8 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
     <div style="font-size:13px;color:var(--text2)">Loading cases...</div>`;
   document.getElementById('condition-modal').classList.remove('hidden');
   const {data}=await sb.from(dbTable).select('*').order('created_at');
-  if(!data||!data.length){
+  const cases=(data||[]).map(withTableData);
+  if(!cases.length){
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
         <div style="font-size:16px;font-weight:600">Export ${exportTitle}</div>
@@ -4284,6 +4289,8 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
       <div class="empty">No cases to export yet.</div>`;
     return;
   }
+  window._subjectExportCases=cases;
+  window._subjectExportMeta={tableField,tableLabel,exportTitle};
   let html=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">Export ${exportTitle}</div>
@@ -4294,7 +4301,7 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=false)">Deselect All</button>
     </div>`;
-  data.forEach(c=>{
+  cases.forEach(c=>{
     html+=`<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
       <input type="checkbox" class="sc-export-cb" data-id="${c.id}" checked style="width:16px;height:16px;flex-shrink:0">
       <span style="font-weight:600">${c.title||'Untitled'}</span>
@@ -4304,9 +4311,14 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
   html+=`
     <div style="display:flex;gap:8px;margin-top:20px">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
-      <button class="btn btn-primary" onclick="generateSubjectCasePDF(${JSON.stringify(data).replace(/</g,'&lt;')},'${tableField}','${tableLabel}','${exportTitle}')">📄 Generate PDF</button>
+      <button class="btn btn-primary" onclick="generateSubjectCasePDFFromModal()">📄 Generate PDF</button>
     </div>`;
   document.getElementById('condition-modal-body').innerHTML=html;
+}
+
+function generateSubjectCasePDFFromModal(){
+  const meta=window._subjectExportMeta||{};
+  generateSubjectCasePDF(window._subjectExportCases||[],meta.tableField||'test_results',meta.tableLabel||'Results',meta.exportTitle||'Cases');
 }
 
 function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
@@ -4333,7 +4345,7 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
       doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
       doc.text(exportTitle+' — Case '+(ci+1)+': '+(c.title||'Untitled'),margin+3,y+7);y+=14;
       if(c.scenario){writeText('Patient Scenario',{size:10,bold:true,color:[40,40,40]});writeText(c.scenario,{size:10,indent:2});y+=3;}
-      const tableD=c.table_data;
+      const tableD=c.table_data||migrateTableData(c);
       if(tableD&&tableD.headers&&tableD.headers.length){
         checkPage(20);writeText(tableLabel,{size:10,bold:true,color:[40,40,40]});
         const hdrs=tableD.headers;const rows=tableD.rows||[];const meta=tableD.meta||[];
@@ -4363,8 +4375,7 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
           checkPage(28);writeText('Q'+(qi+1)+'. '+q.question,{size:10,bold:true,indent:2,color:[20,20,20]});
           (q.options||[]).forEach((opt,oi)=>{
             if(!opt)return;
-            checkPage(6);doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
-            doc.text(letters[oi].toUpperCase()+'. '+opt,margin+6,y);y+=5;
+            writeText(letters[oi].toUpperCase()+'. '+opt,{size:9.5,indent:6,color:[30,30,30]});
           });
           y+=4;
         });
@@ -5109,17 +5120,12 @@ function renderBBQuiz(el){
   const tableHtml=item._tableData&&tblHasContent(item._tableData)?`
     <div style="margin-bottom:12px">
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Typing Results</div>
-      <div style="overflow-x:auto">
-        <table style="border-collapse:collapse;font-size:14px">
-          <thead><tr>${(item._tableData.rows||[]).flat().map(v=>({value:v})).map(col=>`<th style="background:var(--bg4);border:1px solid var(--border2);padding:8px 12px;text-align:center;font-weight:600;color:var(--text);white-space:nowrap">${col.label}</th>`).join('')}</tr></thead>
-          <tbody><tr>${(item._tableData.rows||[]).flat().map(v=>({value:v})).map(col=>`<td style="border:1px solid var(--border);padding:8px 12px;text-align:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);background:var(--bg3)">${col.value}</td>`).join('')}</tr></tbody>
-        </table>
-      </div>
+      ${renderDataTable(item._tableData,{small:true})}
     </div>`:'' ;
 
   const imgHtml=item._imgs&&item._imgs.filter(Boolean).length?`
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      ${item._imgs.filter(Boolean).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="height:70px;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;object-fit:cover">`).join('')}
+      ${item._imgs.filter(Boolean).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="height:70px;max-width:180px;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;object-fit:contain;background:var(--bg3)">`).join('')}
     </div>`:'' ;
 
   const optsHtml=(item.options||[]).map((opt,oi)=>{
@@ -5311,7 +5317,7 @@ function renderBBCase(c,idx){
         <div style="margin-top:16px">
           ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
           ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data,{small:true}):''}  
-          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
+          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="object-fit:contain;background:var(--bg3);cursor:zoom-in">`).join('')}</div>`:''}
           ${qs.length?`
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
@@ -5420,6 +5426,7 @@ async function openBBCaseEditor(caseId){
   const tableD=c.table_data||null;
   window._bbQCount=qs.length;
   window._bbTableCount=0;
+  window._bbEditorImages=(c.images||[]).filter(Boolean);
 
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
@@ -5433,6 +5440,11 @@ async function openBBCaseEditor(caseId){
     <div class="form-group">
       <label>Case Scenario / Patient Info</label>
       <textarea id="bb-scenario" style="min-height:100px">${c.scenario||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Antigram / Case Image</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Upload an antigram panel or supporting case image. Click an image to preview it.</div>
+      <div id="bb-image-editor">${renderBBImageEditor()}</div>
     </div>
     <div class="form-group">
       <label>Typing Results Table Columns</label>
@@ -5462,6 +5474,85 @@ async function openBBCaseEditor(caseId){
     </div>
   `;
   document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+function renderBBImageEditor(){
+  const imgs=(window._bbEditorImages||[]).filter(Boolean);
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:10px">
+      ${imgs.map((url,i)=>`
+        <div style="position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;min-height:96px">
+          <img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:96px;object-fit:contain;background:var(--bg3);cursor:zoom-in" alt="">
+          <button class="btn btn-danger btn-xs" onclick="removeBBEditorImage(${i})" style="position:absolute;top:4px;right:4px;background:#000b">✕</button>
+        </div>`).join('')}
+    </div>
+    <div class="drop-zone" style="padding:18px;min-height:78px" onclick="document.getElementById('bb-img-file').click()" ondrop="handleBBImageDrop(event)" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+      <div style="font-size:22px;margin-bottom:4px">📷</div>
+      <div>${imgs.length?'Add another image':'Drop antigram image or click to upload'}</div>
+      <input type="file" id="bb-img-file" accept="image/*" multiple style="display:none" onchange="handleBBImageFile(event)">
+    </div>`;
+}
+
+function refreshBBImageEditor(){
+  const el=document.getElementById('bb-image-editor');
+  if(el)el.innerHTML=renderBBImageEditor();
+}
+
+function removeBBEditorImage(i){
+  window._bbEditorImages=(window._bbEditorImages||[]).filter((_,idx)=>idx!==i);
+  refreshBBImageEditor();
+}
+
+function compressCaseImageFile(file,max=1200,quality=0.78){
+  return new Promise((resolve,reject)=>{
+    if(!file||!file.type.startsWith('image/')){reject(new Error('Choose an image file.'));return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          let w=img.width,h=img.height;
+          if(w>max||h>max){
+            const scale=Math.min(max/w,max/h);
+            w=Math.max(1,Math.round(w*scale));
+            h=Math.max(1,Math.round(h*scale));
+          }
+          const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+          const ctx=cv.getContext('2d');
+          ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+          ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
+          ctx.drawImage(img,0,0,w,h);
+          resolve(cv.toDataURL('image/jpeg',quality));
+        }catch(err){reject(err);}
+      };
+      img.onerror=()=>reject(new Error('Could not read image.'));
+      img.src=ev.target.result;
+    };
+    reader.onerror=()=>reject(new Error('Could not read image.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function addBBImageFiles(files){
+  const selected=Array.from(files||[]).filter(f=>f.type&&f.type.startsWith('image/'));
+  if(!selected.length)return;
+  const current=(window._bbEditorImages||[]).filter(Boolean);
+  for(const file of selected.slice(0,4-current.length)){
+    try{current.push(await compressCaseImageFile(file));}
+    catch(err){alert('Image upload failed: '+err.message);}
+  }
+  window._bbEditorImages=current.slice(0,4);
+  refreshBBImageEditor();
+}
+
+function handleBBImageFile(e){
+  addBBImageFiles(e.target.files);
+  e.target.value='';
+}
+
+function handleBBImageDrop(e){
+  e.preventDefault();e.currentTarget.classList.remove('dragover');
+  addBBImageFiles(e.dataTransfer.files);
 }
 
 function bbTableRow(i,label,value){
@@ -5555,7 +5646,8 @@ async function saveBBCase(caseId){
     questions.push({question,options,correct,explanation});
   }
 
-  const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images:[]};
+  const images=(window._bbEditorImages||[]).filter(Boolean);
+  const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images};
 
   let error;
   if(caseId){
@@ -6534,10 +6626,7 @@ async function generateCasePDF(){
           writeText(`Q${qi+1}. ${q.question}`, {size:10, bold:true, indent:2, color:[20,20,20]});
           (q.options||[]).forEach((opt,oi)=>{
             if(!opt)return;
-            checkPage(6);
-            doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
-            doc.text(`${letters[oi].toUpperCase()}. ${opt}`, margin+6, y);
-            y += 5.5;
+            writeText(`${letters[oi].toUpperCase()}. ${opt}`, {size:9.5, indent:6, color:[30,30,30]});
           });
           y += 4;
         });
@@ -6563,13 +6652,7 @@ async function generateCasePDF(){
           checkPage(14);
           const correctIdx=letters.indexOf(q.correct||'a');
           const correctText=(q.options||[])[correctIdx]||q[q.correct]||'';
-          doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
-          doc.text(`Q${globalQ}.`,margin,y);
-          doc.setTextColor(20,120,60);
-          doc.splitTextToSize(`${(q.correct||'').toUpperCase()}. ${correctText}`,contentW-14).forEach((line,li)=>{
-            doc.text(line,margin+12,y+(li*5));
-          });
-          y+=5.5;
+          writeText(`Q${globalQ}. ${(q.correct||'').toUpperCase()}. ${correctText}`,{size:10,bold:true,color:[20,120,60]});
           if(q.explanation){
             doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
             doc.splitTextToSize(q.explanation,contentW-16).forEach(line=>{checkPage();doc.text(line,margin+12,y);y+=4;});
@@ -7026,23 +7109,48 @@ async function exportClassSetPDF(id){
       doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
       doc.splitTextToSize(String(text||''),cW-indent).forEach(line=>{checkPage();doc.text(line,margin+indent,y);y+=size*0.4+1.2;});
     };
+    const drawTable=(td)=>{
+      if(!td||!tblHasContent(td))return;
+      const hdrs=(td.headers||[]).filter((_,i)=>i<5);
+      const rows=(td.rows||[]).slice(0,5);
+      const meta=td.meta||[];
+      if(!hdrs.length&&!rows.length)return;
+      const cols=Math.max(1,hdrs.length,Math.max(0,...rows.map(r=>(r||[]).length)));
+      const colW=cW/cols;
+      checkPage(10+(rows.length+1)*8);
+      doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+      for(let c=0;c<cols;c++){
+        doc.setFillColor(225,225,225);doc.rect(margin+c*colW,y,colW,8,'F');doc.setDrawColor(165,165,165);doc.rect(margin+c*colW,y,colW,8,'S');
+        doc.text(doc.splitTextToSize(String(hdrs[c]||''),colW-3).slice(0,1),margin+c*colW+1.5,y+5.4);
+      }
+      y+=8;
+      rows.forEach((row,ri)=>{
+        checkPage(8);
+        for(let c=0;c<cols;c++){
+          const m=(meta[ri]||[])[c]||{};
+          const rgb=m.color?hexToRgb(m.color):[40,40,40];
+          doc.setFillColor(248,248,248);doc.rect(margin+c*colW,y,colW,8,'F');doc.setDrawColor(180,180,180);doc.rect(margin+c*colW,y,colW,8,'S');
+          doc.setFontSize(7.5);doc.setFont('helvetica',m.bold?'bold':'normal');doc.setTextColor(...rgb);
+          doc.text(doc.splitTextToSize(String((row||[])[c]||''),colW-3).slice(0,1),margin+c*colW+1.5,y+5.4);
+        }
+        y+=8;
+      });
+      y+=4;
+    };
 
     // ── Page 1+: Questions only (no answers shown) ──
-    doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
-    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
-    doc.text(`${s.name}${s.topic?' — '+s.topic:''}`,(pageW/2),y+7,{align:'center'});y+=14;
-    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-    doc.text('Answer key on final page',margin,y);y+=8;
+    write(`${s.name}${s.topic?' - '+s.topic:''}`,{size:14,bold:true,color:[20,20,20]});
+    write('Answer key on final page',{size:8,color:[100,100,100]});
+    y+=4;
 
     const letters=['a','b','c','d'];
     qs.forEach((q,i)=>{
       checkPage(32);
       write(`Q${i+1}. ${q.question}`,{size:11,bold:true});
+      if(q.table_data&&tblHasContent(q.table_data))drawTable(q.table_data);
       letters.forEach(l=>{
         if(!q[l])return;
-        checkPage(6);
-        doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
-        doc.text(`${l.toUpperCase()}. ${q[l]}`,margin+4,y);y+=5.5;
+        write(`${l.toUpperCase()}. ${q[l]}`,{size:10,indent:4,color:[40,40,40]});
       });
       y+=4;
     });
@@ -7058,16 +7166,11 @@ async function exportClassSetPDF(id){
     qs.forEach((q,i)=>{
       checkPage(20);
       // Question number + correct letter
-      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
       const correctLetter=(q.correct||'').toUpperCase();
       const correctText=q[q.correct]||'';
-      doc.text(`Q${i+1}.`,margin,y);
-      doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
-      doc.text(`${correctLetter}. ${correctText}`,margin+12,y);
-      y+=5.5;
+      write(`Q${i+1}. ${correctLetter}. ${correctText}`,{size:10,bold:true,color:[20,120,60]});
       if(q.explanation){
-        doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
-        doc.splitTextToSize(q.explanation,cW-16).forEach(line=>{checkPage();doc.text(line,margin+12,y);y+=4;});
+        write(q.explanation,{size:8.5,indent:8,color:[80,80,100]});
       }
       y+=3;
     });
@@ -7332,14 +7435,40 @@ function exportClassMissed(){
       doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
       doc.splitTextToSize(String(text||''),cW-indent).forEach(line=>{checkPage();doc.text(line,margin+indent,y);y+=size*0.4+1.2;});
     };
+    const drawTable=(td)=>{
+      if(!td||!tblHasContent(td))return;
+      const hdrs=(td.headers||[]).slice(0,5);
+      const rows=(td.rows||[]).slice(0,5);
+      const meta=td.meta||[];
+      const cols=Math.max(1,hdrs.length,Math.max(0,...rows.map(r=>(r||[]).length)));
+      const colW=cW/cols;
+      checkPage(10+(rows.length+1)*8);
+      for(let c=0;c<cols;c++){
+        doc.setFillColor(225,225,225);doc.rect(margin+c*colW,y,colW,8,'F');doc.setDrawColor(165,165,165);doc.rect(margin+c*colW,y,colW,8,'S');
+        doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+        doc.text(doc.splitTextToSize(String(hdrs[c]||''),colW-3).slice(0,1),margin+c*colW+1.5,y+5.4);
+      }
+      y+=8;
+      rows.forEach((row,ri)=>{
+        checkPage(8);
+        for(let c=0;c<cols;c++){
+          const m=(meta[ri]||[])[c]||{};
+          const rgb=m.color?hexToRgb(m.color):[40,40,40];
+          doc.setFillColor(248,248,248);doc.rect(margin+c*colW,y,colW,8,'F');doc.setDrawColor(180,180,180);doc.rect(margin+c*colW,y,colW,8,'S');
+          doc.setFontSize(7.5);doc.setFont('helvetica',m.bold?'bold':'normal');doc.setTextColor(...rgb);
+          doc.text(doc.splitTextToSize(String((row||[])[c]||''),colW-3).slice(0,1),margin+c*colW+1.5,y+5.4);
+        }
+        y+=8;
+      });
+      y+=4;
+    };
     // Header
-    doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
-    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
-    doc.text(`Missed Questions — ${s?.name||'Quiz'}`+(s?.topic?` (${s.topic})`:''),(pageW/2),y+7,{align:'center'});
-    y+=16;
+    write(`Missed Questions - ${s?.name||'Quiz'}${s?.topic?' ('+s.topic+')':''}`,{size:13,bold:true,color:[20,20,20]});
+    y+=4;
     missed.forEach(({q,given},i)=>{
       checkPage(30);
       write(`Q${i+1}. ${q.question}`,{size:11,bold:true});
+      if(q.table_data&&tblHasContent(q.table_data))drawTable(q.table_data);
       ['a','b','c','d'].forEach(l=>{
         if(!q[l])return;
         const isCorrect=l===q.correct,isGiven=l===given;
