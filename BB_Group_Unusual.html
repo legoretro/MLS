@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BB Group Match - Unusual Suspects</title>
+<style>
+:root{
+  --bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;--bg4:#242840;
+  --border:#2a2f4a;--border2:#3a4060;--accent:#4f8ef7;--accent2:#93bdff;
+  --text:#e8eaf6;--text2:#aeb4d2;--text3:#6f7899;--good:#3ddc84;--bad:#f06474;--warn:#f5a623;
+  --r:10px;--r2:14px;--mono:"SFMono-Regular","Menlo",monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top left,#10233f 0,#0d0f12 36%,#090a0d 100%);color:var(--text);font-family:var(--sans);min-height:100vh}
+a{color:var(--accent2);text-decoration:none}
+.wrap{max-width:1220px;margin:0 auto;padding:22px}
+.top{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}
+.eyebrow{font-family:var(--mono);font-size:12px;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:28px;line-height:1.1;margin:0 0 8px}
+.sub{color:var(--text2);font-size:14px;max-width:760px;line-height:1.5}
+.pillbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.pill{border:1px solid var(--border);background:var(--bg2);color:var(--text2);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:750;cursor:pointer}
+.pill.active{background:var(--accent);border-color:var(--accent);color:white}
+.panel{background:rgba(20,23,32,.92);border:1px solid var(--border);border-radius:var(--r2);box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden}
+.toolbar{display:flex;gap:8px;align-items:center;padding:14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.btn{border:1px solid var(--border);background:var(--bg3);color:var(--text);border-radius:var(--r);padding:9px 13px;font-weight:750;font-size:13px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:white}
+.btn.good{background:#3ddc8420;border-color:#3ddc8460;color:var(--good)}
+.score{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text3)}
+.game{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:0}
+.bank{border-right:1px solid var(--border);padding:14px;background:rgba(13,15,18,.45);min-height:620px}
+.bank-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:850;margin-bottom:10px}
+.chips{display:flex;flex-direction:column;gap:8px}
+.chip{border:1px solid var(--border2);background:linear-gradient(180deg,var(--bg4),var(--bg3));color:var(--text);border-radius:var(--r);padding:10px 11px;font-size:13px;line-height:1.3;cursor:grab;box-shadow:0 4px 14px rgba(0,0,0,.16);user-select:none}
+.chip:active{cursor:grabbing}
+.chip.selected{outline:2px solid var(--accent2);border-color:var(--accent2)}
+.board{padding:14px;display:grid;gap:10px}
+.row{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:stretch}
+.system{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px}
+.dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--system,#4f8ef7);font-family:var(--mono);font-weight:900;color:#fff;flex-shrink:0;font-size:12px}
+.system-name{font-weight:850;font-size:14px}
+.hint{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:2px}
+.slot{min-height:60px;border:1.5px dashed var(--border2);border-radius:var(--r);background:rgba(28,32,48,.72);display:flex;align-items:center;padding:8px;transition:.14s}
+.slot.over{border-color:var(--accent2);background:#4f8ef714}
+.slot.empty::before{content:"drop matching chip";font-family:var(--mono);font-size:11px;color:var(--text3);padding-left:4px}
+.slot .chip{width:100%;cursor:pointer}
+.slot.correct{border-style:solid;border-color:var(--good);background:#3ddc8412}
+.slot.wrong{border-style:solid;border-color:var(--bad);background:#f0647412}
+.mini{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin:14px 0}
+.mini div{background:rgba(20,23,32,.78);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;font-size:12px;color:var(--text2)}
+.mini b{display:block;color:var(--text);font-size:14px;margin-bottom:2px}
+.msg{font-size:13px;color:var(--text2);padding:0 14px 14px;min-height:24px}
+.msg.good{color:var(--good)}
+.msg.bad{color:var(--bad)}
+@media(max-width:860px){
+  .game{grid-template-columns:1fr}
+  .bank{border-right:0;border-bottom:1px solid var(--border);min-height:0}
+  .row{grid-template-columns:1fr}
+  .score{margin-left:0;width:100%}
+  .mini{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Blood Bank Groups</div>
+      <h1>Unusual Suspects Drag Match</h1>
+      <div class="sub">Practice systems that are not routine antigram anchors. Match each system to its antigen code, exclusion reason, or serology clue.</div>
+    </div>
+    <a class="btn" href="index.html">Back to MLS</a>
+  </div>
+
+  <div class="mini">
+    <div><b>Objective 1</b>letter designations</div>
+    <div><b>Objective 2</b>why not on antigram</div>
+    <div><b>Objective 3</b>serology presentation</div>
+    <div><b>Objective 4</b>clinical clue</div>
+  </div>
+
+  <div class="pillbar" id="roundTabs"></div>
+
+  <section class="panel">
+    <div class="toolbar">
+      <button class="btn primary" id="checkBtn">Check</button>
+      <button class="btn" id="resetBtn">Reset round</button>
+      <button class="btn good" id="answerBtn">Show answers</button>
+      <div class="score" id="scoreText">0 / 0 placed</div>
+    </div>
+    <div class="game">
+      <aside class="bank">
+        <div class="bank-title">Answer chips</div>
+        <div class="chips" id="bank"></div>
+      </aside>
+      <main class="board" id="board"></main>
+    </div>
+    <div class="msg" id="msg"></div>
+  </section>
+</div>
+
+<script>
+const systems=[
+  {id:"diego",name:"Diego",short:"DI",color:"#4f8ef7"},
+  {id:"cartwright",name:"Cartwright",short:"YT",color:"#2fa66a"},
+  {id:"xg",name:"Xg",short:"XG",color:"#6474d8"},
+  {id:"scianna",name:"Scianna",short:"SC",color:"#16a085"},
+  {id:"dombrock",name:"Dombrock",short:"DO",color:"#d07a24"},
+  {id:"colton",name:"Colton",short:"CO",color:"#d0a126"},
+  {id:"lw",name:"Landsteiner-Wiener",short:"LW",color:"#8e44ad"},
+  {id:"chrg",name:"Chido/Rodgers",short:"CH",color:"#778899"},
+  {id:"gerbich",name:"Gerbich",short:"GE",color:"#bd4d9b"},
+  {id:"cromer",name:"Cromer",short:"CROM",color:"#c74656"},
+  {id:"knops",name:"Knops",short:"KN",color:"#2f7dd1"},
+  {id:"indian",name:"Indian",short:"IN",color:"#9569d8"},
+  {id:"ok",name:"Ok",short:"OK",color:"#3a9d8f"},
+  {id:"raph",name:"Raph",short:"RAPH",color:"#b57f3a"},
+  {id:"jmh",name:"JMH",short:"JMH",color:"#6277a8"},
+  {id:"vel",name:"Vel",short:"VEL",color:"#d35f5f"},
+  {id:"jr",name:"Jr",short:"JR",color:"#3ca370"},
+  {id:"sda",name:"Sd(a)",short:"SDA",color:"#d49b2f"},
+  {id:"anwj",name:"AnWj",short:"ANWJ",color:"#8b6bd6"},
+  {id:"hla",name:"HLA",short:"HLA",color:"#56606f"}
+];
+
+const rounds=[
+  {id:"codes",name:"Antigen Codes",items:{
+    diego:"Dia/Dib plus Wra/Wrb",
+    cartwright:"Yta/Ytb",
+    xg:"Xga and CD99",
+    scianna:"Sc1/Sc2 and Sc3",
+    dombrock:"Doa/Dob plus Hy, Joa, Gya",
+    colton:"Coa/Cob and Co3",
+    lw:"LWa/LWb; expression tracks with RhD",
+    chrg:"Chido and Rodgers on C4",
+    gerbich:"Ge2, Ge3, Ge4",
+    cromer:"Cra, Tca and DAF/CD55 antigens",
+    knops:"Kna/Knb, McCa/McCb, Sla/Vil",
+    indian:"Ina/Inb on CD44",
+    ok:"Oka on basigin/CD147",
+    raph:"MER2 on CD151",
+    jmh:"JMH high-incidence antigen",
+    vel:"Vel high-incidence antigen",
+    jr:"Jr(a) high-incidence antigen",
+    sda:"Sd(a) carbohydrate antigen",
+    anwj:"AnWj high-incidence antigen",
+    hla:"HLA-A, HLA-B, HLA-C"
+  }},
+  {id:"reason",name:"Why Not Routine",items:{
+    diego:"Usually low-incidence or ancestry-linked; not routine for every panel",
+    cartwright:"High/low incidence pair; antibodies are uncommon",
+    xg:"Cold acting and usually not clinically significant",
+    scianna:"Low/high incidence pairs; clinical significance is uncommon",
+    dombrock:"High-incidence antigens and poor immunogens",
+    colton:"Clinically important, but common high-incidence targets limit routine use",
+    lw:"Variable incidence because expression is related to RhD antigen strength",
+    chrg:"Clinically insignificant and neutralized by plasma",
+    gerbich:"Rare system; linked to elliptocytosis and occasional HDN",
+    cromer:"Usually no HDN; more than one antithetical partner; rarely significant",
+    knops:"HTLA pattern: weak, high-titer, low-avidity reactions",
+    indian:"Rare high/low incidence system",
+    ok:"High-incidence antigen; Ok(a-) donors are rare",
+    raph:"High-incidence antigen; antibodies are rare",
+    jmh:"Often acquired antigen loss; usually not clinically significant",
+    vel:"High-incidence antigen; Vel-negative donors are rare",
+    jr:"High-incidence antigen; Jr(a-) donors are rare",
+    sda:"Mixed-field pattern; often neutralized by urine/glycoprotein",
+    anwj:"High-incidence antigen; rare antibody",
+    hla:"Not a mature RBC antigram target; leukocyte/platelet system"
+  }},
+  {id:"clue",name:"Serology Clues",items:{
+    diego:"Can cause HDN/HTR when present; think Dia in some populations",
+    cartwright:"Anti-Yta is usually mild; high-incidence antigen problem",
+    xg:"X-linked inheritance clue; anti-Xga tends to be cold",
+    scianna:"Rare antibodies; low/high incidence pair clue",
+    dombrock:"Enzyme-sensitive, weak antibodies; delayed HTR possible",
+    colton:"AQP1 association; anti-Coa can cause HTR and HDN",
+    lw:"Looks Rh-related; LW may weaken when RhD expression is weak",
+    chrg:"Plasma neutralization removes reactivity",
+    gerbich:"Membrane protein defects; elliptocytosis clue",
+    cromer:"DAF/CD55 complement regulator clue",
+    knops:"HTLA: weak broad reactivity that is hard to rule out",
+    indian:"CD44 association; rare but can be clinically significant",
+    ok:"High-incidence target; rare anti-Oka",
+    raph:"CD151 association; rare anti-MER2",
+    jmh:"Older/acquired antigen loss pattern",
+    vel:"Anti-Vel can be severe and complement-binding",
+    jr:"Anti-Jra can cause HTR and HDN",
+    sda:"Reacts with mixed-field, refractile agglutinates",
+    anwj:"Rare anti-AnWj can be clinically significant",
+    hla:"Platelet/leukocyte antibodies; transfusion reactions, not RBC panel ID"
+  }}
+];
+
+let roundIndex=0;
+let placements={};
+let selectedChip=null;
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+function chipId(systemId){return rounds[roundIndex].id+"__"+systemId;}
+function currentRound(){return rounds[roundIndex];}
+
+function renderTabs(){
+  const tabs=document.getElementById("roundTabs");
+  tabs.innerHTML=rounds.map((r,i)=>`<button class="pill ${i===roundIndex?"active":""}" data-round="${i}">${r.name}</button>`).join("");
+  tabs.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
+    roundIndex=Number(btn.dataset.round);placements={};selectedChip=null;render();
+  }));
+}
+
+function makeChip(systemId,text){
+  const id=chipId(systemId);
+  const chip=document.createElement("div");
+  chip.className="chip";
+  chip.draggable=true;
+  chip.dataset.id=id;
+  chip.dataset.system=systemId;
+  chip.textContent=text;
+  chip.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",id);});
+  chip.addEventListener("click",()=>selectChip(id));
+  if(selectedChip===id)chip.classList.add("selected");
+  return chip;
+}
+
+function selectChip(id){
+  selectedChip=selectedChip===id?null:id;
+  render();
+}
+
+function placeChip(targetSystemId,id){
+  const fromSystem=Object.keys(placements).find(k=>placements[k]===id);
+  if(fromSystem)delete placements[fromSystem];
+  placements[targetSystemId]=id;
+  selectedChip=null;
+  render();
+}
+
+function clearSlot(systemId){
+  delete placements[systemId];
+  selectedChip=null;
+  render();
+}
+
+function renderBank(){
+  const bank=document.getElementById("bank");
+  const r=currentRound();
+  const placed=new Set(Object.values(placements));
+  const chips=shuffle(systems.map(s=>({systemId:s.id,text:r.items[s.id],id:chipId(s.id)})).filter(c=>!placed.has(c.id)));
+  bank.innerHTML="";
+  chips.forEach(c=>bank.appendChild(makeChip(c.systemId,c.text)));
+}
+
+function renderBoard(){
+  const board=document.getElementById("board");
+  const r=currentRound();
+  board.innerHTML="";
+  systems.forEach(s=>{
+    const row=document.createElement("div");
+    row.className="row";
+    row.innerHTML=`<div class="system"><div class="dot" style="--system:${s.color}">${s.short}</div><div><div class="system-name">${s.name}</div><div class="hint">${r.name}</div></div></div>`;
+    const slot=document.createElement("div");
+    slot.className="slot empty";
+    slot.dataset.system=s.id;
+    slot.addEventListener("dragover",e=>{e.preventDefault();slot.classList.add("over");});
+    slot.addEventListener("dragleave",()=>slot.classList.remove("over"));
+    slot.addEventListener("drop",e=>{
+      e.preventDefault();slot.classList.remove("over");
+      placeChip(s.id,e.dataTransfer.getData("text/plain"));
+    });
+    slot.addEventListener("click",()=>{
+      if(selectedChip)placeChip(s.id,selectedChip);
+      else if(placements[s.id])clearSlot(s.id);
+    });
+    if(placements[s.id]){
+      slot.classList.remove("empty");
+      const sysId=placements[s.id].split("__")[1];
+      slot.appendChild(makeChip(sysId,r.items[sysId]));
+    }
+    row.appendChild(slot);
+    board.appendChild(row);
+  });
+}
+
+function updateScore(){
+  const placed=Object.keys(placements).length;
+  document.getElementById("scoreText").textContent=`${placed} / ${systems.length} placed`;
+}
+
+function checkAnswers(){
+  let correct=0;
+  document.querySelectorAll(".slot").forEach(slot=>{
+    const systemId=slot.dataset.system;
+    const expected=chipId(systemId);
+    slot.classList.remove("correct","wrong");
+    if(!placements[systemId])return;
+    if(placements[systemId]===expected){slot.classList.add("correct");correct++;}
+    else slot.classList.add("wrong");
+  });
+  const msg=document.getElementById("msg");
+  msg.className="msg "+(correct===systems.length?"good":"bad");
+  msg.textContent=correct===systems.length?"Clean sweep. Try another round.":`${correct} correct. Tap a filled slot to return a chip.`;
+}
+
+function showAnswers(){
+  placements={};
+  systems.forEach(s=>placements[s.id]=chipId(s.id));
+  selectedChip=null;
+  render();
+  checkAnswers();
+}
+
+function resetRound(){
+  placements={};selectedChip=null;
+  document.getElementById("msg").textContent="";
+  document.getElementById("msg").className="msg";
+  render();
+}
+
+function render(){
+  renderTabs();
+  renderBank();
+  renderBoard();
+  updateScore();
+}
+
+document.getElementById("checkBtn").addEventListener("click",checkAnswers);
+document.getElementById("resetBtn").addEventListener("click",resetRound);
+document.getElementById("answerBtn").addEventListener("click",showAnswers);
+render();
+</script>
+</body>
+</html>
