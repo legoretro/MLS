@@ -121,8 +121,14 @@ select option{background:var(--bg3)}
 .interactive-tool-thumb{width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border)}
 .interactive-tool-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
 .interactive-tool-desc{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px;line-height:1.35}
-.interactive-tool-topic{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.interactive-tool-topic{font-size:10px;color:var(--tool-color,var(--accent));font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .interactive-tool-arrow{margin-left:auto;color:var(--text3);font-size:18px;line-height:1}
+.theme-toggle-btn{min-width:148px;justify-content:center}
+.resource-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.resource-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
+.resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
+.resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
 
 /* Quiz */
 .quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
@@ -428,7 +434,7 @@ body.light-mode .option-letter{color:var(--text3) !important}
 .flash-face-front{background:var(--bg2)}
 </style>
 </head>
-<body>
+<body class="light-mode">
 
 <!-- Splash shown while JS/Supabase loads -->
 <div id="pwa-splash">
@@ -500,7 +506,7 @@ body.light-mode .option-letter{color:var(--text3) !important}
       <div class="logo-sub">Student Created · For Studying Purposes Only</div>
     </div>
     <div class="flex gap-8 flex-center">
-      <button class="btn btn-ghost btn-sm" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+      <button class="btn btn-ghost btn-sm theme-toggle-btn" id="theme-btn" onclick="toggleTheme()" title="Switch to dark mode">🔬🐱 Switch to dark</button>
       <button class="btn btn-ghost btn-sm" onclick="openAdminModal()">Admin</button>
     </div>
   </header>
@@ -543,9 +549,9 @@ const PARA_MYCO_KEYS=['parasitology','mycology'];
 const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'ABH Structures',url:'ABO_Lewis_Structures.html',description:'Build H, A, B, Bombay and acquired B structures',topic:'Blood Bank',icon:'ABH',color:'#b22222'},
   {title:'Lewis & Secretor Genes',url:'Lewis_Secretor_Genes.html',description:'Match Le/Se genotypes, secretor status and Lewis phenotype',topic:'Blood Bank',icon:'Le',color:'#b22222'},
-  {title:'ABO Phenotype Ranking',url:'ABO_Population_Ranking.html',description:'ABO and D ranking practice',topic:'Blood Bank',icon:'ABO',color:'#b22222'},
-  {title:'Blood Group Antigen Frequencies',url:'BloodGroupSystems_Freq_Final.html',description:'Fill-in and drag antigen frequency patterns',topic:'Blood Bank',icon:'BG',color:'#b22222'},
-  {title:'Rh Haplotype Frequency',url:'Rh_Haplotype_Frequency.html',description:'Rank Rh haplotypes by population pattern',topic:'Blood Bank',icon:'Rh',color:'#b22222'},
+  {title:'ABO Phenotype Ranking',url:'ABO_Population_Ranking.html',description:'ABO and D ranking practice',topic:'Blood Bank',icon:'BB',color:'#b22222'},
+  {title:'Blood Group Antigen Frequencies',url:'BloodGroupSystems_Freq_Final.html',description:'Fill-in and drag antigen frequency patterns',topic:'Blood Bank',icon:'BB',color:'#b22222'},
+  {title:'Rh Haplotype Frequency',url:'Rh_Haplotype_Frequency.html',description:'Rank Rh haplotypes by population pattern',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'BB Groups: Usual Suspects',url:'BB_Group_Usual.html',description:'Drag-match common blood group systems and antibody rules',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'BB Groups: Unusual Suspects',url:'BB_Group_Unusual.html',description:'Drag-match uncommon systems, codes and serology clues',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'UA Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'UA',color:'#c8a800'},
@@ -553,6 +559,11 @@ const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Urinary System Labeling',url:'urinary_labeling.html',description:'Label renal and urinary anatomy',topic:'Urinalysis',icon:'RN',color:'#c8a800'},
   {title:'Thyroid Lab Findings',url:'Thyroid_Label.html',description:'Drag thyroid hormones into the interpretation table',topic:'Chemistry',icon:'TH',color:'#2980b9'},
   {title:'Parathyroid & Hypercalcemia',url:'Para_Thyroid_Label.html',description:'Match PTH, calcium and hypercalcemia findings',topic:'Chemistry',icon:'PT',color:'#2980b9'}
+];
+const RESOURCES=[
+  {title:'MLS OIT Lecture Materials',meta:'Course lecture notes, slides, handouts, and instructor-provided class materials used while building study tools.',note:'Primary course source'},
+  {title:'ASCP BOC Study Guide / Content Outline',meta:'Board of Certification topic organization, exam emphasis, and review framing.',note:'Exam blueprint reference'},
+  {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, procedure notes, and laboratory manuals used for definitions, tables, and interpretive rules.',note:'Add book-level citations here as you finalize them'}
 ];
 
 const HEME_FOLDERS = [
@@ -640,6 +651,7 @@ window.__appInit = async function(){
   if(window.__appInitDone)return;
   window.__appInitDone=true;
   clearStaleAppCaches();
+  applySavedTheme();
   try{
     sb = supabase.createClient(SB_URL, SB_KEY);
     const _t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('to'),ms));
@@ -971,6 +983,7 @@ function renderView(){
   else if(appState.view==='subject')renderSubjectView(v);
   else if(appState.view==='interactive')renderInteractiveView(v);
   else if(appState.view==='all')renderAllView(v);
+  else if(appState.view==='resources')renderResourcesView(v);
   else if(appState.view==='formulas')renderFormulasView(v);
   else if(appState.view==='class')renderClassView(v);
 }
@@ -1130,6 +1143,12 @@ async function renderHome(v){
     + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Interactive Learning</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Built-in study tools and saved resources</div></div>'
     + '<div style="font-size:18px;color:var(--text3)">›</div>'
     + '</div></div>'
+    + '<div class="mt-8">'
+    + '<div onclick="goResources()" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--border2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+    + '<div style="font-size:28px;flex-shrink:0">📚</div>'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Resources</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Citation starter list for study materials</div></div>'
+    + '<div style="font-size:18px;color:var(--text3)">›</div>'
+    + '</div></div>'
     + '<div class="mt-24">'
     + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
     + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
@@ -1189,6 +1208,29 @@ async function renderInteractiveView(v){
   `;
   loadInteractiveLinks();
 }
+function renderResourcesView(v){
+  v.innerHTML=`
+    <div class="flex-center gap-12 mb-16 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
+      <div>
+        <div class="section-title">Resources</div>
+        <div class="section-sub" style="margin-bottom:0">Citation starter list for materials used across the study tools.</div>
+      </div>
+    </div>
+    <div class="resource-list">
+      ${RESOURCES.map(r=>`
+        <div class="resource-card">
+          <div class="resource-title">${esc(r.title)}</div>
+          <div class="resource-meta">${esc(r.meta)}</div>
+          <div class="resource-note">${esc(r.note)}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card-sm mt-16" style="font-size:12px;color:var(--text2);line-height:1.6">
+      Add exact textbook editions, authors, and page ranges here as you finalize the reference list.
+    </div>
+  `;
+}
 async function loadInteractiveLinks(){
   let links=[];
   try{
@@ -1199,8 +1241,8 @@ async function loadInteractiveLinks(){
   }
   const grid = document.getElementById('interactive-links-grid');
   const adminDiv = document.getElementById('interactive-admin');
-  const builtinUrls = new Set(BUILT_IN_INTERACTIVE_LINKS.map(l=>String(l.url||'').toLowerCase()));
-  const customLinks = (links||[]).filter(l=>!builtinUrls.has(String(l.url||'').toLowerCase()));
+  const builtinUrls = new Set(BUILT_IN_INTERACTIVE_LINKS.map(l=>normalizeInteractiveUrl(l.url)));
+  const customLinks = (links||[]).filter(l=>!builtinUrls.has(normalizeInteractiveUrl(l.url))).map(inferInteractiveLinkMeta);
   const allLinks = [...BUILT_IN_INTERACTIVE_LINKS.map(l=>({...l,_builtin:true})), ...customLinks.map(l=>({...l,_builtin:false}))];
 
   if(grid){
@@ -1211,7 +1253,7 @@ async function loadInteractiveLinks(){
         const url = lnk.url || '#';
         const action = isLocalInteractiveUrl(url) ? "window.location.href='" + jsAttr(url) + "'" : "window.open('" + jsAttr(url) + "','_blank')";
         const color = lnk.color || 'var(--accent)';
-        const media = lnk.image_url
+        const media = lnk.image_url && !lnk.force_icon
           ? '<img class="interactive-tool-thumb" src="'+esc(lnk.image_url)+'" alt="">'
           : '<div class="interactive-tool-bubble" style="--tool-color:'+color+'">'+esc(lnk.icon||'GO')+'</div>';
         return '<div class="interactive-tool-card" style="--tool-color:'+color+'" onclick="'+action+'">'
@@ -1247,6 +1289,32 @@ async function loadInteractiveLinks(){
       + '<button class="btn btn-primary btn-sm" onclick="addInteractiveLink()">Add Link</button>'
       + '</div>';
   }
+}
+
+function normalizeInteractiveUrl(url){
+  const raw=String(url||'').trim();
+  const file=(raw.match(/([^/?#]+\.html)(?:[?#].*)?$/i)||[])[1];
+  return (file||raw).toLowerCase();
+}
+
+function inferInteractiveLinkMeta(link){
+  const l={...link};
+  const text=(String(l.title||'')+' '+String(l.url||'')).toLowerCase();
+  if(/blood|abo|lewis|secretor|rh|haplotype|antigen|bb_group/.test(text)){
+    l.topic='Blood Bank';
+    l.icon='BB';
+    l.color='#b22222';
+    l.force_icon=true;
+  }else if(/urine|urinalysis|urinary|renal|reagent/.test(text)){
+    l.topic='Urinalysis';
+    l.icon=l.icon||'UA';
+    l.color='#c8a800';
+  }else if(/thyroid|parathyroid|chem/.test(text)){
+    l.topic='Chemistry';
+    l.icon=l.icon||'CH';
+    l.color='#2980b9';
+  }
+  return l;
 }
 
 async function addInteractiveLink(){
@@ -1379,6 +1447,7 @@ function goAll(){appState.view='all';appState.allStarted=false;appState.allDone=
 function goFormulas(){appState.view='formulas';renderView();}
 function goHome(){appState.view='home';clearInterval(appState.allTimer);renderView();}
 function goInteractive(){appState.view='interactive';renderView();}
+function goResources(){appState.view='resources';renderView();}
 function goClass(){appState.view='class';appState.classView=null;appState.classSubject=null;appState.classSet=null;renderView();}
 
 function renderSubjectView(v){
@@ -1822,7 +1891,7 @@ async function renderImagesTab(el){
 
 // Generic images (non-hematology/micro/ua) — mycology, parasitology, etc.
 async function renderGenericImages(el){
-  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images...</div>';
+  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
   let data;
   if(appState.subject==='para_myco'){
     const [r1,r2]=await Promise.all([
@@ -6948,6 +7017,7 @@ async function openClassSetEditor(id){
     </div>
     <div id="cs-q-list"></div>
     <div class="flex gap-8 mt-16 flex-wrap">
+      <button class="btn btn-ghost" onclick="csSaveQState();csAddQ()">+ Add Question</button>
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
       <button class="btn btn-primary" onclick="saveClassSet()">Save Set</button>
     </div>
@@ -7713,11 +7783,26 @@ function parseCSV(text){
 function parseSteps(s){
   try{return typeof s==='string'?JSON.parse(s||'[]'):(s||[]);}catch{return [];}
 }
+function applySavedTheme(){
+  if(!localStorage.getItem('mlsboc_light_default_v2')){
+    localStorage.setItem('mlsboc_theme','light');
+    localStorage.setItem('mlsboc_light_default_v2','1');
+  }
+  const saved=localStorage.getItem('mlsboc_theme')||'light';
+  document.body.classList.toggle('light-mode', saved!=='dark');
+  updateThemeButton();
+}
+function updateThemeButton(){
+  const btn=document.getElementById('theme-btn');
+  if(!btn)return;
+  const isLight=document.body.classList.contains('light-mode');
+  btn.textContent=isLight?'🔬🐱 Switch to dark':'💤🐱 Switch to light';
+  btn.title=isLight?'Switch to dark mode':'Switch to light mode';
+}
 function toggleTheme(){
   const isLight=document.body.classList.toggle('light-mode');
   localStorage.setItem('mlsboc_theme', isLight?'light':'dark');
-  const btn=document.getElementById('theme-btn');
-  if(btn)btn.textContent=isLight?'🌑':'🌙';
+  updateThemeButton();
 }
 function handleILImgFile(e){
   const file=e.target.files[0];if(!file)return;

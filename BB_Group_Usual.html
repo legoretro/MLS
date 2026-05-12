@@ -81,13 +81,6 @@ h1{font-size:28px;line-height:1.1;margin:0 0 8px}
     </div>
   </div>
 
-  <div class="mini">
-    <div><b>Objective 1</b>antithetical pairs</div>
-    <div><b>Objective 2</b>RBC location/enzyme clues</div>
-    <div><b>Objective 3</b>antibody behavior</div>
-    <div><b>Objective 4</b>clinical significance</div>
-  </div>
-
   <div class="pillbar" id="roundTabs"></div>
 
   <section class="panel">
@@ -122,7 +115,7 @@ const systems=[
 ];
 
 const rounds=[
-  {id:"identity",name:"System ID",items:{
+  {id:"identity",name:"Round 1: System ID",items:{
     abo:"Ch 9; H/FUT1-FUT2; A sugar = GalNAc, B sugar = galactose; no antithetical pair",
     rh:"Ch 1; Rh/RHAG membrane complex; D has no partner; C/c and E/e are pairs",
     mns:"Ch 4; GYPA makes M/N, GYPB makes S/s/U; M/N and S/s are pairs",
@@ -133,7 +126,7 @@ const rounds=[
     lewis:"Ch 19; plasma antigens adsorb to RBC; Lea/Leb are not true pairs",
     lutheran:"Ch 19; BCAM glycoprotein; Lua/Lub pair; mixed-field expression"
   }},
-  {id:"antibody",name:"Antibody Rules",items:{
+  {id:"antibody",name:"Round 2: Antibody Rules",items:{
     abo:"IgM cold, naturally occurring; fixes complement; severe HTR, mild HDN",
     rh:"IgG warm; dosage; does not usually fix complement; severe HDN",
     mns:"Anti-M/N often IgM cold; anti-S/s/U IgG warm; M/N enzyme susceptible",
@@ -144,7 +137,7 @@ const rounds=[
     lewis:"IgM cold; naturally occurring; neutralizable; no HDN",
     lutheran:"Lua IgM cold, Lub IgG warm; no complement; no HDN or HTR"
   }},
-  {id:"clinical",name:"Clinical Clues",items:{
+  {id:"clinical",name:"Round 3: Clinical Clues",items:{
     abo:"H antigen is required; Bombay lacks H; Parabombay secretor has soluble H",
     rh:"Most immunogenic after ABO; D typing and RhIG prevention matter",
     mns:"Anti-N can be transient in dialysis; S/s/U are the stronger clinical risk",

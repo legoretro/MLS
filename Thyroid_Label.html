@@ -339,7 +339,7 @@ tr:nth-child(even) td{background:#f1f1f1}
 
 <div class="section-controls">
   <button id="checkBtn" class="checkBtn">✔ Check Answers</button>
-  <button id="answerBtn" class="answerBtn">👁 See All Correct Answers</button>
+  <button id="answerBtn" class="answerBtn">Show answers</button>
   <button id="resetBtn" class="resetBtn">↺ Reset</button>
   <div id="msg" class="score"></div>
 </div>
@@ -593,16 +593,19 @@ function resetAll(){
   clearMarks();
 }
 
-function toggleAnswers(){
-  const key = document.getElementById("answerKey");
-  const btn = document.getElementById("answerBtn");
-  key.classList.toggle("show");
-  btn.textContent = key.classList.contains("show") ? "🙈 Hide Correct Answers" : "👁 See All Correct Answers";
+function showAnswers(){
+  Object.keys(ANSWERS).forEach(key=>{
+    state[key]=ANSWERS[key];
+    const el=document.querySelector(`.dropzone[data-key="${key}"]`);
+    if(el)renderDrop(el);
+  });
+  renderChipUsage();
+  checkAnswers();
 }
 
 document.getElementById("checkBtn").addEventListener("click",checkAnswers);
 document.getElementById("resetBtn").addEventListener("click",resetAll);
-document.getElementById("answerBtn").addEventListener("click",toggleAnswers);
+document.getElementById("answerBtn").addEventListener("click",showAnswers);
 
 buildChipBank();
 setupDrops();

@@ -389,7 +389,7 @@
   <div class="controls">
     <button class="checkBtn" id="colorCheckBtn">✔ Check Answers</button>
     <button class="resetBtn" id="colorResetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="colorAnswersBtn">See All Answers</button>
+    <button class="seeAnswersBtn" id="colorAnswersBtn">Show answers</button>
     <div class="score" id="colorScoreMsg"></div>
   </div>
 
@@ -488,7 +488,7 @@
   <div class="controls">
     <button class="checkBtn" id="clarityCheckBtn">✔ Check Answers</button>
     <button class="resetBtn" id="clarityResetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="clarityAnswersBtn">See All Answers</button>
+    <button class="seeAnswersBtn" id="clarityAnswersBtn">Show answers</button>
     <div class="score" id="clarityScoreMsg"></div>
   </div>
 
@@ -808,10 +808,9 @@ const clarityRows = [
 function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
 function setupToggle(btnId, panelId){
   const btn = document.getElementById(btnId);
-  const panel = document.getElementById(panelId);
   btn.addEventListener("click", () => {
-    panel.classList.toggle("show");
-    btn.textContent = panel.classList.contains("show") ? "Hide Answers" : "See All Answers";
+    if(btnId==="colorAnswersBtn") showColorAnswers();
+    else if(btnId==="clarityAnswersBtn") showClarityAnswers();
   });
 }
 
@@ -943,6 +942,15 @@ function resetColor(){
   colorRows.forEach(row=>renderColorSlot(colorSlotKey(row.id)));
   clearColorMarks(); renderColorBankUsage();
 }
+function showColorAnswers(){
+  colorRows.forEach(row=>{
+    const key=colorSlotKey(row.id);
+    colorSetState(key,{value:row.cause});
+    renderColorSlot(key);
+  });
+  renderColorBankUsage();
+  checkColorAnswers();
+}
 
 /* ========= CLARITY ACTIVITY ========= */
 const clarityNonState = {};
@@ -1059,6 +1067,16 @@ function resetClarity(){
   buildClarityBank("path","clarityPathBank");
   clarityRows.forEach(row=>{ renderClaritySlot("non",row.id); renderClaritySlot("path",row.id); });
   clearClarityMarks();
+}
+function showClarityAnswers(){
+  clarityRows.forEach(row=>{
+    cSet("non",cSlotKey("non",row.id),{value:row.nonpath});
+    cSet("path",cSlotKey("path",row.id),{value:row.path});
+    renderClaritySlot("non",row.id);
+    renderClaritySlot("path",row.id);
+  });
+  renderClarityBankUsage();
+  checkClarityAnswers();
 }
 
 /* ========= INIT ========= */

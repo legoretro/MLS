@@ -387,7 +387,7 @@
   <div class="controls">
     <button class="checkBtn" id="checkBtn">Check Answers</button>
     <button class="resetBtn" id="resetBtn">Reset</button>
-    <button class="answersBtn" id="answersBtn">See All Answers</button>
+    <button class="answersBtn" id="answersBtn">Show answers</button>
     <div class="score" id="scoreMsg"></div>
   </div>
 
@@ -843,9 +843,26 @@ function buildAnswers(){
 
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", reset);
-document.getElementById("answersBtn").addEventListener("click", () => {
-  document.getElementById("answersPanel").classList.toggle("show");
-});
+function showAnswers(){
+  systems.forEach((system, systemIndex) => {
+    system.antigens.forEach((item, antigenIndex) => {
+      const input = document.getElementById(freqInputId(systemIndex, antigenIndex));
+      if(input) input.value = item.frequency;
+      const realDiff = item.significant.find(s => s.population !== "No significant difference");
+      if(realDiff){
+        const populationKey = slotKey(systemIndex, antigenIndex, "population");
+        const levelKey = slotKey(systemIndex, antigenIndex, "level");
+        setState(populationKey,{type:"population",value:realDiff.population});
+        setState(levelKey,{type:"level",value:realDiff.level});
+        renderSlot(populationKey);
+        renderSlot(levelKey);
+      }
+    });
+  });
+  renderBankUsage();
+  checkAnswers();
+}
+document.getElementById("answersBtn").addEventListener("click", showAnswers);
 
 buildBanks();
 buildSystems();

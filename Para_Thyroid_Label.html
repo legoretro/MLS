@@ -450,7 +450,7 @@
   <div class="controls">
     <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
     <button class="resetBtn" id="resetBtn">↺ Reset</button>
-    <button class="keyBtn" id="keyBtn">🔑 Show Answer Key</button>
+    <button class="keyBtn" id="keyBtn">Show answers</button>
     <div class="score" id="scoreMsg"></div>
   </div>
 
@@ -874,16 +874,22 @@ const keyBtn      = document.getElementById("keyBtn");
 const keyPanel    = document.getElementById("answerKey");
 const keyCloseBtn = document.getElementById("keyCloseBtn");
 
-keyBtn.addEventListener("click", () => {
-  buildAnswerKey();
-  keyPanel.classList.add("visible");
-  keyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-  keyBtn.textContent = "🔑 Answer Key ✓";
-});
+function showAnswers(){
+  SECTION1.forEach(row=>{
+    state.section1[row.id]=row.answer;
+    renderSingleSlot(row.id);
+  });
+  state.section2=[...CORRECT_CAUSES];
+  renderCauseBox();
+  refreshBankUsage();
+  checkAnswers();
+}
+
+keyBtn.addEventListener("click", showAnswers);
 
 keyCloseBtn.addEventListener("click", () => {
   keyPanel.classList.remove("visible");
-  keyBtn.textContent = "🔑 Show Answer Key";
+  keyBtn.textContent = "Show answers";
 });
 
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);

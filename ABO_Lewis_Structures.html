@@ -447,7 +447,7 @@
   <div class="section-controls">
     <button id="checkBtn" class="checkBtn">✔ Check Answers</button>
     <button id="resetBtn" class="resetBtn">↺ Reset</button>
-    <button id="seeAnswersBtn" class="seeBtn">👁 See All Answers</button>
+    <button id="seeAnswersBtn" class="seeBtn">Show answers</button>
     <div id="msg" class="score"></div>
   </div>
 
@@ -496,7 +496,7 @@
   <div class="section-controls">
     <button id="checkBtnType1" class="checkBtn">✔ Check Answers</button>
     <button id="resetBtnType1" class="resetBtn">↺ Reset Type 1 Only</button>
-    <button id="seeAnswersBtnType1" class="seeBtn">👁 See All Answers</button>
+    <button id="seeAnswersBtnType1" class="seeBtn">Show answers</button>
     <div id="msgType1" class="score"></div>
   </div>
 
@@ -1435,14 +1435,40 @@ function resetType1(){
 }
 
 
-function toggleAnswersPanel(){
-  const panel = document.getElementById("answersPanel");
-  const isOpen = panel.classList.toggle("show");
-  const text = isOpen ? "🙈 Hide Answers" : "👁 See All Answers";
-  const btn1 = document.getElementById("seeAnswersBtn");
-  const btn2 = document.getElementById("seeAnswersBtnType1");
-  if(btn1) btn1.textContent = text;
-  if(btn2) btn2.textContent = text;
+function showCurrentAnswer(){
+  const ans = ANSWERS[currentTarget] || ANSWERS.bombay;
+  state.side = ans.side;
+  state.top = ans.top;
+  state.label = ans.label;
+  renderSugarDrop("side");
+  renderSugarDrop("top");
+  renderLabelDrop();
+  renderSugarBankUsage();
+  renderLabelBankUsage();
+  checkAnswers();
+}
+
+function showType1Answer(){
+  if(!type1State.lewisSide) type1State.lewisSide = "FUT3";
+  if(!type1State.secretorSide) type1State.secretorSide = "FUT2";
+  if(!type1State.top) type1State.top = "N-acetylgalactosamine";
+  type1State.abhLabel = getType1ExpectedABH();
+  type1State.lewisLabel = getType1ExpectedLewis();
+  type1State.secretorLabel = getType1ExpectedSecretor();
+  type1State.agglutinationLabel = getType1ExpectedAgglutination();
+  renderType1SugarDrop("lewisSide");
+  renderType1SugarDrop("secretorSide");
+  renderType1SugarDrop("top");
+  renderType1LabelDrop("abhLabel");
+  renderType1LabelDrop("lewisLabel");
+  renderType1LabelDrop("secretorLabel");
+  renderType1LabelDrop("agglutinationLabel");
+  renderType1SugarBankUsage();
+  renderType1LabelBankUsage("abh");
+  renderType1LabelBankUsage("lewis");
+  renderType1LabelBankUsage("secretor");
+  renderType1LabelBankUsage("agglutination");
+  checkAnswersType1();
 }
 
 function resetAll(){
@@ -1462,7 +1488,7 @@ function resetAll(){
 
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", resetAll);
-document.getElementById("seeAnswersBtn").addEventListener("click", toggleAnswersPanel);
+document.getElementById("seeAnswersBtn").addEventListener("click", showCurrentAnswer);
 
 buildSugarBank();
 buildLabelBank();
@@ -1484,7 +1510,7 @@ setupType1LabelDrop("label-drop-secretor-type1", "secretorLabel", "type1-label-s
 setupType1LabelDrop("label-drop-agglutination-type1", "agglutinationLabel", "type1-label-agglutination", "agglutination");
 document.getElementById("checkBtnType1").addEventListener("click", checkAnswersType1);
 document.getElementById("resetBtnType1").addEventListener("click", resetType1);
-document.getElementById("seeAnswersBtnType1").addEventListener("click", toggleAnswersPanel);
+document.getElementById("seeAnswersBtnType1").addEventListener("click", showType1Answer);
 resetType1();
 resetAll();
 </script>

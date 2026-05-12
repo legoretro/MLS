@@ -450,7 +450,7 @@
   <div class="controls">
     <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
     <button class="resetBtn" id="resetBtn">↺ Reset</button>
-    <button class="keyBtn" id="keyBtn">🔑 Show Answer Key</button>
+    <button class="keyBtn" id="keyBtn">Show answers</button>
     <div class="score" id="scoreMsg"></div>
   </div>
 
@@ -869,16 +869,23 @@ const keyBtn      = document.getElementById("keyBtn");
 const keyPanel    = document.getElementById("answerKey");
 const keyCloseBtn = document.getElementById("keyCloseBtn");
 
-keyBtn.addEventListener("click", () => {
-  buildAnswerKey();
-  keyPanel.classList.add("visible");
-  keyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-  keyBtn.textContent = "🔑 Answer Key ✓";
-});
+function showAnswers(){
+  PADS.forEach(pad=>{
+    COL_DEFS.forEach(({col})=>{
+      const key=slotKey(pad.id,col);
+      setState(key,{col,value:pad[col]});
+      renderSlot(key);
+    });
+  });
+  refreshBankUsage();
+  checkAnswers();
+}
+
+keyBtn.addEventListener("click", showAnswers);
 
 keyCloseBtn.addEventListener("click", () => {
   keyPanel.classList.remove("visible");
-  keyBtn.textContent = "🔑 Show Answer Key";
+  keyBtn.textContent = "Show answers";
 });
 
 buildBank();
@@ -1125,7 +1132,7 @@ reset();
   <div class="a2-controls">
     <button class="a2-checkBtn" id="a2CheckBtn">✔ Check Answers</button>
     <button class="a2-resetBtn" id="a2ResetBtn">↺ Reset</button>
-    <button class="a2-keyBtn"   id="a2KeyBtn">🔑 Show Answer Key</button>
+    <button class="a2-keyBtn"   id="a2KeyBtn">Show answers</button>
     <div class="a2-score" id="a2ScoreMsg"></div>
   </div>
 
@@ -1465,15 +1472,21 @@ const a2KeyBtn      = document.getElementById("a2KeyBtn");
 const a2KeyPanel    = document.getElementById("a2AnswerKey");
 const a2KeyCloseBtn = document.getElementById("a2KeyCloseBtn");
 
-a2KeyBtn.addEventListener("click", () => {
-  a2BuildKey();
-  a2KeyPanel.classList.add("visible");
-  a2KeyPanel.scrollIntoView({ behavior:"smooth", block:"start" });
-  a2KeyBtn.textContent = "🔑 Answer Key ✓";
-});
+function a2ShowAnswers(){
+  A2_PADS.forEach(pad=>{
+    ["fp","fn","cs"].forEach(col=>{
+      state2[pad.id][col]=A2_CHIP_LABELS[pad.id][col];
+      renderA2Drop(pad.id,col);
+    });
+  });
+  a2RefreshBankUsage();
+  a2Check();
+}
+
+a2KeyBtn.addEventListener("click", a2ShowAnswers);
 a2KeyCloseBtn.addEventListener("click", () => {
   a2KeyPanel.classList.remove("visible");
-  a2KeyBtn.textContent = "🔑 Show Answer Key";
+  a2KeyBtn.textContent = "Show answers";
 });
 
 a2BuildBanks();
