@@ -563,8 +563,13 @@ const BUILT_IN_INTERACTIVE_LINKS=[
 ];
 const RESOURCES=[
   {title:'MLS OIT Lecture Materials',meta:'Course lecture notes, slides, handouts, and instructor-provided class materials used while building study tools.',note:'Primary course source'},
-  {title:'ASCP BOC Study Guide / Content Outline',meta:'Board of Certification topic organization, exam emphasis, and review framing.',note:'Exam blueprint reference'},
-  {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, procedure notes, and laboratory manuals used for definitions, tables, and interpretive rules.',note:'Add book-level citations here as you finalize them'}
+  {title:'ASCP/ASCPi MLS Content Guideline',meta:'XYZ',note:'ASCP reference placeholder'},
+  {title:'ASCP BOC Study Guide / Content Outline',meta:'XYZ',note:'ASCP reference placeholder'},
+  {title:'Success! In Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman; Janelle M. Chiasera',note:'Textbook reference'},
+  {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, procedure notes, and laboratory manuals used for definitions, tables, and interpretive rules.',note:'Add book-level citations here as you finalize them'},
+  {title:'Calculations / Equations Reference List',meta:'XYZ',note:'Equation source placeholder'},
+  {title:'Reference Ranges Source List',meta:'XYZ',note:'Equation source placeholder'},
+  {title:'Formula Practice and Conversion Sources',meta:'XYZ',note:'Equation source placeholder'}
 ];
 
 const HEME_FOLDERS = [
@@ -1532,7 +1537,7 @@ async function renderQuizTab(el){
           </div>
           <button class="btn btn-primary" onclick="startSubjectQuiz()" ${count?'':'disabled'}>Start Quiz</button>
         </div>
-        ${adminQuizControls()}
+        ${isAdmin?adminQuizControls():''}
       </div>
       ${renderQuizQuestionBank(questions)}
     `;
@@ -1644,7 +1649,7 @@ function renderQuizQuestionRow(q,i){
         <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">Q${i+1}</span>
         ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
-        <button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>
+        ${isAdmin?`<button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>`:''}
       </div>
       <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:8px">${escNL(q.question)}</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;font-size:12px;color:var(--text2)">
