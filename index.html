@@ -555,6 +555,7 @@ const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'BB Groups: Usual Suspects',url:'BB_Group_Usual.html',description:'Drag-match common blood group systems and antibody rules',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'BB Groups: Unusual Suspects',url:'BB_Group_Unusual.html',description:'Drag-match uncommon systems, codes and serology clues',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'UA Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'UA',color:'#c8a800'},
+  {title:'UA Flowchart Drag and Drop',url:'UA_Flowchart_Drag_Drop.html',description:'Match macro and micro renal findings into disease-pattern branches',topic:'Urinalysis',icon:'FC',color:'#c8a800'},
   {title:'Urine Color & Clarity',url:'Urine_Color_and_Clarity.html',description:'Match urine appearance to causes and findings',topic:'Urinalysis',icon:'UC',color:'#c8a800'},
   {title:'Urinary System Labeling',url:'urinary_labeling.html',description:'Label renal and urinary anatomy',topic:'Urinalysis',icon:'RN',color:'#c8a800'},
   {title:'Thyroid Lab Findings',url:'Thyroid_Label.html',description:'Drag thyroid hormones into the interpretation table',topic:'Chemistry',icon:'TH',color:'#2980b9'},
@@ -655,9 +656,7 @@ window.__appInit = async function(){
   try{
     sb = supabase.createClient(SB_URL, SB_KEY);
     const _t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('to'),ms));
-    if(!localStorage.getItem('mlsboc_seeded')){
-      seedIfEmpty().then(()=>localStorage.setItem('mlsboc_seeded','1')).catch(()=>{});
-    }
+    localStorage.setItem('mlsboc_seeded','disabled');
     await Promise.race([
       Promise.all([loadIconCache(),loadFolderIconCache(),loadClassIconCache()]),
       _t(5000)
@@ -875,6 +874,9 @@ async function generateUASingleImagePDF(items, title, filename){
 }
 
 async function seedIfEmpty(){
+  return;
+}
+async function seedIfEmptyLegacyUnused(){
   try{
     const {data}=await sb.from('mlsboc_questions').select('id').limit(1);
     if(data&&data.length>0)return;
@@ -4508,11 +4510,7 @@ function renderProgressVisual(subj, rightPct, wrongPct, isDone100){
   const r=Math.max(0,Math.min(100,rightPct||0));
   const w=Math.max(0,Math.min(100-r,wrongPct||0));
   const confetti=isDone100?renderConfetti():'';
-  if(subj==='blood_bank')       return confetti+renderBBVisual(r,w);
-  if(subj==='clinical_chemistry')return confetti+renderChemVisual(r,w);
-  if(subj==='urinalysis')       return confetti+renderUAVisual(r,w);
-  if(subj==='microbiology')     return confetti+renderMicroVisual(r,w);
-  return confetti+renderGenericVisual(r,w);
+  return confetti+renderLabCoatCellVisual(subj,r,w,isDone100);
 }
 
 function renderConfetti(){
@@ -4531,6 +4529,107 @@ function renderConfetti(){
   return `<div style="position:relative;overflow:visible;height:0">
     <svg style="position:absolute;left:0;top:-10px;width:100%;height:90px;overflow:visible;pointer-events:none">
       ${pieces.join('')}
+    </svg>
+  </div>`;
+}
+
+function getProgressSubjectMeta(subj){
+  const map={
+    blood_bank:{label:'Blood Bank',short:'BB',accent:'#c94f55',tool:'drop'},
+    clinical_chemistry:{label:'Chemistry',short:'CH',accent:'#2f86c5',tool:'flask'},
+    hematology:{label:'Hematology',short:'HE',accent:'#d23d4b',tool:'cell'},
+    immunology:{label:'Immunology',short:'IM',accent:'#7c4dcc',tool:'shield'},
+    lab_operations:{label:'Lab Ops',short:'LO',accent:'#4a6fdc',tool:'chart'},
+    microbiology:{label:'Microbiology',short:'MI',accent:'#32a66a',tool:'dish'},
+    parasitology:{label:'Parasitology',short:'PA',accent:'#7aa23b',tool:'lens'},
+    mycology:{label:'Mycology',short:'MY',accent:'#8f6ab8',tool:'spore'},
+    para_myco:{label:'Para/Myco',short:'PM',accent:'#7aa23b',tool:'lens'},
+    urinalysis:{label:'Urinalysis',short:'UA',accent:'#c8a800',tool:'strip'}
+  };
+  return map[subj]||{label:'Quiz',short:'MLS',accent:'#2563d4',tool:'scope'};
+}
+
+function renderLabCoatCellVisual(subj,r,w,isDone100){
+  const meta=getProgressSubjectMeta(subj);
+  const id='labcell_'+String(subj||'x').replace(/[^a-z0-9_]/gi,'');
+  const H=74;
+  const rightH=Math.round(r/100*H);
+  const wrongH=Math.round(w/100*H);
+  const wrongY=108-wrongH;
+  const rightY=wrongY-rightH;
+  const mood=r>=80?'M72 82 Q86 94 100 82':r>=45?'M74 84 Q86 90 98 84':'M74 91 Q86 82 98 91';
+  const sparkle=isDone100?`
+    <g class="sparkles">
+      <path d="M48 22 L52 32 L62 36 L52 40 L48 50 L44 40 L34 36 L44 32 Z" fill="#ffe44d"/>
+      <path d="M126 26 L129 34 L137 37 L129 40 L126 48 L123 40 L115 37 L123 34 Z" fill="#3ddc84"/>
+    </g>`:'';
+  const accessory={
+    drop:`<path d="M142 73 C142 64 153 55 153 46 C164 62 170 70 170 82 C170 96 158 106 145 101 C136 98 132 89 135 81 C137 77 139 75 142 73Z" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><circle cx="149" cy="82" r="6" fill="${meta.accent}" opacity=".22"/>`,
+    flask:`<path d="M150 51 L150 74 L136 101 Q134 106 140 106 L174 106 Q180 106 177 101 L164 74 L164 51 Z" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><path d="M141 94 Q155 88 175 94 L175 103 L140 103 Z" fill="${meta.accent}" opacity=".35"/>`,
+    cell:`<circle cx="156" cy="82" r="24" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><circle cx="148" cy="77" r="5" fill="${meta.accent}" opacity=".28"/><circle cx="162" cy="88" r="8" fill="${meta.accent}" opacity=".22"/>`,
+    dish:`<ellipse cx="156" cy="88" rx="28" ry="18" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><circle cx="146" cy="86" r="5" fill="${meta.accent}" opacity=".55"/><circle cx="160" cy="94" r="4" fill="${meta.accent}" opacity=".45"/><circle cx="168" cy="83" r="3" fill="${meta.accent}" opacity=".4"/>`,
+    strip:`<rect x="147" y="50" width="18" height="62" rx="7" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><rect x="151" y="58" width="10" height="10" rx="2" fill="#f5d34f"/><rect x="151" y="73" width="10" height="10" rx="2" fill="#7fc97f"/><rect x="151" y="88" width="10" height="10" rx="2" fill="#5aa6d6"/>`,
+    shield:`<path d="M156 50 L178 60 L174 84 Q170 101 156 110 Q142 101 138 84 L134 60 Z" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><path d="M147 79 L154 86 L168 68" fill="none" stroke="${meta.accent}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+    chart:`<rect x="136" y="55" width="40" height="52" rx="7" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><rect x="144" y="88" width="6" height="10" fill="${meta.accent}" opacity=".75"/><rect x="154" y="76" width="6" height="22" fill="${meta.accent}" opacity=".55"/><rect x="164" y="66" width="6" height="32" fill="${meta.accent}" opacity=".85"/>`,
+    lens:`<circle cx="153" cy="78" r="21" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><line x1="168" y1="93" x2="181" y2="106" stroke="${meta.accent}" stroke-width="5" stroke-linecap="round"/><circle cx="148" cy="74" r="5" fill="${meta.accent}" opacity=".3"/>`,
+    spore:`<circle cx="156" cy="82" r="22" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><circle cx="144" cy="70" r="5" fill="${meta.accent}" opacity=".28"/><circle cx="166" cy="76" r="4" fill="${meta.accent}" opacity=".38"/><circle cx="157" cy="94" r="7" fill="${meta.accent}" opacity=".22"/>`,
+    scope:`<path d="M144 103 H178" stroke="${meta.accent}" stroke-width="6" stroke-linecap="round"/><path d="M153 101 L165 65 L176 69 L164 103" fill="#fff" stroke="${meta.accent}" stroke-width="3"/><circle cx="168" cy="61" r="8" fill="#fff" stroke="${meta.accent}" stroke-width="3"/>`
+  }[meta.tool]||'';
+  return `<div class="spv-wrap lab-cell-wrap" style="min-height:178px">
+    <svg width="220" height="178" viewBox="0 0 210 178" role="img" aria-label="${meta.label} progress">
+      <style>
+        #${id} .lab-cell{animation:lab-cell-float 2.6s ease-in-out infinite;transform-origin:86px 88px}
+        #${id} .liquid{transition:all .45s ease}
+        #${id} .glint{animation:lab-cell-glint 2.4s ease-in-out infinite}
+        #${id} .bubbles circle{animation:lab-cell-bubble 1.7s ease-in-out infinite}
+        #${id} .bubbles circle:nth-child(2){animation-delay:.35s}
+        #${id} .bubbles circle:nth-child(3){animation-delay:.7s}
+        #${id} .sparkles{animation:lab-cell-pop .8s ease-in-out infinite alternate;transform-origin:105px 40px}
+        @keyframes lab-cell-float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+        @keyframes lab-cell-glint{0%,100%{opacity:.18}50%{opacity:.55}}
+        @keyframes lab-cell-bubble{0%{transform:translateY(12px);opacity:0}40%{opacity:.75}100%{transform:translateY(-16px);opacity:0}}
+        @keyframes lab-cell-pop{from{transform:scale(.92);opacity:.65}to{transform:scale(1.1);opacity:1}}
+      </style>
+      <g id="${id}">
+        <ellipse cx="104" cy="154" rx="58" ry="10" fill="rgba(30,43,80,.10)"/>
+        ${sparkle}
+        <g class="lab-cell">
+          <defs>
+            <clipPath id="${id}_clip">
+              <path d="M54 50 C64 25 106 21 126 39 C146 57 140 102 124 122 C107 143 66 139 50 119 C34 99 40 67 54 50Z"/>
+            </clipPath>
+            <linearGradient id="${id}_good" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6ee7a8"/><stop offset="100%" stop-color="#1a8a4a"/></linearGradient>
+            <linearGradient id="${id}_bad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff8a8f"/><stop offset="100%" stop-color="#c0303f"/></linearGradient>
+          </defs>
+          <path d="M54 50 C64 25 106 21 126 39 C146 57 140 102 124 122 C107 143 66 139 50 119 C34 99 40 67 54 50Z" fill="#eef9ff" stroke="${meta.accent}" stroke-width="3" opacity=".96"/>
+          <g clip-path="url(#${id}_clip)">
+            ${wrongH>0?`<rect class="liquid" x="36" y="${wrongY}" width="108" height="${wrongH+6}" fill="url(#${id}_bad)" opacity=".82"/>`:''}
+            ${rightH>0?`<rect class="liquid" x="36" y="${rightY}" width="108" height="${rightH+6}" fill="url(#${id}_good)" opacity=".82"/>`:''}
+            <path class="glint" d="M65 41 C50 61 48 88 58 108" stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none"/>
+          </g>
+          <path d="M54 50 C64 25 106 21 126 39 C146 57 140 102 124 122 C107 143 66 139 50 119 C34 99 40 67 54 50Z" fill="none" stroke="${meta.accent}" stroke-width="3"/>
+          <path d="M58 100 L114 100 L126 136 Q87 152 48 136 Z" fill="#fff" stroke="#d9deea" stroke-width="3"/>
+          <path d="M83 101 L72 136 M91 101 L103 136" stroke="#d9deea" stroke-width="3" stroke-linecap="round"/>
+          <path d="M81 101 L86 113 L92 101" fill="none" stroke="${meta.accent}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="74" cy="73" r="8" fill="#fff" stroke="#596070" stroke-width="3"/>
+          <circle cx="99" cy="73" r="8" fill="#fff" stroke="#596070" stroke-width="3"/>
+          <line x1="82" y1="73" x2="91" y2="73" stroke="#596070" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="74" cy="73" r="2.8" fill="#596070"/>
+          <circle cx="99" cy="73" r="2.8" fill="#596070"/>
+          <path d="${mood}" fill="none" stroke="#596070" stroke-width="3" stroke-linecap="round"/>
+          <path d="M54 107 Q35 111 28 96" stroke="${meta.accent}" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <path d="M122 102 Q137 105 146 93" stroke="${meta.accent}" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+        <g class="bubbles" fill="${meta.accent}" opacity=".55">
+          <circle cx="36" cy="82" r="4"/>
+          <circle cx="128" cy="56" r="3"/>
+          <circle cx="138" cy="122" r="5"/>
+        </g>
+        <g>${accessory}</g>
+        <rect x="63" y="141" width="70" height="22" rx="11" fill="var(--bg3)" stroke="var(--border)"/>
+        <text x="98" y="156" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="var(--mono)">${meta.short} ${r}%</text>
+        ${w>0?`<text x="98" y="173" text-anchor="middle" font-size="10" fill="var(--danger)" font-family="var(--mono)">${w}% retry</text>`:''}
+      </g>
     </svg>
   </div>`;
 }
@@ -6311,11 +6410,21 @@ async function adminAddQ(){
 }
 
 async function adminBulkQ(e){
-  const rows=parseCSV(await e.target.files[0].text());
+  const file=e.target.files[0];if(!file)return;
+  const text=await file.text();
+  const records=parseCSVRecords(text);
+  const rows=records.length?records:parseCSV(text);
+  let imported=0,skipped=0;
   for(const r of rows){
-    if(r.length<6)continue;
-    try{await sb.from('mlsboc_questions').insert({subject:appState.subject,question:r[0],option_a:r[1],option_b:r[2],option_c:r[3],option_d:r[4],correct_answer:r[5].toLowerCase(),explanation:r[6]||''});}catch(e){}
+    const q=normalizeQuizCSVRow(r);
+    if(!q){skipped++;continue;}
+    try{
+      const {error}=await sb.from('mlsboc_questions').insert({subject:appState.subject,...q});
+      if(error)skipped++;else imported++;
+    }catch(err){skipped++;}
   }
+  e.target.value='';
+  alert(`Imported ${imported} question${imported!==1?'s':''}${skipped?`; skipped ${skipped}`:''}.`);
   renderTab();
 }
 
@@ -7773,12 +7882,82 @@ function dlCSV(rows,filename){
   const csv=rows.map(r=>r.map(csvEsc).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=filename;a.click();
 }
+function parseCSVRows(text){
+  text=String(text||'').replace(/^\uFEFF/,'');
+  const rows=[];
+  let row=[],cell='',inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i],next=text[i+1];
+    if(inQuotes){
+      if(ch==='"'&&next==='"'){cell+='"';i++;}
+      else if(ch==='"')inQuotes=false;
+      else cell+=ch;
+    }else if(ch==='"'){
+      inQuotes=true;
+    }else if(ch===','){
+      row.push(cell);cell='';
+    }else if(ch==='\n'||ch==='\r'){
+      if(ch==='\r'&&next==='\n')i++;
+      row.push(cell);rows.push(row);
+      row=[];cell='';
+    }else{
+      cell+=ch;
+    }
+  }
+  if(cell!==''||row.length){row.push(cell);rows.push(row);}
+  return rows
+    .map(r=>r.map(c=>String(c||'').trim()))
+    .filter(r=>r.some(c=>c!==''));
+}
+function normalizeCSVHeader(h){
+  return String(h||'').toLowerCase().trim().replace(/^\uFEFF/,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+}
+function looksLikeCSVHeader(row){
+  const known=new Set(['question','prompt','stem','name','title','folder','key_features','notes','description','scenario','case_data','answer','group_label','a','b','c','d','option_a','option_b','option_c','option_d','correct','correct_answer','explanation']);
+  return (row||[]).map(normalizeCSVHeader).some(h=>known.has(h));
+}
 function parseCSV(text){
-  return text.trim().split('\n').slice(1).map(line=>{
-    const r=[],re=/("(?:[^"]|"")*"|[^,]*),?/g;let m;
-    while((m=re.exec(line))!==null&&m[0])r.push(m[1].replace(/^"|"$/g,'').replace(/""/g,'"'));
-    return r;
-  });
+  const rows=parseCSVRows(text);
+  if(!rows.length)return [];
+  return looksLikeCSVHeader(rows[0])?rows.slice(1):rows;
+}
+function parseCSVRecords(text){
+  const rows=parseCSVRows(text);
+  if(!rows.length||!looksLikeCSVHeader(rows[0]))return [];
+  const headers=rows[0].map(normalizeCSVHeader);
+  return rows.slice(1).map(r=>{
+    const rec={};
+    headers.forEach((h,i)=>{if(h)rec[h]=r[i]||'';});
+    return rec;
+  }).filter(r=>Object.values(r).some(v=>String(v||'').trim()));
+}
+function csvField(row,names,idx){
+  if(Array.isArray(row))return row[idx]||'';
+  for(const n of names){
+    const key=normalizeCSVHeader(n);
+    if(Object.prototype.hasOwnProperty.call(row,key))return row[key]||'';
+  }
+  return '';
+}
+function normalizeQuizCSVRow(row){
+  const payload={
+    question:String(csvField(row,['question','prompt','stem'],0)||'').trim(),
+    option_a:String(csvField(row,['option_a','a','choice_a','answer_a'],1)||'').trim(),
+    option_b:String(csvField(row,['option_b','b','choice_b','answer_b'],2)||'').trim(),
+    option_c:String(csvField(row,['option_c','c','choice_c','answer_c'],3)||'').trim(),
+    option_d:String(csvField(row,['option_d','d','choice_d','answer_d'],4)||'').trim(),
+    explanation:String(csvField(row,['explanation','rationale','notes'],6)||'').trim()
+  };
+  const raw=String(csvField(row,['correct_answer','correct','answer','key'],5)||'').toLowerCase().trim();
+  const cleaned=raw.replace(/^option[_\s-]*/,'').replace(/^choice[_\s-]*/,'').replace(/^answer[_\s-]*/,'');
+  const map={a:'a',b:'b',c:'c',d:'d','1':'a','2':'b','3':'c','4':'d'};
+  let ans=map[cleaned]||map[cleaned.charAt(0)]||'';
+  if(!ans){
+    ans=['a','b','c','d'].find(l=>payload['option_'+l].toLowerCase()===raw)||'';
+  }
+  payload.correct_answer=ans;
+  if(!payload.question||!payload.option_a||!payload.option_b||!payload.option_c||!payload.option_d||!payload.correct_answer)return null;
+  return payload;
 }
 function parseSteps(s){
   try{return typeof s==='string'?JSON.parse(s||'[]'):(s||[]);}catch{return [];}
