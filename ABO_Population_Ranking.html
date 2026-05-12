@@ -3,282 +3,50 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ABO Phenotype Frequency – Rank It!</title>
+<title>Antigen Donor Frequencies</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
-
-  * { box-sizing: border-box; }
-
+  *{box-sizing:border-box}
   :root{
-    --bg: #ece9e2;
-    --panel: #f7f3eb;
-    --header: #e8920a;
-    --cell: #fde8c8;
-    --cell2: #fbd8a8;
-    --border: #f7ddb5;
-    --text: #111;
-    --muted: #666;
-    --drop: #fffaf0;
-    --drop-border: #e8920a;
-    --good: #2e8b57;
-    --bad: #c0392b;
-    --top-dark: #2c2c2c;
-    --top-yellow: #f5c842;
-    --shadow: 0 2px 12px rgba(0,0,0,.10);
+    --bg:#eef1f8;--paper:#fff;--ink:#1a1d2e;--muted:#5a627f;--soft:#f7f8fc;
+    --stripe:#edf2ff;--border:#c8cce0;--accent:#2563d4;--good:#1a8a4a;--bad:#c0303f;
+    --shadow:0 12px 30px rgba(35,50,90,.10);
   }
-
-  body{
-    margin:0;
-    font-family:'Nunito', sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding:12px;
-  }
-
-  .wrap{ max-width:1000px; margin:0 auto; }
-
-  header{
-    background:var(--top-dark);
-    color:#fff;
-    padding:10px 18px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    border-radius:12px;
-    margin-bottom:10px;
-    box-shadow:var(--shadow);
-  }
-
-  header h1{ margin:0; font-size:1.35rem; font-weight:900; color:var(--top-yellow); }
-  header p{ margin:2px 0 0; font-size:.72rem; color:#d4d4d4; line-height:1.35; }
-
-  .badge{
-    margin-left:auto;
-    background:var(--bad);
-    color:#fff;
-    font-weight:800;
-    font-size:.68rem;
-    padding:4px 10px;
-    border-radius:20px;
-    white-space:nowrap;
-  }
-
-  .controls{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-bottom:10px;
-    background:var(--panel);
-    border-radius:12px;
-    padding:10px 12px;
-    box-shadow:var(--shadow);
-    align-items:center;
-  }
-
-  button{
-    border:none;
-    border-radius:8px;
-    padding:8px 12px;
-    font-family:'Nunito', sans-serif;
-    font-weight:800;
-    cursor:pointer;
-    font-size:.82rem;
-  }
-
-  .checkBtn{ background:#1f1f1f; color:#fff; }
-  .resetBtn{ background:#d9d2c6; color:#333; }
-
-  .score{
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    padding:6px 10px;
-    border-radius:8px;
-    min-height:32px;
-    font-size:.82rem;
-  }
-  .score.good{ background:#edf8f1; color:var(--good); }
-  .score.bad{  background:#fff0ee; color:var(--bad); }
-
-  /* layout: bank left, columns right */
-  .layout{
-    display:grid;
-    grid-template-columns: 160px 1fr;
-    gap:10px;
-    align-items:start;
-  }
-
-  .bank{
-    background:var(--panel);
-    border-radius:12px;
-    padding:10px;
-    box-shadow:var(--shadow);
-    position:sticky;
-    top:10px;
-  }
-
-  .bank h2{
-    margin:0 0 8px;
-    font-size:.78rem;
-    text-transform:uppercase;
-    letter-spacing:1px;
-  }
-
-  .hint{
-    font-size:.68rem;
-    color:var(--muted);
-    line-height:1.3;
-    margin-bottom:8px;
-  }
-
-  .chip{
-    background:#fff;
-    border:2px solid #ddd4c4;
-    border-radius:8px;
-    padding:9px;
-    margin-bottom:6px;
-    cursor:grab;
-    user-select:none;
-    transition:.15s ease;
-    text-align:center;
-    font-weight:900;
-    font-size:.88rem;
-  }
-  .chip:last-child{ margin-bottom:0; }
-  .chip.dragging{ opacity:.45; }
-  .chip.used{ opacity:.22; pointer-events:none; }
-
-  /* 4 phenotype columns */
-  .columns{
-    display:grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap:10px;
-  }
-
-  .col-section{
-    box-shadow:var(--shadow);
-    border-radius:12px;
-    overflow:hidden;
-    background:transparent;
-  }
-
-  .col-title{
-    background:var(--header);
-    color:#fff;
-    text-align:center;
-    font-size:1.25rem;
-    font-weight:900;
-    padding:12px 6px;
-    letter-spacing:.5px;
-  }
-
-  table{
-    width:100%;
-    border-collapse:collapse;
-    table-layout:fixed;
-  }
-
-  th, td{
-    border:2px solid var(--border);
-    padding:6px 4px;
-    text-align:center;
-  }
-
-  th{
-    background:var(--header);
-    color:#fff;
-    font-size:.75rem;
-    font-weight:900;
-  }
-
-  td{ background:var(--cell); }
-  tbody tr:nth-child(even) td{ background:var(--cell2); }
-
-  .dropzone{
-    min-height:44px;
-    background:var(--drop);
-    border:2px dashed #cfc3a5;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:.15s ease;
-    padding:4px 5px;
-    text-align:center;
-    line-height:1.2;
-    font-weight:900;
-    font-size:.82rem;
-  }
-
-  .dropzone.drag-over{
-    border-color:var(--drop-border);
-    background:#fff4d8;
-    transform:scale(1.02);
-  }
-
-  .dropzone.filled{
-    border-style:solid;
-    background:#fff;
-    cursor:pointer;
-    color:#111;
-  }
-
-  .dropzone.correct{
-    background:#edf8f1;
-    border-color:var(--good);
-    color:var(--good);
-  }
-
-  .dropzone.wrong{
-    background:#fff0ee;
-    border-color:var(--bad);
-    color:var(--bad);
-  }
-
-  .placeholder{
-    color:#9b8b66;
-    font-weight:800;
-    font-size:.62rem;
-    text-align:center;
-    width:100%;
-  }
-
-  .seeAnswersBtn{ background:#b8860b; color:#fff; }
-  .answers-panel{
-    display:none;
-    margin-top:10px;
-    background:var(--panel);
-    border-radius:12px;
-    padding:12px;
-    box-shadow:var(--shadow);
-    line-height:1.5;
-  }
-  .answers-panel.show{ display:block; }
-  .answers-panel h3{
-    margin:0 0 8px;
-    font-size:.9rem;
-    text-transform:uppercase;
-    letter-spacing:.5px;
-  }
-  .answers-panel h4{
-    margin:10px 0 6px;
-    font-size:.82rem;
-  }
-  .answers-panel table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:6px;
-  }
-  .answers-panel th, .answers-panel td{
-    border:2px solid var(--border);
-    padding:6px 8px;
-    text-align:left;
-    background:#fff;
-    font-size:.8rem;
-  }
-
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',Arial,sans-serif;padding:0 18px 24px}
+  .wrap{max-width:1320px;margin:0 auto}
+  .hero,.controls,.table-card{background:var(--paper);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+  .hero{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:18px 20px;margin:18px auto 14px}
+  h1{margin:0;font-size:1.65rem;line-height:1.1;font-weight:900}
+  .hero p{margin:6px 0 0;color:var(--muted);font-size:.92rem;line-height:1.4}
+  .badge{background:var(--accent);color:#fff;border-radius:999px;padding:7px 13px;font-size:.72rem;font-weight:900;letter-spacing:.06em;white-space:nowrap}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px;margin-bottom:14px}
+  button{border:0;border-radius:9px;padding:9px 13px;font:900 .86rem/1 'Nunito',Arial,sans-serif;cursor:pointer}
+  .checkBtn{background:var(--accent);color:#fff}
+  .resetBtn{background:#e4e7f0;color:#4b526e}
+  .answersBtn{background:#1a8a4a18;color:var(--good);border:1px solid #1a8a4a44}
+  .score{margin-left:auto;min-height:32px;display:flex;align-items:center;padding:6px 10px;border-radius:8px;font-weight:900}
+  .score.good{background:#edf8f1;color:var(--good)}
+  .score.bad{background:#fff0ee;color:var(--bad)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .tab{background:var(--paper);border:1px solid var(--border);color:var(--ink);box-shadow:0 2px 8px rgba(35,50,90,.06);border-radius:999px;padding:8px 13px}
+  .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .table-card{overflow:hidden}
+  .table-title{background:var(--accent);color:#fff;padding:13px 16px;text-align:center;font-weight:900;font-size:1.12rem}
+  .table-scroll{overflow:auto}
+  table{width:100%;border-collapse:collapse;min-width:980px}
+  th,td{border:1px solid var(--border);padding:8px;text-align:center}
+  th{background:var(--accent);color:#fff;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+  td{background:var(--soft);font-weight:800}
+  tr:nth-child(even) td{background:var(--stripe)}
+  td.antigen{text-align:left;font-weight:900;color:#7a4800;min-width:140px}
+  input,select{width:100%;min-height:38px;border:2px solid #d8cfbe;border-radius:8px;background:#fff;color:var(--ink);font:900 .9rem/1 'Nunito',Arial,sans-serif;text-align:center;padding:5px}
+  select{text-align:left}
+  input.correct,select.correct{background:#edf8f1;border-color:var(--good);color:var(--good)}
+  input.wrong,select.wrong{background:#fff0ee;border-color:var(--bad);color:var(--bad)}
+  .note{color:var(--muted);font-size:.82rem;line-height:1.45;margin:12px 2px 0}
+  @media(max-width:760px){body{padding:0 10px 18px}.hero{align-items:flex-start;flex-direction:column}.score{margin-left:0;width:100%}h1{font-size:1.35rem}}
 </style>
+<script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css">
 </head>
 <body class="mls-interactive">
@@ -290,880 +58,234 @@
   <a class="mls-home-btn" href="index.html">&larr; MLS Home</a>
 </header>
 
-    <a href="https://legoretro.github.io/MLS/" style="display:block; margin:20px;">← Back</a>
-<style>
-  .split-layout{
-    display:grid;
-    grid-template-columns: 110px 1fr 110px;
-    gap:10px;
-    align-items:start;
-  }
-</style>
-
-<div class="wrap" style="max-width:960px;">
-
-  <header>
+<div class="wrap">
+  <section class="hero">
     <div>
-      <h1>🩸 ABO Phenotype Frequency – Fill It In!</h1>
-      <p>Drag the correct percentage into each cell of the table.<br>Click a filled cell to return it to the bank.</p>
+      <h1>Antigen Donor Frequencies</h1>
+      <p>Full donor-frequency table by population. Use the buttons to switch systems, then fill the population values and the memorize/difference columns.</p>
     </div>
-    <span class="badge">FILL IT IN!</span>
-  </header>
+    <div class="badge">FULL TABLE FREQ</div>
+  </section>
 
-  <div class="controls">
-    <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
-    <button class="resetBtn" id="resetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="showAnswersBtn">Show answers</button>
+  <section class="controls">
+    <button class="checkBtn" id="checkBtn">Check Answers</button>
+    <button class="resetBtn" id="resetBtn">Reset</button>
+    <button class="answersBtn" id="answersBtn">Show answers</button>
     <div class="score" id="scoreMsg"></div>
-  </div>
+  </section>
 
-  <div class="answers-panel" id="answersPanel">
-    <h3>Answers — ABO Fill In</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Phenotype</th>
-          <th>White</th>
-          <th>Black</th>
-          <th>Hispanic</th>
-          <th>Asian</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>O</td><td>45%</td><td>50%</td><td>56%</td><td>40%</td></tr>
-        <tr><td>A</td><td>40%</td><td>26%</td><td>31%</td><td>28%</td></tr>
-        <tr><td>B</td><td>11%</td><td>20%</td><td>10%</td><td>25%</td></tr>
-        <tr><td>AB</td><td>4%</td><td>4%</td><td>3%</td><td>7%</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <nav class="tabs" id="tabs" aria-label="Blood group systems"></nav>
 
-  <div class="split-layout">
-
-    <!-- LEFT BANK (7 chips) -->
-    <div class="bank" style="position:sticky;top:10px;">
-      <h2>Numbers</h2>
-      <div id="chipWrapLeft"></div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="col-section">
-      <div class="col-title" style="font-size:.95rem; padding:10px 8px;">ABO Phenotype Frequency (%) by Population</div>
-      <table style="table-layout:fixed;">
+  <section class="table-card">
+    <div class="table-title" id="tableTitle"></div>
+    <div class="table-scroll">
+      <table>
         <thead>
           <tr>
-            <th style="width:20%;">Phenotype</th>
-            <th>White</th>
+            <th>Antigen</th>
+            <th>Caucasian</th>
             <th>Black</th>
-            <th>Hispanic</th>
             <th>Asian</th>
+            <th>Indian</th>
+            <th>Hispanic</th>
+            <th>Frequency<br>to Memorize</th>
+            <th>Population Different In</th>
+            <th>Higher / Lower</th>
           </tr>
         </thead>
-        <tbody id="aboTableBody"></tbody>
+        <tbody id="tbody"></tbody>
       </table>
     </div>
-
-    <!-- RIGHT BANK (7 chips) -->
-    <div class="bank" style="position:sticky;top:10px;">
-      <h2>Numbers</h2>
-      <div id="chipWrapRight"></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── RANKING ACTIVITY ── -->
-<div class="wrap" style="max-width:960px; margin-top:28px;">
-
-  <header>
-    <div>
-      <h1>🩸 ABO Phenotype Frequency – Rank It!</h1>
-      <p>Drag populations into each phenotype column, ranked most → least frequent.<br>Click a filled slot to return it to the bank.</p>
-    </div>
-    <span class="badge">RANK IT!</span>
-  </header>
-
-  <div class="controls">
-    <button class="checkBtn" id="rankCheckBtn">✔ Check Answers</button>
-    <button class="resetBtn" id="rankResetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="showRankAnswersBtn">Show answers</button>
-    <div class="score" id="rankScoreMsg"></div>
-  </div>
-
-  <div class="answers-panel" id="rankAnswersPanel">
-    <h3>Answers — ABO Rank It</h3>
-    <h4>O</h4>
-    <div>Hispanic → Black → White → Asian</div>
-    <h4>A</h4>
-    <div>White → Hispanic → Asian → Black</div>
-    <h4>B</h4>
-    <div>Asian → Black → White → Hispanic</div>
-    <h4>AB</h4>
-    <div>Asian → White / Black tie → Hispanic</div>
-  </div>
-
-  <div class="layout">
-    <div class="bank">
-      <h2>Populations</h2>
-      <p class="hint">Each population can be used once per phenotype. Drag to rank top → bottom.</p>
-      <div id="rankChipWrap"></div>
-    </div>
-    <div class="columns" id="rankColsWrap"></div>
-  </div>
+  </section>
+  <p class="note">NT means not tested/not taught in the source table. Leading zeros are accepted either way when you check answers.</p>
 </div>
 
 <script>
-/* ════════════════════════════════════
-   ACTIVITY 1 — ABO FILL-IN
-════════════════════════════════════ */
-const ABO_PHENOTYPES = ["O","A","B","AB"];
-const ABO_POPS = ["White","Black","Hispanic","Asian"];
+const SYSTEMS = [
+  {name:"ABO", rows:[
+    {antigen:"A", c:"40", black:"27", asian:"23", indian:"23", hispanic:"12", memorize:"40", diff:"Caucasian", level:"Higher"},
+    {antigen:"B", c:"20", black:"20", asian:"10", indian:"32", hispanic:"04", memorize:"20", diff:"Asian and Hispanic", level:"Lower"},
+    {antigen:"O (H Antigen)", c:"45", black:"49", asian:"46", indian:"37", hispanic:"84", memorize:"45", diff:"Hispanic", level:"Higher"},
+    {antigen:"AB", c:"04", black:"04", asian:"06", indian:"08", hispanic:"00", memorize:"05", diff:"", level:""}
+  ]},
+  {name:"Rh", rows:[
+    {antigen:"D", c:"85", black:"92", asian:"99", indian:"93", hispanic:"93", memorize:"85", diff:"", level:""},
+    {antigen:"C", c:"70", black:"34", asian:"93", indian:"87", hispanic:"70", memorize:"70", diff:"Black", level:"Lower"},
+    {antigen:"c", c:"80", black:"97", asian:"47", indian:"58", hispanic:"40", memorize:"80", diff:"Asian, Indian and Hispanic", level:"Lower"},
+    {antigen:"E", c:"30", black:"21", asian:"40", indian:"20", hispanic:"24", memorize:"30", diff:"", level:""},
+    {antigen:"e", c:"98", black:"99", asian:"96", indian:"99", hispanic:"81", memorize:"98", diff:"", level:""}
+  ]},
+  {name:"Kell", rows:[
+    {antigen:"K", c:"09", black:"02", asian:"00", indian:"04", hispanic:"03", memorize:"09", diff:"", level:""},
+    {antigen:"k", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""},
+    {antigen:"Kpa", c:"02", black:"00", asian:"00", indian:"00", hispanic:"00", memorize:"00", diff:"", level:""},
+    {antigen:"Kpb", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""},
+    {antigen:"Jsa", c:"00", black:"20", asian:"00", indian:"00", hispanic:"01", memorize:"01", diff:"Black", level:"Higher"},
+    {antigen:"Jsb", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""}
+  ]},
+  {name:"Duffy", rows:[
+    {antigen:"Fya", c:"65", black:"10", asian:"99", indian:"81", hispanic:"78", memorize:"60", diff:"Black", level:"Lower"},
+    {antigen:"Fyb", c:"80", black:"23", asian:"09", indian:"57", hispanic:"64", memorize:"75", diff:"Asian (lowest), Black (lower), Caucasian (higher)", level:"Mixed"},
+    {antigen:"Fy3/FY5", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""}
+  ]},
+  {name:"Kidd", rows:[
+    {antigen:"Jka", c:"79", black:"94", asian:"38", indian:"47", hispanic:"NT", memorize:"80", diff:"Asian", level:"Lower"},
+    {antigen:"Jk3", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""}
+  ]},
+  {name:"MNS", rows:[
+    {antigen:"M", c:"78", black:"70", asian:"79", indian:"88", hispanic:"88", memorize:"85", diff:"", level:""},
+    {antigen:"N", c:"72", black:"74", asian:"67", indian:"65", hispanic:"59", memorize:"70", diff:"", level:""},
+    {antigen:"S", c:"55", black:"37", asian:"09", indian:"54", hispanic:"57", memorize:"50", diff:"Asian (lowest), Black (lower)", level:"Lower"},
+    {antigen:"s", c:"89", black:"93", asian:"100", indian:"89", hispanic:"87", memorize:"90", diff:"", level:""},
+    {antigen:"U", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""}
+  ]},
+  {name:"P1PK / Globoside", rows:[
+    {antigen:"P1 (P1, P, Pk)", c:"79", black:"94", asian:"38", indian:"47", hispanic:"NT", memorize:"80", diff:"Asian", level:"Lower"},
+    {antigen:"P2 (P, Pk)", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""},
+    {antigen:"p (rare)", c:"100", black:"100", asian:"100", indian:"100", hispanic:"100", memorize:"100", diff:"", level:""}
+  ]},
+  {name:"Lewis", rows:[
+    {antigen:"Lea", c:"22", black:"23", asian:"14", indian:"20", hispanic:"NT", memorize:"", diff:"", level:""},
+    {antigen:"Leb", c:"72", black:"55", asian:"59", indian:"60", hispanic:"NT", memorize:"", diff:"", level:""}
+  ]},
+  {name:"Lutheran", rows:[
+    {antigen:"Lua", c:"08", black:"05", asian:"01", indian:"00", hispanic:"03", memorize:"05", diff:"", level:""},
+    {antigen:"Lub", c:"99", black:"99", asian:"99", indian:"99", hispanic:"99", memorize:"99", diff:"", level:""}
+  ]}
+];
 
-const ABO_ANSWERS = {
-  O:  { White:"45", Black:"50", Hispanic:"56", Asian:"40" },
-  A:  { White:"40", Black:"26", Hispanic:"31", Asian:"28" },
-  B:  { White:"11", Black:"20", Hispanic:"10", Asian:"25" },
-  AB: { White:"4",  Black:"4",  Hispanic:"3",  Asian:"7"  },
-};
-
-const ABO_VALUE_MAX = {};
-ABO_PHENOTYPES.forEach(ph => {
-  ABO_POPS.forEach(pop => {
-    const v = ABO_ANSWERS[ph][pop];
-    ABO_VALUE_MAX[v] = (ABO_VALUE_MAX[v] || 0) + 1;
-  });
-});
-// Sort descending numerically → 14 unique values, split into two halves of 7
-const ABO_VALUES = Object.keys(ABO_VALUE_MAX).sort((a,b) => +b - +a);
-const LEFT_VALS  = ABO_VALUES.slice(0, 7);
-const RIGHT_VALS = ABO_VALUES.slice(7);
-
+const NUMERIC_FIELDS = ["c","black","asian","indian","hispanic","memorize"];
+const DIFF_OPTIONS = ["","Caucasian","Black","Asian","Indian","Hispanic","Asian and Hispanic","Asian, Indian and Hispanic","Asian (lowest), Black (lower)","Asian (lowest), Black (lower), Caucasian (higher)"];
+const LEVEL_OPTIONS = ["","Higher","Lower","Mixed"];
+let activeIndex = 0;
 const state = {};
-let dragItem = null;
-let dragFrom = null;
 
-function slotKey(ph, pop){ return `${ph}__${pop}`; }
-function getState(k){ return state[k] || null; }
-function setState(k, v){ if(v == null) delete state[k]; else state[k] = v; }
-function countUses(val){ return Object.values(state).filter(v => v && v.val === val).length; }
+function key(rowIndex, field){ return `${activeIndex}_${rowIndex}_${field}`; }
+function norm(value){
+  const v = String(value || "").trim();
+  if(!v) return "";
+  if(v.toUpperCase() === "NT") return "NT";
+  if(/^\d+$/.test(v)) return String(Number(v));
+  return v.toLowerCase();
+}
+function answer(row, field){ return norm(row[field]); }
+function getValue(rowIndex, field){ return state[key(rowIndex, field)] || ""; }
+function setValue(rowIndex, field, value){ state[key(rowIndex, field)] = value; }
+function inputId(rowIndex, field){ return `field-${rowIndex}-${field}`; }
 
-function buildBank(){
-  buildBankSide("chipWrapLeft",  LEFT_VALS);
-  buildBankSide("chipWrapRight", RIGHT_VALS);
+function buildTabs(){
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = SYSTEMS.map((system, index) => `<button class="tab ${index===activeIndex?"active":""}" data-index="${index}" type="button">${system.name}</button>`).join("");
+  tabs.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+    activeIndex = Number(btn.dataset.index);
+    buildTabs();
+    buildTable();
+    clearScore();
+  }));
 }
 
-function buildBankSide(wrapperId, vals){
-  const wrap = document.getElementById(wrapperId);
-  wrap.innerHTML = "";
-  vals.forEach(val => {
-    const chip = document.createElement("div");
-    chip.className = "chip";
-    chip.dataset.val = val;
-    chip.draggable = true;
-    chip.textContent = val + "%";
-    chip.addEventListener("dragstart", e => {
-      if(countUses(val) >= ABO_VALUE_MAX[val]){ e.preventDefault(); return; }
-      dragItem = { val }; dragFrom = null;
-      chip.classList.add("dragging");
-    });
-    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
-    wrap.appendChild(chip);
-  });
+function buildSelect(rowIndex, field, options){
+  const sel = document.createElement("select");
+  sel.id = inputId(rowIndex, field);
+  sel.innerHTML = options.map(opt => `<option value="${opt}">${opt || "-"}</option>`).join("");
+  sel.value = getValue(rowIndex, field);
+  sel.addEventListener("change", () => { setValue(rowIndex, field, sel.value); clearScore(); });
+  return sel;
 }
 
-function renderBankUsage(){
-  ABO_VALUES.forEach(val => {
-    // query both banks
-    document.querySelectorAll(`.chip[data-val="${val}"]`).forEach(chip => {
-      chip.classList.toggle("used", countUses(val) >= ABO_VALUE_MAX[val]);
-    });
-  });
+function buildInput(rowIndex, field){
+  const input = document.createElement("input");
+  input.id = inputId(rowIndex, field);
+  input.type = "text";
+  input.inputMode = "numeric";
+  input.autocomplete = "off";
+  input.value = getValue(rowIndex, field);
+  input.placeholder = field === "memorize" ? "%" : "freq";
+  input.addEventListener("input", () => { setValue(rowIndex, field, input.value); clearScore(); });
+  return input;
 }
 
-function buildABOTable(){
-  const body = document.getElementById("aboTableBody");
-  body.innerHTML = "";
-  ABO_PHENOTYPES.forEach(ph => {
+function buildTable(){
+  const system = SYSTEMS[activeIndex];
+  document.getElementById("tableTitle").textContent = system.name;
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  system.rows.forEach((row, rowIndex) => {
     const tr = document.createElement("tr");
-    const tdPh = document.createElement("td");
-    tdPh.style.cssText = "font-size:1.2rem;font-weight:900;color:#7a4800;";
-    tdPh.textContent = ph;
-    tr.appendChild(tdPh);
-    ABO_POPS.forEach(pop => {
+    const antigen = document.createElement("td");
+    antigen.className = "antigen";
+    antigen.textContent = row.antigen;
+    tr.appendChild(antigen);
+    NUMERIC_FIELDS.forEach(field => {
       const td = document.createElement("td");
-      td.appendChild(makeDropzone(ph, pop));
+      td.appendChild(buildInput(rowIndex, field));
       tr.appendChild(td);
     });
-    body.appendChild(tr);
+    const diffTd = document.createElement("td");
+    diffTd.appendChild(buildSelect(rowIndex, "diff", DIFF_OPTIONS));
+    tr.appendChild(diffTd);
+    const levelTd = document.createElement("td");
+    levelTd.appendChild(buildSelect(rowIndex, "level", LEVEL_OPTIONS));
+    tr.appendChild(levelTd);
+    tbody.appendChild(tr);
   });
 }
 
-function makeDropzone(ph, pop){
-  const key = slotKey(ph, pop);
-  const dz = document.createElement("div");
-  dz.className = "dropzone";
-  dz.id = `slot-${key}`;
-  dz.draggable = true;
-  renderSlotContent(dz, null);
-
-  dz.addEventListener("dragover", e => {
-    if(dragItem){ e.preventDefault(); dz.classList.add("drag-over"); }
-  });
-  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
-
-  dz.addEventListener("drop", e => {
-    e.preventDefault();
-    dz.classList.remove("drag-over");
-    if(!dragItem) return;
-    const { val } = dragItem;
-    const existing = getState(key);
-    const movingSame = dragFrom && getState(dragFrom) && getState(dragFrom).val === val;
-    const atMax = countUses(val) >= ABO_VALUE_MAX[val];
-    if(atMax && !movingSame){ dragItem = null; dragFrom = null; return; }
-    if(dragFrom && dragFrom !== key){
-      if(existing){ setState(dragFrom, existing); renderSlot(dragFrom); }
-      else { setState(dragFrom, null); renderSlot(dragFrom); }
-    }
-    setState(key, { val });
-    renderSlot(key);
-    dragItem = null; dragFrom = null;
-    clearMarks(); renderBankUsage();
-  });
-
-  dz.addEventListener("click", () => {
-    if(!getState(key)) return;
-    setState(key, null); renderSlot(key); clearMarks(); renderBankUsage();
-  });
-
-  dz.addEventListener("dragstart", e => {
-    const cur = getState(key);
-    if(!cur){ e.preventDefault(); return; }
-    dragItem = { ...cur }; dragFrom = key;
-  });
-  return dz;
-}
-
-function renderSlotContent(el, val){
-  if(!val){
-    el.innerHTML = `<div class="placeholder">— drop —</div>`;
-    el.classList.remove("filled");
-  } else {
-    el.textContent = val.val + "%";
-    el.classList.add("filled");
-  }
-}
-
-function renderSlot(key){
-  const el = document.getElementById(`slot-${key}`);
-  if(!el) return;
-  el.classList.remove("correct","wrong");
-  renderSlotContent(el, getState(key));
-}
-
-function clearMarks(){
-  document.querySelectorAll("#aboTableBody .dropzone").forEach(z => z.classList.remove("correct","wrong"));
-  const msg = document.getElementById("scoreMsg");
-  msg.textContent = ""; msg.className = "score";
+function clearScore(){
+  document.querySelectorAll("input,select").forEach(el => el.classList.remove("correct","wrong"));
+  const score = document.getElementById("scoreMsg");
+  score.textContent = "";
+  score.className = "score";
 }
 
 function checkAnswers(){
-  let correct = 0, total = 0;
-  ABO_PHENOTYPES.forEach(ph => {
-    ABO_POPS.forEach(pop => {
+  let correct = 0;
+  let total = 0;
+  const system = SYSTEMS[activeIndex];
+  system.rows.forEach((row, rowIndex) => {
+    [...NUMERIC_FIELDS, "diff", "level"].forEach(field => {
       total++;
-      const key = slotKey(ph, pop);
-      const el = document.getElementById(`slot-${key}`);
-      const cur = getState(key);
-      el.classList.remove("correct","wrong");
-      if(cur && cur.val === ABO_ANSWERS[ph][pop]){ el.classList.add("correct"); correct++; }
-      else el.classList.add("wrong");
+      const el = document.getElementById(inputId(rowIndex, field));
+      const ok = norm(el.value) === answer(row, field);
+      el.classList.toggle("correct", ok);
+      el.classList.toggle("wrong", !ok);
+      if(ok) correct++;
     });
   });
-  const msg = document.getElementById("scoreMsg");
-  msg.textContent = `${correct}/${total} correct`;
-  msg.className = `score ${correct === total ? "good" : "bad"}`;
+  const score = document.getElementById("scoreMsg");
+  score.textContent = `${correct}/${total} correct`;
+  score.className = `score ${correct === total ? "good" : "bad"}`;
 }
 
-function reset(){
-  Object.keys(state).forEach(k => delete state[k]);
-  ABO_PHENOTYPES.forEach(ph => ABO_POPS.forEach(pop => renderSlot(slotKey(ph, pop))));
-  clearMarks(); renderBankUsage();
-}
-
-function showABOAnswers(){
-  ABO_PHENOTYPES.forEach(ph => {
-    ABO_POPS.forEach(pop => {
-      const key = slotKey(ph, pop);
-      setState(key, { val: ABO_ANSWERS[ph][pop] });
-      renderSlot(key);
+function showAnswers(){
+  const system = SYSTEMS[activeIndex];
+  system.rows.forEach((row, rowIndex) => {
+    [...NUMERIC_FIELDS, "diff", "level"].forEach(field => {
+      setValue(rowIndex, field, row[field]);
+      const el = document.getElementById(inputId(rowIndex, field));
+      if(el) el.value = row[field];
     });
   });
-  renderBankUsage();
   checkAnswers();
 }
 
-document.getElementById("checkBtn").addEventListener("click", checkAnswers);
-document.getElementById("resetBtn").addEventListener("click", reset);
-document.getElementById("showAnswersBtn").addEventListener("click", showABOAnswers);
-buildBank(); buildABOTable(); reset();
-
-
-/* ════════════════════════════════════
-   ACTIVITY 2 — ABO RANKING
-════════════════════════════════════ */
-const RANK_PHENOTYPES = ["O","A","B","AB"];
-const RANK_POPULATIONS = ["White","Black","Hispanic","Asian"];
-
-const RANK_CORRECT = {
-  O:  ["Hispanic","Black","White","Asian"],
-  A:  ["White","Hispanic","Asian","Black"],
-  B:  ["Asian","Black","White","Hispanic"],
-  AB: ["Asian","White","Black","Hispanic"],
-};
-
-const RANK_TIED = {
-  AB: { ranks:[1,2], pops:["White","Black"] }
-};
-
-const rankState = {};
-let rankDragItem = null;
-let rankDragFrom = null;
-
-function rankSlotKey(ph, r){ return `rank__${ph}__${r}`; }
-function rankGetState(k){ return rankState[k] || null; }
-function rankSetState(k, v){ if(v == null) delete rankState[k]; else rankState[k] = v; }
-
-function rankCountInPhenotype(ph, pop){
-  let n = 0;
-  for(let r = 0; r < 4; r++){
-    const s = rankGetState(rankSlotKey(ph, r));
-    if(s && s.pop === pop) n++;
-  }
-  return n;
-}
-function rankCountTotal(pop){
-  return Object.values(rankState).filter(v => v && v.pop === pop).length;
-}
-
-function buildRankBank(){
-  const wrap = document.getElementById("rankChipWrap"); wrap.innerHTML = "";
-  RANK_POPULATIONS.forEach(pop => {
-    const chip = document.createElement("div");
-    chip.className = "chip"; chip.id = `rankchip-${pop}`; chip.draggable = true;
-    chip.textContent = pop;
-    chip.addEventListener("dragstart", e => {
-      if(rankCountTotal(pop) >= 4){ e.preventDefault(); return; }
-      rankDragItem = { pop }; rankDragFrom = null; chip.classList.add("dragging");
+function resetCurrent(){
+  const system = SYSTEMS[activeIndex];
+  system.rows.forEach((_, rowIndex) => {
+    [...NUMERIC_FIELDS, "diff", "level"].forEach(field => {
+      setValue(rowIndex, field, "");
+      const el = document.getElementById(inputId(rowIndex, field));
+      if(el) el.value = "";
     });
-    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
-    wrap.appendChild(chip);
   });
+  clearScore();
 }
 
-function renderRankBankUsage(){
-  RANK_POPULATIONS.forEach(pop => {
-    const chip = document.getElementById(`rankchip-${pop}`);
-    if(!chip) return;
-    chip.classList.toggle("used", rankCountTotal(pop) >= 4);
-  });
-}
-
-function buildRankColumns(){
-  const wrap = document.getElementById("rankColsWrap"); wrap.innerHTML = "";
-  RANK_PHENOTYPES.forEach(ph => {
-    const section = document.createElement("div");
-    section.className = "col-section";
-    const title = document.createElement("div");
-    title.className = "col-title"; title.textContent = ph;
-    section.appendChild(title);
-    const tbl = document.createElement("table");
-    const tbody = document.createElement("tbody");
-    for(let r = 0; r < 4; r++){
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.appendChild(makeRankDropzone(ph, r));
-      tr.appendChild(td); tbody.appendChild(tr);
-    }
-    tbl.appendChild(tbody); section.appendChild(tbl); wrap.appendChild(section);
-  });
-}
-
-function makeRankDropzone(ph, rank){
-  const key = rankSlotKey(ph, rank);
-  const dz = document.createElement("div");
-  dz.className = "dropzone"; dz.id = `rslot-${key}`; dz.draggable = true;
-  renderRankSlotContent(dz, null);
-
-  dz.addEventListener("dragover", e => {
-    if(rankDragItem){ e.preventDefault(); dz.classList.add("drag-over"); }
-  });
-  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
-
-  dz.addEventListener("drop", e => {
-    e.preventDefault(); dz.classList.remove("drag-over");
-    if(!rankDragItem) return;
-    const { pop } = rankDragItem;
-    const existing = rankGetState(key);
-    const movingSame = rankDragFrom && rankGetState(rankDragFrom) && rankGetState(rankDragFrom).pop === pop;
-    if(rankCountInPhenotype(ph, pop) > 0 && !movingSame){ rankDragItem = null; rankDragFrom = null; return; }
-    if(rankDragFrom && rankDragFrom !== key){
-      if(existing){ rankSetState(rankDragFrom, existing); renderRankSlot(rankDragFrom); }
-      else { rankSetState(rankDragFrom, null); renderRankSlot(rankDragFrom); }
-    }
-    rankSetState(key, { pop }); renderRankSlot(key);
-    rankDragItem = null; rankDragFrom = null;
-    clearRankMarks(); renderRankBankUsage();
-  });
-
-  dz.addEventListener("click", () => {
-    if(!rankGetState(key)) return;
-    rankSetState(key, null); renderRankSlot(key); clearRankMarks(); renderRankBankUsage();
-  });
-
-  dz.addEventListener("dragstart", e => {
-    const cur = rankGetState(key);
-    if(!cur){ e.preventDefault(); return; }
-    rankDragItem = { ...cur }; rankDragFrom = key;
-  });
-  return dz;
-}
-
-function renderRankSlotContent(el, val){
-  if(!val){
-    el.innerHTML = `<div class="placeholder">— drop here —</div>`;
-    el.classList.remove("filled");
-  } else {
-    el.textContent = val.pop; el.classList.add("filled");
-  }
-}
-
-function renderRankSlot(key){
-  const el = document.getElementById(`rslot-${key}`);
-  if(!el) return;
-  el.classList.remove("correct","wrong");
-  renderRankSlotContent(el, rankGetState(key));
-}
-
-function clearRankMarks(){
-  document.querySelectorAll("#rankColsWrap .dropzone").forEach(z => z.classList.remove("correct","wrong"));
-  const msg = document.getElementById("rankScoreMsg");
-  msg.textContent = ""; msg.className = "score";
-}
-
-function isRankCorrect(ph, rank, pop){
-  const tied = RANK_TIED[ph];
-  if(tied && tied.ranks.includes(rank)) return tied.pops.includes(pop);
-  return RANK_CORRECT[ph][rank] === pop;
-}
-
-function checkRankAnswers(){
-  let correct = 0, total = 0;
-  RANK_PHENOTYPES.forEach(ph => {
-    for(let r = 0; r < 4; r++){
-      total++;
-      const key = rankSlotKey(ph, r);
-      const el = document.getElementById(`rslot-${key}`);
-      const cur = rankGetState(key);
-      el.classList.remove("correct","wrong");
-      if(cur && isRankCorrect(ph, r, cur.pop)){ el.classList.add("correct"); correct++; }
-      else el.classList.add("wrong");
-    }
-  });
-  const msg = document.getElementById("rankScoreMsg");
-  msg.textContent = `${correct}/${total} correct`;
-  msg.className = `score ${correct === total ? "good" : "bad"}`;
-}
-
-function resetRank(){
-  Object.keys(rankState).forEach(k => delete rankState[k]);
-  RANK_PHENOTYPES.forEach(ph => { for(let r=0;r<4;r++) renderRankSlot(rankSlotKey(ph,r)); });
-  clearRankMarks(); renderRankBankUsage();
-}
-
-function showRankAnswers(){
-  RANK_PHENOTYPES.forEach(ph => {
-    for(let r = 0; r < 4; r++){
-      const key = rankSlotKey(ph, r);
-      rankSetState(key, { pop: RANK_CORRECT[ph][r] });
-      renderRankSlot(key);
-    }
-  });
-  renderRankBankUsage();
-  checkRankAnswers();
-}
-
-document.getElementById("rankCheckBtn").addEventListener("click", checkRankAnswers);
-document.getElementById("rankResetBtn").addEventListener("click", resetRank);
-document.getElementById("showRankAnswersBtn").addEventListener("click", showRankAnswers);
-buildRankBank(); buildRankColumns(); resetRank();
+document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+document.getElementById("resetBtn").addEventListener("click", resetCurrent);
+document.getElementById("answersBtn").addEventListener("click", showAnswers);
+buildTabs();
+buildTable();
 </script>
 </body>
 </html>
-
-<!-- ═══════════════════════════════════════════
-     D ANTIGEN SECTION (Frequency + Mutation)
-═══════════════════════════════════════════ -->
-<style>
-  /* extra styles for the mutation match table */
-  .mutation-td{
-    text-align:left;
-    font-size:.78rem;
-    font-weight:800;
-    color:#7a4800;
-    padding-left:8px;
-    line-height:1.45;
-  }
-  .d-two-col{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:10px;
-  }
-</style>
-
-<div class="wrap" style="max-width:1000px; margin-top:28px;">
-
-  <header>
-    <div>
-      <h1>🩸 D Antigen – Rank &amp; Match!</h1>
-      <p>Left: rank populations by D antigen frequency (highest → lowest). &nbsp;|&nbsp; Right: match each ancestry to its D-negative mechanism.<br>Click a filled slot to return it to the bank.</p>
-    </div>
-    <span class="badge">RANK &amp; MATCH!</span>
-  </header>
-
-  <div class="controls">
-    <button class="checkBtn" id="dCheckBtn">✔ Check Answers</button>
-    <button class="resetBtn" id="dResetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="showDAnswersBtn">Show answers</button>
-    <div class="score" id="dScoreMsg"></div>
-  </div>
-
-  <div class="answers-panel" id="dAnswersPanel">
-    <h3>Answers — D Antigen</h3>
-    <h4>D Antigen Frequency</h4>
-    <div>Asian → Black → Hispanic → Caucasian</div>
-    <h4>D-Negative Mechanism by Ancestry</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Mechanism</th>
-          <th>Ancestry</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>"Del" mutant RHD gene</td><td>Asian (10-30%)</td></tr>
-        <tr><td>RHD gene with missense mutations</td><td>African</td></tr>
-        <tr><td>Deletion of RHD gene</td><td>European</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- outer 3-col: pop bank | activities | ancestry bank -->
-  <div style="display:grid; grid-template-columns:160px 1fr 170px; gap:10px; align-items:start;">
-
-    <!-- LEFT BANK: populations -->
-    <div class="bank" style="position:sticky; top:10px;">
-      <h2>Populations</h2>
-      <p class="hint">Drag into the frequency ranking (left activity).</p>
-      <div id="dChipWrap"></div>
-    </div>
-
-    <!-- TWO ACTIVITIES SIDE BY SIDE -->
-    <div class="d-two-col">
-
-      <!-- Activity 1: frequency ranking -->
-      <div class="col-section">
-        <div class="col-title" style="font-size:.95rem; padding:10px 6px;">D Antigen Frequency<br><span style="font-size:.72rem; font-weight:700; opacity:.85;">highest → lowest</span></div>
-        <table><tbody id="dTableBody"></tbody></table>
-      </div>
-
-      <!-- Activity 2: mutation match -->
-      <div class="col-section">
-        <div class="col-title" style="font-size:.95rem; padding:10px 6px;">D-Negative Mechanism by Ancestry<br><span style="font-size:.72rem; font-weight:700; opacity:.85;">drag ancestry into each row</span></div>
-        <table>
-          <thead>
-            <tr>
-              <th style="width:55%;">Mechanism</th>
-              <th>Ancestry</th>
-            </tr>
-          </thead>
-          <tbody id="mTableBody"></tbody>
-        </table>
-      </div>
-
-    </div>
-
-    <!-- RIGHT BANK: ancestries for mutation match -->
-    <div class="bank" style="position:sticky; top:10px;">
-      <h2>Ancestries</h2>
-      <p class="hint">Drag into the mutation match (right activity).</p>
-      <div id="mChipWrap"></div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-/* ══════════════════════════════
-   ACTIVITY 1 — D Frequency Rank
-══════════════════════════════ */
-const D_POPS = ["Caucasian","Black","Hispanic","Asian"];
-// highest → lowest: Asian ~100, Black 95, Hispanic 92.5, Caucasian 80
-const D_CORRECT = ["Asian","Black","Hispanic","Caucasian"];
-
-const dState = {};
-let dDragItem = null;
-let dDragFrom = null;
-
-function dSlotKey(r){ return `d__${r}`; }
-function dGetState(k){ return dState[k]||null; }
-function dSetState(k,v){ if(v==null) delete dState[k]; else dState[k]=v; }
-function dCountTotal(pop){ return Object.values(dState).filter(v=>v&&v.pop===pop).length; }
-
-function buildDBank(){
-  const wrap=document.getElementById("dChipWrap"); wrap.innerHTML="";
-  D_POPS.forEach(pop=>{
-    const chip=document.createElement("div");
-    chip.className="chip"; chip.id=`dchip-${pop}`; chip.draggable=true; chip.textContent=pop;
-    chip.addEventListener("dragstart",e=>{
-      if(dCountTotal(pop)>=1){e.preventDefault();return;}
-      dDragItem={type:"freq",pop}; dDragFrom=null; chip.classList.add("dragging");
-    });
-    chip.addEventListener("dragend",()=>chip.classList.remove("dragging"));
-    wrap.appendChild(chip);
-  });
-}
-
-function renderDBankUsage(){
-  D_POPS.forEach(pop=>{
-    const chip=document.getElementById(`dchip-${pop}`);
-    if(!chip) return;
-    chip.classList.toggle("used",dCountTotal(pop)>=1);
-  });
-}
-
-function buildDTable(){
-  const body=document.getElementById("dTableBody"); body.innerHTML="";
-  for(let r=0;r<4;r++){
-    const tr=document.createElement("tr");
-    const td=document.createElement("td");
-    td.appendChild(makeDDropzone(r));
-    tr.appendChild(td); body.appendChild(tr);
-  }
-}
-
-function makeDDropzone(rank){
-  const key=dSlotKey(rank);
-  const dz=document.createElement("div");
-  dz.className="dropzone"; dz.id=`dslot-${key}`; dz.draggable=true;
-  renderDSlotContent(dz,null);
-
-  dz.addEventListener("dragover",e=>{
-    if(dDragItem&&dDragItem.type==="freq"){e.preventDefault();dz.classList.add("drag-over");}
-  });
-  dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
-  dz.addEventListener("drop",e=>{
-    e.preventDefault(); dz.classList.remove("drag-over");
-    if(!dDragItem||dDragItem.type!=="freq") return;
-    const {pop}=dDragItem;
-    const existing=dGetState(key);
-    const movingSame=dDragFrom&&dGetState(dDragFrom)&&dGetState(dDragFrom).pop===pop;
-    if(dCountTotal(pop)>0&&!movingSame){dDragItem=null;dDragFrom=null;return;}
-    if(dDragFrom&&dDragFrom!==key){
-      if(existing){dSetState(dDragFrom,existing);renderDSlot(dDragFrom);}
-      else{dSetState(dDragFrom,null);renderDSlot(dDragFrom);}
-    }
-    dSetState(key,{pop}); renderDSlot(key);
-    dDragItem=null; dDragFrom=null;
-    clearDMarks(); renderDBankUsage();
-  });
-  dz.addEventListener("click",()=>{
-    if(!dGetState(key)) return;
-    dSetState(key,null); renderDSlot(key); clearDMarks(); renderDBankUsage();
-  });
-  dz.addEventListener("dragstart",e=>{
-    const cur=dGetState(key); if(!cur){e.preventDefault();return;}
-    dDragItem={type:"freq",...cur}; dDragFrom=key;
-  });
-  return dz;
-}
-
-function renderDSlotContent(el,val){
-  if(!val){el.innerHTML=`<div class="placeholder">— drop here —</div>`;el.classList.remove("filled");}
-  else{el.textContent=val.pop;el.classList.add("filled");}
-}
-function renderDSlot(key){
-  const el=document.getElementById(`dslot-${key}`); if(!el) return;
-  el.classList.remove("correct","wrong"); renderDSlotContent(el,dGetState(key));
-}
-
-/* ══════════════════════════════
-   ACTIVITY 2 — Mutation Match
-══════════════════════════════ */
-// Rows: mechanism text → correct ancestry
-const M_ROWS = [
-  { id:"m0", mechanism:'"Del" mutant RHD gene', ancestry:"Asian (10-30%)" },
-  { id:"m1", mechanism:"RHD gene with missense mutations",  ancestry:"African"  },
-  { id:"m2", mechanism:"Deletion of RHD gene", ancestry:"European" },
-];
-const M_ANCESTRIES = ["African","Asian (10-30%)","European",];
-
-const mState = {};
-let mDragItem = null;
-let mDragFrom = null;
-
-function mSlotKey(id){ return `m__${id}`; }
-function mGetState(k){ return mState[k]||null; }
-function mSetState(k,v){ if(v==null) delete mState[k]; else mState[k]=v; }
-function mCountTotal(anc){ return Object.values(mState).filter(v=>v&&v.ancestry===anc).length; }
-
-function buildMBank(){
-  const wrap=document.getElementById("mChipWrap"); wrap.innerHTML="";
-  M_ANCESTRIES.forEach(anc=>{
-    const chip=document.createElement("div");
-    chip.className="chip"; chip.id=`mchip-${anc}`; chip.draggable=true; chip.textContent=anc;
-    chip.addEventListener("dragstart",e=>{
-      if(mCountTotal(anc)>=1){e.preventDefault();return;}
-      mDragItem={type:"mut",ancestry:anc}; mDragFrom=null; chip.classList.add("dragging");
-    });
-    chip.addEventListener("dragend",()=>chip.classList.remove("dragging"));
-    wrap.appendChild(chip);
-  });
-}
-
-function renderMBankUsage(){
-  M_ANCESTRIES.forEach(anc=>{
-    const chip=document.getElementById(`mchip-${anc}`); if(!chip) return;
-    chip.classList.toggle("used",mCountTotal(anc)>=1);
-  });
-}
-
-function buildMTable(){
-  const body=document.getElementById("mTableBody"); body.innerHTML="";
-  M_ROWS.forEach(row=>{
-    const tr=document.createElement("tr");
-    const tdM=document.createElement("td");
-    tdM.className="mutation-td"; tdM.textContent=row.mechanism;
-    const tdD=document.createElement("td");
-    tdD.appendChild(makeMDropzone(row.id));
-    tr.appendChild(tdM); tr.appendChild(tdD); body.appendChild(tr);
-  });
-}
-
-function makeMDropzone(rowId){
-  const key=mSlotKey(rowId);
-  const dz=document.createElement("div");
-  dz.className="dropzone"; dz.id=`mslot-${key}`; dz.draggable=true;
-  renderMSlotContent(dz,null);
-
-  dz.addEventListener("dragover",e=>{
-    if(mDragItem&&mDragItem.type==="mut"){e.preventDefault();dz.classList.add("drag-over");}
-  });
-  dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
-  dz.addEventListener("drop",e=>{
-    e.preventDefault(); dz.classList.remove("drag-over");
-    if(!mDragItem||mDragItem.type!=="mut") return;
-    const {ancestry}=mDragItem;
-    const existing=mGetState(key);
-    const movingSame=mDragFrom&&mGetState(mDragFrom)&&mGetState(mDragFrom).ancestry===ancestry;
-    if(mCountTotal(ancestry)>0&&!movingSame){mDragItem=null;mDragFrom=null;return;}
-    if(mDragFrom&&mDragFrom!==key){
-      if(existing){mSetState(mDragFrom,existing);renderMSlot(mDragFrom);}
-      else{mSetState(mDragFrom,null);renderMSlot(mDragFrom);}
-    }
-    mSetState(key,{ancestry}); renderMSlot(key);
-    mDragItem=null; mDragFrom=null;
-    clearDMarks(); renderMBankUsage();
-  });
-  dz.addEventListener("click",()=>{
-    if(!mGetState(key)) return;
-    mSetState(key,null); renderMSlot(key); clearDMarks(); renderMBankUsage();
-  });
-  dz.addEventListener("dragstart",e=>{
-    const cur=mGetState(key); if(!cur){e.preventDefault();return;}
-    mDragItem={type:"mut",...cur}; mDragFrom=key;
-  });
-  return dz;
-}
-
-function renderMSlotContent(el,val){
-  if(!val){el.innerHTML=`<div class="placeholder">— drop here —</div>`;el.classList.remove("filled");}
-  else{el.textContent=val.ancestry;el.classList.add("filled");}
-}
-function renderMSlot(key){
-  const el=document.getElementById(`mslot-${key}`); if(!el) return;
-  el.classList.remove("correct","wrong"); renderMSlotContent(el,mGetState(key));
-}
-
-/* ══════════════════════════════
-   SHARED CHECK / RESET
-══════════════════════════════ */
-function clearDMarks(){
-  document.querySelectorAll("#dTableBody .dropzone, #mTableBody .dropzone")
-    .forEach(z=>z.classList.remove("correct","wrong"));
-  const msg=document.getElementById("dScoreMsg");
-  msg.textContent=""; msg.className="score";
-}
-
-function checkDAnswers(){
-  let correct=0, total=0;
-
-  // Check freq ranking
-  for(let r=0;r<4;r++){
-    total++;
-    const key=dSlotKey(r);
-    const el=document.getElementById(`dslot-${key}`);
-    const cur=dGetState(key);
-    el.classList.remove("correct","wrong");
-    if(cur&&cur.pop===D_CORRECT[r]){el.classList.add("correct");correct++;}
-    else el.classList.add("wrong");
-  }
-
-  // Check mutation match
-  M_ROWS.forEach(row=>{
-    total++;
-    const key=mSlotKey(row.id);
-    const el=document.getElementById(`mslot-${key}`);
-    const cur=mGetState(key);
-    el.classList.remove("correct","wrong");
-    if(cur&&cur.ancestry===row.ancestry){el.classList.add("correct");correct++;}
-    else el.classList.add("wrong");
-  });
-
-  const msg=document.getElementById("dScoreMsg");
-  msg.textContent=`${correct}/${total} correct`;
-  msg.className=`score ${correct===total?"good":"bad"}`;
-}
-
-function resetD(){
-  Object.keys(dState).forEach(k=>delete dState[k]);
-  Object.keys(mState).forEach(k=>delete mState[k]);
-  for(let r=0;r<4;r++) renderDSlot(dSlotKey(r));
-  M_ROWS.forEach(row=>renderMSlot(mSlotKey(row.id)));
-  clearDMarks(); renderDBankUsage(); renderMBankUsage();
-}
-
-function showDAnswers(){
-  D_CORRECT.forEach((pop, r) => {
-    const key = dSlotKey(r);
-    dSetState(key, { pop });
-    renderDSlot(key);
-  });
-  M_ROWS.forEach(row => {
-    const key = mSlotKey(row.id);
-    mSetState(key, { ancestry: row.ancestry });
-    renderMSlot(key);
-  });
-  renderDBankUsage();
-  renderMBankUsage();
-  checkDAnswers();
-}
-
-document.getElementById("dCheckBtn").addEventListener("click",checkDAnswers);
-document.getElementById("dResetBtn").addEventListener("click",resetD);
-document.getElementById("showDAnswersBtn").addEventListener("click",showDAnswers);
-
-buildDBank(); buildDTable();
-buildMBank(); buildMTable();
-resetD();
-
-</script>

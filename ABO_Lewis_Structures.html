@@ -562,6 +562,7 @@
     }
   }
 </style>
+<script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css">
 </head>
 <body class="mls-interactive">
@@ -578,7 +579,6 @@
   <div class="structure-tabs" id="structureTabs">
     <button class="structure-tab active" data-structure-section="type2" type="button">ABH Type 2</button>
     <button class="structure-tab" data-structure-section="type1" type="button">Lewis / Secretor Type 1</button>
-    <button class="structure-tab" data-structure-section="mechanisms" type="button">Usual System Mechanisms</button>
   </div>
 </div>
 
@@ -721,34 +721,6 @@
     </div>
   </div>
 </div>
-
-
-<div class="wrap section-block structure-section" data-structure-section="mechanisms">
-  <header>
-    <div>
-      <h1>Usual System Mechanisms</h1>
-      <p>Match each blood group system with the chromosome, membrane structure, or sugar/mechanism clue. Tap a card, then tap a slot, or drag it into place.</p>
-    </div>
-    <div class="badge">Usual Suspects</div>
-  </header>
-
-  <div class="section-controls">
-    <button id="checkMechanismBtn" class="checkBtn">✔ Check Answers</button>
-    <button id="resetMechanismBtn" class="resetBtn">↺ Reset</button>
-    <button id="showMechanismBtn" class="seeBtn">Show answers</button>
-    <div id="mechanismMsg" class="score"></div>
-  </div>
-
-  <div class="mechanism-layout">
-    <div class="bank">
-      <h2>Mechanism Cards</h2>
-      <div class="hint">Cards are split into quick facts so you do not have to read one long sentence.</div>
-      <div id="mechanismBank"></div>
-    </div>
-    <div class="mechanism-board" id="mechanismBoard"></div>
-  </div>
-</div>
-
 
 
 <div class="wrap">
@@ -1654,162 +1626,6 @@ function showType1Answer(){
   checkAnswersType1();
 }
 
-const MECHANISM_SYSTEMS = [
-  {id:"abo", name:"ABO", short:"AB", card:["Chromosome 9","H is FUT1","Secretor uses FUT2","A = GalNAc; B = galactose"]},
-  {id:"rh", name:"Rh", short:"Rh", card:["Chromosome 1","RHD / RHCE","RhAG membrane complex","D has no partner"]},
-  {id:"mns", name:"MNS", short:"MN", card:["Chromosome 4","GYPA makes M/N","GYPB makes S/s/U","glycophorin system"]},
-  {id:"p", name:"P / Glob", short:"P", card:["P1PK on chromosome 22","Glob on chromosome 3","glycosphingolipid","P1 weak at birth"]},
-  {id:"kell", name:"Kell", short:"K", card:["Chromosome 7","Kell linked to Kx","K/k pair","Kpa/Kpb and Jsa/Jsb pairs"]},
-  {id:"duffy", name:"Duffy", short:"Fy", card:["Chromosome 1","ACKR1 multipass glycoprotein","Fya/Fyb pair","malaria clue"]},
-  {id:"kidd", name:"Kidd", short:"Jk", card:["Chromosome 18","urea transporter","Jka/Jkb pair","antibodies can hide"]},
-  {id:"lewis", name:"Lewis", short:"Le", card:["Chromosome 19","plasma antigens","adsorb onto RBC","Lea/Leb are not true pairs"]},
-  {id:"lutheran", name:"Lutheran", short:"Lu", card:["Chromosome 19","BCAM glycoprotein","Lua/Lub pair","mixed-field expression"]}
-];
-
-const mechanismState = {};
-let mechanismSelected = null;
-let mechanismDragId = null;
-
-function mechanismCardId(systemId){
-  return `mechanism__${systemId}`;
-}
-
-function mechanismSystemFromCard(cardId){
-  return cardId ? cardId.replace("mechanism__", "") : "";
-}
-
-function makeMechanismCard(system){
-  const card = document.createElement("div");
-  card.className = "mechanism-card";
-  card.draggable = true;
-  card.dataset.id = mechanismCardId(system.id);
-  card.dataset.system = system.id;
-  if(mechanismSelected === card.dataset.id) card.classList.add("selected");
-  system.card.forEach(part => {
-    const line = document.createElement("span");
-    line.textContent = part;
-    card.appendChild(line);
-  });
-  card.addEventListener("dragstart", e => {
-    mechanismDragId = card.dataset.id;
-    e.dataTransfer.setData("text/plain", card.dataset.id);
-  });
-  card.addEventListener("click", () => {
-    mechanismSelected = mechanismSelected === card.dataset.id ? null : card.dataset.id;
-    renderMechanismGame();
-  });
-  return card;
-}
-
-function placeMechanismCard(targetSystemId, cardId){
-  if(!cardId) return;
-  Object.keys(mechanismState).forEach(key => {
-    if(mechanismState[key] === cardId) delete mechanismState[key];
-  });
-  mechanismState[targetSystemId] = cardId;
-  mechanismSelected = null;
-  mechanismDragId = null;
-  renderMechanismGame();
-}
-
-function clearMechanismSlot(systemId){
-  delete mechanismState[systemId];
-  mechanismSelected = null;
-  renderMechanismGame();
-}
-
-function renderMechanismBank(){
-  const bank = document.getElementById("mechanismBank");
-  const placed = new Set(Object.values(mechanismState));
-  bank.innerHTML = "";
-  MECHANISM_SYSTEMS
-    .filter(system => !placed.has(mechanismCardId(system.id)))
-    .forEach(system => bank.appendChild(makeMechanismCard(system)));
-}
-
-function renderMechanismBoard(){
-  const board = document.getElementById("mechanismBoard");
-  board.innerHTML = "";
-  MECHANISM_SYSTEMS.forEach(system => {
-    const row = document.createElement("div");
-    row.className = "mechanism-row";
-    row.innerHTML = `
-      <div class="mechanism-system">
-        <div class="mechanism-dot">${system.short}</div>
-        <div>${system.name}</div>
-      </div>
-    `;
-    const slot = document.createElement("div");
-    slot.className = "mechanism-slot empty";
-    slot.dataset.system = system.id;
-    slot.addEventListener("dragover", e => {
-      e.preventDefault();
-      slot.classList.add("drag-over");
-    });
-    slot.addEventListener("dragleave", () => slot.classList.remove("drag-over"));
-    slot.addEventListener("drop", e => {
-      e.preventDefault();
-      slot.classList.remove("drag-over");
-      placeMechanismCard(system.id, e.dataTransfer.getData("text/plain") || mechanismDragId);
-    });
-    slot.addEventListener("click", () => {
-      if(mechanismSelected) placeMechanismCard(system.id, mechanismSelected);
-      else if(mechanismState[system.id]) clearMechanismSlot(system.id);
-    });
-    if(mechanismState[system.id]){
-      slot.classList.remove("empty");
-      const cardSystem = MECHANISM_SYSTEMS.find(item => item.id === mechanismSystemFromCard(mechanismState[system.id]));
-      if(cardSystem) slot.appendChild(makeMechanismCard(cardSystem));
-    }
-    row.appendChild(slot);
-    board.appendChild(row);
-  });
-}
-
-function clearMechanismMarks(){
-  document.querySelectorAll(".mechanism-slot").forEach(slot => slot.classList.remove("correct","wrong"));
-  const msg = document.getElementById("mechanismMsg");
-  msg.textContent = "";
-  msg.className = "score";
-}
-
-function renderMechanismGame(){
-  renderMechanismBank();
-  renderMechanismBoard();
-  clearMechanismMarks();
-}
-
-function checkMechanismAnswers(){
-  let correct = 0;
-  MECHANISM_SYSTEMS.forEach(system => {
-    const slot = document.querySelector(`.mechanism-slot[data-system="${system.id}"]`);
-    if(!slot) return;
-    const isCorrect = mechanismSystemFromCard(mechanismState[system.id]) === system.id;
-    slot.classList.toggle("correct", isCorrect);
-    slot.classList.toggle("wrong", !!mechanismState[system.id] && !isCorrect);
-    if(isCorrect) correct++;
-  });
-  const msg = document.getElementById("mechanismMsg");
-  msg.textContent = `${correct}/${MECHANISM_SYSTEMS.length} correct`;
-  msg.className = `score ${correct === MECHANISM_SYSTEMS.length ? "good" : "bad"}`;
-}
-
-function showMechanismAnswers(){
-  MECHANISM_SYSTEMS.forEach(system => {
-    mechanismState[system.id] = mechanismCardId(system.id);
-  });
-  mechanismSelected = null;
-  renderMechanismBank();
-  renderMechanismBoard();
-  checkMechanismAnswers();
-}
-
-function resetMechanismGame(){
-  Object.keys(mechanismState).forEach(key => delete mechanismState[key]);
-  mechanismSelected = null;
-  renderMechanismGame();
-}
-
 function setupStructureTabs(){
   const tabs = document.querySelectorAll(".structure-tab");
   const sections = document.querySelectorAll(".structure-section");
@@ -1864,11 +1680,7 @@ setupType1LabelDrop("label-drop-agglutination-type1", "agglutinationLabel", "typ
 document.getElementById("checkBtnType1").addEventListener("click", checkAnswersType1);
 document.getElementById("resetBtnType1").addEventListener("click", resetType1);
 document.getElementById("seeAnswersBtnType1").addEventListener("click", showType1Answer);
-document.getElementById("checkMechanismBtn").addEventListener("click", checkMechanismAnswers);
-document.getElementById("resetMechanismBtn").addEventListener("click", resetMechanismGame);
-document.getElementById("showMechanismBtn").addEventListener("click", showMechanismAnswers);
 setupStructureTabs();
-renderMechanismGame();
 resetType1();
 resetAll();
 </script>

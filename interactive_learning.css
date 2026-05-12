@@ -263,3 +263,98 @@ body.bb-match .msg.bad{color:var(--mls-danger)}
   body.bb-match .mini{grid-template-columns:1fr}
   body.bb-match .toolbar .btn{flex:1}
 }
+
+html[data-mls-theme="dark"] body.mls-interactive{
+  --mls-bg:#0d0f16;
+  --mls-bg2:#151927;
+  --mls-bg3:#202638;
+  --mls-bg4:#2a3148;
+  --mls-border:#303852;
+  --mls-border2:#56607f;
+  --mls-text:#eef1fb;
+  --mls-text2:#b8c0dc;
+  --mls-text3:#8791b4;
+  --mls-accent:#4e86ff;
+  --mls-accent2:#78a5ff;
+  --mls-success:#55c58a;
+  --mls-danger:#ff7582;
+  --bg:var(--mls-bg);
+  --panel:var(--mls-bg2);
+  --paper:var(--mls-bg2);
+  --header:var(--mls-accent);
+  --accent:var(--mls-accent);
+  --blue:var(--mls-accent);
+  --stripe:#202947;
+  --cell:#161c2e;
+  --fixed:#202947;
+  --fixed-border:var(--mls-border);
+  --drop:#101625;
+  --drop-border:var(--mls-accent);
+  --border:var(--mls-border);
+  --muted:var(--mls-text3);
+  --ink:var(--mls-text);
+  --text:var(--mls-text);
+  --good:var(--mls-success);
+  --bad:var(--mls-danger);
+  background:linear-gradient(180deg,#0d0f16 0,#111827 52%,#0b0d13 100%) !important;
+  color:var(--mls-text) !important;
+}
+html[data-mls-theme="dark"] body.mls-interactive .site-header,
+html[data-mls-theme="dark"] body.mls-interactive header:not(.site-header),
+html[data-mls-theme="dark"] body.mls-interactive .section-controls,
+html[data-mls-theme="dark"] body.mls-interactive .controls,
+html[data-mls-theme="dark"] body.mls-interactive .bank,
+html[data-mls-theme="dark"] body.mls-interactive .main-card,
+html[data-mls-theme="dark"] body.mls-interactive .panel,
+html[data-mls-theme="dark"] body.mls-interactive .answer-key,
+html[data-mls-theme="dark"] body.mls-interactive .answers-panel,
+html[data-mls-theme="dark"] body.mls-interactive #answersSection,
+html[data-mls-theme="dark"] body.mls-interactive .a2-answer-key,
+html[data-mls-theme="dark"] body.mls-interactive .answer-panel,
+html[data-mls-theme="dark"] body.mls-interactive .key-panel{
+  background:var(--mls-bg2) !important;
+  border-color:var(--mls-border) !important;
+  color:var(--mls-text) !important;
+  box-shadow:0 12px 28px rgba(0,0,0,.28) !important;
+}
+html[data-mls-theme="dark"] body.mls-interactive .main-body,
+html[data-mls-theme="dark"] body.mls-interactive .structure,
+html[data-mls-theme="dark"] body.mls-interactive table,
+html[data-mls-theme="dark"] body.mls-interactive td,
+html[data-mls-theme="dark"] body.mls-interactive .label-drop,
+html[data-mls-theme="dark"] body.mls-interactive .dropzone,
+html[data-mls-theme="dark"] body.mls-interactive .chip,
+html[data-mls-theme="dark"] body.mls-interactive input,
+html[data-mls-theme="dark"] body.mls-interactive select,
+html[data-mls-theme="dark"] body.mls-interactive textarea{
+  background:var(--mls-bg3) !important;
+  color:var(--mls-text) !important;
+  border-color:var(--mls-border2) !important;
+}
+html[data-mls-theme="dark"] body.mls-interactive tr:nth-child(even) td{
+  background:#1b2236 !important;
+}
+html[data-mls-theme="dark"] body.mls-interactive .fixed,
+html[data-mls-theme="dark"] body.mls-interactive .hex.fixed,
+html[data-mls-theme="dark"] body.mls-interactive .donor-static,
+html[data-mls-theme="dark"] body.mls-interactive .system,
+html[data-mls-theme="dark"] body.mls-interactive .mechanism-system{
+  background:var(--mls-bg4) !important;
+  color:var(--mls-text) !important;
+}
+html[data-mls-theme="dark"] body.mls-interactive .placeholder,
+html[data-mls-theme="dark"] body.mls-interactive .hint,
+html[data-mls-theme="dark"] body.mls-interactive header:not(.site-header) p{
+  color:var(--mls-text3) !important;
+}
+html[data-mls-theme="dark"] body.bb-match .toolbar,
+html[data-mls-theme="dark"] body.bb-match .bank,
+html[data-mls-theme="dark"] body.bb-match .board,
+html[data-mls-theme="dark"] body.bb-match .msg,
+html[data-mls-theme="dark"] body.bb-match .system,
+html[data-mls-theme="dark"] body.bb-match .slot{
+  background:var(--mls-bg2) !important;
+}
+html[data-mls-theme="dark"] body.bb-match .chip{
+  background:linear-gradient(180deg,var(--mls-bg4),var(--mls-bg3)) !important;
+}

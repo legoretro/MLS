@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Blood Group Antigen Frequencies - Fill It In</title>
+<title>Antigen Short Version</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
 
@@ -385,6 +385,7 @@
     table{ min-width:620px; }
   }
 </style>
+<script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css">
 </head>
 <body class="mls-interactive">
@@ -399,8 +400,8 @@
 <div class="wrap">
   <header>
     <div>
-      <h1>Blood Group Antigen Frequencies - Fill It In</h1>
-      <p>Type each antigen frequency, then drag the significant population difference and high/low label into the last two columns. Click any filled drag blank to send it back.</p>
+      <h1>Antigen Short Version</h1>
+      <p>Practice the frequency-to-memorize values and the significant population differences. The full donor table is in Antigen Donor Frequencies.</p>
     </div>
     <span class="badge">ANTIGEN PRACTICE</span>
   </header>
@@ -452,9 +453,9 @@ const systems = [
   {
     isbt:"001", name:"ABO", symbol:"ABO",
     antigens:[
-      { antigen:"A", frequency:"45", significant:[{ population:"No significant difference", level:"N/A" }] },
-      { antigen:"B", frequency:"20", significant:[{ population:"No significant difference", level:"N/A" }] },
-      { antigen:"O", frequency:"45", significant:[{ population:"No significant difference", level:"N/A" }] },
+      { antigen:"A", frequency:"40", significant:[{ population:"Caucasian", level:"High" }] },
+      { antigen:"B", frequency:"20", significant:[{ population:"Asian and Hispanic", level:"Low" }] },
+      { antigen:"O (H)", frequency:"45", significant:[{ population:"Hispanic", level:"High" }] },
       { antigen:"AB", frequency:"05", significant:[{ population:"No significant difference", level:"N/A" }], className:"low" }
     ]
   },
@@ -519,7 +520,7 @@ const systems = [
   }
 ];
 
-const populations = ["Caucasian", "Black", "Asian", "Indian", "Hispanic", "No significant difference"];
+const populations = ["Caucasian", "Black", "Asian", "Indian", "Hispanic", "Asian and Hispanic", "No significant difference"];
 const levels = ["High", "Low", "N/A"];
 const state = {};
 let dragItem = null;
