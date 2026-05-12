@@ -113,6 +113,16 @@ select option{background:var(--bg3)}
 .class-material-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
 .class-material-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px}
 .class-material-arrow{margin-left:auto;color:var(--text3);font-size:18px;line-height:1}
+.interactive-tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.interactive-tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:104px;text-align:left;width:100%;position:relative;overflow:hidden}
+.interactive-tool-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--tool-color,var(--accent));opacity:.9}
+.interactive-tool-card:hover{border-color:color-mix(in srgb,var(--tool-color,var(--accent)) 55%,var(--border));background:var(--bg3);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.interactive-tool-bubble{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,var(--tool-color,var(--accent)),color-mix(in srgb,var(--tool-color,var(--accent)) 64%,#fff));color:#fff;font-family:var(--mono);font-size:15px;font-weight:800;letter-spacing:.2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.16)}
+.interactive-tool-thumb{width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border)}
+.interactive-tool-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
+.interactive-tool-desc{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px;line-height:1.35}
+.interactive-tool-topic{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.interactive-tool-arrow{margin-left:auto;color:var(--text3);font-size:18px;line-height:1}
 
 /* Quiz */
 .quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
@@ -530,6 +540,20 @@ const SUBJECTS = [
   {key:'urinalysis',name:'Urinalysis',icon:'🧪'}
 ];
 const PARA_MYCO_KEYS=['parasitology','mycology'];
+const BUILT_IN_INTERACTIVE_LINKS=[
+  {title:'ABH Structures',url:'ABO_Lewis_Structures.html',description:'Build H, A, B, Bombay and acquired B structures',topic:'Blood Bank',icon:'ABH',color:'#b22222'},
+  {title:'Lewis & Secretor Genes',url:'Lewis_Secretor_Genes.html',description:'Match Le/Se genotypes, secretor status and Lewis phenotype',topic:'Blood Bank',icon:'Le',color:'#b22222'},
+  {title:'ABO Phenotype Ranking',url:'ABO_Population_Ranking.html',description:'ABO and D ranking practice',topic:'Blood Bank',icon:'ABO',color:'#b22222'},
+  {title:'Blood Group Antigen Frequencies',url:'BloodGroupSystems_Freq_Final.html',description:'Fill-in and drag antigen frequency patterns',topic:'Blood Bank',icon:'BG',color:'#b22222'},
+  {title:'Rh Haplotype Frequency',url:'Rh_Haplotype_Frequency.html',description:'Rank Rh haplotypes by population pattern',topic:'Blood Bank',icon:'Rh',color:'#b22222'},
+  {title:'BB Groups: Usual Suspects',url:'BB_Group_Usual.html',description:'Drag-match common blood group systems and antibody rules',topic:'Blood Bank',icon:'BB',color:'#b22222'},
+  {title:'BB Groups: Unusual Suspects',url:'BB_Group_Unusual.html',description:'Drag-match uncommon systems, codes and serology clues',topic:'Blood Bank',icon:'BB',color:'#b22222'},
+  {title:'UA Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'UA',color:'#c8a800'},
+  {title:'Urine Color & Clarity',url:'Urine_Color_and_Clarity.html',description:'Match urine appearance to causes and findings',topic:'Urinalysis',icon:'UC',color:'#c8a800'},
+  {title:'Urinary System Labeling',url:'urinary_labeling.html',description:'Label renal and urinary anatomy',topic:'Urinalysis',icon:'RN',color:'#c8a800'},
+  {title:'Thyroid Lab Findings',url:'Thyroid_Label.html',description:'Drag thyroid hormones into the interpretation table',topic:'Chemistry',icon:'TH',color:'#2980b9'},
+  {title:'Parathyroid & Hypercalcemia',url:'Para_Thyroid_Label.html',description:'Match PTH, calcium and hypercalcemia findings',topic:'Chemistry',icon:'PT',color:'#2980b9'}
+];
 
 const HEME_FOLDERS = [
   {key:'anemias',name:'Anemias',icon:'💉'},
@@ -1103,7 +1127,7 @@ async function renderHome(v){
     + '<div class="mt-8">'
     + '<div onclick="goInteractive()" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--border2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
     + '<div style="font-size:28px;flex-shrink:0">🔗</div>'
-    + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Interactive Learning</div><div style="font-size:11px;color:var(--text3);margin-top:2px">External tools, simulations and resources</div></div>'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Interactive Learning</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Built-in study tools and saved resources</div></div>'
     + '<div style="font-size:18px;color:var(--text3)">›</div>'
     + '</div></div>'
     + '<div class="mt-24">'
@@ -1140,9 +1164,13 @@ async function renderHome(v){
     if(el)el.textContent=(count||0)+' formulas';
   }).catch(()=>{});
   CLASS_SUBJECTS.forEach(async s=>{
-    const {count}=await sb.from('mlsboc_class_sets').select('id',{count:'exact',head:true}).eq('subject',s.key).catch(()=>({count:0}));
+    let count=0;
+    try{
+      const res=await sb.from('mlsboc_class_sets').select('id',{count:'exact',head:true}).eq('subject',s.key);
+      count=res.count||0;
+    }catch(e){}
     const el=document.getElementById('ccnt-'+s.key);
-    if(el)el.textContent=(count||0)+' sets';
+    if(el)el.textContent=count+' sets';
   });
   loadAttemptsHome();
   loadInteractiveLinks();
@@ -1155,34 +1183,51 @@ async function renderInteractiveView(v){
       <div class="section-title">Interactive Learning</div>
       ${isAdmin?`<button class="btn btn-primary btn-sm ml-auto" onclick="addInteractiveLink()">+ Add Link</button>`:''}
     </div>
-    <p class="text-muted" style="font-size:13px;margin-bottom:20px">External tools, simulations and study resources.</p>
+    <p class="text-muted" style="font-size:13px;margin-bottom:20px">Built-in study tools plus saved resources.</p>
     <div id="interactive-links-grid"><div style="color:var(--text3);font-size:13px;padding:20px">Loading...</div></div>
     ${isAdmin?'<div class="mt-16" id="interactive-admin"></div>':''}
   `;
   loadInteractiveLinks();
 }
 async function loadInteractiveLinks(){
-  const {data:links} = await sb.from('mlsboc_interactive_links').select('*').order('created_at',{ascending:true});
+  let links=[];
+  try{
+    const res = await sb.from('mlsboc_interactive_links').select('*').order('created_at',{ascending:true});
+    links = res.data || [];
+  }catch(e){
+    links = [];
+  }
   const grid = document.getElementById('interactive-links-grid');
   const adminDiv = document.getElementById('interactive-admin');
+  const builtinUrls = new Set(BUILT_IN_INTERACTIVE_LINKS.map(l=>String(l.url||'').toLowerCase()));
+  const customLinks = (links||[]).filter(l=>!builtinUrls.has(String(l.url||'').toLowerCase()));
+  const allLinks = [...BUILT_IN_INTERACTIVE_LINKS.map(l=>({...l,_builtin:true})), ...customLinks.map(l=>({...l,_builtin:false}))];
 
   if(grid){
-    if(!links||!links.length){
+    if(!allLinks.length){
       grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.' + (isAdmin?' Use the form below to add one.':'') + '</div>';
     } else {
-      grid.innerHTML = '<div class="subject-grid">' + links.map((lnk) =>
-        '<div class="subject-card" style="position:relative;cursor:pointer" onclick="window.open(\'' + lnk.url + '\',\'_blank\')">'
-        + (lnk.image_url ? '<div style="width:100%;height:130px;overflow:hidden"><img src="'+lnk.image_url+'" style="width:100%;height:130px;object-fit:cover;display:block"></div>'
-          : '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px">🔗</div>')
-        + '<div style="padding:10px 12px 12px">'
-        + '<div class="subject-name" style="color:var(--accent)">' + lnk.title + '</div>'
-        + (lnk.description ? '<div class="subject-count">' + lnk.description + '</div>' : '')
-        + '</div>'
-        + (isAdmin ? '<div style="display:flex;gap:6px;padding:4px 10px 8px" onclick="event.stopPropagation()">'
-          + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">✏️ Edit</button>'
-          + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="flex:1;padding:5px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">✕ Remove</button>'
-          + '</div>' : '')
-        + '</div>'
+      grid.innerHTML = '<div class="interactive-tool-grid">' + allLinks.map((lnk) => {
+        const url = lnk.url || '#';
+        const action = isLocalInteractiveUrl(url) ? "window.location.href='" + jsAttr(url) + "'" : "window.open('" + jsAttr(url) + "','_blank')";
+        const color = lnk.color || 'var(--accent)';
+        const media = lnk.image_url
+          ? '<img class="interactive-tool-thumb" src="'+esc(lnk.image_url)+'" alt="">'
+          : '<div class="interactive-tool-bubble" style="--tool-color:'+color+'">'+esc(lnk.icon||'GO')+'</div>';
+        return '<div class="interactive-tool-card" style="--tool-color:'+color+'" onclick="'+action+'">'
+          + media
+          + '<div style="flex:1;min-width:0">'
+          + '<div class="interactive-tool-topic">'+esc(lnk.topic || (lnk._builtin?'Interactive':'Saved Link'))+'</div>'
+          + '<div class="interactive-tool-title">'+esc(lnk.title)+'</div>'
+          + (lnk.description ? '<div class="interactive-tool-desc">'+esc(lnk.description)+'</div>' : '')
+          + '</div>'
+          + '<div class="interactive-tool-arrow">›</div>'
+          + (isAdmin && !lnk._builtin ? '<div style="display:flex;gap:6px;position:absolute;right:8px;bottom:8px" onclick="event.stopPropagation()">'
+            + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">Edit</button>'
+            + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">Remove</button>'
+            + '</div>' : '')
+          + '</div>';
+      }
       ).join('') + '</div>';
     }
   }
@@ -7649,6 +7694,8 @@ function renderClassFlashcard(v){
 function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
 function fmtTime(s){const m=Math.floor(s/60),sec=s%60;return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function esc(s){return String(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function jsAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
+function isLocalInteractiveUrl(url){return !!String(url||'').match(/^[^/:?#]+\.html(?:[?#].*)?$/);}
 // escNL: same as esc but preserves newlines as <br> tags — used for question/scenario text
 function escNL(s){return esc(s).replace(/\n/g,'<br>');} 
 function csvEsc(s){s=String(s||'');if(s.includes(',')||s.includes('"')||s.includes('\n'))s='"'+s.replace(/"/g,'""')+'"';return s;}
