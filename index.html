@@ -567,10 +567,67 @@ const RESOURCES=[
   {title:'ASCP BOC Study Guide / Content Outline',meta:'XYZ',note:'ASCP reference placeholder'},
   {title:'Success! In Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman; Janelle M. Chiasera',note:'Textbook reference'},
   {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, procedure notes, and laboratory manuals used for definitions, tables, and interpretive rules.',note:'Add book-level citations here as you finalize them'},
-  {title:'Calculations / Equations Reference List',meta:'XYZ',note:'Equation source placeholder'},
-  {title:'Reference Ranges Source List',meta:'XYZ',note:'Equation source placeholder'},
-  {title:'Formula Practice and Conversion Sources',meta:'XYZ',note:'Equation source placeholder'}
+  {title:'Calculations and Reference Ranges Sources',meta:'XYZ',note:'Citation source placeholder for Calculation / RR tab formulas and values'}
 ];
+
+const CALC_PLACEHOLDERS=[
+  {name:'Anion Gap',category:'Chemistry'},
+  {name:'Corrected Calcium',category:'Chemistry'},
+  {name:'Serum Osmolality',category:'Chemistry'},
+  {name:'Creatinine Clearance',category:'Chemistry'},
+  {name:'LDL Cholesterol (Friedewald)',category:'Chemistry'},
+  {name:'Percent Transferrin Saturation',category:'Chemistry'},
+  {name:'Absolute Cell Count',category:'Hematology'},
+  {name:'Corrected WBC Count',category:'Hematology'},
+  {name:'Reticulocyte Production Index',category:'Hematology'},
+  {name:'Body Fluid Cell Count Correction',category:'Urinalysis / Body Fluids'},
+  {name:'CSF WBC Correction',category:'Urinalysis / Body Fluids'},
+  {name:'Coefficient of Variation (CV)',category:'Lab Operations'},
+  {name:'Standard Deviation Index (SDI)',category:'Lab Operations'},
+  {name:'Sensitivity / Specificity',category:'Lab Operations'},
+  {name:'PPV / NPV',category:'Lab Operations'},
+  {name:'Dilution / Concentration',category:'Lab Operations'}
+].map((f,i)=>({
+  id:'placeholder-calc-'+i,
+  type:'calc',
+  _placeholder:true,
+  name:f.name,
+  category:f.category,
+  result_label:'XYZ',
+  numerator:'XYZ',
+  denominator:'XYZ',
+  multiplier:'XYZ',
+  steps:['XYZ'],
+  notes:'XYZ',
+  example:'XYZ'
+}));
+
+const RR_PLACEHOLDERS=[
+  {name:'CBC Reference Ranges',category:'Hematology'},
+  {name:'Coagulation Reference Ranges',category:'Hematology'},
+  {name:'Basic Chemistry Reference Ranges',category:'Chemistry'},
+  {name:'Liver / Pancreas Reference Ranges',category:'Chemistry'},
+  {name:'Lipid Reference Ranges',category:'Chemistry'},
+  {name:'Iron Studies Reference Ranges',category:'Chemistry'},
+  {name:'Therapeutic Drug Monitoring Reference Ranges',category:'Chemistry'},
+  {name:'Blood Gas Reference Ranges',category:'Chemistry'},
+  {name:'Endocrine Reference Ranges',category:'Chemistry'},
+  {name:'Urinalysis Reference Ranges',category:'Urinalysis / Body Fluids'},
+  {name:'CSF Reference Ranges',category:'Urinalysis / Body Fluids'},
+  {name:'Body Fluid Reference Ranges',category:'Urinalysis / Body Fluids'},
+  {name:'Immunology / Serology Reference Ranges',category:'Immunology'}
+].map((f,i)=>({
+  id:'placeholder-rr-'+i,
+  type:'rr',
+  _placeholder:true,
+  name:f.name,
+  category:f.category,
+  conventional_value:'XYZ',
+  conventional_unit:'XYZ',
+  si_value:'XYZ',
+  si_unit:'XYZ',
+  notes:'XYZ'
+}));
 
 const HEME_FOLDERS = [
   {key:'anemias',name:'Anemias',icon:'💉'},
@@ -1187,7 +1244,7 @@ async function renderHome(v){
   });
   sb.from('mlsboc_formulas').select('id',{count:'exact',head:true}).then(({count})=>{
     const el=document.getElementById('cnt-formulas');
-    if(el)el.textContent=(count||0)+' formulas';
+    if(el)el.textContent=((count||0)+CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges';
   }).catch(()=>{});
   CLASS_SUBJECTS.forEach(async s=>{
     let count=0;
@@ -1539,7 +1596,7 @@ async function renderQuizTab(el){
         </div>
         ${isAdmin?adminQuizControls():''}
       </div>
-      ${renderQuizQuestionBank(questions)}
+      ${isAdmin?renderQuizQuestionBank(questions):renderHiddenQuestionBankNote()}
     `;
     return;
   }
@@ -1636,6 +1693,14 @@ function renderQuizQuestionBank(questions){
           ${questions.map((q,i)=>renderQuizQuestionRow(q,i)).join('')}
         </div>
       `:'<div class="empty" style="margin:0">No questions yet. Add one above or import a CSV.</div>'}
+    </div>
+  `;
+}
+
+function renderHiddenQuestionBankNote(){
+  return `
+    <div class="card-sm mt-16" style="font-size:13px;color:var(--text2);line-height:1.6">
+      Question banks are hidden in regular view so the book questions are not redistributed. Practice here, and for the full Q/A resource go to the resource book :D
     </div>
   `;
 }
@@ -5975,16 +6040,34 @@ async function deleteBBCase(id){
 //   type='rr'    → name, category, conventional_value, conventional_unit,
 //                  si_value, si_unit, notes
 
+function mergeFormulaPlaceholders(rows,placeholders){
+  const seen=new Set((rows||[]).map(f=>`${String(f.category||'General').toLowerCase()}::${String(f.name||'').toLowerCase()}`));
+  return [...(rows||[]),...placeholders.filter(f=>!seen.has(`${String(f.category||'General').toLowerCase()}::${String(f.name||'').toLowerCase()}`))];
+}
+
+function splitFormulaRows(allRows){
+  const calcData=[],rrData=[];
+  (allRows||[]).forEach(f=>{
+    if(f.type==='rr')rrData.push(f);
+    else calcData.push(f);
+  });
+  return {
+    calcData:mergeFormulaPlaceholders(calcData,CALC_PLACEHOLDERS),
+    rrData:mergeFormulaPlaceholders(rrData,RR_PLACEHOLDERS)
+  };
+}
+
 async function renderFormulasView(v){
   // Fetch all rows then split by type — works even if 'type' column not yet added to Supabase
   let calcData=[],rrData=[];
   try{
     const {data:allRows}=await sb.from('mlsboc_formulas').select('*').order('category,name');
-    (allRows||[]).forEach(f=>{
-      if(f.type==='rr') rrData.push(f);
-      else calcData.push(f); // default everything to calc if type missing
-    });
-  }catch(e){ console.warn('Formulas fetch failed:',e); }
+    ({calcData,rrData}=splitFormulaRows(allRows));
+  }catch(e){
+    console.warn('Formulas fetch failed:',e);
+    calcData=CALC_PLACEHOLDERS;
+    rrData=RR_PLACEHOLDERS;
+  }
 
   // Group by category
   const groupBy=(arr)=>{const g={};arr.forEach(f=>{const c=f.category||'General';if(!g[c])g[c]=[];g[c].push(f);});return g;};
@@ -6027,7 +6110,7 @@ function renderCalcCard(f){
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px">
       <div class="flex-center gap-8 mb-12">
         <span style="font-size:15px;font-weight:700;color:var(--text)">${esc(f.name)}</span>
-        ${isAdmin?`<div class="ml-auto flex gap-6">
+        ${isAdmin&&!f._placeholder?`<div class="ml-auto flex gap-6">
           <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>
           <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
         </div>`:''}
@@ -6075,10 +6158,10 @@ function renderRRTab(cats,all){
                 <td style="border:1px solid var(--border);padding:10px 14px;font-weight:600;font-size:14px;color:var(--text)">${esc(f.name)}</td>
                 <td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:14px;color:var(--text)">${esc(f.conventional_value||'—')}${f.conventional_unit?'<span style="font-size:11px;color:var(--text3);margin-left:4px">'+esc(f.conventional_unit)+'</span>':''}</td>
                 <td style="border:1px solid var(--border);padding:10px 14px;text-align:center;font-family:var(--mono);font-size:14px;color:var(--text)">${esc(f.si_value||'—')}${f.si_unit?'<span style="font-size:11px;color:var(--text3);margin-left:4px">'+esc(f.si_unit)+'</span>':''}</td>
-                ${isAdmin?`<td style="border:1px solid var(--border);padding:6px;text-align:center">
+                ${isAdmin&&!f._placeholder?`<td style="border:1px solid var(--border);padding:6px;text-align:center">
                   <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','rr')">Edit</button>
                   <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
-                </td>`:''}
+                </td>`:isAdmin?'<td style="border:1px solid var(--border);padding:6px;text-align:center;font-size:11px;color:var(--text3)">placeholder</td>':''}
               </tr>`).join('')}
           </tbody>
         </table>
@@ -6178,8 +6261,8 @@ async function openFormulasExport(){
   let calcData=[],rrData=[];
   try{
     const {data:allRows}=await sb.from('mlsboc_formulas').select('*').order('category,name');
-    (allRows||[]).forEach(f=>{ if(f.type==='rr') rrData.push(f); else calcData.push(f); });
-  }catch(e){}
+    ({calcData,rrData}=splitFormulaRows(allRows));
+  }catch(e){calcData=CALC_PLACEHOLDERS;rrData=RR_PLACEHOLDERS;}
   if(!calcData.length&&!rrData.length){alert('Nothing to export yet.');return;}
 
   document.getElementById('condition-modal-body').innerHTML=`
