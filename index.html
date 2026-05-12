@@ -1518,29 +1518,23 @@ async function renderTab(){
 async function renderQuizTab(el){
   if(appState.quizDone){renderQuizResults(el,false);return;}
   if(!appState.quizStarted){
-    let count=0;
-    if(appState.subject==='para_myco'){
-      const [c1,c2]=await Promise.all([
-        sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject','parasitology'),
-        sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject','mycology')
-      ]);
-      count=(c1.count||0)+(c2.count||0);
-    }else{
-      const res=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',appState.subject);
-      count=res.count||0;
-    }
+    const questions=await loadCurrentQuizQuestions();
+    const count=questions.length;
     el.innerHTML=`
-      <div class="card" style="max-width:480px">
-        <div class="section-title" style="font-size:15px">Subject Quiz</div>
-        <p class="text-muted mt-8" style="font-size:13px">${count||0} questions available. Practice only — results not saved.</p>
-        <div class="divider"></div>
-        <div class="form-group">
-          <label>Number of questions</label>
-          <input type="number" id="q-count" value="10" min="1" max="${count||50}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start">
+        <div class="card">
+          <div class="section-title" style="font-size:15px">Subject Quiz</div>
+          <p class="text-muted mt-8" style="font-size:13px">${count||0} questions available. Practice only — results not saved.</p>
+          <div class="divider"></div>
+          <div class="form-group">
+            <label>Number of questions</label>
+            <input type="number" id="q-count" value="${Math.min(10,Math.max(count,1))}" min="1" max="${count||50}">
+          </div>
+          <button class="btn btn-primary" onclick="startSubjectQuiz()" ${count?'':'disabled'}>Start Quiz</button>
         </div>
-        <button class="btn btn-primary" onclick="startSubjectQuiz()">Start Quiz</button>
+        ${adminQuizControls()}
       </div>
-      ${isAdmin?adminQuizControls():''}
+      ${renderQuizQuestionBank(questions)}
     `;
     return;
   }
@@ -1583,6 +1577,93 @@ async function renderQuizTab(el){
       </div>
     </div>
   `;
+}
+
+function quizSubjectKeys(){
+  return appState.subject==='para_myco'?['parasitology','mycology']:[appState.subject];
+}
+
+function subjectLabel(key){
+  const subject=SUBJECTS.find(s=>s.key===key);
+  if(subject)return subject.name;
+  if(key==='parasitology')return 'Parasitology';
+  if(key==='mycology')return 'Mycology';
+  return String(key||'').replace(/_/g,' ').replace(/\b\w/g,m=>m.toUpperCase());
+}
+
+function normalizeQuizSubjectKey(raw){
+  const key=String(raw||'').toLowerCase().trim().replace(/[\s-]+/g,'_');
+  const aliases={
+    para:'parasitology',
+    parasites:'parasitology',
+    parasite:'parasitology',
+    parasitology:'parasitology',
+    myco:'mycology',
+    fungi:'mycology',
+    fungus:'mycology',
+    mycology:'mycology'
+  };
+  const normalized=aliases[key]||key;
+  return quizSubjectKeys().includes(normalized)?normalized:null;
+}
+
+async function loadCurrentQuizQuestions(){
+  const keys=quizSubjectKeys();
+  const results=await Promise.all(keys.map(key=>
+    sb.from('mlsboc_questions').select('*').eq('subject',key)
+  ));
+  return results.flatMap((res,idx)=>(res.data||[]).map(q=>({...q,_subject:q.subject||keys[idx]})))
+    .sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+}
+
+function renderQuizQuestionBank(questions){
+  return `
+    <div class="card mt-16">
+      <div class="flex-center gap-8 mb-12 flex-wrap">
+        <div>
+          <div class="section-title" style="font-size:15px">Question Bank</div>
+          <p class="text-muted mt-4" style="font-size:12px">Questions saved for this BOC/Prep section appear here.</p>
+        </div>
+        <span class="tag tag-info ml-auto">${questions.length} total</span>
+      </div>
+      ${questions.length?`
+        <div style="display:grid;gap:10px;max-height:560px;overflow:auto;padding-right:4px">
+          ${questions.map((q,i)=>renderQuizQuestionRow(q,i)).join('')}
+        </div>
+      `:'<div class="empty" style="margin:0">No questions yet. Add one above or import a CSV.</div>'}
+    </div>
+  `;
+}
+
+function renderQuizQuestionRow(q,i){
+  const correct=q.correct_answer||'a';
+  const correctText=q['option_'+correct]||'';
+  return `
+    <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
+      <div class="flex-center gap-8 mb-8 flex-wrap">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">Q${i+1}</span>
+        ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
+        <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
+        <button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:8px">${escNL(q.question)}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;font-size:12px;color:var(--text2)">
+        ${['a','b','c','d'].map(l=>`
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 9px">
+            <b style="color:${l===correct?'var(--success)':'var(--text)'}">${l.toUpperCase()}.</b> ${esc(q['option_'+l]||'')}
+          </div>`).join('')}
+      </div>
+      ${q.explanation?`<div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.45"><b>Explanation:</b> ${esc(q.explanation)}</div>`:''}
+      ${correctText?`<div style="font-size:11px;color:var(--success);margin-top:6px;font-family:var(--mono)">Correct: ${esc(correctText)}</div>`:''}
+    </div>
+  `;
+}
+
+async function deleteQuizQuestion(id){
+  if(!confirm('Delete this question?'))return;
+  const {error}=await sb.from('mlsboc_questions').delete().eq('id',id);
+  if(error)alert('Delete failed: '+error.message);
+  renderTab();
 }
 
 async function startSubjectQuiz(){
@@ -6373,8 +6454,15 @@ async function reviewAttemptFromAll(idx){reviewAttempt(idx);}
 // ─── ADMIN CONTROLS ───────────────────────────────────────────────────────────
 function adminQuizControls(){
   return `
-    <div class="card mt-16">
-      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Question</div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Question Manager</div>
+      ${appState.subject==='para_myco'?`
+        <div class="form-group"><label>Section</label>
+          <select id="adm-subject">
+            <option value="parasitology">Parasitology</option>
+            <option value="mycology">Mycology</option>
+          </select>
+        </div>`:''}
       <div class="form-group"><label>Question</label><textarea id="adm-q"></textarea></div>
       <div class="form-group"><label>Option A</label><input type="text" id="adm-a"></div>
       <div class="form-group"><label>Option B</label><input type="text" id="adm-b"></div>
@@ -6391,11 +6479,12 @@ function adminQuizControls(){
         </label>
         <button class="btn btn-ghost btn-sm" onclick="dlCSV([['question','option_a','option_b','option_c','option_d','correct_answer','explanation'],['Sample question?','Choice A','Choice B','Choice C','Choice D','a','Explanation here']],'quiz_template.csv')">Download Template</button>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d), explanation</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d), explanation. Para/Myco can also include a subject column.</div>
     </div>`;
 }
 
 async function adminAddQ(){
+  const subject=normalizeQuizSubjectKey(document.getElementById('adm-subject')?.value)||quizSubjectKeys()[0];
   const q=document.getElementById('adm-q')?.value.trim();
   const a=document.getElementById('adm-a')?.value.trim();
   const b=document.getElementById('adm-b')?.value.trim();
@@ -6404,13 +6493,14 @@ async function adminAddQ(){
   const ans=document.getElementById('adm-ans')?.value;
   const exp=document.getElementById('adm-exp')?.value.trim();
   if(!q||!a||!b||!c||!d){alert('Fill in all fields.');return;}
-  const {error}=await sb.from('mlsboc_questions').insert({subject:appState.subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:exp||''});
+  const {error}=await sb.from('mlsboc_questions').insert({subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:exp||''});
   if(error)alert('Error: '+error.message);
   else renderTab();
 }
 
 async function adminBulkQ(e){
   const file=e.target.files[0];if(!file)return;
+  const selectedSubject=normalizeQuizSubjectKey(document.getElementById('adm-subject')?.value)||quizSubjectKeys()[0];
   const text=await file.text();
   const records=parseCSVRecords(text);
   const rows=records.length?records:parseCSV(text);
@@ -6419,7 +6509,8 @@ async function adminBulkQ(e){
     const q=normalizeQuizCSVRow(r);
     if(!q){skipped++;continue;}
     try{
-      const {error}=await sb.from('mlsboc_questions').insert({subject:appState.subject,...q});
+      const subject=normalizeQuizSubjectKey(csvField(r,['subject','section','category','topic'],-1))||selectedSubject;
+      const {error}=await sb.from('mlsboc_questions').insert({subject,...q});
       if(error)skipped++;else imported++;
     }catch(err){skipped++;}
   }
