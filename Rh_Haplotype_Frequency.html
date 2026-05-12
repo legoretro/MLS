@@ -503,7 +503,7 @@
   <div class="section-controls">
     <button id="rhCheckBtn" class="checkBtn">✔ Check Rh Section</button>
     <button id="rhResetBtn" class="resetBtn">↺ Reset Rh Section</button>
-    <button id="rhShowAnswersBtn" class="resetBtn">👁 See Rh Answers</button>
+    <button id="rhShowAnswersBtn" class="resetBtn">Show answers</button>
     <div id="rhMsg" class="score"></div>
   </div>
 
@@ -530,7 +530,7 @@
       <div class="section-controls" style="margin-bottom:14px;">
         <button id="donorCheckBtn" class="checkBtn">✔ Check Donor Section</button>
         <button id="donorResetBtn" class="resetBtn">↺ Reset Donor Section</button>
-        <button id="donorShowAnswersBtn" class="resetBtn">👁 See Donor Answers</button>
+        <button id="donorShowAnswersBtn" class="resetBtn">Show answers</button>
         <div id="donorMsg" class="score"></div>
       </div>
 
@@ -973,6 +973,20 @@ function resetRh(){
   renderBankUsage();
 }
 
+function showRhAnswers(){
+  GROUPS.forEach(group => {
+    for(let row = 1; row <= 8; row++){
+      ["weiner","fisher"].forEach(col => {
+        const key = slotKey(group.key, row, col);
+        setState(key, { section: "rh", type: col, value: ANSWERS[group.key][col][row - 1] });
+        renderSlot(key);
+      });
+    }
+  });
+  renderBankUsage();
+  checkRhAnswers();
+}
+
 /* =========================
    DONOR FREQUENCY SECTION
 ========================= */
@@ -1261,6 +1275,22 @@ function resetDonor(){
   renderDonorBankUsage();
 }
 
+function showDonorAnswers(){
+  for(let row = 1; row <= DONOR_ROWS; row++){
+    const answer = DONOR_ANSWERS[row - 1];
+    donorSetState(donorKey(row, "frequency"), { section: "donor", type: "frequency", value: answer.frequency });
+    renderDonorSlot(donorKey(row, "frequency"));
+    if(answer.pop){
+      donorSetState(donorKey(row, "pop"), { section: "donor", type: "pop", value: answer.pop });
+    } else {
+      donorSetState(donorKey(row, "pop"), null);
+    }
+    renderDonorSlot(donorKey(row, "pop"));
+  }
+  renderDonorBankUsage();
+  checkDonorAnswers();
+}
+
 /* =========================
    INIT
 ========================= */
@@ -1269,14 +1299,8 @@ document.getElementById("rhCheckBtn").addEventListener("click", checkRhAnswers);
 document.getElementById("rhResetBtn").addEventListener("click", resetRh);
 document.getElementById("donorCheckBtn").addEventListener("click", checkDonorAnswers);
 document.getElementById("donorResetBtn").addEventListener("click", resetDonor);
-document.getElementById("rhShowAnswersBtn").addEventListener("click", () => {
-  const section = document.getElementById("rhAnswersSection");
-  section.style.display = section.style.display === "none" ? "block" : "none";
-});
-document.getElementById("donorShowAnswersBtn").addEventListener("click", () => {
-  const section = document.getElementById("donorAnswersSection");
-  section.style.display = section.style.display === "none" ? "block" : "none";
-});
+document.getElementById("rhShowAnswersBtn").addEventListener("click", showRhAnswers);
+document.getElementById("donorShowAnswersBtn").addEventListener("click", showDonorAnswers);
 
 buildBanks();
 buildTables();

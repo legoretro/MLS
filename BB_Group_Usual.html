@@ -139,7 +139,7 @@ const rounds=[
   }},
   {id:"clinical",name:"Round 3: Clinical Clues",items:{
     abo:"H antigen is required; Bombay lacks H; Parabombay secretor has soluble H",
-    rh:"Most immunogenic after ABO; D typing and RhIG prevention matter",
+    rh:"Most immunogenic after ABO; D antigen is the major typing clue; severe HDN risk",
     mns:"Anti-N can be transient in dialysis; S/s/U are the stronger clinical risk",
     p:"Anti-P1 often insignificant; anti-PP1Pk can cause HTR and pregnancy loss",
     kell:"McLeod/Kx association; anti-K can cause severe HDN by suppressing erythropoiesis",
@@ -158,6 +158,14 @@ function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
 function chipId(systemId){return rounds[roundIndex].id+"__"+systemId;}
 function currentRound(){return rounds[roundIndex];}
 function systemById(id){return systems.find(s=>s.id===id);}
+function formatChipText(text){
+  return String(text)
+    .split(";")
+    .map(part=>part.trim())
+    .filter(Boolean)
+    .map(part=>`<span>${part}</span>`)
+    .join("");
+}
 
 function renderTabs(){
   const tabs=document.getElementById("roundTabs");
@@ -174,7 +182,7 @@ function makeChip(systemId,text){
   chip.draggable=true;
   chip.dataset.id=id;
   chip.dataset.system=systemId;
-  chip.textContent=text;
+  chip.innerHTML=formatChipText(text);
   chip.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",id);});
   chip.addEventListener("click",()=>selectChip(id));
   if(selectedChip===id)chip.classList.add("selected");

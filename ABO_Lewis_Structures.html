@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Blood Banking Structures – ABH System</title>
+<title>Blood Structures</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
 
@@ -330,6 +330,142 @@
     margin-top:18px;
   }
 
+  .structure-tabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:0 0 12px;
+  }
+
+  .structure-tab{
+    border:2px solid var(--fixed-border);
+    background:#fff;
+    color:#222;
+    border-radius:999px;
+    padding:8px 12px;
+    font-weight:900;
+    box-shadow:var(--shadow);
+  }
+
+  .structure-tab.active{
+    background:var(--header);
+    border-color:var(--header);
+    color:#fff;
+  }
+
+  .structure-section{
+    display:none;
+  }
+
+  .structure-section.active{
+    display:block;
+  }
+
+  .mechanism-layout{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:12px;
+    align-items:start;
+  }
+
+  .mechanism-board{
+    display:grid;
+    gap:10px;
+  }
+
+  .mechanism-row{
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:10px;
+    align-items:stretch;
+  }
+
+  .mechanism-system{
+    background:#fff;
+    border:2px solid var(--fixed-border);
+    border-radius:12px;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:900;
+  }
+
+  .mechanism-dot{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:var(--header);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    font-size:.78rem;
+  }
+
+  .mechanism-slot{
+    min-height:74px;
+    background:var(--drop);
+    border:2px dashed #cfc3a5;
+    border-radius:12px;
+    padding:8px;
+    display:flex;
+    align-items:center;
+  }
+
+  .mechanism-slot.empty::before{
+    content:"drop matching card";
+    color:#9b8b66;
+    font-size:.72rem;
+    font-weight:900;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+
+  .mechanism-slot.drag-over{
+    border-color:var(--drop-border);
+    background:#fff4d8;
+  }
+
+  .mechanism-slot.correct{
+    background:#edf8f1;
+    border-color:var(--good);
+  }
+
+  .mechanism-slot.wrong{
+    background:#fff0ee;
+    border-color:var(--bad);
+  }
+
+  .mechanism-card{
+    width:100%;
+    background:#fff;
+    border:2px solid #ddd4c4;
+    border-radius:10px;
+    padding:9px 10px;
+    cursor:grab;
+    font-weight:900;
+    line-height:1.25;
+  }
+
+  .mechanism-card span{
+    display:block;
+  }
+
+  .mechanism-card span + span{
+    margin-top:5px;
+    padding-top:5px;
+    border-top:1px solid #e4dccf;
+    color:#3d3d3d;
+    font-weight:800;
+  }
+
+  .mechanism-card.selected{
+    outline:3px solid rgba(37,99,212,.24);
+    border-color:#2563d4;
+  }
+
   .subbank-title{
     margin:12px 0 6px;
     font-size:.72rem;
@@ -410,6 +546,10 @@
     .layout{
       grid-template-columns:1fr;
     }
+    .mechanism-layout,
+    .mechanism-row{
+      grid-template-columns:1fr;
+    }
     .bank{
       position:static;
     }
@@ -435,13 +575,21 @@
 
     <a href="https://legoretro.github.io/MLS/" style="display:block; margin:20px;">← Back</a>
 <div class="wrap">
+  <div class="structure-tabs" id="structureTabs">
+    <button class="structure-tab active" data-structure-section="type2" type="button">ABH Type 2</button>
+    <button class="structure-tab" data-structure-section="type1" type="button">Lewis / Secretor Type 1</button>
+    <button class="structure-tab" data-structure-section="mechanisms" type="button">Usual System Mechanisms</button>
+  </div>
+</div>
+
+<div class="wrap structure-section active" data-structure-section="type2">
 
   <header>
     <div>
-      <h1>🩸 Blood Banking Structures – ABH System</h1>
+      <h1>🩸 Blood Structures</h1>
       <p>Use one base structure. The chain runs bottom to top. Add FUT1 or FUT2 to the side and add the antigen sugar to the top to build Bombay, H, A, B, or Acquired B-Antigen.</p>
     </div>
-    <div class="badge">1 Structure</div>
+    <div class="badge">ABH Type 2</div>
   </header>
 
   <div class="section-controls">
@@ -492,7 +640,15 @@
 
 </div>
 
-<div class="wrap section-block">
+<div class="wrap section-block structure-section" data-structure-section="type1">
+  <header>
+    <div>
+      <h1>Lewis / Secretor Type 1 Structures</h1>
+      <p>Build the Type 1 chain with FUT3, FUT2, and ABH sugars, then match the Lewis, secretor, and agglutination labels.</p>
+    </div>
+    <div class="badge">Type 1</div>
+  </header>
+
   <div class="section-controls">
     <button id="checkBtnType1" class="checkBtn">✔ Check Answers</button>
     <button id="resetBtnType1" class="resetBtn">↺ Reset Type 1 Only</button>
@@ -567,10 +723,37 @@
 </div>
 
 
+<div class="wrap section-block structure-section" data-structure-section="mechanisms">
+  <header>
+    <div>
+      <h1>Usual System Mechanisms</h1>
+      <p>Match each blood group system with the chromosome, membrane structure, or sugar/mechanism clue. Tap a card, then tap a slot, or drag it into place.</p>
+    </div>
+    <div class="badge">Usual Suspects</div>
+  </header>
+
+  <div class="section-controls">
+    <button id="checkMechanismBtn" class="checkBtn">✔ Check Answers</button>
+    <button id="resetMechanismBtn" class="resetBtn">↺ Reset</button>
+    <button id="showMechanismBtn" class="seeBtn">Show answers</button>
+    <div id="mechanismMsg" class="score"></div>
+  </div>
+
+  <div class="mechanism-layout">
+    <div class="bank">
+      <h2>Mechanism Cards</h2>
+      <div class="hint">Cards are split into quick facts so you do not have to read one long sentence.</div>
+      <div id="mechanismBank"></div>
+    </div>
+    <div class="mechanism-board" id="mechanismBoard"></div>
+  </div>
+</div>
+
+
 
 <div class="wrap">
   <div id="answersPanel" class="answers-panel">
-    <div class="answers-title">See All Answers</div>
+    <div class="answers-title">Reference</div>
 
     <div class="answers-subtitle">Type 2 Chain Base Structure</div>
     <div class="answers-grid">
@@ -1471,6 +1654,176 @@ function showType1Answer(){
   checkAnswersType1();
 }
 
+const MECHANISM_SYSTEMS = [
+  {id:"abo", name:"ABO", short:"AB", card:["Chromosome 9","H is FUT1","Secretor uses FUT2","A = GalNAc; B = galactose"]},
+  {id:"rh", name:"Rh", short:"Rh", card:["Chromosome 1","RHD / RHCE","RhAG membrane complex","D has no partner"]},
+  {id:"mns", name:"MNS", short:"MN", card:["Chromosome 4","GYPA makes M/N","GYPB makes S/s/U","glycophorin system"]},
+  {id:"p", name:"P / Glob", short:"P", card:["P1PK on chromosome 22","Glob on chromosome 3","glycosphingolipid","P1 weak at birth"]},
+  {id:"kell", name:"Kell", short:"K", card:["Chromosome 7","Kell linked to Kx","K/k pair","Kpa/Kpb and Jsa/Jsb pairs"]},
+  {id:"duffy", name:"Duffy", short:"Fy", card:["Chromosome 1","ACKR1 multipass glycoprotein","Fya/Fyb pair","malaria clue"]},
+  {id:"kidd", name:"Kidd", short:"Jk", card:["Chromosome 18","urea transporter","Jka/Jkb pair","antibodies can hide"]},
+  {id:"lewis", name:"Lewis", short:"Le", card:["Chromosome 19","plasma antigens","adsorb onto RBC","Lea/Leb are not true pairs"]},
+  {id:"lutheran", name:"Lutheran", short:"Lu", card:["Chromosome 19","BCAM glycoprotein","Lua/Lub pair","mixed-field expression"]}
+];
+
+const mechanismState = {};
+let mechanismSelected = null;
+let mechanismDragId = null;
+
+function mechanismCardId(systemId){
+  return `mechanism__${systemId}`;
+}
+
+function mechanismSystemFromCard(cardId){
+  return cardId ? cardId.replace("mechanism__", "") : "";
+}
+
+function makeMechanismCard(system){
+  const card = document.createElement("div");
+  card.className = "mechanism-card";
+  card.draggable = true;
+  card.dataset.id = mechanismCardId(system.id);
+  card.dataset.system = system.id;
+  if(mechanismSelected === card.dataset.id) card.classList.add("selected");
+  system.card.forEach(part => {
+    const line = document.createElement("span");
+    line.textContent = part;
+    card.appendChild(line);
+  });
+  card.addEventListener("dragstart", e => {
+    mechanismDragId = card.dataset.id;
+    e.dataTransfer.setData("text/plain", card.dataset.id);
+  });
+  card.addEventListener("click", () => {
+    mechanismSelected = mechanismSelected === card.dataset.id ? null : card.dataset.id;
+    renderMechanismGame();
+  });
+  return card;
+}
+
+function placeMechanismCard(targetSystemId, cardId){
+  if(!cardId) return;
+  Object.keys(mechanismState).forEach(key => {
+    if(mechanismState[key] === cardId) delete mechanismState[key];
+  });
+  mechanismState[targetSystemId] = cardId;
+  mechanismSelected = null;
+  mechanismDragId = null;
+  renderMechanismGame();
+}
+
+function clearMechanismSlot(systemId){
+  delete mechanismState[systemId];
+  mechanismSelected = null;
+  renderMechanismGame();
+}
+
+function renderMechanismBank(){
+  const bank = document.getElementById("mechanismBank");
+  const placed = new Set(Object.values(mechanismState));
+  bank.innerHTML = "";
+  MECHANISM_SYSTEMS
+    .filter(system => !placed.has(mechanismCardId(system.id)))
+    .forEach(system => bank.appendChild(makeMechanismCard(system)));
+}
+
+function renderMechanismBoard(){
+  const board = document.getElementById("mechanismBoard");
+  board.innerHTML = "";
+  MECHANISM_SYSTEMS.forEach(system => {
+    const row = document.createElement("div");
+    row.className = "mechanism-row";
+    row.innerHTML = `
+      <div class="mechanism-system">
+        <div class="mechanism-dot">${system.short}</div>
+        <div>${system.name}</div>
+      </div>
+    `;
+    const slot = document.createElement("div");
+    slot.className = "mechanism-slot empty";
+    slot.dataset.system = system.id;
+    slot.addEventListener("dragover", e => {
+      e.preventDefault();
+      slot.classList.add("drag-over");
+    });
+    slot.addEventListener("dragleave", () => slot.classList.remove("drag-over"));
+    slot.addEventListener("drop", e => {
+      e.preventDefault();
+      slot.classList.remove("drag-over");
+      placeMechanismCard(system.id, e.dataTransfer.getData("text/plain") || mechanismDragId);
+    });
+    slot.addEventListener("click", () => {
+      if(mechanismSelected) placeMechanismCard(system.id, mechanismSelected);
+      else if(mechanismState[system.id]) clearMechanismSlot(system.id);
+    });
+    if(mechanismState[system.id]){
+      slot.classList.remove("empty");
+      const cardSystem = MECHANISM_SYSTEMS.find(item => item.id === mechanismSystemFromCard(mechanismState[system.id]));
+      if(cardSystem) slot.appendChild(makeMechanismCard(cardSystem));
+    }
+    row.appendChild(slot);
+    board.appendChild(row);
+  });
+}
+
+function clearMechanismMarks(){
+  document.querySelectorAll(".mechanism-slot").forEach(slot => slot.classList.remove("correct","wrong"));
+  const msg = document.getElementById("mechanismMsg");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
+function renderMechanismGame(){
+  renderMechanismBank();
+  renderMechanismBoard();
+  clearMechanismMarks();
+}
+
+function checkMechanismAnswers(){
+  let correct = 0;
+  MECHANISM_SYSTEMS.forEach(system => {
+    const slot = document.querySelector(`.mechanism-slot[data-system="${system.id}"]`);
+    if(!slot) return;
+    const isCorrect = mechanismSystemFromCard(mechanismState[system.id]) === system.id;
+    slot.classList.toggle("correct", isCorrect);
+    slot.classList.toggle("wrong", !!mechanismState[system.id] && !isCorrect);
+    if(isCorrect) correct++;
+  });
+  const msg = document.getElementById("mechanismMsg");
+  msg.textContent = `${correct}/${MECHANISM_SYSTEMS.length} correct`;
+  msg.className = `score ${correct === MECHANISM_SYSTEMS.length ? "good" : "bad"}`;
+}
+
+function showMechanismAnswers(){
+  MECHANISM_SYSTEMS.forEach(system => {
+    mechanismState[system.id] = mechanismCardId(system.id);
+  });
+  mechanismSelected = null;
+  renderMechanismBank();
+  renderMechanismBoard();
+  checkMechanismAnswers();
+}
+
+function resetMechanismGame(){
+  Object.keys(mechanismState).forEach(key => delete mechanismState[key]);
+  mechanismSelected = null;
+  renderMechanismGame();
+}
+
+function setupStructureTabs(){
+  const tabs = document.querySelectorAll(".structure-tab");
+  const sections = document.querySelectorAll(".structure-section");
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.structureSection;
+      tabs.forEach(item => item.classList.toggle("active", item === tab));
+      sections.forEach(section => {
+        section.classList.toggle("active", section.dataset.structureSection === target);
+      });
+    });
+  });
+}
+
 function resetAll(){
   state.side = null;
   state.top = null;
@@ -1511,6 +1864,11 @@ setupType1LabelDrop("label-drop-agglutination-type1", "agglutinationLabel", "typ
 document.getElementById("checkBtnType1").addEventListener("click", checkAnswersType1);
 document.getElementById("resetBtnType1").addEventListener("click", resetType1);
 document.getElementById("seeAnswersBtnType1").addEventListener("click", showType1Answer);
+document.getElementById("checkMechanismBtn").addEventListener("click", checkMechanismAnswers);
+document.getElementById("resetMechanismBtn").addEventListener("click", resetMechanismGame);
+document.getElementById("showMechanismBtn").addEventListener("click", showMechanismAnswers);
+setupStructureTabs();
+renderMechanismGame();
 resetType1();
 resetAll();
 </script>

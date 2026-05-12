@@ -131,6 +131,27 @@
   .legend .high{ color:var(--high); }
   .legend .low{ color:var(--low); }
 
+  .system-tabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:0 0 14px;
+  }
+  .system-tab{
+    border:2px solid var(--border);
+    background:#fff;
+    color:var(--ink);
+    border-radius:999px;
+    padding:8px 12px;
+    font-weight:900;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .system-tab.active{
+    background:var(--header);
+    border-color:var(--header);
+    color:#fff;
+  }
+
   .activity-layout{
     display:grid;
     grid-template-columns:minmax(0, 1fr) 180px;
@@ -396,6 +417,8 @@
     <span class="low">Low Frequency = &lt;9%</span>
   </div>
 
+  <div class="system-tabs" id="systemTabs" aria-label="Blood group frequency systems"></div>
+
   <div class="answers-panel" id="answersPanel">
     <h2>Answer Key</h2>
     <div id="answersContent"></div>
@@ -501,6 +524,27 @@ const levels = ["High", "Low", "N/A"];
 const state = {};
 let dragItem = null;
 let dragFrom = null;
+let activeSystemIndex = 0;
+
+function activeSystemIndexes(){
+  return [activeSystemIndex];
+}
+
+function buildSystemTabs(){
+  const tabs = document.getElementById("systemTabs");
+  tabs.innerHTML = systems.map((system, index) => `
+    <button class="system-tab ${index === activeSystemIndex ? "active" : ""}" data-system-index="${index}" type="button">${system.name}</button>
+  `).join("");
+  tabs.querySelectorAll(".system-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeSystemIndex = Number(btn.dataset.systemIndex);
+      buildSystemTabs();
+      buildSystems();
+      clearMarks();
+      renderBankUsage();
+    });
+  });
+}
 
 function plainAntigen(html){
   const tmp = document.createElement("div");
@@ -684,7 +728,8 @@ function formatSignificance(significant){
 function buildSystems(){
   const wrap = document.getElementById("systemsWrap");
   wrap.innerHTML = "";
-  systems.forEach((system, systemIndex) => {
+  activeSystemIndexes().forEach(systemIndex => {
+    const system = systems[systemIndex];
     const card = document.createElement("section");
     card.className = "system-card";
     card.innerHTML = `
@@ -744,7 +789,8 @@ function buildSystems(){
 function checkAnswers(){
   let correct = 0;
   let total = 0;
-  systems.forEach((system, systemIndex) => {
+  activeSystemIndexes().forEach(systemIndex => {
+    const system = systems[systemIndex];
     system.antigens.forEach((item, antigenIndex) => {
       total++;
       const input = document.getElementById(freqInputId(systemIndex, antigenIndex));
@@ -778,7 +824,8 @@ function checkAnswers(){
 
 function reset(){
   Object.keys(state).forEach(key => delete state[key]);
-  systems.forEach((system, systemIndex) => {
+  activeSystemIndexes().forEach(systemIndex => {
+    const system = systems[systemIndex];
     system.antigens.forEach((_, antigenIndex) => {
       const input = document.getElementById(freqInputId(systemIndex, antigenIndex));
       if(input) input.value = "";
@@ -844,7 +891,8 @@ function buildAnswers(){
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", reset);
 function showAnswers(){
-  systems.forEach((system, systemIndex) => {
+  activeSystemIndexes().forEach(systemIndex => {
+    const system = systems[systemIndex];
     system.antigens.forEach((item, antigenIndex) => {
       const input = document.getElementById(freqInputId(systemIndex, antigenIndex));
       if(input) input.value = item.frequency;
@@ -865,6 +913,7 @@ function showAnswers(){
 document.getElementById("answersBtn").addEventListener("click", showAnswers);
 
 buildBanks();
+buildSystemTabs();
 buildSystems();
 buildAnswers();
 reset();

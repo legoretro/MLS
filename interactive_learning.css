@@ -225,16 +225,18 @@ body.bb-match .bank{border-right:1px solid var(--mls-border);padding:14px;backgr
 body.bb-match .bank-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mls-text3);font-weight:700;margin-bottom:10px}
 body.bb-match .chips{display:flex;flex-direction:column;gap:8px}
 body.bb-match .chip{border:1px solid var(--mls-border2);background:linear-gradient(180deg,#fff,#f3f5fb);color:var(--mls-text);border-radius:var(--mls-r);padding:10px 11px;font-size:13px;line-height:1.35;cursor:grab;box-shadow:0 5px 14px rgba(35,50,90,.10);user-select:none}
+body.bb-match .chip span{display:block}
+body.bb-match .chip span+span{margin-top:5px;padding-top:5px;border-top:1px solid var(--mls-border)}
 body.bb-match .chip:hover{border-color:var(--mls-accent);box-shadow:0 8px 18px rgba(37,99,212,.12)}
 body.bb-match .chip:active{cursor:grabbing}
 body.bb-match .chip.selected{outline:2px solid color-mix(in srgb,var(--mls-accent) 55%,#fff);border-color:var(--mls-accent)}
-body.bb-match .board{padding:14px;display:grid;gap:10px;background:#fff}
-body.bb-match .row{display:grid;grid-template-columns:155px 1fr;gap:10px;align-items:stretch}
+body.bb-match .board{padding:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;background:#fff}
+body.bb-match .row{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch}
 body.bb-match .system{background:#f7f8fc;border:1px solid var(--mls-border);border-radius:var(--mls-r);padding:12px;display:flex;align-items:center;gap:10px}
 body.bb-match .dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--system,var(--mls-accent));font-family:var(--mls-mono);font-weight:800;color:#fff;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
 body.bb-match .system-name{font-weight:700;font-size:14px;color:var(--mls-text)}
 body.bb-match .hint{font-family:var(--mls-mono);font-size:11px;color:var(--mls-text3);margin-top:2px}
-body.bb-match .slot{min-height:62px;border:1.5px dashed var(--mls-border2);border-radius:var(--mls-r);background:#f9faff;display:flex;align-items:center;padding:8px;transition:.14s}
+body.bb-match .slot{min-height:88px;border:1.5px dashed var(--mls-border2);border-radius:var(--mls-r);background:#f9faff;display:flex;align-items:center;padding:8px;transition:.14s}
 body.bb-match .slot.over{border-color:var(--mls-accent);background:#2563d40d}
 body.bb-match .slot.empty::before{content:"drop matching chip";font-family:var(--mls-mono);font-size:11px;color:var(--mls-text3);padding-left:4px}
 body.bb-match .slot .chip{width:100%;cursor:pointer}
@@ -251,6 +253,7 @@ body.bb-match .msg.bad{color:var(--mls-danger)}
   body.bb-match .wrap{padding:18px 14px}
   body.bb-match .game{grid-template-columns:1fr}
   body.bb-match .bank{border-right:0;border-bottom:1px solid var(--mls-border);min-height:0}
+  body.bb-match .board{grid-template-columns:1fr}
   body.bb-match .row{grid-template-columns:1fr}
   body.bb-match .score{margin-left:0;width:100%}
   body.bb-match .mini{grid-template-columns:1fr 1fr}

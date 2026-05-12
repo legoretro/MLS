@@ -313,7 +313,7 @@
   <div class="controls">
     <button class="checkBtn" id="checkBtn">✔ Check Answers</button>
     <button class="resetBtn" id="resetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="showAnswersBtn">See All Answers</button>
+    <button class="seeAnswersBtn" id="showAnswersBtn">Show answers</button>
     <div class="score" id="scoreMsg"></div>
   </div>
 
@@ -386,7 +386,7 @@
   <div class="controls">
     <button class="checkBtn" id="rankCheckBtn">✔ Check Answers</button>
     <button class="resetBtn" id="rankResetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="showRankAnswersBtn">See All Answers</button>
+    <button class="seeAnswersBtn" id="showRankAnswersBtn">Show answers</button>
     <div class="score" id="rankScoreMsg"></div>
   </div>
 
@@ -590,8 +590,21 @@ function reset(){
   clearMarks(); renderBankUsage();
 }
 
+function showABOAnswers(){
+  ABO_PHENOTYPES.forEach(ph => {
+    ABO_POPS.forEach(pop => {
+      const key = slotKey(ph, pop);
+      setState(key, { val: ABO_ANSWERS[ph][pop] });
+      renderSlot(key);
+    });
+  });
+  renderBankUsage();
+  checkAnswers();
+}
+
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", reset);
+document.getElementById("showAnswersBtn").addEventListener("click", showABOAnswers);
 buildBank(); buildABOTable(); reset();
 
 
@@ -767,8 +780,21 @@ function resetRank(){
   clearRankMarks(); renderRankBankUsage();
 }
 
+function showRankAnswers(){
+  RANK_PHENOTYPES.forEach(ph => {
+    for(let r = 0; r < 4; r++){
+      const key = rankSlotKey(ph, r);
+      rankSetState(key, { pop: RANK_CORRECT[ph][r] });
+      renderRankSlot(key);
+    }
+  });
+  renderRankBankUsage();
+  checkRankAnswers();
+}
+
 document.getElementById("rankCheckBtn").addEventListener("click", checkRankAnswers);
 document.getElementById("rankResetBtn").addEventListener("click", resetRank);
+document.getElementById("showRankAnswersBtn").addEventListener("click", showRankAnswers);
 buildRankBank(); buildRankColumns(); resetRank();
 </script>
 </body>
@@ -807,7 +833,7 @@ buildRankBank(); buildRankColumns(); resetRank();
   <div class="controls">
     <button class="checkBtn" id="dCheckBtn">✔ Check Answers</button>
     <button class="resetBtn" id="dResetBtn">↺ Reset</button>
-    <button class="seeAnswersBtn" id="showDAnswersBtn">See All Answers</button>
+    <button class="seeAnswersBtn" id="showDAnswersBtn">Show answers</button>
     <div class="score" id="dScoreMsg"></div>
   </div>
 
@@ -1116,25 +1142,28 @@ function resetD(){
   clearDMarks(); renderDBankUsage(); renderMBankUsage();
 }
 
+function showDAnswers(){
+  D_CORRECT.forEach((pop, r) => {
+    const key = dSlotKey(r);
+    dSetState(key, { pop });
+    renderDSlot(key);
+  });
+  M_ROWS.forEach(row => {
+    const key = mSlotKey(row.id);
+    mSetState(key, { ancestry: row.ancestry });
+    renderMSlot(key);
+  });
+  renderDBankUsage();
+  renderMBankUsage();
+  checkDAnswers();
+}
+
 document.getElementById("dCheckBtn").addEventListener("click",checkDAnswers);
 document.getElementById("dResetBtn").addEventListener("click",resetD);
+document.getElementById("showDAnswersBtn").addEventListener("click",showDAnswers);
 
 buildDBank(); buildDTable();
 buildMBank(); buildMTable();
 resetD();
-
-function setupAnswerToggle(btnId, panelId){
-  const btn = document.getElementById(btnId);
-  const panel = document.getElementById(panelId);
-  if(!btn || !panel) return;
-  btn.addEventListener("click", () => {
-    panel.classList.toggle("show");
-    btn.textContent = panel.classList.contains("show") ? "Hide Answers" : "See All Answers";
-  });
-}
-
-setupAnswerToggle("showAnswersBtn", "answersPanel");
-setupAnswerToggle("showRankAnswersBtn", "rankAnswersPanel");
-setupAnswerToggle("showDAnswersBtn", "dAnswersPanel");
 
 </script>

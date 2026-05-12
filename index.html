@@ -547,7 +547,7 @@ const SUBJECTS = [
 ];
 const PARA_MYCO_KEYS=['parasitology','mycology'];
 const BUILT_IN_INTERACTIVE_LINKS=[
-  {title:'ABH Structures',url:'ABO_Lewis_Structures.html',description:'Build H, A, B, Bombay and acquired B structures',topic:'Blood Bank',icon:'ABH',color:'#b22222'},
+  {title:'Blood Structures',url:'ABO_Lewis_Structures.html',description:'Build ABH, Lewis/secretor, and usual-system structure clues',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'Lewis & Secretor Genes',url:'Lewis_Secretor_Genes.html',description:'Match Le/Se genotypes, secretor status and Lewis phenotype',topic:'Blood Bank',icon:'Le',color:'#b22222'},
   {title:'ABO Phenotype Ranking',url:'ABO_Population_Ranking.html',description:'ABO and D ranking practice',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'Blood Group Antigen Frequencies',url:'BloodGroupSystems_Freq_Final.html',description:'Fill-in and drag antigen frequency patterns',topic:'Blood Bank',icon:'BB',color:'#b22222'},
@@ -905,7 +905,7 @@ async function seedIfEmpty(){
         {question:"Rh null phenotype individuals may develop:",option_a:"Anti-D only",option_b:"Anti-Rh17 (anti-total Rh)",option_c:"Anti-C only",option_d:"Anti-e only",correct_answer:"b",explanation:"Rh null individuals lack all Rh antigens and can make anti-Rh17."},
         {question:"Coombs crossmatch is incompatible when:",option_a:"No agglutination at IS phase",option_b:"Agglutination at AHG phase",option_c:"Rouleaux is present",option_d:"All phases negative",correct_answer:"b",explanation:"Agglutination at AHG phase indicates antibody coating donor cells."},
         {question:"Which blood product is indicated for multiple factor deficiencies?",option_a:"Packed RBCs",option_b:"Fresh frozen plasma",option_c:"Cryoprecipitate",option_d:"Platelets",correct_answer:"b",explanation:"FFP contains all clotting factors."},
-        {question:"The Kleihauer-Betke test is used to:",option_a:"Detect fetal hemoglobin in maternal blood",option_b:"Identify weak D",option_c:"Screen for antibodies",option_d:"Confirm ABO typing",correct_answer:"a",explanation:"KB stain differentiates fetal RBCs from adult RBCs for RhIG dosing."}
+        {question:"The Kleihauer-Betke test is used to:",option_a:"Detect fetal hemoglobin in maternal blood",option_b:"Identify weak D",option_c:"Screen for antibodies",option_d:"Confirm ABO typing",correct_answer:"a",explanation:"KB stain differentiates fetal RBCs from adult RBCs for fetal bleed quantitation."}
       ],
       immunology:[
         {question:"First immunoglobulin produced in primary immune response:",option_a:"IgG",option_b:"IgA",option_c:"IgM",option_d:"IgE",correct_answer:"c",explanation:"IgM is the first antibody produced and is pentameric."},
@@ -7784,9 +7784,8 @@ function parseSteps(s){
   try{return typeof s==='string'?JSON.parse(s||'[]'):(s||[]);}catch{return [];}
 }
 function applySavedTheme(){
-  if(!localStorage.getItem('mlsboc_light_default_v2')){
+  if(!localStorage.getItem('mlsboc_theme')){
     localStorage.setItem('mlsboc_theme','light');
-    localStorage.setItem('mlsboc_light_default_v2','1');
   }
   const saved=localStorage.getItem('mlsboc_theme')||'light';
   document.body.classList.toggle('light-mode', saved!=='dark');
