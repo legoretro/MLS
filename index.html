@@ -6590,8 +6590,6 @@ function renderCalcCard(f){
               <div style="font-size:14px;font-family:var(--mono);font-weight:600;color:var(--accent2);white-space:nowrap">${esc(s)}</div>
             </div>`).join('')}
         </div>`:''}
-      ${f.notes?`<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px">${escNL(f.notes)}</div>`:''}
-      ${f.example?`<div style="background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;font-size:13px;color:var(--text2)"><strong style="color:var(--text)">Example:</strong> ${esc(f.example)}</div>`:''}
     </div>`;
 }
 
@@ -6667,7 +6665,6 @@ async function openFormulaEditor(id,type){
         ${steps.map((s,i)=>`<input type="text" id="fm-step-${i}" value="${esc(s||'')}" placeholder="Step ${i+1} (leave blank to skip)" style="margin-bottom:6px;font-family:var(--mono)">`).join('')}
       </div>
       <div class="form-group"><label>Notes / Explanation (optional)</label><textarea id="fm-notes" style="min-height:60px">${f.notes||''}</textarea></div>
-      <div class="form-group"><label>Example (optional)</label><textarea id="fm-example" style="min-height:50px">${f.example||''}</textarea></div>
     `}
     <div class="flex gap-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
@@ -6697,7 +6694,7 @@ async function saveFormula(id,type){
     payload.multiplier=document.getElementById('fm-multiplier')?.value.trim()||'';
     payload.steps=Array.from({length:5},(_,i)=>document.getElementById('fm-step-'+i)?.value.trim()||'').filter(Boolean);
     payload.notes=document.getElementById('fm-notes')?.value.trim()||'';
-    payload.example=document.getElementById('fm-example')?.value.trim()||'';
+    payload.example='';
     // Keep formula column satisfied (build from numerator/denominator or use name)
     payload.formula=[payload.numerator,payload.denominator].filter(Boolean).join(' / ')||payload.result_label||payload.name||'';
   }
@@ -6734,6 +6731,10 @@ async function openFormulasExport(){
         <input type="checkbox" id="exp-calc" ${calcData.length?'checked':''} ${!calcData.length?'disabled':''} style="width:16px;height:16px">
         <span>Calculations (${calcData.length} items)</span>
       </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;color:var(--text2);padding-left:26px">
+        <input type="checkbox" id="exp-calc-blank" ${!calcData.length?'disabled':''} style="width:15px;height:15px">
+        <span>Blank calculation practice sheet (names only)</span>
+      </label>
       <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
         <input type="checkbox" id="exp-rr" ${rrData.length?'checked':''} ${!rrData.length?'disabled':''} style="width:16px;height:16px">
         <span>Reference Ranges (${rrData.length} items)</span>
@@ -6768,12 +6769,12 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
   doc.text('Calculations - One Page',margin,12);
   doc.setFontSize(8);
   doc.setFont('helvetica','normal');
-  doc.text('Compact study sheet. Verify course-specific policies and units.',pageW-margin,12,{align:'right'});
+  doc.text('Formula-only study sheet',pageW-margin,12,{align:'right'});
 
   const cols=2;
   const gap=5;
   const colW=(cW-gap)/cols;
-  const rowH=16.3;
+  const rowH=13.2;
   const startY=24;
   const rowsPerCol=Math.floor((pageH-startY-14)/rowH);
   const maxItems=rowsPerCol*cols;
@@ -6794,13 +6795,51 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
     doc.setFontSize(6.8);
     doc.setTextColor(28,92,185);
     doc.text(doc.splitTextToSize(calcFormulaText(f),colW-5).slice(0,2),x+2.5,y+8.2);
-    const note=f.example?('Ex: '+f.example):(f.notes||'');
-    if(note){
-      doc.setFont('helvetica','normal');
-      doc.setFontSize(5.8);
-      doc.setTextColor(82,86,110);
-      doc.text(doc.splitTextToSize(String(note),colW-5).slice(0,1),x+2.5,y+14.2);
-    }
+  });
+  if((calcData||[]).length>maxItems){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180,50,60);
+    doc.text(`Showing ${maxItems} of ${calcData.length} calculations on this one-page sheet.`,margin,pageH-8);
+  }
+}
+
+function drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin){
+  const cW=pageW-margin*2;
+  doc.setFillColor(38,96,207);
+  doc.rect(0,0,pageW,18,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.text('Calculations - Blank Practice',margin,12);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text('Write each formula from memory.',pageW-margin,12,{align:'right'});
+
+  const cols=2;
+  const gap=7;
+  const colW=(cW-gap)/cols;
+  const rowH=17;
+  const startY=25;
+  const rowsPerCol=Math.floor((pageH-startY-12)/rowH);
+  const maxItems=rowsPerCol*cols;
+  const items=(calcData||[]).slice(0,maxItems);
+  items.forEach((f,i)=>{
+    const col=Math.floor(i/rowsPerCol);
+    const row=i%rowsPerCol;
+    const x=margin+col*(colW+gap);
+    const y=startY+row*rowH;
+    doc.setDrawColor(198,205,226);
+    doc.setFillColor(250,251,254);
+    doc.roundedRect(x,y,colW,rowH-1.4,1.8,1.8,'FD');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.2);
+    doc.setTextColor(18,25,45);
+    doc.text(doc.splitTextToSize(String(f.name||''),colW-5).slice(0,1),x+2.5,y+5);
+    doc.setDrawColor(44,83,170);
+    doc.setLineWidth(0.35);
+    doc.line(x+2.5,y+11.2,x+colW-2.5,y+11.2);
+    doc.line(x+2.5,y+15.2,x+colW-2.5,y+15.2);
   });
   if((calcData||[]).length>maxItems){
     doc.setFont('helvetica','normal');
@@ -6816,6 +6855,7 @@ function generateFormulasPDF(){
   const rrData=exportData.rrData||[];
   const inclCalc=document.getElementById('exp-calc')?.checked;
   const inclRR=document.getElementById('exp-rr')?.checked;
+  const blankCalc=document.getElementById('exp-calc-blank')?.checked;
   if(!inclCalc&&!inclRR){alert('Select at least one section.');return;}
   try{
     const {jsPDF}=window.jspdf;
@@ -6829,7 +6869,8 @@ function generateFormulasPDF(){
     const catHeader=(title)=>{checkPage(8);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(60,80,140);doc.text(title.toUpperCase(),margin,y);y+=2;doc.setDrawColor(60,80,140);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=5;};
 
     if(inclCalc&&calcData.length){
-      drawCalcOnePage(doc,calcData,pageW,pageH,margin);
+      if(blankCalc)drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin);
+      else drawCalcOnePage(doc,calcData,pageW,pageH,margin);
       y=pageH;
     }
     if(inclRR&&rrData.length){
@@ -6875,7 +6916,7 @@ function generateFormulasPDF(){
     }
     const tot=doc.internal.getNumberOfPages();
     for(let p=1;p<=tot;p++){doc.setPage(p);refreshPage();doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep — Calculations & Reference Ranges · Page '+p+' of '+tot,margin,pageH-6);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});}
-    doc.save('mls_calc_rr.pdf');
+    doc.save(blankCalc&&inclCalc&&!inclRR?'mls_calc_blank_practice.pdf':'mls_calc_rr.pdf');
     document.getElementById('condition-modal').classList.add('hidden');
   }catch(err){alert('PDF export failed: '+err.message);}
 }
