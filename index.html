@@ -241,88 +241,413 @@ select option{background:var(--bg3)}
   justify-content:center;
   align-items:center;
   pointer-events:none;
-  padding:8px 0 0;
-  min-height:224px;
+  padding:10px 0 0;
+  min-height:278px;
+  perspective:800px;
+}
+.class-mascot-paper{
+  position:relative;
+  width:264px;
+  height:252px;
+  border-radius:12px;
+  background:linear-gradient(145deg,#fff,var(--bg2));
+  border:1px solid var(--border);
+  box-shadow:0 18px 32px rgba(28,36,74,.12);
+  transform:rotate(-1.6deg);
+  animation:class-mascot-paper 5s ease-in-out infinite;
+  overflow:visible;
 }
 .class-mascot-card{
-  position:relative;
-  width:232px;
-  height:210px;
-  border-radius:var(--r2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:visible;
-  animation:spv-float 2.9s ease-in-out infinite;
-}
-.class-mascot-card img{
-  width:212px;
-  height:212px;
-  object-fit:contain;
-  filter:drop-shadow(0 12px 18px rgba(20,30,60,.16));
-  transition:filter .25s ease, transform .25s ease;
-}
-.class-mascot-card.sad img{
-  filter:grayscale(.18) saturate(.82) drop-shadow(0 12px 18px rgba(20,30,60,.14));
-  transform:translateY(3px) rotate(-2deg);
-}
-.class-mascot-card.abnormal img{
-  filter:hue-rotate(28deg) saturate(1.55) contrast(1.08) drop-shadow(0 0 16px rgba(192,48,63,.22));
-  transform:skew(-5deg,2deg) scale(1.04);
-  animation:mascot-abnormal 1.6s ease-in-out infinite;
-}
-.class-mascot-face{
+  --mascot:#58a8dd;
+  --mascot2:#a7dcff;
+  --edge:#327fba;
+  --shadow:rgba(50,127,186,.22);
   position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity .2s ease;
+  inset:8px;
+  transform-origin:50% 78%;
+  animation:class-mascot-bob 2.8s ease-in-out infinite;
 }
-.class-mascot-card.sad .class-mascot-face{opacity:1}
-.class-mascot-face::before,
-.class-mascot-face::after{
-  content:"";
-  position:absolute;
-  top:86px;
-  width:22px;
-  height:9px;
-  border-top:4px solid #1a1d2e;
-  border-radius:50%;
-  transform:rotate(18deg);
-}
-.class-mascot-face::before{left:74px}
-.class-mascot-face::after{right:74px;transform:rotate(-18deg)}
-.class-mascot-mouth{
+.class-mascot-card.type-micro{--mascot:#a7d85f;--mascot2:#d8f5a0;--edge:#5c9630;--shadow:rgba(92,150,48,.24)}
+.class-mascot-card.type-urine{--mascot:#f3c936;--mascot2:#fff29a;--edge:#b98210;--shadow:rgba(185,130,16,.24)}
+.class-mascot-card.type-chem{--mascot:#20b8ef;--mascot2:#9ceaff;--edge:#287dbb;--shadow:rgba(32,184,239,.24)}
+.class-mascot-card.type-blood{--mascot:#e64b4f;--mascot2:#ff9d9f;--edge:#9d1e2c;--shadow:rgba(230,75,79,.25)}
+.class-mascot-card.sad{animation:class-mascot-sad-bob 1.7s ease-in-out infinite}
+.class-mascot-card.abnormal{animation:class-mascot-alert 1.05s ease-in-out infinite}
+.mascot-body{
   position:absolute;
   left:50%;
-  top:124px;
-  width:34px;
-  height:18px;
-  margin-left:-17px;
-  border-top:5px solid #1a1d2e;
+  top:30px;
+  width:112px;
+  height:146px;
+  transform:translateX(-50%);
+  border:4px solid var(--edge);
+  border-radius:54px 54px 42px 42px/48px 48px 58px 58px;
+  background:
+    radial-gradient(circle at 32% 22%,rgba(255,255,255,.72) 0 9%,transparent 10%),
+    radial-gradient(circle at 70% 18%,rgba(255,255,255,.32) 0 13%,transparent 14%),
+    linear-gradient(145deg,var(--mascot2),var(--mascot) 62%,color-mix(in srgb,var(--edge) 28%,var(--mascot)));
+  box-shadow:inset -12px -12px 0 rgba(0,0,0,.05),0 16px 24px var(--shadow);
+  overflow:visible;
+  z-index:4;
+}
+.class-mascot-card.type-blood .mascot-body{
+  top:46px;
+  width:132px;
+  height:124px;
   border-radius:50%;
+}
+.class-mascot-card.type-chem .mascot-body{
+  top:28px;
+  width:126px;
+  height:150px;
+  border-radius:22px 22px 42px 42px;
+  clip-path:polygon(34% 0,66% 0,68% 25%,94% 100%,6% 100%,32% 25%);
+  border:0;
+}
+.class-mascot-card.type-urine .mascot-body{
+  top:28px;
+  width:122px;
+  height:148px;
+  border:0;
+  border-radius:58% 58% 66% 66%/42% 42% 72% 72%;
+  clip-path:polygon(50% 0,80% 30%,91% 67%,72% 100%,28% 100%,9% 67%,20% 30%);
+}
+.class-mascot-card.abnormal .mascot-body{
+  animation:class-mascot-morph 1.1s ease-in-out infinite;
+  filter:saturate(1.45) hue-rotate(18deg) contrast(1.08);
+}
+.mascot-flask-neck{
+  position:absolute;
+  left:50%;
+  top:-19px;
+  width:42px;
+  height:30px;
+  margin-left:-21px;
+  border:4px solid var(--edge);
+  border-bottom:0;
+  border-radius:18px 18px 6px 6px;
+  background:rgba(255,255,255,.6);
+  display:none;
+}
+.class-mascot-card.type-chem .mascot-flask-neck{display:block}
+.mascot-liquid{
+  position:absolute;
+  left:13px;
+  right:13px;
+  bottom:13px;
+  height:54%;
+  border-radius:0 0 34px 34px;
+  background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(0,90,170,.18));
+  animation:class-mascot-liquid 2s ease-in-out infinite;
+  display:none;
+}
+.class-mascot-card.type-chem .mascot-liquid{display:block}
+.mascot-face{
+  position:absolute;
+  inset:0;
+  z-index:6;
+}
+.mascot-eye{
+  position:absolute;
+  top:62px;
+  width:28px;
+  height:34px;
+  border:3px solid #1a2031;
+  border-radius:50%;
+  background:#fff;
+  animation:class-mascot-blink 5.2s ease-in-out infinite;
+}
+.mascot-eye.left{left:26px}
+.mascot-eye.right{right:26px}
+.mascot-eye::before{
+  content:"";
+  position:absolute;
+  left:8px;
+  top:8px;
+  width:13px;
+  height:17px;
+  border-radius:50%;
+  background:#16203a;
+  animation:class-mascot-look 3.4s ease-in-out infinite;
+}
+.mascot-eye::after{
+  content:"";
+  position:absolute;
+  left:12px;
+  top:8px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#fff;
+}
+.class-mascot-card.type-blood .mascot-eye{top:46px}
+.class-mascot-card.type-chem .mascot-eye{top:70px}
+.mascot-brow{
+  position:absolute;
+  top:52px;
+  width:24px;
+  height:8px;
+  border-top:4px solid #293046;
+  border-radius:50%;
+  z-index:8;
+}
+.mascot-brow.left{left:24px;transform:rotate(-12deg)}
+.mascot-brow.right{right:24px;transform:rotate(12deg)}
+.class-mascot-card.type-blood .mascot-brow{top:37px}
+.class-mascot-card.type-chem .mascot-brow{top:60px}
+.mascot-mouth{
+  position:absolute;
+  left:50%;
+  top:93px;
+  width:32px;
+  height:21px;
+  margin-left:-16px;
+  border:3px solid #24131b;
+  border-top:0;
+  border-radius:0 0 22px 22px;
+  background:#331320;
+  overflow:hidden;
+  z-index:8;
+}
+.mascot-mouth::after{
+  content:"";
+  position:absolute;
+  left:6px;
+  right:6px;
+  bottom:-4px;
+  height:12px;
+  border-radius:50%;
+  background:#ff6b86;
+}
+.class-mascot-card.type-blood .mascot-mouth{top:74px}
+.class-mascot-card.type-chem .mascot-mouth{top:101px}
+.class-mascot-card.sad .mascot-brow.left{transform:rotate(18deg)}
+.class-mascot-card.sad .mascot-brow.right{transform:rotate(-18deg)}
+.class-mascot-card.sad .mascot-eye{transform:scaleY(.78);animation:none}
+.class-mascot-card.sad .mascot-mouth{
+  top:95px;
+  width:38px;
+  height:20px;
+  margin-left:-19px;
+  border:0;
+  border-top:5px solid #22283a;
+  border-radius:50%;
+  background:transparent;
+}
+.class-mascot-card.sad.type-blood .mascot-mouth{top:76px}
+.class-mascot-card.sad .mascot-mouth::after{display:none}
+.mascot-spikes{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:none;
+}
+.class-mascot-card.type-micro .mascot-spikes{display:block}
+.mascot-spike{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:6px;
+  height:18px;
+  border-radius:999px;
+  background:var(--edge);
+  transform:translate(-50%,-50%) rotate(calc(var(--i) * 30deg)) translateY(-74px);
+  transform-origin:center center;
+  animation:class-mascot-spike 1.7s ease-in-out infinite;
+  animation-delay:calc(var(--i) * -.09s);
+}
+.mascot-spot{
+  position:absolute;
+  border-radius:50%;
+  background:color-mix(in srgb,var(--edge) 34%,transparent);
+  z-index:7;
+  opacity:.45;
+  animation:class-mascot-spot 3.1s ease-in-out infinite;
+}
+.mascot-spot.s1{left:32px;top:30px;width:13px;height:13px}
+.mascot-spot.s2{right:28px;top:44px;width:8px;height:8px}
+.mascot-spot.s3{left:47px;bottom:28px;width:18px;height:10px;border-radius:12px;transform:rotate(-24deg)}
+.mascot-arm{
+  position:absolute;
+  top:132px;
+  width:58px;
+  height:20px;
+  border-radius:999px;
+  background:#fff;
+  border:3px solid #d3d8e6;
+  z-index:2;
+  transform-origin:100% 50%;
+}
+.mascot-arm.left{
+  left:43px;
+  transform:rotate(-28deg);
+  animation:class-mascot-wave 2.1s ease-in-out infinite;
+}
+.mascot-arm.right{
+  right:43px;
+  transform-origin:0 50%;
+  transform:rotate(24deg);
+}
+.mascot-arm::after{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--mascot);
+  border:3px solid var(--edge);
+  top:-2px;
+}
+.mascot-arm.left::after{left:-12px}
+.mascot-arm.right::after{right:-12px}
+.class-mascot-card.sad .mascot-arm.left{animation:none;transform:rotate(20deg)}
+.class-mascot-card.sad .mascot-arm.right{transform:rotate(-16deg)}
+.mascot-coat{
+  position:absolute;
+  left:50%;
+  top:130px;
+  width:146px;
+  height:70px;
+  margin-left:-73px;
+  z-index:5;
+  pointer-events:none;
+}
+.mascot-coat::before,
+.mascot-coat::after{
+  content:"";
+  position:absolute;
+  top:0;
+  width:52px;
+  height:70px;
+  background:#fff;
+  border:3px solid #d3d8e6;
+  box-shadow:inset 0 -8px 0 rgba(30,40,70,.03);
+}
+.mascot-coat::before{
+  left:17px;
+  border-radius:14px 10px 18px 22px;
+  transform:skew(-10deg) rotate(5deg);
+}
+.mascot-coat::after{
+  right:17px;
+  border-radius:10px 14px 22px 18px;
+  transform:skew(10deg) rotate(-5deg);
+}
+.mascot-pocket{
+  position:absolute;
+  top:36px;
+  width:23px;
+  height:19px;
+  border:3px solid #e0e4ef;
+  border-top:0;
+  border-radius:0 0 8px 8px;
+  z-index:7;
+}
+.mascot-pocket.left{left:31px;transform:rotate(5deg)}
+.mascot-pocket.right{right:31px;transform:rotate(-5deg)}
+.mascot-leg{
+  position:absolute;
+  top:192px;
+  width:21px;
+  height:25px;
+  border-radius:0 0 11px 11px;
+  background:var(--mascot);
+  border:3px solid var(--edge);
+  z-index:1;
+}
+.mascot-leg.left{left:105px}
+.mascot-leg.right{right:105px}
+.mascot-shadow{
+  position:absolute;
+  left:50%;
+  bottom:21px;
+  width:118px;
+  height:18px;
+  margin-left:-59px;
+  border-radius:50%;
+  background:rgba(210,83,97,.16);
+  animation:class-mascot-shadow 2.8s ease-in-out infinite;
 }
 .class-mascot-chip{
   position:absolute;
-  bottom:3px;
   left:50%;
+  bottom:6px;
   transform:translateX(-50%);
   background:var(--bg2);
   border:1px solid var(--border);
   border-radius:999px;
-  padding:4px 10px;
-  font:700 11px/1 var(--mono);
+  padding:6px 14px;
+  font:800 13px/1 var(--mono);
   color:var(--text2);
-  box-shadow:0 6px 14px rgba(20,30,60,.08);
+  box-shadow:0 8px 16px rgba(20,30,60,.08);
   white-space:nowrap;
+  z-index:9;
+}
+.class-mascot-card.sad .class-mascot-chip{
+  color:var(--text2);
+  border-color:var(--border2);
 }
 .class-mascot-card.abnormal .class-mascot-chip{
   color:var(--danger);
   border-color:#c0303f55;
 }
-@keyframes mascot-abnormal{
-  0%,100%{transform:translateY(0) rotate(-1deg)}
-  50%{transform:translateY(-5px) rotate(2deg)}
+.class-mascot-card.perfect .class-mascot-chip{
+  color:var(--success);
+  border-color:#17935a55;
+}
+@keyframes class-mascot-paper{
+  0%,100%{transform:rotate(-1.6deg)}
+  50%{transform:rotate(1deg) translateY(-2px)}
+}
+@keyframes class-mascot-bob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+@keyframes class-mascot-sad-bob{
+  0%,100%{transform:translateY(3px) rotate(-1deg)}
+  50%{transform:translateY(0) rotate(1deg)}
+}
+@keyframes class-mascot-alert{
+  0%,100%{transform:translate(0,0) rotate(-1deg)}
+  25%{transform:translate(-3px,-2px) rotate(2deg)}
+  50%{transform:translate(3px,1px) rotate(-2deg)}
+  75%{transform:translate(-1px,2px) rotate(1deg)}
+}
+@keyframes class-mascot-morph{
+  0%,100%{border-radius:54px 54px 42px 42px/48px 48px 58px 58px;transform:translateX(-50%) scale(1)}
+  50%{border-radius:38px 62px 50px 44px/58px 38px 62px 48px;transform:translateX(-50%) scale(1.04) skew(-3deg,2deg)}
+}
+@keyframes class-mascot-wave{
+  0%,100%{transform:rotate(-28deg)}
+  50%{transform:rotate(-44deg) translateY(-2px)}
+}
+@keyframes class-mascot-blink{
+  0%,92%,100%{transform:scaleY(1)}
+  95%{transform:scaleY(.12)}
+}
+@keyframes class-mascot-look{
+  0%,100%{transform:translate(0,0)}
+  45%{transform:translate(3px,-1px)}
+  70%{transform:translate(-2px,1px)}
+}
+@keyframes class-mascot-liquid{
+  0%,100%{transform:rotate(-1.5deg)}
+  50%{transform:rotate(2deg) translateY(2px)}
+}
+@keyframes class-mascot-spike{
+  0%,100%{height:17px}
+  50%{height:22px}
+}
+@keyframes class-mascot-spot{
+  0%,100%{opacity:.38}
+  50%{opacity:.68}
+}
+@keyframes class-mascot-shadow{
+  0%,100%{transform:scaleX(1);opacity:.18}
+  50%{transform:scaleX(.82);opacity:.11}
+}
+@media (prefers-reduced-motion:reduce){
+  .class-mascot-paper,.class-mascot-card,.class-mascot-card.abnormal,.mascot-body,.mascot-arm.left,.mascot-eye,.mascot-eye::before,.mascot-liquid,.mascot-spike,.mascot-spot,.mascot-shadow{animation:none!important}
 }
 /* streak flame — bigger, sparks visible when hot */
 .streak-wrap.streak-0 .spark{ display:none }
@@ -4785,23 +5110,48 @@ function renderClassMascotVisual(subj, rightPct, wrongPct, isDone100, isCurrentW
   const r=Math.max(0,Math.min(100,rightPct||0));
   const w=Math.max(0,Math.min(100,wrongPct||0));
   const map={
-    blood_bank:{src:'assets/quiz-mascots/blood-rbc.png',label:'Blood Bank'},
-    hematology:{src:'assets/quiz-mascots/blood-rbc.png',label:'Hematology'},
-    chemistry:{src:'assets/quiz-mascots/chemistry-flask.png',label:'Chemistry'},
-    clinical_chemistry:{src:'assets/quiz-mascots/chemistry-flask.png',label:'Chemistry'},
-    urinalysis:{src:'assets/quiz-mascots/urinalysis-drop.png',label:'Urinalysis'},
-    microbiology:{src:'assets/quiz-mascots/microbiology-microbe.png',label:'Microbiology'}
+    blood_bank:{type:'blood',label:'Blood Bank'},
+    hematology:{type:'blood',label:'Hematology'},
+    chemistry:{type:'chem',label:'Chemistry'},
+    clinical_chemistry:{type:'chem',label:'Chemistry'},
+    urinalysis:{type:'urine',label:'Urinalysis'},
+    microbiology:{type:'micro',label:'Microbiology'}
   };
   const meta=map[subj]||map.chemistry;
   const abnormal=w>=50&&!isDone100;
   const sad=!!isCurrentWrong;
-  const state=sad?'sad':abnormal?'abnormal':'steady';
+  const state=['type-'+meta.type,sad?'sad':'',abnormal?'abnormal':'',isDone100?'perfect':''].filter(Boolean).join(' ');
   const chip=sad?'try again':abnormal?'abnormal morph':isDone100?'perfect':`${r}% correct`;
+  const spikes=Array.from({length:12},(_,i)=>`<span class="mascot-spike" style="--i:${i}"></span>`).join('');
   return `<div class="class-mascot-wrap" aria-label="${esc(meta.label)} quiz mascot">
-    <div class="class-mascot-card ${state}">
-      <img src="${meta.src}" alt="${esc(meta.label)} quiz mascot">
-      <div class="class-mascot-face"><div class="class-mascot-mouth"></div></div>
-      <div class="class-mascot-chip">${esc(chip)}</div>
+    <div class="class-mascot-paper">
+      <div class="class-mascot-card ${state}">
+        <div class="mascot-shadow"></div>
+        <div class="mascot-arm left"></div>
+        <div class="mascot-arm right"></div>
+        <div class="mascot-leg left"></div>
+        <div class="mascot-leg right"></div>
+        <div class="mascot-body">
+          <div class="mascot-spikes">${spikes}</div>
+          <div class="mascot-flask-neck"></div>
+          <div class="mascot-liquid"></div>
+          <span class="mascot-spot s1"></span>
+          <span class="mascot-spot s2"></span>
+          <span class="mascot-spot s3"></span>
+          <div class="mascot-face">
+            <span class="mascot-brow left"></span>
+            <span class="mascot-brow right"></span>
+            <span class="mascot-eye left"></span>
+            <span class="mascot-eye right"></span>
+            <span class="mascot-mouth"></span>
+          </div>
+        </div>
+        <div class="mascot-coat">
+          <span class="mascot-pocket left"></span>
+          <span class="mascot-pocket right"></span>
+        </div>
+        <div class="class-mascot-chip">${esc(chip)}</div>
+      </div>
     </div>
   </div>`;
 }
