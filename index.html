@@ -236,6 +236,94 @@ select option{background:var(--bg3)}
   0%{transform:translateY(0);opacity:.7}
   100%{transform:translateY(-12px);opacity:0}
 }
+.class-mascot-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  pointer-events:none;
+  padding:8px 0 0;
+  min-height:224px;
+}
+.class-mascot-card{
+  position:relative;
+  width:232px;
+  height:210px;
+  border-radius:var(--r2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+  animation:spv-float 2.9s ease-in-out infinite;
+}
+.class-mascot-card img{
+  width:212px;
+  height:212px;
+  object-fit:contain;
+  filter:drop-shadow(0 12px 18px rgba(20,30,60,.16));
+  transition:filter .25s ease, transform .25s ease;
+}
+.class-mascot-card.sad img{
+  filter:grayscale(.18) saturate(.82) drop-shadow(0 12px 18px rgba(20,30,60,.14));
+  transform:translateY(3px) rotate(-2deg);
+}
+.class-mascot-card.abnormal img{
+  filter:hue-rotate(28deg) saturate(1.55) contrast(1.08) drop-shadow(0 0 16px rgba(192,48,63,.22));
+  transform:skew(-5deg,2deg) scale(1.04);
+  animation:mascot-abnormal 1.6s ease-in-out infinite;
+}
+.class-mascot-face{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .2s ease;
+}
+.class-mascot-card.sad .class-mascot-face{opacity:1}
+.class-mascot-face::before,
+.class-mascot-face::after{
+  content:"";
+  position:absolute;
+  top:86px;
+  width:22px;
+  height:9px;
+  border-top:4px solid #1a1d2e;
+  border-radius:50%;
+  transform:rotate(18deg);
+}
+.class-mascot-face::before{left:74px}
+.class-mascot-face::after{right:74px;transform:rotate(-18deg)}
+.class-mascot-mouth{
+  position:absolute;
+  left:50%;
+  top:124px;
+  width:34px;
+  height:18px;
+  margin-left:-17px;
+  border-top:5px solid #1a1d2e;
+  border-radius:50%;
+}
+.class-mascot-chip{
+  position:absolute;
+  bottom:3px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:4px 10px;
+  font:700 11px/1 var(--mono);
+  color:var(--text2);
+  box-shadow:0 6px 14px rgba(20,30,60,.08);
+  white-space:nowrap;
+}
+.class-mascot-card.abnormal .class-mascot-chip{
+  color:var(--danger);
+  border-color:#c0303f55;
+}
+@keyframes mascot-abnormal{
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  50%{transform:translateY(-5px) rotate(2deg)}
+}
 /* streak flame — bigger, sparks visible when hot */
 .streak-wrap.streak-0 .spark{ display:none }
 .streak-wrap:not(.streak-hot) .spark{ display:none }
@@ -571,63 +659,99 @@ const RESOURCES=[
 ];
 
 const CALC_PLACEHOLDERS=[
-  {name:'Anion Gap',category:'Chemistry'},
-  {name:'Corrected Calcium',category:'Chemistry'},
-  {name:'Serum Osmolality',category:'Chemistry'},
-  {name:'Creatinine Clearance',category:'Chemistry'},
-  {name:'LDL Cholesterol (Friedewald)',category:'Chemistry'},
-  {name:'Percent Transferrin Saturation',category:'Chemistry'},
-  {name:'Absolute Cell Count',category:'Hematology'},
-  {name:'Corrected WBC Count',category:'Hematology'},
-  {name:'Reticulocyte Production Index',category:'Hematology'},
-  {name:'Body Fluid Cell Count Correction',category:'Urinalysis / Body Fluids'},
-  {name:'CSF WBC Correction',category:'Urinalysis / Body Fluids'},
-  {name:'Coefficient of Variation (CV)',category:'Lab Operations'},
-  {name:'Standard Deviation Index (SDI)',category:'Lab Operations'},
-  {name:'Sensitivity / Specificity',category:'Lab Operations'},
-  {name:'PPV / NPV',category:'Lab Operations'},
-  {name:'Dilution / Concentration',category:'Lab Operations'}
-].map((f,i)=>({
-  id:'placeholder-calc-'+i,
-  type:'calc',
-  _placeholder:true,
-  name:f.name,
-  category:f.category,
-  result_label:'XYZ',
-  numerator:'XYZ',
-  denominator:'XYZ',
-  multiplier:'XYZ',
-  steps:['XYZ'],
-  notes:'XYZ',
-  example:'XYZ'
-}));
+  {id:'builtin-calc-anion-gap',type:'calc',_placeholder:true,name:'Anion Gap',category:'Chemistry',steps:['Na+ - (Cl- + HCO3-)'],notes:'Typical adult interval: 8-16 mmol/L. Verify with your course/book.',example:'Na 140, Cl 104, HCO3 24 -> 12 mmol/L'},
+  {id:'builtin-calc-corrected-calcium',type:'calc',_placeholder:true,name:'Corrected Calcium',category:'Chemistry',steps:['Measured calcium + 0.8 x (4.0 - albumin g/dL)'],notes:'Used when albumin is low; lab policies may vary.',example:'Ca 7.8, albumin 2.5 -> 7.8 + 0.8(1.5) = 9.0 mg/dL'},
+  {id:'builtin-calc-serum-osm',type:'calc',_placeholder:true,name:'Calculated Serum Osmolality',category:'Chemistry',steps:['2(Na+) + glucose/18 + BUN/2.8'],notes:'Calculated adult serum osmolality estimate.',example:'Na 140, glucose 90, BUN 14 -> 280 + 5 + 5 = 290 mOsm/kg'},
+  {id:'builtin-calc-crcl',type:'calc',_placeholder:true,name:'Creatinine Clearance',category:'Chemistry',result_label:'CrCl',numerator:'Urine creatinine x urine volume (mL/min)',denominator:'Serum creatinine',steps:['Convert timed urine volume to mL/min first.'],notes:'May be normalized to body surface area depending on assignment.',example:'Use timed urine volume, urine creatinine, and serum creatinine.'},
+  {id:'builtin-calc-ldl',type:'calc',_placeholder:true,name:'LDL Cholesterol (Friedewald)',category:'Chemistry',steps:['LDL = total cholesterol - HDL - (triglycerides/5)'],notes:'Use only when triglycerides are less than 400 mg/dL and patient is fasting.',example:'TC 200, HDL 50, TG 150 -> LDL 120 mg/dL'},
+  {id:'builtin-calc-transferrin-sat',type:'calc',_placeholder:true,name:'Percent Transferrin Saturation',category:'Chemistry',result_label:'% Saturation',numerator:'Serum iron',denominator:'TIBC',multiplier:'100',steps:['Serum iron / TIBC x 100'],notes:'Often used with ferritin, TIBC, and clinical picture.',example:'Iron 80, TIBC 320 -> 25%'},
+  {id:'builtin-calc-absolute-cell',type:'calc',_placeholder:true,name:'Absolute Cell Count',category:'Hematology',steps:['WBC count x differential percent / 100'],notes:'Use the cell percent as a whole number, then divide by 100.',example:'WBC 10.0 x 10^3/uL, neutrophils 60% -> ANC 6.0 x 10^3/uL'},
+  {id:'builtin-calc-corrected-wbc',type:'calc',_placeholder:true,name:'Corrected WBC Count',category:'Hematology',result_label:'Corrected WBC',numerator:'Observed WBC x 100',denominator:'100 + NRBC per 100 WBC',steps:['Correct when many NRBCs are counted as WBCs by the instrument.'],notes:'Used when NRBCs are reported per 100 WBC.',example:'WBC 20.0, NRBC 25 -> 20 x 100 / 125 = 16.0 x 10^3/uL'},
+  {id:'builtin-calc-corrected-retic',type:'calc',_placeholder:true,name:'Corrected Reticulocyte Count',category:'Hematology',result_label:'Corrected retic %',numerator:'Retic % x patient Hct',denominator:'Normal Hct',steps:['Normal Hct commonly estimated as 45%.'],notes:'Use assigned normal Hct if your instructor gives one.',example:'Retic 6%, Hct 30 -> 6 x 30 / 45 = 4%'},
+  {id:'builtin-calc-rpi',type:'calc',_placeholder:true,name:'Reticulocyte Production Index',category:'Hematology',result_label:'RPI',numerator:'Corrected retic %',denominator:'Maturation factor',steps:['Maturation factor increases as Hct falls.'],notes:'Approx factors: Hct 45=1, 35=1.5, 25=2, 15=2.5.',example:'Corrected retic 4%, maturation factor 2 -> RPI 2'},
+  {id:'builtin-calc-body-fluid-correction',type:'calc',_placeholder:true,name:'Body Fluid WBC Correction',category:'Urinalysis / Body Fluids',steps:['Corrected WBC = observed fluid WBC - (blood WBC x fluid RBC / blood RBC)'],notes:'Used when a traumatic tap or blood contamination is considered.',example:'Apply only when your course asks for correction.'},
+  {id:'builtin-calc-csf-wbc-correction',type:'calc',_placeholder:true,name:'CSF WBC Correction',category:'Urinalysis / Body Fluids',steps:['Subtract 1 WBC for every 500 to 700 RBCs'],notes:'Correction rules vary; use the ratio assigned in class.',example:'10,000 RBC/uL may account for about 14-20 WBC/uL.'},
+  {id:'builtin-calc-cv',type:'calc',_placeholder:true,name:'Coefficient of Variation (CV)',category:'Lab Operations',result_label:'CV %',numerator:'Standard deviation',denominator:'Mean',multiplier:'100',steps:['SD / mean x 100'],notes:'Measures imprecision relative to the mean.',example:'SD 2, mean 100 -> CV 2%'},
+  {id:'builtin-calc-sdi',type:'calc',_placeholder:true,name:'Standard Deviation Index (SDI)',category:'Lab Operations',result_label:'SDI',numerator:'Lab mean - peer mean',denominator:'Peer SD',steps:['Compare lab performance to peer group.'],notes:'Values near 0 are ideal; +/-2 may indicate concern.',example:'Lab 102, peer 100, peer SD 2 -> SDI +1'},
+  {id:'builtin-calc-sensitivity',type:'calc',_placeholder:true,name:'Sensitivity',category:'Lab Operations',result_label:'Sensitivity',numerator:'True positives',denominator:'True positives + false negatives',multiplier:'100',steps:['TP / (TP + FN) x 100'],notes:'Ability to detect disease when disease is present.',example:'High sensitivity helps rule out when negative.'},
+  {id:'builtin-calc-specificity',type:'calc',_placeholder:true,name:'Specificity',category:'Lab Operations',result_label:'Specificity',numerator:'True negatives',denominator:'True negatives + false positives',multiplier:'100',steps:['TN / (TN + FP) x 100'],notes:'Ability to detect absence of disease when disease is absent.',example:'High specificity helps rule in when positive.'},
+  {id:'builtin-calc-ppv',type:'calc',_placeholder:true,name:'Positive Predictive Value (PPV)',category:'Lab Operations',result_label:'PPV',numerator:'True positives',denominator:'True positives + false positives',multiplier:'100',steps:['TP / (TP + FP) x 100'],notes:'Chance a positive result reflects disease in the tested population.',example:'Affected by prevalence.'},
+  {id:'builtin-calc-npv',type:'calc',_placeholder:true,name:'Negative Predictive Value (NPV)',category:'Lab Operations',result_label:'NPV',numerator:'True negatives',denominator:'True negatives + false negatives',multiplier:'100',steps:['TN / (TN + FN) x 100'],notes:'Chance a negative result reflects no disease in the tested population.',example:'Affected by prevalence.'},
+  {id:'builtin-calc-dilution',type:'calc',_placeholder:true,name:'Dilution / Concentration',category:'Lab Operations',steps:['C1V1 = C2V2','Dilution factor = total volume / sample volume'],notes:'Use the same units across the equation.',example:'1 mL sample + 9 mL diluent = 1:10 dilution'}
+];
 
 const RR_PLACEHOLDERS=[
-  {name:'CBC Reference Ranges',category:'Hematology'},
-  {name:'Coagulation Reference Ranges',category:'Hematology'},
-  {name:'Basic Chemistry Reference Ranges',category:'Chemistry'},
-  {name:'Liver / Pancreas Reference Ranges',category:'Chemistry'},
-  {name:'Lipid Reference Ranges',category:'Chemistry'},
-  {name:'Iron Studies Reference Ranges',category:'Chemistry'},
-  {name:'Therapeutic Drug Monitoring Reference Ranges',category:'Chemistry'},
-  {name:'Blood Gas Reference Ranges',category:'Chemistry'},
-  {name:'Endocrine Reference Ranges',category:'Chemistry'},
-  {name:'Urinalysis Reference Ranges',category:'Urinalysis / Body Fluids'},
-  {name:'CSF Reference Ranges',category:'Urinalysis / Body Fluids'},
-  {name:'Body Fluid Reference Ranges',category:'Urinalysis / Body Fluids'},
-  {name:'Immunology / Serology Reference Ranges',category:'Immunology'}
-].map((f,i)=>({
-  id:'placeholder-rr-'+i,
-  type:'rr',
-  _placeholder:true,
-  name:f.name,
-  category:f.category,
-  conventional_value:'XYZ',
-  conventional_unit:'XYZ',
-  si_value:'XYZ',
-  si_unit:'XYZ',
-  notes:'XYZ'
-}));
+  {id:'builtin-rr-wbc',type:'rr',_placeholder:true,name:'WBC',category:'Hematology - CBC',conventional_value:'4.5-11.0',conventional_unit:'x 10^3/uL',si_value:'4.5-11.0',si_unit:'x 10^9/L',notes:'Adult study range'},
+  {id:'builtin-rr-rbc-m',type:'rr',_placeholder:true,name:'RBC - male',category:'Hematology - CBC',conventional_value:'4.5-5.9',conventional_unit:'x 10^6/uL',si_value:'4.5-5.9',si_unit:'x 10^12/L',notes:'Adult study range'},
+  {id:'builtin-rr-rbc-f',type:'rr',_placeholder:true,name:'RBC - female',category:'Hematology - CBC',conventional_value:'4.1-5.1',conventional_unit:'x 10^6/uL',si_value:'4.1-5.1',si_unit:'x 10^12/L',notes:'Adult study range'},
+  {id:'builtin-rr-hgb-m',type:'rr',_placeholder:true,name:'Hemoglobin - male',category:'Hematology - CBC',conventional_value:'13.5-17.5',conventional_unit:'g/dL',si_value:'135-175',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-hgb-f',type:'rr',_placeholder:true,name:'Hemoglobin - female',category:'Hematology - CBC',conventional_value:'12.0-16.0',conventional_unit:'g/dL',si_value:'120-160',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-hct-m',type:'rr',_placeholder:true,name:'Hematocrit - male',category:'Hematology - CBC',conventional_value:'41-53',conventional_unit:'%',si_value:'0.41-0.53',si_unit:'L/L',notes:'Adult study range'},
+  {id:'builtin-rr-hct-f',type:'rr',_placeholder:true,name:'Hematocrit - female',category:'Hematology - CBC',conventional_value:'36-46',conventional_unit:'%',si_value:'0.36-0.46',si_unit:'L/L',notes:'Adult study range'},
+  {id:'builtin-rr-plt',type:'rr',_placeholder:true,name:'Platelets',category:'Hematology - CBC',conventional_value:'150-450',conventional_unit:'x 10^3/uL',si_value:'150-450',si_unit:'x 10^9/L',notes:'Adult study range'},
+  {id:'builtin-rr-retic',type:'rr',_placeholder:true,name:'Reticulocytes',category:'Hematology - CBC',conventional_value:'0.5-2.5',conventional_unit:'%',si_value:'0.005-0.025',si_unit:'fraction',notes:'Adult study range'},
+  {id:'builtin-rr-pt',type:'rr',_placeholder:true,name:'PT',category:'Hematology - Coagulation',conventional_value:'11-13.5',conventional_unit:'sec',si_value:'11-13.5',si_unit:'sec',notes:'Reagent dependent'},
+  {id:'builtin-rr-inr',type:'rr',_placeholder:true,name:'INR',category:'Hematology - Coagulation',conventional_value:'0.8-1.1',conventional_unit:'ratio',si_value:'0.8-1.1',si_unit:'ratio',notes:'No anticoagulation'},
+  {id:'builtin-rr-aptt',type:'rr',_placeholder:true,name:'aPTT',category:'Hematology - Coagulation',conventional_value:'25-35',conventional_unit:'sec',si_value:'25-35',si_unit:'sec',notes:'Reagent dependent'},
+  {id:'builtin-rr-fibrinogen',type:'rr',_placeholder:true,name:'Fibrinogen',category:'Hematology - Coagulation',conventional_value:'200-400',conventional_unit:'mg/dL',si_value:'2.0-4.0',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-ddimer',type:'rr',_placeholder:true,name:'D-dimer',category:'Hematology - Coagulation',conventional_value:'<0.5',conventional_unit:'ug/mL FEU',si_value:'<0.5',si_unit:'mg/L FEU',notes:'Method dependent'},
+  {id:'builtin-rr-na',type:'rr',_placeholder:true,name:'Sodium',category:'Chemistry - Basic Metabolic',conventional_value:'136-145',conventional_unit:'mmol/L',si_value:'136-145',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-k',type:'rr',_placeholder:true,name:'Potassium',category:'Chemistry - Basic Metabolic',conventional_value:'3.5-5.1',conventional_unit:'mmol/L',si_value:'3.5-5.1',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-cl',type:'rr',_placeholder:true,name:'Chloride',category:'Chemistry - Basic Metabolic',conventional_value:'98-107',conventional_unit:'mmol/L',si_value:'98-107',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-co2',type:'rr',_placeholder:true,name:'CO2 / bicarbonate',category:'Chemistry - Basic Metabolic',conventional_value:'22-29',conventional_unit:'mmol/L',si_value:'22-29',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-glucose',type:'rr',_placeholder:true,name:'Glucose - fasting',category:'Chemistry - Basic Metabolic',conventional_value:'70-99',conventional_unit:'mg/dL',si_value:'3.9-5.5',si_unit:'mmol/L',notes:'Adult fasting study range'},
+  {id:'builtin-rr-bun',type:'rr',_placeholder:true,name:'BUN',category:'Chemistry - Basic Metabolic',conventional_value:'7-20',conventional_unit:'mg/dL',si_value:'2.5-7.1',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-creat-m',type:'rr',_placeholder:true,name:'Creatinine - male',category:'Chemistry - Basic Metabolic',conventional_value:'0.7-1.3',conventional_unit:'mg/dL',si_value:'62-115',si_unit:'umol/L',notes:'Adult study range'},
+  {id:'builtin-rr-creat-f',type:'rr',_placeholder:true,name:'Creatinine - female',category:'Chemistry - Basic Metabolic',conventional_value:'0.6-1.1',conventional_unit:'mg/dL',si_value:'53-97',si_unit:'umol/L',notes:'Adult study range'},
+  {id:'builtin-rr-ca',type:'rr',_placeholder:true,name:'Calcium - total',category:'Chemistry - Basic Metabolic',conventional_value:'8.6-10.2',conventional_unit:'mg/dL',si_value:'2.15-2.55',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-phos',type:'rr',_placeholder:true,name:'Phosphorus',category:'Chemistry - Basic Metabolic',conventional_value:'2.5-4.5',conventional_unit:'mg/dL',si_value:'0.81-1.45',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-mg',type:'rr',_placeholder:true,name:'Magnesium',category:'Chemistry - Basic Metabolic',conventional_value:'1.7-2.2',conventional_unit:'mg/dL',si_value:'0.70-0.95',si_unit:'mmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-albumin',type:'rr',_placeholder:true,name:'Albumin',category:'Chemistry - Proteins',conventional_value:'3.5-5.0',conventional_unit:'g/dL',si_value:'35-50',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-total-protein',type:'rr',_placeholder:true,name:'Total protein',category:'Chemistry - Proteins',conventional_value:'6.4-8.3',conventional_unit:'g/dL',si_value:'64-83',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-ast',type:'rr',_placeholder:true,name:'AST',category:'Chemistry - Liver / Pancreas',conventional_value:'10-40',conventional_unit:'U/L',si_value:'10-40',si_unit:'U/L',notes:'Method dependent'},
+  {id:'builtin-rr-alt',type:'rr',_placeholder:true,name:'ALT',category:'Chemistry - Liver / Pancreas',conventional_value:'7-56',conventional_unit:'U/L',si_value:'7-56',si_unit:'U/L',notes:'Method dependent'},
+  {id:'builtin-rr-alp',type:'rr',_placeholder:true,name:'Alkaline phosphatase',category:'Chemistry - Liver / Pancreas',conventional_value:'44-147',conventional_unit:'U/L',si_value:'44-147',si_unit:'U/L',notes:'Method dependent'},
+  {id:'builtin-rr-tbili',type:'rr',_placeholder:true,name:'Bilirubin - total',category:'Chemistry - Liver / Pancreas',conventional_value:'0.1-1.2',conventional_unit:'mg/dL',si_value:'2-21',si_unit:'umol/L',notes:'Adult study range'},
+  {id:'builtin-rr-dbili',type:'rr',_placeholder:true,name:'Bilirubin - direct',category:'Chemistry - Liver / Pancreas',conventional_value:'0.0-0.3',conventional_unit:'mg/dL',si_value:'0-5',si_unit:'umol/L',notes:'Adult study range'},
+  {id:'builtin-rr-amylase',type:'rr',_placeholder:true,name:'Amylase',category:'Chemistry - Liver / Pancreas',conventional_value:'30-110',conventional_unit:'U/L',si_value:'30-110',si_unit:'U/L',notes:'Method dependent'},
+  {id:'builtin-rr-lipase',type:'rr',_placeholder:true,name:'Lipase',category:'Chemistry - Liver / Pancreas',conventional_value:'10-140',conventional_unit:'U/L',si_value:'10-140',si_unit:'U/L',notes:'Method dependent'},
+  {id:'builtin-rr-chol',type:'rr',_placeholder:true,name:'Cholesterol - desirable',category:'Chemistry - Lipids',conventional_value:'<200',conventional_unit:'mg/dL',si_value:'<5.18',si_unit:'mmol/L',notes:'Adult target range'},
+  {id:'builtin-rr-trig',type:'rr',_placeholder:true,name:'Triglycerides - fasting',category:'Chemistry - Lipids',conventional_value:'<150',conventional_unit:'mg/dL',si_value:'<1.70',si_unit:'mmol/L',notes:'Adult target range'},
+  {id:'builtin-rr-hdl',type:'rr',_placeholder:true,name:'HDL cholesterol',category:'Chemistry - Lipids',conventional_value:'M >40; F >50',conventional_unit:'mg/dL',si_value:'M >1.0; F >1.3',si_unit:'mmol/L',notes:'Adult target range'},
+  {id:'builtin-rr-ldl',type:'rr',_placeholder:true,name:'LDL cholesterol - optimal',category:'Chemistry - Lipids',conventional_value:'<100',conventional_unit:'mg/dL',si_value:'<2.59',si_unit:'mmol/L',notes:'Adult target range'},
+  {id:'builtin-rr-iron',type:'rr',_placeholder:true,name:'Serum iron',category:'Chemistry - Iron Studies',conventional_value:'60-170',conventional_unit:'ug/dL',si_value:'10.7-30.4',si_unit:'umol/L',notes:'Adult study range'},
+  {id:'builtin-rr-tibc',type:'rr',_placeholder:true,name:'TIBC',category:'Chemistry - Iron Studies',conventional_value:'240-450',conventional_unit:'ug/dL',si_value:'43-81',si_unit:'umol/L',notes:'Adult study range'},
+  {id:'builtin-rr-ferritin-m',type:'rr',_placeholder:true,name:'Ferritin - male',category:'Chemistry - Iron Studies',conventional_value:'24-336',conventional_unit:'ng/mL',si_value:'24-336',si_unit:'ug/L',notes:'Adult study range'},
+  {id:'builtin-rr-ferritin-f',type:'rr',_placeholder:true,name:'Ferritin - female',category:'Chemistry - Iron Studies',conventional_value:'11-307',conventional_unit:'ng/mL',si_value:'11-307',si_unit:'ug/L',notes:'Adult study range'},
+  {id:'builtin-rr-tsat',type:'rr',_placeholder:true,name:'Transferrin saturation',category:'Chemistry - Iron Studies',conventional_value:'20-50',conventional_unit:'%',si_value:'0.20-0.50',si_unit:'fraction',notes:'Adult study range'},
+  {id:'builtin-rr-digoxin',type:'rr',_placeholder:true,name:'Digoxin',category:'Chemistry - Therapeutic Drugs',conventional_value:'0.5-2.0',conventional_unit:'ng/mL',si_value:'0.6-2.6',si_unit:'nmol/L',notes:'Therapeutic range; toxicity risk varies'},
+  {id:'builtin-rr-lithium',type:'rr',_placeholder:true,name:'Lithium',category:'Chemistry - Therapeutic Drugs',conventional_value:'0.6-1.2',conventional_unit:'mmol/L',si_value:'0.6-1.2',si_unit:'mmol/L',notes:'Therapeutic range'},
+  {id:'builtin-rr-phenytoin',type:'rr',_placeholder:true,name:'Phenytoin',category:'Chemistry - Therapeutic Drugs',conventional_value:'10-20',conventional_unit:'ug/mL',si_value:'40-80',si_unit:'umol/L',notes:'Therapeutic range'},
+  {id:'builtin-rr-theophylline',type:'rr',_placeholder:true,name:'Theophylline',category:'Chemistry - Therapeutic Drugs',conventional_value:'10-20',conventional_unit:'ug/mL',si_value:'55-110',si_unit:'umol/L',notes:'Therapeutic range'},
+  {id:'builtin-rr-abg-ph',type:'rr',_placeholder:true,name:'Arterial pH',category:'Chemistry - Blood Gas',conventional_value:'7.35-7.45',conventional_unit:'pH',si_value:'7.35-7.45',si_unit:'pH',notes:'Adult arterial range'},
+  {id:'builtin-rr-abg-pco2',type:'rr',_placeholder:true,name:'pCO2',category:'Chemistry - Blood Gas',conventional_value:'35-45',conventional_unit:'mmHg',si_value:'4.7-6.0',si_unit:'kPa',notes:'Adult arterial range'},
+  {id:'builtin-rr-abg-hco3',type:'rr',_placeholder:true,name:'HCO3-',category:'Chemistry - Blood Gas',conventional_value:'22-26',conventional_unit:'mmol/L',si_value:'22-26',si_unit:'mmol/L',notes:'Adult arterial range'},
+  {id:'builtin-rr-abg-po2',type:'rr',_placeholder:true,name:'pO2',category:'Chemistry - Blood Gas',conventional_value:'80-100',conventional_unit:'mmHg',si_value:'10.6-13.3',si_unit:'kPa',notes:'Adult arterial range'},
+  {id:'builtin-rr-tsh',type:'rr',_placeholder:true,name:'TSH',category:'Chemistry - Endocrine',conventional_value:'0.4-4.0',conventional_unit:'uIU/mL',si_value:'0.4-4.0',si_unit:'mIU/L',notes:'Adult study range'},
+  {id:'builtin-rr-ft4',type:'rr',_placeholder:true,name:'Free T4',category:'Chemistry - Endocrine',conventional_value:'0.8-1.8',conventional_unit:'ng/dL',si_value:'10-23',si_unit:'pmol/L',notes:'Adult study range'},
+  {id:'builtin-rr-pth',type:'rr',_placeholder:true,name:'PTH',category:'Chemistry - Endocrine',conventional_value:'10-65',conventional_unit:'pg/mL',si_value:'10-65',si_unit:'ng/L',notes:'Adult study range'},
+  {id:'builtin-rr-ua-sg',type:'rr',_placeholder:true,name:'Urine specific gravity',category:'Urinalysis',conventional_value:'1.005-1.030',conventional_unit:'',si_value:'1.005-1.030',si_unit:'',notes:'Random urine study range'},
+  {id:'builtin-rr-ua-ph',type:'rr',_placeholder:true,name:'Urine pH',category:'Urinalysis',conventional_value:'4.5-8.0',conventional_unit:'pH',si_value:'4.5-8.0',si_unit:'pH',notes:'Diet and specimen age affect pH'},
+  {id:'builtin-rr-ua-protein',type:'rr',_placeholder:true,name:'Urine protein',category:'Urinalysis',conventional_value:'negative-trace',conventional_unit:'',si_value:'negative-trace',si_unit:'',notes:'Dipstick screen'},
+  {id:'builtin-rr-ua-glucose',type:'rr',_placeholder:true,name:'Urine glucose',category:'Urinalysis',conventional_value:'negative',conventional_unit:'',si_value:'negative',si_unit:'',notes:'Dipstick screen'},
+  {id:'builtin-rr-ua-rbc',type:'rr',_placeholder:true,name:'Urine RBC',category:'Urinalysis',conventional_value:'0-2',conventional_unit:'/hpf',si_value:'0-2',si_unit:'/hpf',notes:'Microscopic exam'},
+  {id:'builtin-rr-ua-wbc',type:'rr',_placeholder:true,name:'Urine WBC',category:'Urinalysis',conventional_value:'0-5',conventional_unit:'/hpf',si_value:'0-5',si_unit:'/hpf',notes:'Microscopic exam'},
+  {id:'builtin-rr-csf-protein',type:'rr',_placeholder:true,name:'CSF protein',category:'Body Fluids - CSF',conventional_value:'15-45',conventional_unit:'mg/dL',si_value:'0.15-0.45',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-csf-glucose',type:'rr',_placeholder:true,name:'CSF glucose',category:'Body Fluids - CSF',conventional_value:'40-70',conventional_unit:'mg/dL',si_value:'2.2-3.9',si_unit:'mmol/L',notes:'About 60-70% of plasma glucose'},
+  {id:'builtin-rr-csf-wbc',type:'rr',_placeholder:true,name:'CSF WBC - adult',category:'Body Fluids - CSF',conventional_value:'0-5',conventional_unit:'/uL',si_value:'0-5',si_unit:'x 10^6/L',notes:'Adult study range'},
+  {id:'builtin-rr-csf-rbc',type:'rr',_placeholder:true,name:'CSF RBC',category:'Body Fluids - CSF',conventional_value:'0',conventional_unit:'/uL',si_value:'0',si_unit:'x 10^6/L',notes:'Normal CSF should have no RBCs'},
+  {id:'builtin-rr-crp',type:'rr',_placeholder:true,name:'CRP',category:'Immunology / Serology',conventional_value:'<0.5',conventional_unit:'mg/dL',si_value:'<5',si_unit:'mg/L',notes:'Method dependent'},
+  {id:'builtin-rr-esr-m',type:'rr',_placeholder:true,name:'ESR - male',category:'Immunology / Serology',conventional_value:'0-15',conventional_unit:'mm/hr',si_value:'0-15',si_unit:'mm/hr',notes:'Adult study range'},
+  {id:'builtin-rr-esr-f',type:'rr',_placeholder:true,name:'ESR - female',category:'Immunology / Serology',conventional_value:'0-20',conventional_unit:'mm/hr',si_value:'0-20',si_unit:'mm/hr',notes:'Adult study range'},
+  {id:'builtin-rr-igg',type:'rr',_placeholder:true,name:'IgG',category:'Immunology / Serology',conventional_value:'700-1600',conventional_unit:'mg/dL',si_value:'7-16',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-iga',type:'rr',_placeholder:true,name:'IgA',category:'Immunology / Serology',conventional_value:'70-400',conventional_unit:'mg/dL',si_value:'0.7-4.0',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-igm',type:'rr',_placeholder:true,name:'IgM',category:'Immunology / Serology',conventional_value:'40-230',conventional_unit:'mg/dL',si_value:'0.4-2.3',si_unit:'g/L',notes:'Adult study range'}
+];
 
 const HEME_FOLDERS = [
   {key:'anemias',name:'Anemias',icon:'💉'},
@@ -1700,7 +1824,7 @@ function renderQuizQuestionBank(questions){
 function renderHiddenQuestionBankNote(){
   return `
     <div class="card-sm mt-16" style="font-size:13px;color:var(--text2);line-height:1.6">
-      Question banks are hidden in regular view so the book questions are not redistributed. Practice here, and for the full Q/A resource go to the resource book :D
+      Practice here, and for the full Q/A resource go to the resource book :D
     </div>
   `;
 }
@@ -4657,6 +4781,31 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
 
 
 // ─── SUBJECT PROGRESS VISUAL (cartoon animated, right=green wrong=red dual fill) ─
+function renderClassMascotVisual(subj, rightPct, wrongPct, isDone100, isCurrentWrong){
+  const r=Math.max(0,Math.min(100,rightPct||0));
+  const w=Math.max(0,Math.min(100,wrongPct||0));
+  const map={
+    blood_bank:{src:'assets/quiz-mascots/blood-rbc.png',label:'Blood Bank'},
+    hematology:{src:'assets/quiz-mascots/blood-rbc.png',label:'Hematology'},
+    chemistry:{src:'assets/quiz-mascots/chemistry-flask.png',label:'Chemistry'},
+    clinical_chemistry:{src:'assets/quiz-mascots/chemistry-flask.png',label:'Chemistry'},
+    urinalysis:{src:'assets/quiz-mascots/urinalysis-drop.png',label:'Urinalysis'},
+    microbiology:{src:'assets/quiz-mascots/microbiology-microbe.png',label:'Microbiology'}
+  };
+  const meta=map[subj]||map.chemistry;
+  const abnormal=w>=50&&!isDone100;
+  const sad=!!isCurrentWrong;
+  const state=sad?'sad':abnormal?'abnormal':'steady';
+  const chip=sad?'try again':abnormal?'abnormal morph':isDone100?'perfect':`${r}% correct`;
+  return `<div class="class-mascot-wrap" aria-label="${esc(meta.label)} quiz mascot">
+    <div class="class-mascot-card ${state}">
+      <img src="${meta.src}" alt="${esc(meta.label)} quiz mascot">
+      <div class="class-mascot-face"><div class="class-mascot-mouth"></div></div>
+      <div class="class-mascot-chip">${esc(chip)}</div>
+    </div>
+  </div>`;
+}
+
 function renderProgressVisual(subj, rightPct, wrongPct, isDone100){
   const r=Math.max(0,Math.min(100,rightPct||0));
   const w=Math.max(0,Math.min(100-r,wrongPct||0));
@@ -7440,7 +7589,7 @@ async function startClassQuiz(id,forceNew=false,count=null){
   appState.classQuizBestStreak=0;
   appState._quizResultMap={};
   appState._quizOriginalTotal=chosen; // remember full set size for visual %
-  window._classQuizQs=allQs.slice(0,chosen);
+  window._classQuizQs=allQs.slice(0,chosen).map((q,i)=>({...q,_quizTrackKey:'q'+i}));
   window._classQuizQs._setId=id;
   window._classQuizSetId=id;
   window._kqOpts={};
@@ -7597,9 +7746,10 @@ function renderClassQuiz(v){
 
   // If questions not loaded yet for this set, build them
   if(!window._classQuizQs||window._classQuizQs._setId!==window._classQuizSetId){
-    window._classQuizQs=shuffle(s.questions||[]);
+    window._classQuizQs=shuffle(s.questions||[]).map((q,i)=>({...q,_quizTrackKey:'q'+i}));
     window._classQuizQs._setId=s.id;
     window._classQuizSetId=s.id;
+    appState._quizOriginalTotal=window._classQuizQs.length;
   }
   const questions=window._classQuizQs;
 
@@ -7634,6 +7784,14 @@ function renderClassQuiz(v){
     });
     appState.classMissed=missed;
     const pct=Math.round(correct/questions.length*100);
+    const resultMap=appState._quizResultMap||{};
+    const origTotal=appState._quizOriginalTotal||questions.length;
+    const rightCount=Object.values(resultMap).filter(v=>v==='right').length;
+    const wrongCount=Object.values(resultMap).filter(v=>v==='wrong').length;
+    const rightPct=Math.round(rightCount/origTotal*100);
+    const wrongPct=Math.round(wrongCount/origTotal*100);
+    const subj=appState.classSubject||'';
+    const resultMascot=renderClassMascotVisual(subj,rightPct,wrongPct,rightCount===origTotal,false);
     const startNum=appState._quizStartNum||1;
     let reviewHtml=missed.map(({q,given},mi)=>`
       <div style="background:var(--bg2);border:1px solid #f0647433;border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
@@ -7650,7 +7808,7 @@ function renderClassQuiz(v){
         </div>
         <div class="bbq-body">
           <div style="text-align:center;padding:24px 0 28px">
-            <div style="font-size:48px;margin-bottom:8px">${pct>=80?'🏆':pct>=60?'✅':'📚'}</div>
+            ${resultMascot}
             <div class="bbq-score-big">${pct}%</div>
             <div style="font-size:16px;color:var(--text2)">${correct} of ${questions.length} correct</div>
           </div>
@@ -7661,12 +7819,12 @@ function renderClassQuiz(v){
             <div class="stat-card"><div class="stat-num" style="color:#f5a623">${appState.classQuizBestStreak||0}</div><div class="stat-label">Best Streak</div></div>
           </div>
           <div class="flex gap-8 mb-20 flex-wrap">
-            <button class="btn btn-primary" onclick="startClassQuiz('${s.id}',true,${questions.length})">🔄 Restart All</button>
-            ${missed.length?`<button class="btn btn-warn" onclick="retryClassWrongOnly()">⚡ Quiz Wrong Only (${missed.length})</button>`:''}
+            <button class="btn btn-primary" onclick="startClassQuiz('${s.id}',true,${questions.length})">Restart All</button>
+            ${missed.length?`<button class="btn btn-warn" onclick="retryClassWrongOnly()">Quiz Wrong Only (${missed.length})</button>`:''}
             <button class="btn btn-ghost" onclick="appState.classView='subject';renderView()">Back</button>
-            ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="exportClassMissed()">📥 Export Missed</button>`:''}
+            ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="exportClassMissed()">Export Missed</button>`:''}
           </div>
-          ${missed.length?`<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Missed (${missed.length})</div>${reviewHtml}`:'<div style="color:var(--success);font-weight:600;text-align:center;font-size:18px">Perfect score! 🎉</div>'}
+          ${missed.length?`<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Missed (${missed.length})</div>${reviewHtml}`:'<div style="color:var(--success);font-weight:600;text-align:center;font-size:18px">Perfect score!</div>'}
         </div>
       </div>`;
     return;
@@ -7682,7 +7840,7 @@ function renderClassQuiz(v){
   const pct=Math.round((idx+1)/questions.length*100);
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
-  const emojis=['🔴','🔵','🟡','🟢'];
+  const optionLabels=['A','B','C','D'];
   const letters=['a','b','c','d'];
 
   const optsHtml=letters.map((l,oi)=>{
@@ -7690,7 +7848,7 @@ function renderClassQuiz(v){
     let extra='';
     if(answered){if(l===q.correct)extra=' correct-ans';else if(l===chosen&&chosen!==q.correct)extra=' wrong-ans';}
     return `<button class="bbq-opt${extra}" style="background:${colors[oi]};color:${textColors[oi]}" onclick="classQuizAnswer('${l}')" ${answered?'disabled':''}>
-      <span class="bbq-opt-letter">${emojis[oi]}</span><span>${esc(q[l])}</span></button>`;
+      <span class="bbq-opt-letter">${optionLabels[oi]}</span><span>${esc(q[l])}</span></button>`;
   }).filter(Boolean).join('');
 
   let afterHtml='';
@@ -7723,7 +7881,7 @@ function renderClassQuiz(v){
   const rightPct=Math.round(rightCount/origTotal*100);
   const wrongPct=Math.round(wrongCount/origTotal*100);
   const isDone100=appState.classQuizDone&&(rightCount===origTotal);
-  const subjectVisual=renderProgressVisual(subj,rightPct,wrongPct,isDone100);
+  const subjectVisual=renderClassMascotVisual(subj,rightPct,wrongPct,isDone100,answered&&chosen!==q.correct);
   v.innerHTML=`
     <div class="bbq-overlay">
       <div class="bbq-header" style="gap:8px">
@@ -7789,8 +7947,9 @@ function classQuizAnswer(letter){
     }
     // Only mark wrong if not already right from a previous attempt
     if(!appState._quizResultMap) appState._quizResultMap={};
-    if(appState._quizResultMap[appState.classQuizIdx]!=='right'){
-      appState._quizResultMap[appState.classQuizIdx]=isRight?'right':'wrong';
+    const trackKey=q._quizTrackKey??appState.classQuizIdx;
+    if(appState._quizResultMap[trackKey]!=='right'){
+      appState._quizResultMap[trackKey]=isRight?'right':'wrong';
     }
   }
   renderView();
