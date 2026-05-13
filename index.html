@@ -6763,6 +6763,7 @@ async function openFormulasExport(){
     ({calcData,rrData}=splitFormulaRows(allRows));
   }catch(e){calcData=CALC_PLACEHOLDERS;rrData=RR_PLACEHOLDERS;}
   if(!calcData.length&&!rrData.length){alert('Nothing to export yet.');return;}
+  window._formulaExportData={calcData,rrData};
 
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
@@ -6781,89 +6782,140 @@ async function openFormulasExport(){
     </div>
     <div class="flex gap-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
-      <button class="btn btn-primary" onclick="generateFormulasPDF(${JSON.stringify(calcData).replace(/</g,'&lt;')},${JSON.stringify(rrData).replace(/</g,'&lt;')})">📄 Generate PDF</button>
+      <button class="btn btn-primary" onclick="generateFormulasPDF()">📄 Generate PDF</button>
     </div>
   `;
   document.getElementById('condition-modal').classList.remove('hidden');
 }
 
-function generateFormulasPDF(calcData,rrData){
+function calcFormulaText(f){
+  if(!f)return '';
+  if((f.steps||[]).filter(Boolean).length)return (f.steps||[]).filter(Boolean).join(' | ');
+  const left=f.result_label?f.result_label+' = ':'';
+  if(f.numerator||f.denominator){
+    const frac=(f.numerator||'...')+' / '+(f.denominator||'...');
+    return left+frac+(f.multiplier?' x '+f.multiplier:'');
+  }
+  return f.formula||f.name||'';
+}
+
+function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
+  const cW=pageW-margin*2;
+  doc.setFillColor(38,96,207);
+  doc.rect(0,0,pageW,18,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.text('Calculations - One Page',margin,12);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text('Compact study sheet. Verify course-specific policies and units.',pageW-margin,12,{align:'right'});
+
+  const cols=2;
+  const gap=5;
+  const colW=(cW-gap)/cols;
+  const rowH=16.3;
+  const startY=24;
+  const rowsPerCol=Math.floor((pageH-startY-14)/rowH);
+  const maxItems=rowsPerCol*cols;
+  const items=(calcData||[]).slice(0,maxItems);
+  items.forEach((f,i)=>{
+    const col=Math.floor(i/rowsPerCol);
+    const row=i%rowsPerCol;
+    const x=margin+col*(colW+gap);
+    const y=startY+row*rowH;
+    doc.setFillColor(i%2===0?246:255,i%2===0?248:255,i%2===0?252:255);
+    doc.setDrawColor(198,205,226);
+    doc.roundedRect(x,y,colW,rowH-1.4,1.8,1.8,'FD');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.6);
+    doc.setTextColor(18,25,45);
+    doc.text(doc.splitTextToSize(String(f.name||''),colW-5).slice(0,1),x+2.5,y+4.3);
+    doc.setFont('courier','bold');
+    doc.setFontSize(6.8);
+    doc.setTextColor(28,92,185);
+    doc.text(doc.splitTextToSize(calcFormulaText(f),colW-5).slice(0,2),x+2.5,y+8.2);
+    const note=f.example?('Ex: '+f.example):(f.notes||'');
+    if(note){
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(5.8);
+      doc.setTextColor(82,86,110);
+      doc.text(doc.splitTextToSize(String(note),colW-5).slice(0,1),x+2.5,y+14.2);
+    }
+  });
+  if((calcData||[]).length>maxItems){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180,50,60);
+    doc.text(`Showing ${maxItems} of ${calcData.length} calculations on this one-page sheet.`,margin,pageH-8);
+  }
+}
+
+function generateFormulasPDF(){
+  const exportData=window._formulaExportData||{};
+  const calcData=exportData.calcData||[];
+  const rrData=exportData.rrData||[];
   const inclCalc=document.getElementById('exp-calc')?.checked;
   const inclRR=document.getElementById('exp-rr')?.checked;
   if(!inclCalc&&!inclRR){alert('Select at least one section.');return;}
   try{
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
-    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    const doc=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
+    const margin=10;
+    let pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),cW=pageW-margin*2;
     let y=margin;
-    const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const refreshPage=()=>{pageW=doc.internal.pageSize.getWidth();pageH=doc.internal.pageSize.getHeight();cW=pageW-margin*2;};
+    const checkPage=(n=10)=>{refreshPage();if(y+n>pageH-margin){doc.addPage('a4','landscape');refreshPage();y=margin;}};
     const sectionHeader=(title)=>{checkPage(14);doc.setFillColor(40,60,100);doc.rect(margin,y,cW,10,'F');doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text(title,margin+4,y+7);y+=14;};
-    const catHeader=(title)=>{checkPage(8);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(60,80,140);doc.text(title.toUpperCase(),margin,y);y+=2;doc.setDrawColor(60,80,140);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=5;};
-    const writeText=(text,opts={})=>{const{size=10,bold=false,color=[30,30,30],indent=0}=opts;doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.5;});};
+    const catHeader=(title)=>{checkPage(8);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(60,80,140);doc.text(title.toUpperCase(),margin,y);y+=2;doc.setDrawColor(60,80,140);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=5;};
 
     if(inclCalc&&calcData.length){
-      sectionHeader('Calculations');
-      const cats={};calcData.forEach(f=>{const c=f.category||'General';if(!cats[c])cats[c]=[];cats[c].push(f);});
-      Object.entries(cats).forEach(([cat,items])=>{
-        catHeader(cat);
-        items.forEach(f=>{
-          checkPage(30);
-          writeText(f.name,{size:11,bold:true,color:[20,20,20]});
-          if(f.result_label||f.numerator||f.denominator){
-            const label=f.result_label?f.result_label+' = ':'';
-            const num=f.numerator||'…';const den=f.denominator||'…';
-            const mult=f.multiplier?' × '+f.multiplier:'';
-            const fracW=Math.max(num.length,den.length)*3.2+8;
-            checkPage(20);
-            doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,60,120);
-            if(label)doc.text(label,margin+4,y+6);
-            const fx=margin+4+(label.length*2.8);
-            doc.text(num,fx,y+3);
-            doc.setLineWidth(0.5);doc.setDrawColor(30,60,120);doc.line(fx,y+5,fx+fracW,y+5);
-            doc.text(den,fx,y+10);
-            if(mult)doc.text(mult,fx+fracW+3,y+7);
-            y+=16;
-          }
-          (f.steps||[]).filter(Boolean).forEach((s,i)=>{
-            checkPage(6);doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(50,50,80);
-            doc.text('Step '+(i+1)+': '+s,margin+4,y);y+=5.5;
-          });
-          if(f.notes)writeText(f.notes,{size:9.5,color:[80,80,80],indent:4});
-          if(f.example)writeText('Example: '+f.example,{size:9,color:[60,100,60],indent:4});
-          y+=5;
-        });
-      });
+      drawCalcOnePage(doc,calcData,pageW,pageH,margin);
+      y=pageH;
     }
     if(inclRR&&rrData.length){
+      if(inclCalc)doc.addPage('a4','landscape');
+      refreshPage();
+      y=margin;
       sectionHeader('Reference Ranges');
       const cats={};rrData.forEach(f=>{const c=f.category||'General';if(!cats[c])cats[c]=[];cats[c].push(f);});
       Object.entries(cats).forEach(([cat,items])=>{
         catHeader(cat);
         checkPage(20);
-        const colW=[cW*0.38,cW*0.31,cW*0.31];
+        const colW=[cW*0.30,cW*0.24,cW*0.24,cW*0.22];
         ['Analyte','Conventional Units','SI Units'].forEach((h,i)=>{
           const x=margin+colW.slice(0,i).reduce((a,b)=>a+b,0);
           doc.setFillColor(220,225,240);doc.rect(x,y,colW[i],8,'F');doc.setDrawColor(180,185,210);doc.setLineWidth(0.2);doc.rect(x,y,colW[i],8,'S');
           doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);doc.text(h,x+2,y+5.5);
-        });y+=8;
+        });
+        const nx=margin+colW[0]+colW[1]+colW[2];
+        doc.setFillColor(220,225,240);doc.rect(nx,y,colW[3],8,'F');doc.setDrawColor(180,185,210);doc.rect(nx,y,colW[3],8,'S');
+        doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);doc.text('Notes',nx+2,y+5.5);
+        y+=8;
         items.forEach((f,ri)=>{
           checkPage(8);
           const bg=ri%2===0?[245,246,250]:[255,255,255];
+          const noteLines=doc.splitTextToSize(String(f.notes||''),colW[3]-4).slice(0,2);
+          const rowH=Math.max(8,4+noteLines.length*3.6);
+          checkPage(rowH);
           doc.setFillColor(...bg);
-          colW.forEach((w,ci)=>{const x=margin+colW.slice(0,ci).reduce((a,b)=>a+b,0);doc.rect(x,y,w,8,'F');doc.setDrawColor(200,205,220);doc.rect(x,y,w,8,'S');});
-          doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);doc.text(f.name||'',margin+2,y+5.5);
+          colW.forEach((w,ci)=>{const x=margin+colW.slice(0,ci).reduce((a,b)=>a+b,0);doc.rect(x,y,w,rowH,'F');doc.setDrawColor(200,205,220);doc.rect(x,y,w,rowH,'S');});
+          doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+          doc.text(doc.splitTextToSize(String(f.name||''),colW[0]-4).slice(0,2),margin+2,y+4.8);
           doc.setFont('helvetica','normal');doc.setTextColor(40,40,80);
           const cv=(f.conventional_value||'—')+(f.conventional_unit?' '+f.conventional_unit:'');
           const sv=(f.si_value||'—')+(f.si_unit?' '+f.si_unit:'');
-          doc.text(cv,margin+colW[0]+2,y+5.5);
-          doc.text(sv,margin+colW[0]+colW[1]+2,y+5.5);
-          y+=8;
+          doc.text(doc.splitTextToSize(cv,colW[1]-4).slice(0,2),margin+colW[0]+2,y+4.8);
+          doc.text(doc.splitTextToSize(sv,colW[2]-4).slice(0,2),margin+colW[0]+colW[1]+2,y+4.8);
+          doc.setFontSize(7.2);doc.setTextColor(90,90,105);
+          if(noteLines.length)doc.text(noteLines,margin+colW[0]+colW[1]+colW[2]+2,y+4.6);
+          y+=rowH;
         });
         y+=6;
       });
     }
     const tot=doc.internal.getNumberOfPages();
-    for(let p=1;p<=tot;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep — Calculations & Reference Ranges · Page '+p+' of '+tot,margin,pageH-8);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});}
+    for(let p=1;p<=tot;p++){doc.setPage(p);refreshPage();doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep — Calculations & Reference Ranges · Page '+p+' of '+tot,margin,pageH-6);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});}
     doc.save('mls_calc_rr.pdf');
     document.getElementById('condition-modal').classList.add('hidden');
   }catch(err){alert('PDF export failed: '+err.message);}
