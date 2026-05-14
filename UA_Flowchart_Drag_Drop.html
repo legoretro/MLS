@@ -14,12 +14,14 @@
       background:linear-gradient(180deg,#f7f8fc 0,#eef1f8 48%,#f0f2f8 100%);
       font-family:var(--mls-sans);
     }
-    .ua-wrap{max-width:1320px;margin:0 auto;padding:22px 18px 34px}
-    .ua-hero{
+    .ua-wrap{max-width:1400px;margin:0 auto;padding:22px 18px 34px}
+    .ua-hero,.toolbar,.bank,.board,.flow-panel{
       background:var(--mls-bg2);
       border:1px solid var(--mls-border);
       border-radius:var(--mls-r2);
       box-shadow:0 12px 28px rgba(37,60,105,.08);
+    }
+    .ua-hero{
       padding:18px;
       display:flex;
       gap:14px;
@@ -30,19 +32,15 @@
     }
     .ua-kicker{font-family:var(--mls-mono);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9a8500;margin-bottom:4px}
     h1{font-size:30px;line-height:1.1;margin:0;color:var(--mls-text);letter-spacing:0}
-    .ua-sub{margin:6px 0 0;color:var(--mls-text2);font-size:14px;line-height:1.45;max-width:760px}
+    .ua-sub{margin:6px 0 0;color:var(--mls-text2);font-size:14px;line-height:1.5;max-width:820px}
     .ua-badge{background:#c8a800;color:#fff;border-radius:999px;padding:8px 12px;font-family:var(--mls-mono);font-size:12px;font-weight:700}
     .toolbar{
-      background:var(--mls-bg2);
-      border:1px solid var(--mls-border);
-      border-radius:var(--mls-r2);
       padding:12px;
       display:flex;
       gap:8px;
       align-items:center;
       flex-wrap:wrap;
-      margin-bottom:16px;
-      box-shadow:0 8px 22px rgba(37,60,105,.06);
+      margin-bottom:14px;
     }
     .ua-btn{
       border:1px solid var(--mls-border);
@@ -54,19 +52,75 @@
       cursor:pointer;
     }
     .ua-btn.primary{background:var(--mls-accent);border-color:var(--mls-accent);color:#fff}
-    .ua-btn.good{background:#1a8a4a14;border-color:#1a8a4a55;color:var(--mls-success)}
+    .ua-btn:hover{border-color:var(--mls-border2);background:var(--mls-bg4)}
     .score{margin-left:auto;font-family:var(--mls-mono);font-size:12px;color:var(--mls-text3)}
+    .flow-panel{padding:15px;margin-bottom:14px;overflow:hidden}
+    .flow-title{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+    .flow-title strong{font-size:14px;color:var(--mls-text)}
+    .flow-note{font-size:12px;color:var(--mls-text3);font-family:var(--mls-mono)}
+    .flow-map{
+      display:grid;
+      grid-template-columns:180px repeat(4,minmax(0,1fr));
+      gap:10px;
+      align-items:stretch;
+    }
+    .flow-node{
+      border:1px solid var(--mls-border);
+      border-radius:var(--mls-r);
+      background:var(--mls-bg3);
+      padding:12px;
+      min-height:84px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      position:relative;
+    }
+    .flow-node.start{
+      background:#c8a800;
+      color:#fff;
+      border-color:#c8a800;
+      text-align:center;
+      font-weight:800;
+    }
+    .flow-node.start::after{
+      content:"";
+      position:absolute;
+      right:-10px;
+      top:50%;
+      width:10px;
+      height:2px;
+      background:var(--mls-border2);
+    }
+    .flow-route{background:#fbfcff}
+    .flow-route::before{
+      content:"";
+      position:absolute;
+      left:-10px;
+      top:50%;
+      width:10px;
+      height:2px;
+      background:var(--mls-border2);
+    }
+    .flow-route::after{
+      content:"";
+      position:absolute;
+      left:16px;
+      right:16px;
+      bottom:-10px;
+      height:10px;
+      border-left:2px solid var(--route,#c8a800);
+      border-bottom:2px solid var(--route,#c8a800);
+      border-radius:0 0 0 8px;
+      opacity:.55;
+    }
+    .route-tag{font-family:var(--mls-mono);font-size:11px;font-weight:800;color:var(--route,#c8a800);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+    .route-question{font-size:13px;font-weight:700;color:var(--mls-text);line-height:1.35}
+    .route-sub{font-size:12px;color:var(--mls-text2);line-height:1.45;margin-top:5px}
     .game{
       display:grid;
-      grid-template-columns:minmax(240px,320px) 1fr;
+      grid-template-columns:minmax(250px,320px) 1fr;
       gap:14px;
       align-items:start;
-    }
-    .bank,.board{
-      background:var(--mls-bg2);
-      border:1px solid var(--mls-border);
-      border-radius:var(--mls-r2);
-      box-shadow:0 12px 28px rgba(37,60,105,.08);
     }
     .bank{position:sticky;top:78px;padding:14px;max-height:calc(100vh - 96px);overflow:auto}
     .bank-title{
@@ -112,33 +166,25 @@
     .macro{--chip-color:#c8a800}
     .micro{--chip-color:#2f86c5}
     .board{padding:16px;overflow:hidden}
-    .flow-top{
-      display:grid;
-      grid-template-columns:1fr auto 1fr;
-      align-items:center;
-      gap:10px;
-      margin-bottom:14px;
+    .board-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
     }
-    .flow-line{height:2px;background:linear-gradient(90deg,transparent,var(--mls-border2),transparent)}
-    .root-node{
-      background:#c8a800;
-      color:#fff;
-      border-radius:999px;
-      padding:11px 18px;
-      text-align:center;
-      font-weight:800;
-      box-shadow:0 8px 16px rgba(160,130,0,.16);
-      white-space:nowrap;
-    }
-    .branch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .branch-card{
+    .board-title{font-size:15px;font-weight:800;color:var(--mls-text)}
+    .board-sub{font-size:12px;color:var(--mls-text3);font-family:var(--mls-mono);margin-top:3px}
+    .endpoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .endpoint-card{
       border:1px solid var(--mls-border);
       background:#fbfcff;
       border-radius:var(--mls-r2);
       overflow:hidden;
-      min-height:230px;
+      min-height:236px;
     }
-    .branch-head{
+    .endpoint-head{
       display:flex;
       align-items:center;
       gap:10px;
@@ -146,9 +192,9 @@
       background:var(--mls-bg3);
       border-bottom:1px solid var(--mls-border);
     }
-    .branch-dot{
-      width:40px;
-      height:40px;
+    .endpoint-dot{
+      width:38px;
+      height:38px;
       border-radius:50%;
       display:flex;
       align-items:center;
@@ -159,8 +205,8 @@
       font-weight:800;
       flex-shrink:0;
     }
-    .branch-title{font-weight:800;color:var(--mls-text);font-size:15px}
-    .branch-sub{font-family:var(--mls-mono);font-size:11px;color:var(--mls-text3);margin-top:2px}
+    .endpoint-title{font-weight:800;color:var(--mls-text);font-size:15px}
+    .endpoint-route{font-family:var(--mls-mono);font-size:11px;color:var(--mls-text3);margin-top:2px}
     .slot-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
     .slot-title{
       font-family:var(--mls-mono);
@@ -172,7 +218,7 @@
       margin-bottom:7px;
     }
     .slot{
-      min-height:132px;
+      min-height:126px;
       border:1.5px dashed var(--mls-border2);
       background:#f8faff;
       border-radius:var(--mls-r);
@@ -196,21 +242,24 @@
     .message{padding:12px 2px 0;font-size:13px;color:var(--mls-text2);min-height:32px}
     .message.good{color:var(--mls-success);font-weight:700}
     .message.bad{color:var(--mls-danger);font-weight:700}
-    html[data-mls-theme="dark"] body.ua-flowchart .branch-card,
-    html[data-mls-theme="dark"] body.ua-flowchart .chip{
-      background:var(--mls-bg3);
-    }
+    html[data-mls-theme="dark"] body.ua-flowchart .endpoint-card,
+    html[data-mls-theme="dark"] body.ua-flowchart .flow-route,
+    html[data-mls-theme="dark"] body.ua-flowchart .chip{background:var(--mls-bg3)}
     html[data-mls-theme="dark"] body.ua-flowchart .slot{background:#101625}
+    @media(max-width:1100px){
+      .flow-map{grid-template-columns:1fr 1fr}
+      .flow-node.start{grid-column:1/-1}
+      .flow-node.start::after,.flow-route::before,.flow-route::after{display:none}
+      .endpoint-grid{grid-template-columns:1fr}
+    }
     @media(max-width:920px){
       .game{grid-template-columns:1fr}
       .bank{position:static;max-height:none}
-      .branch-grid{grid-template-columns:1fr}
       .score{margin-left:0;width:100%}
     }
     @media(max-width:560px){
       h1{font-size:24px}
-      .flow-top{grid-template-columns:1fr}
-      .flow-line{display:none}
+      .flow-map{grid-template-columns:1fr}
       .slot-grid{grid-template-columns:1fr}
     }
   </style>
@@ -229,21 +278,29 @@
       <div>
         <div class="ua-kicker">Urinalysis</div>
         <h1>UA Flowchart Drag and Drop</h1>
-        <p class="ua-sub">Sort macro findings and microscopic findings into the renal disease pattern they point toward.</p>
+        <p class="ua-sub">Start with the case pattern, follow the branch, then sort macro and microscopic findings into the endpoint that best fits. It keeps the final case calls for practice.</p>
       </div>
-      <div class="ua-badge">Draft build</div>
+      <div class="ua-badge">Practice mode</div>
     </section>
 
     <section class="toolbar">
       <button class="ua-btn primary" onclick="checkAnswers()">Check</button>
       <button class="ua-btn" onclick="resetGame()">Reset</button>
-      <button class="ua-btn good" onclick="showAnswers()">Show answers</button>
+      <button class="ua-btn" onclick="shuffleBank()">Shuffle bank</button>
       <div class="score" id="score">0 placed</div>
+    </section>
+
+    <section class="flow-panel">
+      <div class="flow-title">
+        <strong>1. Flowchart first</strong>
+        <span class="flow-note">Ask which pattern dominates before matching findings.</span>
+      </div>
+      <div class="flow-map" id="flow-map"></div>
     </section>
 
     <section class="game">
       <aside class="bank">
-        <div class="bank-title">Finding Bank</div>
+        <div class="bank-title">2. Finding Bank</div>
         <div class="bank-tabs">
           <button class="tab active" id="tab-all" onclick="setFilter('all')">All</button>
           <button class="tab" id="tab-macro" onclick="setFilter('macro')">Macro</button>
@@ -253,40 +310,60 @@
       </aside>
 
       <section class="board">
-        <div class="flow-top">
-          <div class="flow-line"></div>
-          <div class="root-node">Renal disease pattern</div>
-          <div class="flow-line"></div>
+        <div class="board-head">
+          <div>
+            <div class="board-title">3. Endpoint matching</div>
+            <div class="board-sub">Drop macro and micro findings into the final pattern cards.</div>
+          </div>
         </div>
-        <div class="branch-grid" id="branches"></div>
+        <div class="endpoint-grid" id="branches"></div>
         <div class="message" id="message"></div>
       </section>
     </section>
   </main>
 
   <script>
-    const branches=[
-      {id:'glomerular',abbr:'GN',title:'Glomerular Disorders',sub:'filter barrier injury',color:'#c8a800',
-        macro:['high protein','hematuria','edema / oliguria clue'],
-        micro:['dysmorphic RBCs','RBC casts','hyaline or granular casts']},
-      {id:'nephrotic',abbr:'NS',title:'Nephrotic Syndrome',sub:'massive protein loss',color:'#bd7d16',
-        macro:['massive proteinuria','low serum albumin + edema','high serum lipids'],
-        micro:['oval fat bodies','fatty casts','waxy casts']},
-      {id:'tubular',abbr:'TB',title:'Tubular Injury',sub:'ATN / reabsorption problem',color:'#2f86c5',
-        macro:['mild proteinuria','low SG / concentrating issue','urine glucose with normal serum glucose'],
-        micro:['RTE cells','epithelial casts','granular, waxy, or broad casts']},
-      {id:'uti',abbr:'UTI',title:'UTI / Pyelonephritis',sub:'lower vs upper infection',color:'#32a66a',
-        macro:['high LEU','nitrite positive + cloudy urine','mild protein + bacteria clue'],
-        micro:['numerous WBCs','numerous bacteria','WBC casts = upper UTI']},
-      {id:'ain',abbr:'AIN',title:'Acute Interstitial Nephritis',sub:'drug/allergy inflammation',color:'#8c62c8',
-        macro:['medication allergy clue','mild to marked protein','high LEU without bacteria'],
-        micro:['WBC casts','eosinophils','absence of bacteria']},
-      {id:'lithiasis',abbr:'RL',title:'Renal Lithiasis',sub:'stone / crystal irritation',color:'#d24b52',
-        macro:['blood positive','pH favors crystals','obstruction or pain clue'],
-        micro:['microscopic RBCs','crystals','few casts']}
+    const routes=[
+      {id:'bloodProtein',tag:'Blood + protein',color:'#c8a800',question:'Is the case dominated by blood/protein or renal function clues?',sub:'Think filter barrier, nephritic/nephrotic, or chronic damage.'},
+      {id:'tubular',tag:'Tubular function',color:'#2f86c5',question:'Is concentration, reabsorption, or tubular cell injury the main clue?',sub:'Compare glucose, SG, serum context, and tubular cells/casts.'},
+      {id:'infection',tag:'WBC / bacteria',color:'#32a66a',question:'Do leukocytes, nitrite, bacteria, or inflammation dominate?',sub:'Separate lower tract, upper tract, and sterile inflammation.'},
+      {id:'colorCrystal',tag:'Color / crystals',color:'#d24b52',question:'Is the main clue color, pigment, crystals, pH, or stone pain?',sub:'Correlate dipstick blood, microscopy, specimen change, and crystals.'}
     ];
 
-    const chips=branches.flatMap(b=>
+    const endpoints=[
+      {id:'pigment',route:'colorCrystal',abbr:'PG',title:'Pigment or Color Clue',color:'#a060b8',
+        macro:['red, brown, or black color shift','blood pad stronger than RBC count'],
+        micro:['few intact RBCs or lysed cells','microscopy does not fully explain color']},
+      {id:'threshold',route:'tubular',abbr:'SG',title:'Concentration / Threshold',color:'#2f86c5',
+        macro:['specific gravity scale problem','glucose result needs serum context'],
+        micro:['bland sediment pattern','few formed elements']},
+      {id:'glomerular',route:'bloodProtein',abbr:'GN',title:'Glomerular Inflammation',color:'#c8a800',
+        macro:['blood plus protein dominate','edema or renal function clue'],
+        micro:['dysmorphic RBC pattern','RBC cast clue']},
+      {id:'nephrotic',route:'bloodProtein',abbr:'NP',title:'Protein-Loss Pattern',color:'#bd7d16',
+        macro:['heavy protein with edema','low albumin or lipid clue'],
+        micro:['fat droplets or oval fat bodies','fatty or waxy cast clue']},
+      {id:'tubularInjury',route:'tubular',abbr:'TB',title:'Tubular Injury / Reabsorption',color:'#2579b8',
+        macro:['mild protein or concentrating defect','urine glucose with normal serum clue'],
+        micro:['renal tubular epithelial cells','epithelial or granular casts']},
+      {id:'lowerUti',route:'infection',abbr:'LU',title:'Lower UTI Pattern',color:'#32a66a',
+        macro:['cloudy urine with LE or nitrite clue','mild protein with urinary symptoms'],
+        micro:['many WBCs and bacteria','squamous contamination check']},
+      {id:'upperUti',route:'infection',abbr:'UP',title:'Upper UTI / Pyelo Pattern',color:'#24915a',
+        macro:['UTI pattern with flank or systemic clue','mild blood and protein possible'],
+        micro:['WBC casts point upward','bacterial cast or renal epithelial clue']},
+      {id:'interstitial',route:'infection',abbr:'IN',title:'Interstitial Inflammation',color:'#8c62c8',
+        macro:['sterile leukocyte pattern','recent drug or allergy clue'],
+        micro:['WBC casts without bacteria','eosinophil-type clue']},
+      {id:'failure',route:'bloodProtein',abbr:'RF',title:'Renal Failure Progression',color:'#5f6f89',
+        macro:['poor concentrating ability','protein or glucose with declining function'],
+        micro:['granular, waxy, or broad casts','RTE and cast mix suggests renal source']},
+      {id:'lithiasis',route:'colorCrystal',abbr:'ST',title:'Stone / Crystal Irritation',color:'#d24b52',
+        macro:['blood with pain or obstruction clue','pH and crystal chemistry matter'],
+        micro:['RBCs from tissue irritation','crystals in fresh urine']}
+    ];
+
+    const chips=endpoints.flatMap(b=>
       ['macro','micro'].flatMap(kind=>
         b[kind].map((text,i)=>({
           id:`${b.id}-${kind}-${i}`,
@@ -301,12 +378,31 @@
     let filter='all';
     let selected=null;
     let checked=false;
+    let shuffled=shuffle(chips);
 
     function shuffle(arr){
       return [...arr].sort(()=>Math.random()-.5);
     }
 
-    const shuffled=shuffle(chips);
+    function routeLabel(routeId){
+      return (routes.find(r=>r.id===routeId)||{}).tag||'Pattern';
+    }
+
+    function renderFlow(){
+      const root=document.getElementById('flow-map');
+      root.innerHTML=`
+        <div class="flow-node start">
+          <div>Start with UA case data</div>
+          <div style="font:700 11px/1.4 var(--mls-mono);opacity:.86;margin-top:6px">color + strip + SG + microscopy</div>
+        </div>
+        ${routes.map(r=>`
+          <div class="flow-node flow-route" style="--route:${r.color}">
+            <div class="route-tag">${r.tag}</div>
+            <div class="route-question">${r.question}</div>
+            <div class="route-sub">${r.sub}</div>
+          </div>`).join('')}
+      `;
+    }
 
     function setFilter(next){
       filter=next;
@@ -349,16 +445,16 @@
     function renderBranches(){
       const root=document.getElementById('branches');
       root.innerHTML='';
-      branches.forEach(branch=>{
+      endpoints.forEach(branch=>{
         const card=document.createElement('div');
-        card.className='branch-card';
+        card.className='endpoint-card';
         card.style.setProperty('--branch',branch.color);
         card.innerHTML=`
-          <div class="branch-head">
-            <div class="branch-dot">${branch.abbr}</div>
+          <div class="endpoint-head">
+            <div class="endpoint-dot">${branch.abbr}</div>
             <div>
-              <div class="branch-title">${branch.title}</div>
-              <div class="branch-sub">${branch.sub}</div>
+              <div class="endpoint-title">${branch.title}</div>
+              <div class="endpoint-route">${routeLabel(branch.route)}</div>
             </div>
           </div>
           <div class="slot-grid">
@@ -413,6 +509,7 @@
       selected=null;
       checked=false;
       document.getElementById('message').textContent='';
+      document.getElementById('message').className='message';
       renderBank();
       renderPlaced();
     }
@@ -422,6 +519,7 @@
       selected=null;
       checked=false;
       document.getElementById('message').textContent='';
+      document.getElementById('message').className='message';
       renderBank();
       renderPlaced();
     }
@@ -440,7 +538,10 @@
       }).length;
       const msg=document.getElementById('message');
       msg.className='message '+(correct===chips.length?'good':'bad');
-      msg.textContent=correct===chips.length?'Perfect. Every branch is sorted.':`${correct}/${chips.length} correct. Click any placed chip to send it back to the bank.`;
+      const remaining=chips.length-placedIds.length;
+      msg.textContent=correct===chips.length
+        ?'Complete. All placed findings fit their endpoint.'
+        :`${correct}/${placedIds.length||0} placed chips fit so far. ${remaining} still in the bank. Click any placed chip to send it back.`;
       renderPlaced();
     }
 
@@ -454,16 +555,12 @@
       renderBranches();
     }
 
-    function showAnswers(){
-      chips.forEach(chip=>{placed[chip.id]={branch:chip.branch,kind:chip.kind};});
-      selected=null;
-      checked=true;
-      document.getElementById('message').className='message good';
-      document.getElementById('message').textContent='Answers placed. Use Reset to practice again.';
+    function shuffleBank(){
+      shuffled=shuffle(shuffled);
       renderBank();
-      renderPlaced();
     }
 
+    renderFlow();
     renderBank();
     renderBranches();
   </script>
