@@ -928,6 +928,26 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.74);border-colo
   .bbq-opt{min-height:72px;font-size:15px;padding:16px}
   .quiz-audio-dock{right:10px;top:auto;bottom:12px}
   .quiz-audio-note{display:none}
+  .bbq-overlay::before{
+    background-image:none;
+    background:linear-gradient(135deg,#dfeaff 0%,#f0e6ff 48%,#d8e7ff 100%);
+    filter:none;
+    transform:none;
+    inset:0;
+    opacity:1;
+  }
+  .bbq-overlay::after{
+    background:linear-gradient(135deg,rgba(37,99,212,.38),rgba(128,80,190,.24));
+  }
+  .bbq-header,
+  .bbq-context,
+  .bbq-question,
+  .quiz-audio-dock{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  .bbq-header{background:rgba(255,255,255,.94)}
+  body:not(.light-mode) .bbq-header{background:rgba(13,15,18,.94)}
 }
 /* Option letters always white in dark mode */
 .option-letter{font-family:var(--mono);font-size:12px;font-weight:500;color:#fff !important;min-width:18px;margin-top:1px}
@@ -1275,16 +1295,7 @@ let appState = {
 };
 
 // Quiz music is generated in-browser, so there are no downloaded or copyrighted audio files.
-const QUIZ_MUSIC_KEY='mlsboc_quiz_music_on';
-let quizAudio={ctx:null,master:null,timer:null,on:false};
-
-function quizMusicWanted(){
-  try{return localStorage.getItem(QUIZ_MUSIC_KEY)==='1';}catch(e){return false;}
-}
-
-function setQuizMusicWanted(on){
-  try{localStorage.setItem(QUIZ_MUSIC_KEY,on?'1':'0');}catch(e){}
-}
+let quizAudio={ctx:null,master:null,source:null,on:false};
 
 function syncQuizShell(){
   const overlay=document.querySelector('.bbq-overlay');
@@ -1307,7 +1318,6 @@ function syncQuizShell(){
   }else if(dock.parentElement!==overlay){
     overlay.appendChild(dock);
   }
-  if(quizMusicWanted()&&!quizAudio.on&&quizAudio.ctx)startQuizMusic();
   updateQuizMusicButton();
 }
 
@@ -1321,51 +1331,42 @@ function updateQuizMusicButton(){
   label.textContent=quizAudio.on?'Lo-fi on':'Lo-fi off';
 }
 
-function makeNoiseBuffer(ctx){
-  const length=Math.max(1,Math.floor(ctx.sampleRate*.18));
-  const buffer=ctx.createBuffer(1,length,ctx.sampleRate);
+function makeLofiLoop(ctx){
+  const seconds=8;
+  const sr=ctx.sampleRate;
+  const len=Math.floor(sr*seconds);
+  const buffer=ctx.createBuffer(1,len,sr);
   const data=buffer.getChannelData(0);
-  for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
-  return buffer;
-}
-
-function playTone(ctx,master,when,freq,duration,type='sine',gainValue=.055){
-  const osc=ctx.createOscillator();
-  const gain=ctx.createGain();
-  osc.type=type;
-  osc.frequency.setValueAtTime(freq,when);
-  gain.gain.setValueAtTime(0,when);
-  gain.gain.linearRampToValueAtTime(gainValue,when+.018);
-  gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
-  osc.connect(gain).connect(master);
-  osc.start(when);
-  osc.stop(when+duration+.04);
-}
-
-function scheduleLofiBar(){
-  if(!quizAudio.ctx||!quizAudio.master)return;
-  const ctx=quizAudio.ctx;
-  const master=quizAudio.master;
-  const now=ctx.currentTime+.05;
+  const bpm=92;
+  const beat=60/bpm;
   const chords=[
     [261.63,329.63,392.00],
     [220.00,277.18,329.63],
     [246.94,311.13,369.99],
     [196.00,246.94,293.66]
   ];
-  const chord=chords[Math.floor((Date.now()/1900)%chords.length)];
-  chord.forEach((f,i)=>playTone(ctx,master,now,f,.95,i?'triangle':'sine',.028));
-  [0,.48,.96,1.44].forEach((beat,i)=>{
-    playTone(ctx,master,now+beat,55,.12,'sine',i===0?.075:.045);
-    const src=ctx.createBufferSource();
-    const gain=ctx.createGain();
-    src.buffer=makeNoiseBuffer(ctx);
-    gain.gain.setValueAtTime(i%2?.018:.028,now+beat+.22);
-    gain.gain.exponentialRampToValueAtTime(.0001,now+beat+.34);
-    src.connect(gain).connect(master);
-    src.start(now+beat+.22);
-    src.stop(now+beat+.38);
-  });
+  const env=(phase)=>Math.min(1,phase/.04)*Math.max(0,1-phase/1.5);
+  for(let i=0;i<len;i++){
+    const t=i/sr;
+    const bar=Math.floor(t/2)%chords.length;
+    const local=t%2;
+    let sample=0;
+    chords[bar].forEach((f,ci)=>{
+      sample+=Math.sin(2*Math.PI*f*t)*(ci===0 ? 0.042 : 0.022)*env(local);
+      sample+=Math.sin(2*Math.PI*(f/2)*t)*.012;
+    });
+    const beatPhase=t%beat;
+    const step=Math.floor(t/beat);
+    if(beatPhase<.10){
+      sample+=Math.sin(2*Math.PI*58*t)*(step%2===0 ? 0.075 : 0.045)*(1-beatPhase/.10);
+    }
+    const hatPhase=(t+beat/2)%beat;
+    if(hatPhase<.035){
+      sample+=(Math.random()*2-1)*.018*(1-hatPhase/.035);
+    }
+    data[i]=Math.max(-.55,Math.min(.55,sample));
+  }
+  return buffer;
 }
 
 async function startQuizMusic(){
@@ -1377,18 +1378,22 @@ async function startQuizMusic(){
     if(quizAudio.ctx.state==='suspended')await quizAudio.ctx.resume();
     if(!quizAudio.master){
       quizAudio.master=quizAudio.ctx.createGain();
-      quizAudio.master.gain.value=.42;
+      quizAudio.master.gain.value=.18;
       const filter=quizAudio.ctx.createBiquadFilter();
       filter.type='lowpass';
-      filter.frequency.value=1700;
+      filter.frequency.value=1900;
       filter.Q.value=.65;
       filter.connect(quizAudio.ctx.destination);
       quizAudio.master.connect(filter);
     }
+    if(quizAudio.source){try{quizAudio.source.stop();}catch(e){}}
+    const src=quizAudio.ctx.createBufferSource();
+    src.buffer=makeLofiLoop(quizAudio.ctx);
+    src.loop=true;
+    src.connect(quizAudio.master);
+    src.start();
+    quizAudio.source=src;
     quizAudio.on=true;
-    setQuizMusicWanted(true);
-    scheduleLofiBar();
-    quizAudio.timer=setInterval(scheduleLofiBar,1900);
     updateQuizMusicButton();
   }catch(err){
     console.warn('Quiz music failed',err);
@@ -1397,9 +1402,8 @@ async function startQuizMusic(){
 }
 
 function stopQuizMusic(persist=true){
-  if(quizAudio.timer){clearInterval(quizAudio.timer);quizAudio.timer=null;}
+  if(quizAudio.source){try{quizAudio.source.stop();}catch(e){}quizAudio.source=null;}
   quizAudio.on=false;
-  if(persist)setQuizMusicWanted(false);
   updateQuizMusicButton();
 }
 
