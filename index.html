@@ -772,9 +772,9 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   background-image:var(--quiz-lab-bg);
   background-size:cover;
   background-position:center;
-  filter:blur(7px) saturate(1.08);
-  transform:scale(1.03);
-  opacity:.82;
+  filter:blur(3px) saturate(1.12);
+  transform:scale(1.015);
+  opacity:.9;
   pointer-events:none;
 }
 .bbq-overlay::after{
@@ -782,9 +782,9 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   position:fixed;
   inset:0;
   background:
-    radial-gradient(circle at 18% 12%,rgba(79,142,247,.30),transparent 32%),
-    radial-gradient(circle at 88% 5%,rgba(245,166,35,.20),transparent 28%),
-    linear-gradient(135deg,rgba(37,99,212,.50),rgba(120,60,190,.32) 48%,rgba(25,70,140,.38));
+    radial-gradient(circle at 18% 12%,rgba(79,142,247,.22),transparent 32%),
+    radial-gradient(circle at 88% 5%,rgba(245,166,35,.16),transparent 28%),
+    linear-gradient(135deg,rgba(37,99,212,.36),rgba(120,60,190,.24) 48%,rgba(25,70,140,.30));
   pointer-events:none;
 }
 .bbq-overlay>*{position:relative;z-index:1}
@@ -929,15 +929,17 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.74);border-colo
   .quiz-audio-dock{right:10px;top:auto;bottom:12px}
   .quiz-audio-note{display:none}
   .bbq-overlay::before{
-    background-image:none;
-    background:linear-gradient(135deg,#dfeaff 0%,#f0e6ff 48%,#d8e7ff 100%);
+    background-image:var(--quiz-lab-bg);
+    background-color:#dfeaff;
+    background-size:cover;
+    background-position:center;
     filter:none;
     transform:none;
     inset:0;
-    opacity:1;
+    opacity:.9;
   }
   .bbq-overlay::after{
-    background:linear-gradient(135deg,rgba(37,99,212,.38),rgba(128,80,190,.24));
+    background:linear-gradient(135deg,rgba(37,99,212,.30),rgba(128,80,190,.18));
   }
   .bbq-header,
   .bbq-context,
@@ -1310,8 +1312,8 @@ function syncQuizShell(){
     dock.id='quiz-audio-dock';
     dock.className='quiz-audio-dock';
     dock.innerHTML=`
-      <button class="quiz-audio-btn" id="quiz-audio-btn" onclick="toggleQuizMusic()" title="Optional generated lo-fi study loop">
-        <span id="quiz-audio-icon">♪</span><span id="quiz-audio-label">Lo-fi off</span>
+      <button class="quiz-audio-btn" id="quiz-audio-btn" onclick="toggleQuizMusic()" title="Optional generated upbeat jazz study loop">
+        <span id="quiz-audio-icon">♪</span><span id="quiz-audio-label">Jazz off</span>
       </button>
       <span class="quiz-audio-note">generated locally</span>`;
     overlay.appendChild(dock);
@@ -1328,43 +1330,57 @@ function updateQuizMusicButton(){
   if(!btn||!label||!icon)return;
   btn.classList.toggle('is-on',quizAudio.on);
   icon.textContent=quizAudio.on?'♫':'♪';
-  label.textContent=quizAudio.on?'Lo-fi on':'Lo-fi off';
+  label.textContent=quizAudio.on?'Jazz on':'Jazz off';
 }
 
-function makeLofiLoop(ctx){
-  const seconds=8;
+function makeJazzLoop(ctx){
+  const bpm=128;
+  const beat=60/bpm;
+  const seconds=beat*16;
   const sr=ctx.sampleRate;
   const len=Math.floor(sr*seconds);
   const buffer=ctx.createBuffer(1,len,sr);
   const data=buffer.getChannelData(0);
-  const bpm=92;
-  const beat=60/bpm;
+  const barLen=beat*4;
   const chords=[
-    [261.63,329.63,392.00],
-    [220.00,277.18,329.63],
-    [246.94,311.13,369.99],
-    [196.00,246.94,293.66]
+    {notes:[261.63,329.63,392.00,493.88],bass:[130.81,164.81,196.00,220.00]},
+    {notes:[220.00,277.18,329.63,392.00],bass:[110.00,138.59,164.81,196.00]},
+    {notes:[293.66,349.23,440.00,523.25],bass:[146.83,174.61,220.00,261.63]},
+    {notes:[196.00,246.94,293.66,349.23,440.00],bass:[98.00,123.47,146.83,174.61]}
   ];
-  const env=(phase)=>Math.min(1,phase/.04)*Math.max(0,1-phase/1.5);
+  const melody=[659.25,587.33,523.25,493.88,440.00,493.88,523.25,587.33];
+  const env=(phase,dur)=>Math.min(1,phase/.025)*Math.max(0,1-phase/dur);
   for(let i=0;i<len;i++){
     const t=i/sr;
-    const bar=Math.floor(t/2)%chords.length;
-    const local=t%2;
+    const bar=Math.floor(t/barLen)%chords.length;
+    const local=t%barLen;
+    const chord=chords[bar];
     let sample=0;
-    chords[bar].forEach((f,ci)=>{
-      sample+=Math.sin(2*Math.PI*f*t)*(ci===0 ? 0.042 : 0.022)*env(local);
-      sample+=Math.sin(2*Math.PI*(f/2)*t)*.012;
+    chord.notes.forEach((f,ci)=>{
+      const compPhase=(local+(ci*.012))%barLen;
+      const hit=(local<beat*.9 || (local>beat*2 && local<beat*2.75));
+      const amp=hit ? env(compPhase,1.15) : .08;
+      sample+=Math.sin(2*Math.PI*f*t)*(ci===0 ? 0.026 : 0.016)*amp;
     });
-    const beatPhase=t%beat;
-    const step=Math.floor(t/beat);
-    if(beatPhase<.10){
-      sample+=Math.sin(2*Math.PI*58*t)*(step%2===0 ? 0.075 : 0.045)*(1-beatPhase/.10);
+    const beatInBar=Math.floor(local/beat);
+    const beatPhase=local%beat;
+    const bassFreq=chord.bass[beatInBar]||chord.bass[0];
+    if(beatPhase<.22){
+      sample+=Math.sin(2*Math.PI*bassFreq*t)*.08*(1-beatPhase/.22);
     }
-    const hatPhase=(t+beat/2)%beat;
-    if(hatPhase<.035){
-      sample+=(Math.random()*2-1)*.018*(1-hatPhase/.035);
+    const swingA=beat*.36;
+    const swingB=beat*.70;
+    const hatPhase=Math.min(Math.abs(beatPhase-swingA),Math.abs(beatPhase-swingB));
+    if(hatPhase<.028){
+      sample+=(Math.random()*2-1)*.014*(1-hatPhase/.028);
     }
-    data[i]=Math.max(-.55,Math.min(.55,sample));
+    const melodyStep=Math.floor(t/(beat*.5));
+    const melodyPhase=t%(beat*.5);
+    if((melodyStep+bar)%4!==1 && melodyPhase<beat*.28){
+      const mf=melody[(melodyStep+bar*2)%melody.length];
+      sample+=Math.sin(2*Math.PI*mf*t)*.018*env(melodyPhase,beat*.28);
+    }
+    data[i]=Math.max(-.65,Math.min(.65,sample));
   }
   return buffer;
 }
@@ -1378,17 +1394,17 @@ async function startQuizMusic(){
     if(quizAudio.ctx.state==='suspended')await quizAudio.ctx.resume();
     if(!quizAudio.master){
       quizAudio.master=quizAudio.ctx.createGain();
-      quizAudio.master.gain.value=.18;
+      quizAudio.master.gain.value=.22;
       const filter=quizAudio.ctx.createBiquadFilter();
       filter.type='lowpass';
-      filter.frequency.value=1900;
+      filter.frequency.value=2400;
       filter.Q.value=.65;
       filter.connect(quizAudio.ctx.destination);
       quizAudio.master.connect(filter);
     }
     if(quizAudio.source){try{quizAudio.source.stop();}catch(e){}}
     const src=quizAudio.ctx.createBufferSource();
-    src.buffer=makeLofiLoop(quizAudio.ctx);
+    src.buffer=makeJazzLoop(quizAudio.ctx);
     src.loop=true;
     src.connect(quizAudio.master);
     src.start();
