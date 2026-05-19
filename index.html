@@ -754,27 +754,181 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .breadcrumb-cur{font-size:13px;color:var(--text2)}
 .image-quiz-img{width:100%;max-width:500px;height:320px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);margin-bottom:20px}
 
-/* Blood Bank Quiz Mode */
-.bbq-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;overflow-y:auto}
-.bbq-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.bbq-body{flex:1;padding:20px;max-width:740px;margin:0 auto;width:100%}
-.bbq-context{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:20px;font-size:15px;color:var(--text)}
+/* Quiz arena */
+.bbq-overlay{
+  --quiz-lab-bg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%23e7f2ff'/%3E%3Cstop offset='.55' stop-color='%23f5e8ff'/%3E%3Cstop offset='1' stop-color='%23d6e4ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='url(%23g)'/%3E%3Cg fill='none' stroke='%2390a3ca' stroke-width='5' opacity='.34'%3E%3Cpath d='M0 180h1600M0 345h1600M0 510h1600M240 0v900M520 0v900M850 0v900M1190 0v900'/%3E%3C/g%3E%3Crect x='80' y='585' width='1440' height='150' rx='18' fill='%23799ad6' opacity='.55'/%3E%3Crect x='160' y='505' width='300' height='150' rx='14' fill='%23ffffff' opacity='.78'/%3E%3Crect x='520' y='505' width='300' height='150' rx='14' fill='%23ffffff' opacity='.70'/%3E%3Crect x='880' y='505' width='300' height='150' rx='14' fill='%23ffffff' opacity='.72'/%3E%3Crect x='1240' y='505' width='230' height='150' rx='14' fill='%23ffffff' opacity='.68'/%3E%3Cg opacity='.55'%3E%3Crect x='230' y='390' width='90' height='120' rx='14' fill='%234b68a8'/%3E%3Ccircle cx='276' cy='350' r='42' fill='%236a88c8'/%3E%3Crect x='670' y='355' width='74' height='150' rx='22' fill='%238ecae6'/%3E%3Crect x='704' y='300' width='110' height='62' rx='16' fill='%23ffffff'/%3E%3Cpath d='M1015 330c70 12 120 70 125 148' stroke='%236a88c8' stroke-width='20' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='1015' cy='330' r='28' fill='%234b68a8'/%3E%3Crect x='1085' y='480' width='120' height='34' rx='17' fill='%234b68a8'/%3E%3C/g%3E%3C/svg%3E");
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  z-index:500;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+}
+.bbq-overlay::before{
+  content:"";
+  position:fixed;
+  inset:-22px;
+  background-image:var(--quiz-lab-bg);
+  background-size:cover;
+  background-position:center;
+  filter:blur(7px) saturate(1.08);
+  transform:scale(1.03);
+  opacity:.82;
+  pointer-events:none;
+}
+.bbq-overlay::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(79,142,247,.30),transparent 32%),
+    radial-gradient(circle at 88% 5%,rgba(245,166,35,.20),transparent 28%),
+    linear-gradient(135deg,rgba(37,99,212,.50),rgba(120,60,190,.32) 48%,rgba(25,70,140,.38));
+  pointer-events:none;
+}
+.bbq-overlay>*{position:relative;z-index:1}
+.bbq-header{
+  background:rgba(255,255,255,.62);
+  border-bottom:1px solid rgba(255,255,255,.48);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-shrink:0;
+  box-shadow:0 10px 26px rgba(22,34,74,.12);
+}
+body:not(.light-mode) .bbq-header{background:rgba(13,15,18,.62);border-color:rgba(255,255,255,.12)}
+.bbq-body{flex:1;padding:28px 20px;max-width:980px;margin:0 auto;width:100%}
+.bbq-context{
+  background:rgba(255,255,255,.76);
+  border:1px solid rgba(255,255,255,.54);
+  border-radius:18px;
+  padding:18px 20px;
+  margin-bottom:20px;
+  font-size:15px;
+  color:var(--text);
+  box-shadow:0 20px 46px rgba(22,34,74,.14);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+body:not(.light-mode) .bbq-context{background:rgba(20,23,32,.72);border-color:rgba(255,255,255,.12)}
 .bbq-context-title{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
 .bbq-context-scenario{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:12px}
-.bbq-question{font-size:20px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:20px;text-align:center}
-.bbq-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.bbq-question{
+  font-size:24px;
+  font-weight:800;
+  color:#1a1d2e;
+  line-height:1.35;
+  margin:0 auto 20px;
+  text-align:center;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(255,255,255,.58);
+  border-radius:16px;
+  padding:18px 22px;
+  max-width:900px;
+  box-shadow:0 16px 34px rgba(22,34,74,.13);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+body:not(.light-mode) .bbq-question{color:var(--text);background:rgba(20,23,32,.82);border-color:rgba(255,255,255,.12)}
+.bbq-options{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
 @media(max-width:520px){.bbq-options{grid-template-columns:1fr}}
-.bbq-opt{border:none;border-radius:var(--r2);padding:14px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;text-align:left;min-height:56px;line-height:1.3;color:#fff}
+.bbq-opt{
+  border:none;
+  border-radius:16px;
+  padding:20px 22px;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease,opacity .18s ease;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-align:left;
+  min-height:92px;
+  line-height:1.22;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.14),0 12px 24px rgba(20,30,70,.18);
+}
+.bbq-opt::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.24),transparent 50%);
+  pointer-events:none;
+}
 .bbq-opt-a{background:#e63946}
 .bbq-opt-b{background:#2196f3}
 .bbq-opt-c{background:#f5a623}
 .bbq-opt-d{background:#3ddc84;color:#1a2a1a}
 .bbq-opt:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px)}
 .bbq-opt:disabled{cursor:default}
-.bbq-opt.correct-ans{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--success);transform:scale(1.03)}
-.bbq-opt.wrong-ans{opacity:.45;transform:scale(0.97)}
-.bbq-opt-letter{font-size:18px;font-weight:800;min-width:28px;opacity:.85}
+.bbq-opt.correct-ans{box-shadow:0 0 0 5px rgba(255,255,255,.95),0 0 0 10px var(--success),0 16px 32px rgba(26,138,74,.24);transform:scale(1.02)}
+.bbq-opt.wrong-ans{opacity:.48;transform:scale(.98);filter:saturate(.65)}
+.bbq-opt.correct-ans::after,.bbq-opt.wrong-ans::after{
+  position:absolute;
+  top:10px;
+  right:12px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.88);
+  color:#1a1d2e;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+.bbq-opt.correct-ans::after{content:"✓";color:var(--success)}
+.bbq-opt.wrong-ans::after{content:"×";color:var(--danger)}
+.bbq-opt-letter{font-size:22px;font-weight:900;min-width:34px;opacity:.95;text-shadow:0 2px 4px rgba(0,0,0,.18)}
 .bbq-score-big{font-size:64px;font-weight:800;font-family:var(--mono);color:var(--accent);text-align:center;margin:16px 0}
+.quiz-audio-dock{
+  position:fixed;
+  right:18px;
+  top:72px;
+  z-index:580;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,.74);
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:16px;
+  padding:8px;
+  box-shadow:0 12px 30px rgba(22,34,74,.18);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.74);border-color:rgba(255,255,255,.14)}
+.quiz-audio-btn{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--bg2);
+  color:var(--text);
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.quiz-audio-btn.is-on{background:var(--accent);border-color:var(--accent);color:#fff}
+.quiz-audio-note{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap}
+@media(max-width:760px){
+  .bbq-body{padding:18px 12px}
+  .bbq-question{font-size:18px;padding:14px}
+  .bbq-opt{min-height:72px;font-size:15px;padding:16px}
+  .quiz-audio-dock{right:10px;top:auto;bottom:12px}
+  .quiz-audio-note{display:none}
+}
 /* Option letters always white in dark mode */
 .option-letter{font-family:var(--mono);font-size:12px;font-weight:500;color:#fff !important;min-width:18px;margin-top:1px}
 body.light-mode .option-letter{color:var(--text3) !important}
@@ -1120,6 +1274,140 @@ let appState = {
   _quizResultMap:{} // idx -> 'right'|'wrong'
 };
 
+// Quiz music is generated in-browser, so there are no downloaded or copyrighted audio files.
+const QUIZ_MUSIC_KEY='mlsboc_quiz_music_on';
+let quizAudio={ctx:null,master:null,timer:null,on:false};
+
+function quizMusicWanted(){
+  try{return localStorage.getItem(QUIZ_MUSIC_KEY)==='1';}catch(e){return false;}
+}
+
+function setQuizMusicWanted(on){
+  try{localStorage.setItem(QUIZ_MUSIC_KEY,on?'1':'0');}catch(e){}
+}
+
+function syncQuizShell(){
+  const overlay=document.querySelector('.bbq-overlay');
+  let dock=document.getElementById('quiz-audio-dock');
+  if(!overlay){
+    if(dock)dock.remove();
+    if(quizAudio.on)stopQuizMusic(false);
+    return;
+  }
+  if(!dock){
+    dock=document.createElement('div');
+    dock.id='quiz-audio-dock';
+    dock.className='quiz-audio-dock';
+    dock.innerHTML=`
+      <button class="quiz-audio-btn" id="quiz-audio-btn" onclick="toggleQuizMusic()" title="Optional generated lo-fi study loop">
+        <span id="quiz-audio-icon">♪</span><span id="quiz-audio-label">Lo-fi off</span>
+      </button>
+      <span class="quiz-audio-note">generated locally</span>`;
+    overlay.appendChild(dock);
+  }else if(dock.parentElement!==overlay){
+    overlay.appendChild(dock);
+  }
+  if(quizMusicWanted()&&!quizAudio.on&&quizAudio.ctx)startQuizMusic();
+  updateQuizMusicButton();
+}
+
+function updateQuizMusicButton(){
+  const btn=document.getElementById('quiz-audio-btn');
+  const label=document.getElementById('quiz-audio-label');
+  const icon=document.getElementById('quiz-audio-icon');
+  if(!btn||!label||!icon)return;
+  btn.classList.toggle('is-on',quizAudio.on);
+  icon.textContent=quizAudio.on?'♫':'♪';
+  label.textContent=quizAudio.on?'Lo-fi on':'Lo-fi off';
+}
+
+function makeNoiseBuffer(ctx){
+  const length=Math.max(1,Math.floor(ctx.sampleRate*.18));
+  const buffer=ctx.createBuffer(1,length,ctx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
+  return buffer;
+}
+
+function playTone(ctx,master,when,freq,duration,type='sine',gainValue=.055){
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.type=type;
+  osc.frequency.setValueAtTime(freq,when);
+  gain.gain.setValueAtTime(0,when);
+  gain.gain.linearRampToValueAtTime(gainValue,when+.018);
+  gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
+  osc.connect(gain).connect(master);
+  osc.start(when);
+  osc.stop(when+duration+.04);
+}
+
+function scheduleLofiBar(){
+  if(!quizAudio.ctx||!quizAudio.master)return;
+  const ctx=quizAudio.ctx;
+  const master=quizAudio.master;
+  const now=ctx.currentTime+.05;
+  const chords=[
+    [261.63,329.63,392.00],
+    [220.00,277.18,329.63],
+    [246.94,311.13,369.99],
+    [196.00,246.94,293.66]
+  ];
+  const chord=chords[Math.floor((Date.now()/1900)%chords.length)];
+  chord.forEach((f,i)=>playTone(ctx,master,now,f,.95,i?'triangle':'sine',.028));
+  [0,.48,.96,1.44].forEach((beat,i)=>{
+    playTone(ctx,master,now+beat,55,.12,'sine',i===0?.075:.045);
+    const src=ctx.createBufferSource();
+    const gain=ctx.createGain();
+    src.buffer=makeNoiseBuffer(ctx);
+    gain.gain.setValueAtTime(i%2?.018:.028,now+beat+.22);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+beat+.34);
+    src.connect(gain).connect(master);
+    src.start(now+beat+.22);
+    src.stop(now+beat+.38);
+  });
+}
+
+async function startQuizMusic(){
+  try{
+    if(quizAudio.on)return;
+    const AudioContext=window.AudioContext||window.webkitAudioContext;
+    if(!AudioContext){alert('Audio is not supported in this browser.');return;}
+    if(!quizAudio.ctx)quizAudio.ctx=new AudioContext();
+    if(quizAudio.ctx.state==='suspended')await quizAudio.ctx.resume();
+    if(!quizAudio.master){
+      quizAudio.master=quizAudio.ctx.createGain();
+      quizAudio.master.gain.value=.42;
+      const filter=quizAudio.ctx.createBiquadFilter();
+      filter.type='lowpass';
+      filter.frequency.value=1700;
+      filter.Q.value=.65;
+      filter.connect(quizAudio.ctx.destination);
+      quizAudio.master.connect(filter);
+    }
+    quizAudio.on=true;
+    setQuizMusicWanted(true);
+    scheduleLofiBar();
+    quizAudio.timer=setInterval(scheduleLofiBar,1900);
+    updateQuizMusicButton();
+  }catch(err){
+    console.warn('Quiz music failed',err);
+    alert('Music could not start in this browser. You can keep quizzing without it.');
+  }
+}
+
+function stopQuizMusic(persist=true){
+  if(quizAudio.timer){clearInterval(quizAudio.timer);quizAudio.timer=null;}
+  quizAudio.on=false;
+  if(persist)setQuizMusicWanted(false);
+  updateQuizMusicButton();
+}
+
+function toggleQuizMusic(){
+  if(quizAudio.on)stopQuizMusic(true);
+  else startQuizMusic();
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.__appInit = async function(){
   // Guard: only run once even if called multiple times
@@ -1462,6 +1750,7 @@ function renderView(){
   else if(appState.view==='resources')renderResourcesView(v);
   else if(appState.view==='formulas')renderFormulasView(v);
   else if(appState.view==='class')renderClassView(v);
+  requestAnimationFrame(syncQuizShell);
 }
 
 // ─── HOME ─────────────────────────────────────────────────────────────────────
@@ -1986,6 +2275,7 @@ async function renderTab(){
   if(appState.subjectTab==='quiz')await renderQuizTab(el);
   else if(appState.subjectTab==='images')await renderImagesTab(el);
   else if(appState.subjectTab==='cases')await renderCasesTab(el);
+  requestAnimationFrame(syncQuizShell);
 }
 
 // ─── QUIZ TAB ─────────────────────────────────────────────────────────────────
@@ -2911,6 +3201,7 @@ function renderUAImageQuiz(el){
     prompt:'What is this urinalysis finding?',
     placeholder:'🧪',
     onAnswer:id=>{appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();},
+    onPrev:()=>{appState.uaQuizIdx=Math.max(0,appState.uaQuizIdx-1);renderTab();},
     onNext:()=>{appState.uaQuizIdx++;renderTab();},
     onDone:()=>{appState.uaQuizDone=true;renderTab();},
     onRetry:()=>startUAQuiz(true),
@@ -2928,7 +3219,7 @@ function answerUAImgQ(id){appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();
 function uaQuizNext(){appState.uaQuizIdx++;renderTab();}
 
 // ─── SHARED KAHOOT IMAGE QUIZ RENDERER ───────────────────────────────────────
-function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onNext,onDone,onRetry,onExit,onRetryWrong}){
+function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onPrev,onNext,onDone,onRetry,onExit,onRetryWrong}){
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const emojis=['🔴','🔵','🟡','🟢'];
@@ -3040,7 +3331,8 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
     +'<div style="font-size:20px;font-weight:800;color:'+(chosen===item.id?'var(--success)':'var(--danger)')+';margin-bottom:6px">'+(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>'
     +(item.key_features&&item.key_features.length?'<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>':'')
     +'</div>'
-    +'<div style="text-align:center">'
+    +'<div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">'
+    +(idx>0&&onPrev?'<button class="btn btn-ghost" style="font-size:15px;padding:12px 24px" onclick="('+onPrev.toString()+')()">← Prev</button>':'')
     +(idx<items.length-1
       ?'<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="('+onNext.toString()+')()">Next →</button>'
       :'<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="('+onDone.toString()+')()">See Results</button>')
@@ -3347,6 +3639,7 @@ function renderHemeImageQuiz(el){
     prompt:'What condition does this represent?',
     placeholder:'🖼️',
     onAnswer:id=>{appState.hemeQuizAns[appState.hemeQuizIdx]=id;renderTab();},
+    onPrev:()=>{appState.hemeQuizIdx=Math.max(0,appState.hemeQuizIdx-1);renderTab();},
     onNext:()=>{appState.hemeQuizIdx++;renderTab();},
     onDone:()=>{appState.hemeQuizDone=true;renderTab();},
     onRetry:()=>startHemeQuiz(),
@@ -3706,6 +3999,7 @@ function renderMicroImageQuiz(el){
     prompt:'Identify this organism.',
     placeholder:'🔬',
     onAnswer:id=>{appState.microQuizAns[appState.microQuizIdx]=id;renderTab();},
+    onPrev:()=>{appState.microQuizIdx=Math.max(0,appState.microQuizIdx-1);renderTab();},
     onNext:()=>{appState.microQuizIdx++;renderTab();},
     onDone:()=>{appState.microQuizDone=true;renderTab();},
     onRetry:()=>startMicroQuiz(),
@@ -4575,8 +4869,9 @@ function renderSubjectCaseQuiz(el,cfg){
   const idx=appState[qmKey+'Idx']||0;
   const item=items[idx];
   if(!item){appState[qmKey]=false;renderTab();return;}
-  const answered=appState[qmKey+'Answered'];
-  const chosen=appState[qmKey+'Chosen'];
+  const answers=appState[qmKey+'Answers']||{};
+  const chosen=answers[idx]??appState[qmKey+'Chosen'];
+  const answered=chosen!==undefined&&chosen!==null;
   const letters=['a','b','c','d'];
   const colors=['bbq-opt-a','bbq-opt-b','bbq-opt-c','bbq-opt-d'];
   const emojis=['🔴','🔵','🟡','🟢'];
@@ -4609,7 +4904,8 @@ function renderSubjectCaseQuiz(el,cfg){
         ${!isCorrect?`<div style="font-size:13px;color:var(--text2)">Correct: <strong style="color:var(--success)">${(item.options||[])[correctIdx]||''}</strong></div>`:''}
         ${item.explanation?`<div style="font-size:13px;color:var(--text2);margin-top:8px;background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left">${item.explanation}</div>`:''}
       </div>
-      <div style="text-align:center">
+      <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        ${idx>0?`<button class="btn btn-ghost" onclick="subjectCaseQuizPrev('${qmKey}')" style="font-size:15px;padding:12px 24px">← Prev</button>`:''}
         ${idx<items.length-1
           ?`<button class="btn btn-primary" onclick="subjectCaseQuizNext('${qmKey}')" style="font-size:15px;padding:12px 32px">Next →</button>`
           :`<button class="btn btn-success" onclick="appState['${qmKey}Done']=true;renderTab()" style="font-size:15px;padding:12px 32px">See Results</button>`}
@@ -4638,29 +4934,38 @@ function renderSubjectCaseQuiz(el,cfg){
 }
 
 function answerSubjectCaseQuiz(qmKey,letter){
-  if(appState[qmKey+'Answered'])return;
+  if(!appState[qmKey+'Answers'])appState[qmKey+'Answers']={};
+  const idx=appState[qmKey+'Idx']||0;
+  if(appState[qmKey+'Answers'][idx]!==undefined)return;
   appState[qmKey+'Answered']=true;
   appState[qmKey+'Chosen']=letter;
-  if(!appState[qmKey+'Answers'])appState[qmKey+'Answers']={};
-  appState[qmKey+'Answers'][appState[qmKey+'Idx']]=letter;
-  const item=(appState[qmKey+'Items']||[])[appState[qmKey+'Idx']];
+  appState[qmKey+'Answers'][idx]=letter;
+  const item=(appState[qmKey+'Items']||[])[idx];
   if(item&&letter===item.correct)appState[qmKey+'Score']=(appState[qmKey+'Score']||0)+1;
   renderTab();
 }
 
 function subjectCaseQuizNext(qmKey){
   appState[qmKey+'Idx']=(appState[qmKey+'Idx']||0)+1;
-  appState[qmKey+'Chosen']=null;
-  appState[qmKey+'Answered']=false;
+  const chosen=(appState[qmKey+'Answers']||{})[appState[qmKey+'Idx']];
+  appState[qmKey+'Chosen']=chosen??null;
+  appState[qmKey+'Answered']=chosen!==undefined;
+  renderTab();
+}
+function subjectCaseQuizPrev(qmKey){
+  appState[qmKey+'Idx']=Math.max(0,(appState[qmKey+'Idx']||0)-1);
+  const chosen=(appState[qmKey+'Answers']||{})[appState[qmKey+'Idx']];
+  appState[qmKey+'Chosen']=chosen??null;
+  appState[qmKey+'Answered']=chosen!==undefined;
   renderTab();
 }
 
 function renderSubjectCaseQuizResults(el,cfg){
   const qmKey=cfg.quizModeKey;
   const total=(appState[qmKey+'Items']||[]).length;
-  const score=appState[qmKey+'Score']||0;
-  const pct=Math.round(score/total*100);
   const answers=appState[qmKey+'Answers']||{};
+  const score=(appState[qmKey+'Items']||[]).reduce((sum,item,i)=>sum+(answers[i]===item.correct?1:0),0);
+  const pct=Math.round(score/total*100);
   const letters=['a','b','c','d'];
   const missed=[];
   (appState[qmKey+'Items']||[]).forEach((item,i)=>{
@@ -5932,8 +6237,9 @@ function renderBBQuiz(el){
   const items=appState.bbQuizItems;
   const idx=appState.bbQuizIdx;
   const item=items[idx];
-  const answered=appState.bbQuizAnswered;
-  const chosen=appState.bbQuizChosen;
+  const answers=appState.bbQuizAnswers||{};
+  const chosen=answers[idx]??appState.bbQuizChosen;
+  const answered=chosen!==undefined&&chosen!==null;
   const letters=['a','b','c','d'];
   const colors=['bbq-opt-a','bbq-opt-b','bbq-opt-c','bbq-opt-d'];
   const emojis=['🔴','🔵','🟡','🟢'];
@@ -5971,7 +6277,8 @@ function renderBBQuiz(el){
         ${!isCorrect?`<div style="font-size:13px;color:var(--text2)">Correct answer: <strong style="color:var(--success)">${(item.options||[])[correctIdx]||''}</strong></div>`:''}
         ${item.explanation?`<div style="font-size:13px;color:var(--text2);margin-top:8px;background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left">${item.explanation}</div>`:''}
       </div>
-      <div style="text-align:center">
+      <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        ${idx>0?`<button class="btn btn-ghost" onclick="bbQuizPrev()" style="font-size:15px;padding:12px 24px">← Prev</button>`:''}
         ${idx<items.length-1
           ?`<button class="btn btn-primary" onclick="bbQuizNext()" style="font-size:15px;padding:12px 32px">Next →</button>`
           :`<button class="btn btn-success" onclick="appState.bbQuizDone=true;renderTab()" style="font-size:15px;padding:12px 32px">See Results</button>`}
@@ -6000,11 +6307,10 @@ function renderBBQuiz(el){
 }
 
 function answerBBQuiz(letter){
-  if(appState.bbQuizAnswered)return;
-  
+  if(!appState.bbQuizAnswers)appState.bbQuizAnswers={};
+  if(appState.bbQuizAnswers[appState.bbQuizIdx]!==undefined)return;
   appState.bbQuizAnswered=true;
   appState.bbQuizChosen=letter;
-  if(!appState.bbQuizAnswers)appState.bbQuizAnswers={};
   appState.bbQuizAnswers[appState.bbQuizIdx]=letter;
   const item=appState.bbQuizItems[appState.bbQuizIdx];
   if(letter&&letter===item.correct)appState.bbQuizScore++;
@@ -6013,16 +6319,24 @@ function answerBBQuiz(letter){
 
 function bbQuizNext(){
   appState.bbQuizIdx++;
-  appState.bbQuizChosen=null;
-  appState.bbQuizAnswered=false;
+  const chosen=(appState.bbQuizAnswers||{})[appState.bbQuizIdx];
+  appState.bbQuizChosen=chosen??null;
+  appState.bbQuizAnswered=chosen!==undefined;
+  renderTab();
+}
+function bbQuizPrev(){
+  appState.bbQuizIdx=Math.max(0,appState.bbQuizIdx-1);
+  const chosen=(appState.bbQuizAnswers||{})[appState.bbQuizIdx];
+  appState.bbQuizChosen=chosen??null;
+  appState.bbQuizAnswered=chosen!==undefined;
   renderTab();
 }
 
 function renderBBQuizResults(el){
   const total=appState.bbQuizItems.length;
-  const score=appState.bbQuizScore;
-  const pct=Math.round(score/total*100);
   const answers=appState.bbQuizAnswers||{};
+  const score=appState.bbQuizItems.reduce((sum,item,i)=>sum+(answers[i]===item.correct?1:0),0);
+  const pct=Math.round(score/total*100);
   const letters=['a','b','c','d'];
   const missed=[];
 
@@ -8261,7 +8575,8 @@ function renderClassQuiz(v){
         <div style="font-size:20px;font-weight:800;color:${isCorrect?'var(--success)':'var(--danger)'};margin-bottom:6px">${isCorrect?'✓ Correct!':'✗ Incorrect — '+esc(q[q.correct]||'')}</div>
         ${q.explanation?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:500px;margin:0 auto">${esc(q.explanation)}</div>`:''}
       </div>
-      <div style="text-align:center">
+      <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        ${idx>0?`<button class="btn btn-ghost" style="font-size:15px;padding:12px 24px" onclick="classQuizPrev()">← Prev</button>`:''}
         ${idx<questions.length-1
           ?`<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="classQuizNext()">Next →</button>`
           :`<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="appState.classQuizDone=true;renderView()">See Results</button>`}
@@ -8357,6 +8672,7 @@ function classQuizAnswer(letter){
   renderView();
 }
 function classQuizNext(){appState.classQuizIdx++;renderView();}
+function classQuizPrev(){appState.classQuizIdx=Math.max(0,appState.classQuizIdx-1);renderView();}
 
 function retryClassWrongOnly(){
   const missed=appState.classMissed||[];
