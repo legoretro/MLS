@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UA Flowchart Drag and Drop</title>
+  <title>UA Renal Disease Flowcharts</title>
   <script src="interactive_theme.js"></script>
   <link rel="stylesheet" href="interactive_learning.css">
   <style>
@@ -14,567 +14,583 @@
       background:linear-gradient(180deg,#f7f8fc 0,#eef1f8 48%,#f0f2f8 100%);
       font-family:var(--mls-sans);
     }
-    .ua-wrap{max-width:1160px;margin:0 auto;padding:22px 18px 34px}
-    .ua-hero,.toolbar,.flow-panel,.bank,.board{
+    .ua-wrap{
+      max-width:1220px;
+      margin:0 auto;
+      padding:22px 18px 38px;
+    }
+    .ua-hero,.flow-section,.flow-tip{
       background:var(--mls-bg2);
       border:1px solid var(--mls-border);
       border-radius:var(--mls-r2);
       box-shadow:0 12px 28px rgba(37,60,105,.08);
     }
     .ua-hero{
-      padding:18px;
       display:flex;
-      gap:14px;
       align-items:center;
       justify-content:space-between;
+      gap:18px;
       flex-wrap:wrap;
-      margin-bottom:14px;
+      padding:18px;
+      margin-bottom:16px;
     }
-    .ua-kicker{font-family:var(--mls-mono);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9a8500;margin-bottom:4px}
-    h1{font-size:30px;line-height:1.1;margin:0;color:var(--mls-text);letter-spacing:0}
-    .ua-sub{margin:6px 0 0;color:var(--mls-text2);font-size:14px;line-height:1.5;max-width:780px}
-    .ua-badge{background:#c8a800;color:#fff;border-radius:999px;padding:8px 12px;font-family:var(--mls-mono);font-size:12px;font-weight:700}
-    .toolbar{
-      padding:12px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-    .ua-btn{
-      border:1px solid var(--mls-border);
-      border-radius:var(--mls-r);
-      background:var(--mls-bg3);
-      color:var(--mls-text);
-      font:700 13px/1 var(--mls-sans);
-      padding:10px 13px;
-      cursor:pointer;
-    }
-    .ua-btn.primary{background:var(--mls-accent);border-color:var(--mls-accent);color:#fff}
-    .ua-btn:hover{border-color:var(--mls-border2);background:var(--mls-bg4)}
-    .score{margin-left:auto;font-family:var(--mls-mono);font-size:12px;color:var(--mls-text3)}
-
-    .flow-panel{padding:16px;margin-bottom:14px}
-    .flow-title{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-    .flow-title strong{font-size:14px;color:var(--mls-text)}
-    .flow-note{font-size:12px;color:var(--mls-text3);font-family:var(--mls-mono)}
-    .flow-map{
-      display:grid;
-      grid-template-columns:140px 28px 1fr;
-      gap:10px;
-      align-items:stretch;
-    }
-    .flow-start{
-      border-radius:18px;
-      background:#c8a800;
-      color:#fff;
-      min-height:130px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:14px;
-      font-weight:800;
-    }
-    .flow-start span{display:block;font:700 11px/1.4 var(--mls-mono);opacity:.88;margin-top:6px}
-    .flow-arrow{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--mls-border2);
-      font-family:var(--mls-mono);
-      font-weight:800;
-      font-size:22px;
-    }
-    .flow-lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    .flow-lane{
-      border:1px solid var(--mls-border);
-      border-top:5px solid var(--lane,#c8a800);
-      border-radius:var(--mls-r2);
-      background:#fbfcff;
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      min-height:130px;
-    }
-    .lane-label{font-family:var(--mls-mono);font-size:11px;font-weight:800;color:var(--lane,#c8a800);text-transform:uppercase;letter-spacing:.08em}
-    .lane-question{font-size:14px;font-weight:800;color:var(--mls-text);line-height:1.3}
-    .lane-path{display:grid;gap:7px;margin-top:auto}
-    .lane-disease{
-      background:var(--mls-bg3);
-      border:1px solid var(--mls-border);
-      border-radius:999px;
-      padding:7px 9px;
-      font-size:12px;
-      font-weight:700;
-      color:var(--mls-text2);
-      text-align:center;
-    }
-
-    .game{display:grid;grid-template-columns:minmax(250px,310px) 1fr;gap:14px;align-items:start}
-    .bank{position:sticky;top:78px;padding:14px;max-height:calc(100vh - 96px);overflow:auto}
-    .bank-title,.board-label{
-      font-family:var(--mls-mono);
-      font-size:12px;
-      font-weight:800;
+    .ua-kicker{
+      margin-bottom:5px;
+      font:800 12px/1 var(--mls-mono);
+      color:#b49a00;
       letter-spacing:.09em;
       text-transform:uppercase;
-      color:var(--mls-text3);
-      margin-bottom:10px;
     }
-    .bank-help{font-size:12px;line-height:1.45;color:var(--mls-text2);margin-bottom:12px}
-    .clue-list{display:flex;flex-direction:column;gap:10px}
-    .clue-card{
-      background:linear-gradient(180deg,#fff,#f7f8fc);
-      border:1px solid var(--mls-border2);
-      border-left:6px solid var(--clue,#c8a800);
-      border-radius:var(--mls-r2);
-      padding:11px;
-      cursor:grab;
-      user-select:none;
-      box-shadow:0 5px 14px rgba(35,50,90,.09);
+    h1{
+      margin:0;
+      color:var(--mls-text);
+      font-size:31px;
+      line-height:1.1;
+      letter-spacing:0;
     }
-    .clue-card:hover,.clue-card.selected{border-color:var(--mls-accent);box-shadow:0 8px 18px rgba(37,99,212,.14)}
-    .clue-card:active{cursor:grabbing}
-    .clue-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-    .clue-dot{
-      width:28px;
-      height:28px;
-      border-radius:50%;
-      background:var(--clue,#c8a800);
-      color:#fff;
+    .ua-sub{
+      max-width:820px;
+      margin:7px 0 0;
+      color:var(--mls-text2);
+      font-size:15px;
+      line-height:1.45;
+    }
+    .ua-jumps{
       display:flex;
-      align-items:center;
-      justify-content:center;
-      font:800 11px/1 var(--mls-mono);
-      flex-shrink:0;
-    }
-    .clue-title{font-size:13px;font-weight:800;color:var(--mls-text);line-height:1.25}
-    .clue-row{
-      display:grid;
-      grid-template-columns:72px 1fr;
       gap:8px;
+      flex-wrap:wrap;
+    }
+    .ua-jump{
+      display:inline-flex;
       align-items:center;
-      padding:7px 8px;
+      justify-content:center;
+      min-height:38px;
+      padding:0 13px;
+      border-radius:999px;
       border:1px solid var(--mls-border);
-      border-radius:var(--mls-r);
-      background:var(--mls-bg2);
-      margin-top:6px;
-    }
-    .clue-row span:first-child{
-      font:800 10px/1.2 var(--mls-mono);
-      color:var(--mls-text3);
-      text-transform:uppercase;
-      letter-spacing:.05em;
-    }
-    .clue-row span:last-child{font-size:12px;font-weight:700;color:var(--mls-text2);line-height:1.3}
-
-    .board{padding:16px}
-    .board-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-    .board-title{font-size:16px;font-weight:800;color:var(--mls-text)}
-    .board-sub{font-size:12px;color:var(--mls-text3);font-family:var(--mls-mono);margin-top:3px}
-    .disorder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-    .disorder-card{
-      border:1px solid var(--mls-border);
-      background:#fbfcff;
-      border-radius:var(--mls-r2);
-      overflow:hidden;
-      min-height:214px;
-      display:flex;
-      flex-direction:column;
-    }
-    .disorder-head{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 14px;
       background:var(--mls-bg3);
-      border-bottom:1px solid var(--mls-border);
+      color:var(--mls-text2);
+      text-decoration:none;
+      font:800 12px/1 var(--mls-sans);
     }
-    .disorder-icon{
-      width:40px;
-      height:40px;
+    .ua-jump:hover{
+      background:var(--mls-bg4);
+      color:var(--mls-text);
+      border-color:var(--mls-border2);
+    }
+    .flow-tip{
+      padding:12px 14px;
+      margin-bottom:16px;
+      color:var(--mls-text2);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .flow-section{
+      margin:0 0 18px;
+      overflow:hidden;
+    }
+    .section-head{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:14px;
+      align-items:center;
+      padding:18px;
+      border-bottom:1px solid var(--mls-border);
+      background:linear-gradient(180deg,#ffffff,#fbfcff);
+    }
+    .section-bubble{
+      width:58px;
+      height:58px;
       border-radius:50%;
-      background:var(--branch,#c8a800);
-      color:#fff;
       display:flex;
       align-items:center;
       justify-content:center;
-      font:800 12px/1 var(--mls-mono);
+      background:var(--section,#c8a800);
+      color:#fff;
+      font:800 17px/1 var(--mls-mono);
+      box-shadow:0 10px 20px rgba(37,60,105,.16);
       flex-shrink:0;
     }
-    .disorder-name{font-size:15px;font-weight:800;color:var(--mls-text);line-height:1.25}
-    .disorder-branch{font:700 11px/1.2 var(--mls-mono);color:var(--mls-text3);margin-top:3px}
-    .drop-space{
-      margin:12px;
-      min-height:112px;
-      border:2px dashed var(--mls-border2);
-      background:#f8faff;
-      border-radius:var(--mls-r2);
-      padding:9px;
-      display:flex;
-      align-items:stretch;
-      transition:.15s ease;
-      flex:1;
+    .section-label{
+      margin-bottom:4px;
+      color:var(--section,#c8a800);
+      font:800 12px/1 var(--mls-mono);
+      letter-spacing:.1em;
+      text-transform:uppercase;
     }
-    .drop-space.empty::before{
-      content:"drop clue card here";
-      margin:auto;
-      color:var(--mls-text3);
-      font:700 11px/1.2 var(--mls-mono);
+    h2{
+      margin:0;
+      color:var(--mls-text);
+      font-size:25px;
+      line-height:1.15;
+      letter-spacing:0;
+    }
+    .section-summary{
+      margin:7px 0 0;
+      max-width:930px;
+      color:var(--mls-text2);
+      font-size:14px;
+      line-height:1.45;
+    }
+    .flow-scroll{
+      overflow:auto;
+      background:#f8faff;
+      padding:20px;
+    }
+    .flow-map{
+      min-width:920px;
+      color:var(--mls-text);
+    }
+    .flow-level{
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      position:relative;
+    }
+    .flow-level.top{
+      margin-bottom:22px;
+    }
+    .flow-level.top::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:100%;
+      height:22px;
+      border-left:2px solid #9aa2be;
+    }
+    .flow-level.branches{
+      align-items:flex-start;
+    }
+    .flow-node{
+      position:relative;
+      width:240px;
+      min-height:58px;
+      padding:13px 14px;
+      border:1px solid var(--mls-border);
+      border-radius:10px;
+      background:var(--mls-bg2);
+      box-shadow:0 7px 18px rgba(37,60,105,.08);
       text-align:center;
     }
-    .drop-space.over{border-color:var(--mls-accent);background:#2563d40d}
-    .drop-space .clue-card{box-shadow:none;cursor:pointer;width:100%;border-left-width:5px}
-    .drop-space.checked.correct{border-style:solid;border-color:var(--mls-success);background:#1a8a4a0f}
-    .drop-space.checked.wrong{border-style:solid;border-color:var(--mls-danger);background:#c0303f0f}
-    .message{padding:12px 2px 0;font-size:13px;color:var(--mls-text2);min-height:32px}
-    .message.good{color:var(--mls-success);font-weight:800}
-    .message.bad{color:var(--mls-danger);font-weight:800}
-
-    html[data-mls-theme="dark"] body.ua-flowchart .flow-lane,
-    html[data-mls-theme="dark"] body.ua-flowchart .disorder-card,
-    html[data-mls-theme="dark"] body.ua-flowchart .clue-card{background:var(--mls-bg3)}
-    html[data-mls-theme="dark"] body.ua-flowchart .drop-space,
-    html[data-mls-theme="dark"] body.ua-flowchart .clue-row{background:#101625}
-
-    @media(max-width:1050px){
-      .flow-map{grid-template-columns:1fr}
-      .flow-arrow{display:none}
-      .flow-lanes,.disorder-grid{grid-template-columns:1fr 1fr}
+    .flow-node.start{
+      width:280px;
+      border-color:var(--section,#c8a800);
+      background:linear-gradient(180deg,#fff,#fff9dc);
     }
-    @media(max-width:860px){
-      .game{grid-template-columns:1fr}
-      .bank{position:static;max-height:none}
-      .score{margin-left:0;width:100%}
+    .flow-node.test{
+      background:#fff8e9;
+      border-color:#e6d7b5;
     }
-    @media(max-width:620px){
-      h1{font-size:24px}
-      .flow-lanes,.disorder-grid{grid-template-columns:1fr}
-      .clue-row{grid-template-columns:1fr}
+    .flow-node.end{
+      width:250px;
+      min-height:82px;
+      background:#f4fbf7;
+      border-color:#b8dcc7;
+      text-align:left;
+    }
+    .node-title{
+      display:block;
+      color:var(--mls-text);
+      font-size:14px;
+      font-weight:800;
+      line-height:1.25;
+    }
+    .node-small{
+      display:block;
+      margin-top:6px;
+      color:var(--mls-text2);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .node-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:var(--section-tint,#fff9dc);
+      color:var(--section,#c8a800);
+      font:800 10px/1 var(--mls-mono);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .branch{
+      position:relative;
+      width:286px;
+      display:grid;
+      gap:18px;
+      justify-items:center;
+    }
+    .branch::before{
+      content:"";
+      position:absolute;
+      top:-22px;
+      left:50%;
+      height:22px;
+      border-left:2px solid #9aa2be;
+    }
+    .branch::after{
+      content:"";
+      position:absolute;
+      top:-22px;
+      height:2px;
+      background:#9aa2be;
+    }
+    .branch:first-child::after{
+      right:-153px;
+      left:50%;
+    }
+    .branch:nth-child(2)::after{
+      right:-153px;
+      left:-153px;
+    }
+    .branch:last-child::after{
+      right:50%;
+      left:-153px;
+    }
+    .branch-lines{
+      position:absolute;
+      top:76px;
+      bottom:100px;
+      left:50%;
+      border-left:2px solid #9aa2be;
+      z-index:0;
+    }
+    .flow-node{
+      z-index:1;
+    }
+    .decision-row{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin:-8px 0 -4px;
+      z-index:1;
+    }
+    .decision-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:24px;
+      padding:0 8px;
+      border-radius:5px;
+      border:1px solid #b7d6bf;
+      background:#e7f6eb;
+      color:#23713f;
+      font:800 11px/1 var(--mls-mono);
+    }
+    .decision-chip.watch{
+      border-color:#e6c8cf;
+      background:#fff0f2;
+      color:#b12b45;
+    }
+    .flow-key{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+      padding:14px 18px 18px;
+      border-top:1px solid var(--mls-border);
+      background:var(--mls-bg2);
+    }
+    .key-card{
+      border:1px solid var(--mls-border);
+      border-left:5px solid var(--section,#c8a800);
+      border-radius:10px;
+      padding:11px 12px;
+      background:#fbfcff;
+    }
+    .key-card strong{
+      display:block;
+      margin-bottom:4px;
+      color:var(--mls-text);
+      font-size:13px;
+    }
+    .key-card span{
+      color:var(--mls-text2);
+      font-size:12px;
+      line-height:1.35;
+    }
+    html[data-mls-theme="dark"] body.ua-flowchart{
+      background:linear-gradient(180deg,#111522 0,#161b2b 100%);
+    }
+    html[data-mls-theme="dark"] .section-head,
+    html[data-mls-theme="dark"] .flow-scroll,
+    html[data-mls-theme="dark"] .flow-key,
+    html[data-mls-theme="dark"] .flow-node,
+    html[data-mls-theme="dark"] .key-card{
+      background:var(--mls-bg2);
+    }
+    html[data-mls-theme="dark"] .flow-node.start{
+      background:var(--mls-bg3);
+    }
+    html[data-mls-theme="dark"] .flow-node.test{
+      background:var(--mls-bg3);
+      border-color:var(--mls-border);
+    }
+    html[data-mls-theme="dark"] .flow-node.end{
+      background:var(--mls-bg3);
+    }
+    @media(max-width:760px){
+      .ua-wrap{padding:14px 10px 26px}
+      .ua-hero,.section-head{padding:14px}
+      .section-head{grid-template-columns:1fr}
+      .section-bubble{width:48px;height:48px;font-size:15px}
+      h1{font-size:25px}
+      h2{font-size:22px}
+      .flow-scroll{padding:12px}
+      .flow-key{grid-template-columns:1fr}
+    }
+    @media print{
+      .site-header,.ua-jumps{display:none!important}
+      body.ua-flowchart{background:#fff}
+      .ua-wrap{max-width:none;padding:0}
+      .flow-section{break-inside:avoid;box-shadow:none}
+      .flow-scroll{overflow:visible}
     }
   </style>
 </head>
-<body class="mls-interactive ua-flowchart">
-  <div class="site-header">
+<body class="ua-flowchart mls-interactive">
+  <header class="site-header">
     <div>
-      <div class="logo">MLS Interactive Learning</div>
-      <div class="logo-sub">Urinalysis flowchart practice</div>
+      <div class="logo">MLS Interactive</div>
+      <div class="logo-sub">Urinalysis renal disease maps</div>
     </div>
-    <a class="mls-home-btn" href="index.html">Home</a>
-  </div>
+    <a class="mls-home-btn" href="index.html">Back to MLS Home</a>
+  </header>
 
   <main class="ua-wrap">
     <section class="ua-hero">
       <div>
         <div class="ua-kicker">Urinalysis</div>
-        <h1>UA Flowchart Drag and Drop</h1>
-        <p class="ua-sub">Use the flowchart as a visual map. Each clue card already combines the outside finding and microscope finding. Drag the whole card to the disorder it belongs with.</p>
+        <h1>Renal Disease Flowcharts</h1>
+        <p class="ua-sub">Three simple maps from the Exam 4 renal disease lecture: glomerular, tubular, and interstitial patterns. Start at the top of each chart and follow the lines down to the UA clues.</p>
       </div>
-      <div class="ua-badge">Simple mode</div>
+      <nav class="ua-jumps" aria-label="Flowchart sections">
+        <a class="ua-jump" href="#glomerular">Glomerular</a>
+        <a class="ua-jump" href="#tubular">Tubular</a>
+        <a class="ua-jump" href="#interstitial">Interstitial</a>
+      </nav>
     </section>
 
-    <section class="toolbar">
-      <button class="ua-btn primary" onclick="checkAnswers()">Check</button>
-      <button class="ua-btn" onclick="resetGame()">Reset</button>
-      <button class="ua-btn" onclick="shuffleBank()">Shuffle bank</button>
-      <div class="score" id="score">0/6 matched</div>
-    </section>
+    <div class="flow-tip">
+      These are built as a first-pass memory map, not a question bank: pattern first, then the most useful urine clues.
+    </div>
 
-    <section class="flow-panel">
-      <div class="flow-title">
-        <strong>1. Follow the big visual path</strong>
-        <span class="flow-note">Start broad, then choose the disorder bucket below.</span>
+    <section class="flow-section" id="glomerular" style="--section:#c8a800;--section-tint:#fff6c7">
+      <div class="section-head">
+        <div class="section-bubble">G</div>
+        <div>
+          <div class="section-label">Section 1</div>
+          <h2>Glomerular Disorders</h2>
+          <p class="section-summary">Glomerular disease starts at the filtering membrane. When that barrier is injured, urine commonly shows blood, protein, and casts.</p>
+        </div>
       </div>
-      <div class="flow-map" id="flow-map"></div>
-    </section>
-
-    <section class="game">
-      <aside class="bank">
-        <div class="bank-title">2. Clue cards</div>
-        <div class="bank-help">Each card has both parts together: outside clue + microscope clue. Drag one whole card to one disorder.</div>
-        <div class="clue-list" id="bank"></div>
-      </aside>
-
-      <section class="board">
-        <div class="board-head">
-          <div>
-            <div class="board-label">3. Disorder spaces</div>
-            <div class="board-title">Drop the matching clue card</div>
-            <div class="board-sub">One combined clue card per disorder.</div>
-          </div>
-        </div>
-        <div class="disorder-grid" id="disorders"></div>
-        <div class="message" id="message"></div>
-      </section>
-    </section>
-  </main>
-
-  <script>
-    const lanes=[
-      {id:'bloodProtein',label:'Blood / protein path',color:'#c8a800',question:'Blood or protein is the big clue',diseases:['Kidney filter irritation','Protein spill pattern']},
-      {id:'infection',label:'Infection path',color:'#32a66a',question:'WBCs, bacteria, or infection clues stand out',diseases:['Bladder infection pattern','Kidney infection pattern']},
-      {id:'tubuleCrystal',label:'Tubule / crystal path',color:'#2f86c5',question:'Tubule damage or crystals stand out',diseases:['Tubule damage pattern','Crystal / stone pattern']}
-    ];
-
-    const disorders=[
-      {
-        id:'filter',
-        lane:'bloodProtein',
-        abbr:'KF',
-        title:'Kidney Filter Irritation',
-        clueTitle:'Blood and protein together',
-        outside:'blood + protein',
-        microscope:'RBC casts or odd-shaped RBCs'
-      },
-      {
-        id:'proteinSpill',
-        lane:'bloodProtein',
-        abbr:'PS',
-        title:'Protein Spill Pattern',
-        clueTitle:'Protein loss pattern',
-        outside:'very high protein + swelling',
-        microscope:'fat droplets or oval fat bodies'
-      },
-      {
-        id:'bladderUti',
-        lane:'infection',
-        abbr:'BI',
-        title:'Bladder Infection Pattern',
-        clueTitle:'Lower UTI clues',
-        outside:'cloudy urine + LE/nitrite',
-        microscope:'many WBCs + bacteria'
-      },
-      {
-        id:'kidneyInfection',
-        lane:'infection',
-        abbr:'KI',
-        title:'Kidney Infection Pattern',
-        clueTitle:'Upper UTI clues',
-        outside:'UTI clues + fever/flank pain',
-        microscope:'WBC casts'
-      },
-      {
-        id:'tubuleDamage',
-        lane:'tubuleCrystal',
-        abbr:'TD',
-        title:'Tubule Damage Pattern',
-        clueTitle:'Tubule injury clues',
-        outside:'poor concentration or glucose mismatch',
-        microscope:'renal tubular cells or granular casts'
-      },
-      {
-        id:'crystalStone',
-        lane:'tubuleCrystal',
-        abbr:'CS',
-        title:'Crystal / Stone Pattern',
-        clueTitle:'Crystal irritation clues',
-        outside:'pain with blood or pH clue',
-        microscope:'crystals with RBCs'
-      }
-    ];
-
-    const clues=disorders.map(d=>({
-      id:d.id,
-      lane:d.lane,
-      title:d.clueTitle,
-      outside:d.outside,
-      microscope:d.microscope
-    }));
-
-    let placed={};
-    let selected=null;
-    let checked=false;
-    let shuffled=shuffle(clues);
-
-    function shuffle(arr){
-      return [...arr].sort(()=>Math.random()-.5);
-    }
-
-    function laneFor(id){
-      return lanes.find(l=>l.id===id)||lanes[0];
-    }
-
-    function escText(value){
-      return String(value||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-    }
-
-    function renderFlow(){
-      const root=document.getElementById('flow-map');
-      root.innerHTML=`
-        <div class="flow-start">
-          <div>Start with UA clues</div>
-          <span>outside + microscope</span>
-        </div>
-        <div class="flow-arrow">-&gt;</div>
-        <div class="flow-lanes">
-          ${lanes.map(l=>`
-            <div class="flow-lane" style="--lane:${l.color}">
-              <div class="lane-label">${escText(l.label)}</div>
-              <div class="lane-question">${escText(l.question)}</div>
-              <div class="lane-path">
-                ${l.diseases.map(d=>`<div class="lane-disease">${escText(d)}</div>`).join('')}
-              </div>
-            </div>`).join('')}
-        </div>`;
-    }
-
-    function makeClueCard(clue){
-      const lane=laneFor(clue.lane);
-      const el=document.createElement('div');
-      el.className='clue-card'+(selected===clue.id?' selected':'');
-      el.style.setProperty('--clue',lane.color);
-      el.draggable=true;
-      el.dataset.id=clue.id;
-      el.innerHTML=`
-        <div class="clue-head">
-          <div class="clue-dot">${escText(lane.label.slice(0,2).toUpperCase())}</div>
-          <div class="clue-title">${escText(clue.title)}</div>
-        </div>
-        <div class="clue-row"><span>outside</span><span>${escText(clue.outside)}</span></div>
-        <div class="clue-row"><span>scope</span><span>${escText(clue.microscope)}</span></div>`;
-      el.addEventListener('dragstart',ev=>{
-        ev.dataTransfer.setData('text/plain',clue.id);
-      });
-      el.addEventListener('click',ev=>{
-        ev.stopPropagation();
-        if(placed[clue.id])returnClue(clue.id);
-        else{
-          selected=selected===clue.id?null:clue.id;
-          renderBank();
-        }
-      });
-      return el;
-    }
-
-    function renderBank(){
-      const bank=document.getElementById('bank');
-      const available=shuffled.filter(clue=>!placed[clue.id]);
-      bank.innerHTML='';
-      if(!available.length){
-        bank.innerHTML='<div style="font-size:12px;color:var(--mls-text3);line-height:1.5">All clue cards are placed. Check your matches.</div>';
-      }
-      available.forEach(clue=>bank.appendChild(makeClueCard(clue)));
-      updateScore();
-    }
-
-    function renderDisorders(){
-      const root=document.getElementById('disorders');
-      root.innerHTML='';
-      disorders.forEach(d=>{
-        const lane=laneFor(d.lane);
-        const card=document.createElement('div');
-        card.className='disorder-card';
-        card.style.setProperty('--branch',lane.color);
-        card.innerHTML=`
-          <div class="disorder-head">
-            <div class="disorder-icon">${escText(d.abbr)}</div>
-            <div>
-              <div class="disorder-name">${escText(d.title)}</div>
-              <div class="disorder-branch">${escText(lane.label)}</div>
+      <div class="flow-scroll">
+        <div class="flow-map">
+          <div class="flow-level top">
+            <div class="flow-node start">
+              <span class="node-tag">Start</span>
+              <span class="node-title">Glomerular membrane injury</span>
+              <span class="node-small">Immune damage, membrane thickening, deposits, or inherited barrier weakness.</span>
             </div>
           </div>
-          <div class="drop-space empty" data-target="${escText(d.id)}"></div>`;
-        root.appendChild(card);
-      });
-      document.querySelectorAll('.drop-space').forEach(space=>{
-        space.addEventListener('dragover',ev=>{ev.preventDefault();space.classList.add('over');});
-        space.addEventListener('dragleave',()=>space.classList.remove('over'));
-        space.addEventListener('drop',ev=>{
-          ev.preventDefault();
-          space.classList.remove('over');
-          const id=ev.dataTransfer.getData('text/plain');
-          placeClue(id,space.dataset.target);
-        });
-        space.addEventListener('click',()=>{
-          if(selected)placeClue(selected,space.dataset.target);
-        });
-      });
-      renderPlaced();
-    }
+          <div class="flow-level branches">
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Inflammatory pattern</span>
+                <span class="node-small">Think glomerulonephritis when blood and casts are prominent.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip">blood + protein</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Post-strep GN</span>
+                <span class="node-small">RBCs, dysmorphic RBCs, WBCs, protein, RBC casts; serum ASO may be elevated.</span>
+              </div>
+              <div class="flow-node end">
+                <span class="node-title">RPGN, Goodpasture, vasculitis</span>
+                <span class="node-small">Proteinuria with RBCs and RBC casts; renal function can worsen quickly.</span>
+              </div>
+            </div>
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Membrane or deposit pattern</span>
+                <span class="node-small">The membrane becomes thickened, damaged, or loaded with immune deposits.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip watch">watch protein</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Membranous or membranoproliferative GN</span>
+                <span class="node-small">Proteinuria and RBCs; membranoproliferative disease may include decreased complement.</span>
+              </div>
+              <div class="flow-node end">
+                <span class="node-title">IgA nephropathy or chronic GN</span>
+                <span class="node-small">Hematuria pattern; chronic disease can add protein, glucose, and reduced renal function.</span>
+              </div>
+            </div>
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Protein-loss pattern</span>
+                <span class="node-small">The main clue is heavy protein loss with edema or lipid findings.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip">fat clues</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Nephrotic syndrome</span>
+                <span class="node-small">Marked protein, RBCs, fat droplets, oval fat bodies, RTE cells, fatty or waxy casts.</span>
+              </div>
+              <div class="flow-node end">
+                <span class="node-title">Minimal change, FSGS, Alport, diabetic nephropathy</span>
+                <span class="node-small">Protein is important; RBCs or inherited basement membrane changes may help separate causes.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-key">
+        <div class="key-card"><strong>Big UA clue</strong><span>Blood plus protein points back to the glomerular filter.</span></div>
+        <div class="key-card"><strong>Microscope clue</strong><span>RBC casts and dysmorphic RBCs make the glomerulus feel likely.</span></div>
+        <div class="key-card"><strong>Protein clue</strong><span>Very heavy protein with lipid findings fits a nephrotic pattern.</span></div>
+      </div>
+    </section>
 
-    function renderPlaced(){
-      document.querySelectorAll('.drop-space').forEach(space=>{
-        const target=space.dataset.target;
-        const clue=clues.find(c=>placed[c.id]===target);
-        space.innerHTML='';
-        space.classList.toggle('empty',!clue);
-        space.classList.remove('checked','correct','wrong');
-        if(checked&&clue){
-          space.classList.add('checked',clue.id===target?'correct':'wrong');
-        }
-        if(clue)space.appendChild(makeClueCard(clue));
-      });
-      updateScore();
-    }
+    <section class="flow-section" id="tubular" style="--section:#2c83d6;--section-tint:#e7f2ff">
+      <div class="section-head">
+        <div class="section-bubble">T</div>
+        <div>
+          <div class="section-label">Section 2</div>
+          <h2>Tubular Disorders</h2>
+          <p class="section-summary">Tubular disease affects the cells that reabsorb, secrete, or respond to signals. Clues often involve RTE cells, epithelial casts, low specific gravity, or substances that should have been reabsorbed.</p>
+        </div>
+      </div>
+      <div class="flow-scroll">
+        <div class="flow-map">
+          <div class="flow-level top">
+            <div class="flow-node start">
+              <span class="node-tag">Start</span>
+              <span class="node-title">Tubular cell or reabsorption problem</span>
+              <span class="node-small">Tubules are injured or cannot handle filtrate normally.</span>
+            </div>
+          </div>
+          <div class="flow-level branches">
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Cell injury pattern</span>
+                <span class="node-small">Ischemia or toxins injure renal tubular epithelial cells.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip">RTE cells</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Acute tubular necrosis</span>
+                <span class="node-small">Mild protein, RTE cells, epithelial casts; hyaline, granular, waxy, or broad casts may appear.</span>
+              </div>
+            </div>
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Proximal reabsorption failure</span>
+                <span class="node-small">Several filtered substances are lost because proximal transport fails.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip watch">many losses</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Fanconi syndrome</span>
+                <span class="node-small">Glucose, amino acids, phosphorus, sodium, potassium, bicarbonate, and water can be affected.</span>
+              </div>
+            </div>
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Specific response or transporter problem</span>
+                <span class="node-small">One function is mostly affected instead of the whole proximal tubule.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip">specific clue</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Nephrogenic diabetes insipidus</span>
+                <span class="node-small">Tubules do not respond to ADH; urine has low specific gravity with frequent urination.</span>
+              </div>
+              <div class="flow-node end">
+                <span class="node-title">Renal glycosuria</span>
+                <span class="node-small">Urine glucose is increased even though serum glucose is normal.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-key">
+        <div class="key-card"><strong>Big UA clue</strong><span>RTE cells and epithelial casts point toward tubular cell injury.</span></div>
+        <div class="key-card"><strong>Reabsorption clue</strong><span>Unexpected urine glucose or multiple losses can mean transport failure.</span></div>
+        <div class="key-card"><strong>Concentration clue</strong><span>Low specific gravity with frequent urination fits the ADH-response branch.</span></div>
+      </div>
+    </section>
 
-    function placeClue(id,target){
-      const clue=clues.find(c=>c.id===id);
-      if(!clue)return;
-      Object.keys(placed).forEach(existing=>{
-        if(placed[existing]===target)delete placed[existing];
-      });
-      placed[id]=target;
-      selected=null;
-      checked=false;
-      clearMessage();
-      renderBank();
-      renderPlaced();
-    }
-
-    function returnClue(id){
-      delete placed[id];
-      selected=null;
-      checked=false;
-      clearMessage();
-      renderBank();
-      renderPlaced();
-    }
-
-    function clearMessage(){
-      const msg=document.getElementById('message');
-      msg.textContent='';
-      msg.className='message';
-    }
-
-    function updateScore(){
-      const placedCount=Object.keys(placed).length;
-      document.getElementById('score').textContent=`${placedCount}/${clues.length} matched`;
-    }
-
-    function checkAnswers(){
-      checked=true;
-      const placedIds=Object.keys(placed);
-      const correct=placedIds.filter(id=>placed[id]===id).length;
-      const remaining=clues.length-placedIds.length;
-      const msg=document.getElementById('message');
-      msg.className='message '+(correct===clues.length?'good':'bad');
-      msg.textContent=correct===clues.length
-        ?'Nice. Every clue card is in the matching disorder space.'
-        :`${correct}/${placedIds.length||0} placed clue cards match. ${remaining} still in the bank. Click a placed card to move it back.`;
-      renderPlaced();
-    }
-
-    function resetGame(){
-      placed={};
-      selected=null;
-      checked=false;
-      clearMessage();
-      renderBank();
-      renderDisorders();
-    }
-
-    function shuffleBank(){
-      shuffled=shuffle(shuffled);
-      renderBank();
-    }
-
-    renderFlow();
-    renderBank();
-    renderDisorders();
-  </script>
+    <section class="flow-section" id="interstitial" style="--section:#1a8a4a;--section-tint:#e6f6ed">
+      <div class="section-head">
+        <div class="section-bubble">I</div>
+        <div>
+          <div class="section-label">Section 3</div>
+          <h2>Interstitial Disorders</h2>
+          <p class="section-summary">Interstitial disease affects the space around tubules, so inflammation and infection clues matter. WBCs, bacteria, WBC casts, and eosinophils help separate the branches.</p>
+        </div>
+      </div>
+      <div class="flow-scroll">
+        <div class="flow-map">
+          <div class="flow-level top">
+            <div class="flow-node start">
+              <span class="node-tag">Start</span>
+              <span class="node-title">Interstitial inflammation or infection</span>
+              <span class="node-small">Inflammation around tubules often overlaps with tubular findings.</span>
+            </div>
+          </div>
+          <div class="flow-level branches">
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Lower urinary tract pattern</span>
+                <span class="node-small">Bladder infection without kidney cast clue.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip">WBC + bacteria</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Cystitis</span>
+                <span class="node-small">Numerous WBCs and bacteria, mild protein, and RBCs.</span>
+              </div>
+            </div>
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Upper urinary tract pattern</span>
+                <span class="node-small">Kidney involvement adds cast clues.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip watch">WBC casts</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Acute pyelonephritis</span>
+                <span class="node-small">Numerous WBCs and bacteria, mild protein, RBCs, plus WBC casts.</span>
+              </div>
+              <div class="flow-node end">
+                <span class="node-title">Chronic pyelonephritis</span>
+                <span class="node-small">WBC casts can appear with granular, waxy, or broad casts and long-term damage.</span>
+              </div>
+            </div>
+            <div class="branch">
+              <span class="branch-lines"></span>
+              <div class="flow-node test">
+                <span class="node-title">Drug or allergic inflammation pattern</span>
+                <span class="node-small">Inflammation appears without the bacteria pattern.</span>
+              </div>
+              <div class="decision-row"><span class="decision-chip">no bacteria</span></div>
+              <div class="flow-node end">
+                <span class="node-title">Acute interstitial nephritis</span>
+                <span class="node-small">RBCs, protein, many WBCs, WBC casts, eosinophils, and absence of bacteria.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-key">
+        <div class="key-card"><strong>Big UA clue</strong><span>WBCs and bacteria suggest infection somewhere in the urinary tract.</span></div>
+        <div class="key-card"><strong>Upper tract clue</strong><span>WBC casts separate kidney involvement from simple lower UTI patterns.</span></div>
+        <div class="key-card"><strong>Allergy clue</strong><span>Eosinophils with no bacteria fits acute interstitial nephritis.</span></div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
