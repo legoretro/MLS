@@ -78,20 +78,6 @@ body.ua-flow-page{
 }
 .ua-flow-btn.primary:hover{background:var(--mls-accent2);color:#fff}
 .ua-flow-panel{overflow:hidden;margin-bottom:14px}
-.ua-flow-toolbar{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  flex-wrap:wrap;
-  padding:12px;
-  border-bottom:1px solid var(--mls-border);
-  background:#fbfcff;
-}
-.ua-flow-score{
-  margin-left:auto;
-  color:var(--mls-text3);
-  font:800 12px/1 var(--mls-mono);
-}
 .ua-flow-canvas{
   overflow:auto;
   padding:18px;
@@ -188,24 +174,19 @@ body.ua-flow-page{
   font-size:12px;
   line-height:1.4;
 }
-.ua-drop-pair{
+.ua-static-pair{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:9px;
 }
-.ua-drop-zone{
-  min-height:82px;
-  border:2px dashed var(--mls-border2);
+.ua-static-box{
+  min-height:76px;
+  border:1px solid var(--mls-border);
   border-radius:10px;
   background:#f8faff;
-  padding:8px;
-  transition:border-color .15s ease,background .15s ease;
+  padding:9px;
 }
-.ua-drop-zone.over{
-  border-color:var(--mls-accent);
-  background:#2563d40d;
-}
-.ua-drop-label{
+.ua-static-label{
   display:block;
   margin-bottom:7px;
   color:var(--mls-text3);
@@ -213,73 +194,28 @@ body.ua-flow-page{
   letter-spacing:.08em;
   text-transform:uppercase;
 }
-.ua-drop-items{
+.ua-static-list{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
-  min-height:50px;
 }
-.ua-drop-zone.empty .ua-drop-items::before{
-  content:"drop here";
-  color:var(--mls-text3);
-  font:800 11px/1 var(--mls-mono);
-  margin:auto;
-}
-.ua-drop-zone.checked.good{border-style:solid;border-color:var(--mls-success);background:#1a8a4a10}
-.ua-drop-zone.checked.bad{border-style:solid;border-color:var(--mls-danger);background:#c0303f10}
-.ua-flow-bank{
-  padding:14px;
-}
-.ua-bank-title{
-  margin-bottom:8px;
-  color:var(--mls-text);
-  font-size:16px;
-  font-weight:800;
-}
-.ua-bank-help{
-  margin-bottom:12px;
-  color:var(--mls-text2);
-  font-size:13px;
-  line-height:1.4;
-}
-.ua-chip-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-.ua-chip{
+.ua-static-list span{
   display:inline-flex;
   align-items:center;
-  min-height:36px;
-  border:1px solid var(--mls-border2);
+  min-height:28px;
+  padding:0 9px;
   border-radius:999px;
-  background:#fff;
+  border:1px solid #d8c783;
+  background:#fffdf2;
   color:var(--mls-text);
-  padding:0 12px;
-  font-size:13px;
+  font-size:12px;
   font-weight:800;
-  cursor:grab;
-  user-select:none;
-  box-shadow:0 4px 10px rgba(37,60,105,.08);
 }
-.ua-chip:active{cursor:grabbing}
-.ua-chip.selected{
-  outline:3px solid #2563d433;
-  border-color:var(--mls-accent);
-}
-.ua-chip.wrong{
-  border-color:var(--mls-danger);
-  background:#fff5f6;
-}
-.ua-flow-message{
-  padding:11px 14px 0;
-  min-height:32px;
-  color:var(--mls-text2);
+.ua-static-empty{
+  color:var(--mls-text3);
   font-size:13px;
   font-weight:700;
 }
-.ua-flow-message.good{color:var(--mls-success)}
-.ua-flow-message.bad{color:var(--mls-danger)}
 .ua-flow-menu-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
@@ -295,17 +231,15 @@ body.ua-flow-page{
 .ua-flow-menu-card strong{display:block;font-size:19px;margin-bottom:8px}
 .ua-flow-menu-card span{display:block;color:var(--mls-text2);font-size:13px;line-height:1.4}
 html[data-mls-theme="dark"] body.ua-flow-page{background:linear-gradient(180deg,#111522 0,#161b2b 100%)}
-html[data-mls-theme="dark"] .ua-flow-toolbar,
 html[data-mls-theme="dark"] .ua-flow-canvas,
 html[data-mls-theme="dark"] .ua-disease-card,
-html[data-mls-theme="dark"] .ua-drop-zone,
-html[data-mls-theme="dark"] .ua-chip{background:var(--mls-bg3)}
+html[data-mls-theme="dark"] .ua-static-box{background:var(--mls-bg3)}
+html[data-mls-theme="dark"] .ua-static-list span{background:var(--mls-bg2)}
 @media(max-width:760px){
   .ua-flow-wrap{padding:14px 10px 28px}
   .ua-flow-hero{padding:14px}
   .ua-flow-hero h1{font-size:25px}
-  .ua-flow-score{margin-left:0;width:100%}
   .ua-flow-map{min-width:760px;grid-template-columns:180px 36px 1fr}
   .ua-flow-branches{grid-template-columns:repeat(3,240px)}
-  .ua-drop-pair{grid-template-columns:1fr 1fr}
+  .ua-static-pair{grid-template-columns:1fr}
 }
