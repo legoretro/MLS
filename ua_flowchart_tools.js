@@ -7,37 +7,36 @@
     return String(value||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   }
 
-  function renderList(items){
-    if(!items||!items.length)return '<div class="ua-static-empty">none listed</div>';
-    return `<div class="ua-static-list">${items.map(item=>`<span>${esc(item)}</span>`).join('')}</div>`;
+  function renderFacts(label,items){
+    if(!items||!items.length)return '';
+    return `
+      <div class="ua-node-facts">
+        <span>${esc(label)}</span>
+        <p>${items.map(esc).join(' • ')}</p>
+      </div>
+    `;
   }
 
   function renderDisease(disease){
     return `
-      <article class="ua-disease-card">
-        <div>
-          <div class="ua-disease-name">${esc(disease.name)}</div>
-          <div class="ua-disease-note">${esc(disease.note)}</div>
-        </div>
-        <div class="ua-static-pair">
-          <div class="ua-static-box">
-            <span class="ua-static-label">Urine findings</span>
-            ${renderList(disease.urine)}
-          </div>
-          <div class="ua-static-box">
-            <span class="ua-static-label">Serum / other</span>
-            ${renderList(disease.other)}
-          </div>
-        </div>
+      <article class="ua-disease-node">
+        <h3>${esc(disease.name)}</h3>
+        <p class="ua-disease-note">${esc(disease.note)}</p>
+        ${renderFacts('Urine',disease.urine)}
+        ${renderFacts('Other',disease.other)}
       </article>
     `;
   }
 
   function renderBranch(branch){
+    const diseaseCount=Math.max(1,(branch.diseases||[]).length);
     return `
-      <section class="ua-branch">
-        <div class="ua-branch-title">${esc(branch.title)}</div>
-        ${branch.diseases.map(renderDisease).join('')}
+      <section class="ua-branch-flow">
+        <div class="ua-branch-node">${esc(branch.title)}</div>
+        <div class="ua-branch-drop" aria-hidden="true"></div>
+        <div class="ua-disease-row" style="--disease-cols:${diseaseCount};grid-template-columns:repeat(${diseaseCount},170px)">
+          ${branch.diseases.map(renderDisease).join('')}
+        </div>
       </section>
     `;
   }
@@ -68,13 +67,13 @@
 
       <section class="ua-flow-panel">
         <div class="ua-flow-canvas">
-          <div class="ua-flow-map">
+          <div class="ua-flow-chart">
             <div class="ua-start-node">
               <strong>${esc(data.startTitle)}</strong>
               <span>${esc(data.startNote)}</span>
             </div>
-            <div class="ua-flow-connector" aria-hidden="true"></div>
-            <div class="ua-flow-branches">
+            <div class="ua-root-drop" aria-hidden="true"></div>
+            <div class="ua-branch-row">
               ${data.branches.map(renderBranch).join('')}
             </div>
           </div>
