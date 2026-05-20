@@ -756,7 +756,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 
 /* Quiz arena */
 .bbq-overlay{
-  --quiz-lab-bg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cdefs%3E%3ClinearGradient id='wall' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop stop-color='%23eef5ff'/%3E%3Cstop offset='.58' stop-color='%23dfeafa'/%3E%3Cstop offset='1' stop-color='%23c8d7ee'/%3E%3C/linearGradient%3E%3ClinearGradient id='glass' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffffff' stop-opacity='.86'/%3E%3Cstop offset='1' stop-color='%239bc9ef' stop-opacity='.42'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='url(%23wall)'/%3E%3Crect y='620' width='1600' height='280' fill='%23b8c7dd'/%3E%3Cpath d='M0 620h1600M0 705h1600M0 790h1600M260 620l-90 280M535 620l-35 280M805 620v280M1075 620l42 280M1350 620l98 280' stroke='%23eaf0fb' stroke-width='5' opacity='.55'/%3E%3Crect x='70' y='500' width='1460' height='95' rx='18' fill='%238ba4c8' opacity='.72'/%3E%3Crect x='95' y='585' width='1410' height='45' rx='10' fill='%237b91b4' opacity='.72'/%3E%3Crect x='145' y='350' width='265' height='142' rx='16' fill='%23f8fbff' opacity='.86'/%3E%3Crect x='465' y='350' width='265' height='142' rx='16' fill='%23f8fbff' opacity='.80'/%3E%3Crect x='785' y='350' width='265' height='142' rx='16' fill='%23f8fbff' opacity='.82'/%3E%3Crect x='1105' y='350' width='330' height='142' rx='16' fill='%23f8fbff' opacity='.78'/%3E%3Cg opacity='.54' stroke='%2399abc9' stroke-width='5'%3E%3Cpath d='M145 420h1290M275 350v142M600 350v142M915 350v142M1235 350v142'/%3E%3C/g%3E%3Cg opacity='.62'%3E%3Crect x='215' y='425' width='48' height='76' rx='10' fill='url(%23glass)'/%3E%3Crect x='282' y='395' width='34' height='106' rx='12' fill='url(%23glass)'/%3E%3Crect x='545' y='405' width='58' height='94' rx='14' fill='%23cde9f7'/%3E%3Crect x='625' y='445' width='72' height='34' rx='17' fill='%23edf7ff'/%3E%3Cpath d='M900 468c46-52 122-48 157 2' fill='none' stroke='%236b84ad' stroke-width='18' stroke-linecap='round'/%3E%3Cellipse cx='898' cy='471' rx='34' ry='18' fill='%236b84ad'/%3E%3Crect x='970' y='503' width='120' height='28' rx='14' fill='%236b84ad'/%3E%3Crect x='1195' y='395' width='42' height='108' rx='14' fill='url(%23glass)'/%3E%3Crect x='1260' y='425' width='42' height='78' rx='14' fill='url(%23glass)'/%3E%3Crect x='1325' y='380' width='54' height='122' rx='18' fill='%23d7eefb'/%3E%3C/g%3E%3Cg opacity='.22' stroke='%237d92b5' stroke-width='3'%3E%3Cpath d='M0 155h1600M0 275h1600M0 395h1600M210 0v620M480 0v620M760 0v620M1040 0v620M1320 0v620'/%3E%3C/g%3E%3C/svg%3E");
+  --quiz-lab-bg:var(--custom-quiz-bg,url("assets/quiz-bg/lab-quiz-bg.jpg"));
   position:fixed;
   inset:0;
   background:var(--bg);
@@ -770,6 +770,8 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   position:fixed;
   inset:-22px;
   background-image:var(--quiz-lab-bg);
+  background-color:#eaf3ff;
+  background-blend-mode:screen;
   background-size:cover;
   background-position:center;
   filter:none;
@@ -782,9 +784,8 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   position:fixed;
   inset:0;
   background:
-    radial-gradient(circle at 18% 12%,rgba(79,142,247,.16),transparent 34%),
-    radial-gradient(circle at 88% 5%,rgba(245,166,35,.10),transparent 28%),
-    linear-gradient(135deg,rgba(37,99,212,.18),rgba(115,84,190,.12) 48%,rgba(255,255,255,.16));
+    radial-gradient(circle at 18% 12%,rgba(79,142,247,.10),transparent 34%),
+    linear-gradient(135deg,rgba(255,255,255,.42),rgba(236,244,255,.30) 48%,rgba(255,255,255,.22));
   pointer-events:none;
 }
 .bbq-overlay>*{position:relative;z-index:1}
@@ -922,7 +923,8 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
   .quiz-audio-note{display:none}
   .bbq-overlay::before{
     background-image:var(--quiz-lab-bg);
-    background-color:#dfeaff;
+    background-color:#eaf3ff;
+    background-blend-mode:screen;
     background-size:cover;
     background-position:center;
     filter:none;
@@ -931,7 +933,7 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
     opacity:.9;
   }
   .bbq-overlay::after{
-    background:linear-gradient(135deg,rgba(37,99,212,.18),rgba(128,80,190,.10),rgba(255,255,255,.16));
+    background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(236,244,255,.24),rgba(255,255,255,.18));
   }
   .bbq-header{background:rgba(255,255,255,.94)}
   body:not(.light-mode) .bbq-header{background:rgba(13,15,18,.94)}
@@ -1035,6 +1037,11 @@ body.light-mode .option-letter{color:var(--text3) !important}
 <div id="main-app">
   <div id="admin-bar-el" class="admin-bar hidden">
     <span>⚠ ADMIN MODE</span>
+    <label class="btn btn-sm btn-ghost" style="cursor:pointer">Quiz BG
+      <input type="file" accept="image/*" style="display:none" onchange="handleQuizBackgroundFile(event)">
+    </label>
+    <button class="btn btn-sm btn-ghost" onclick="resetQuizBackground()">Reset BG</button>
+    <span id="quiz-bg-status" style="font-size:11px;color:var(--text3)"></span>
     <button class="btn btn-sm btn-ghost" onclick="exitAdmin()" style="margin-left:auto">Exit Admin</button>
   </div>
   <header>
@@ -1446,12 +1453,71 @@ function toggleQuizMusic(){
   else startQuizMusic();
 }
 
+const QUIZ_BG_KEY='mlsboc_quiz_bg';
+function applyQuizBackgroundFromStorage(){
+  try{
+    const stored=localStorage.getItem(QUIZ_BG_KEY);
+    if(stored){
+      document.documentElement.style.setProperty('--custom-quiz-bg',`url("${stored}")`);
+    }else{
+      document.documentElement.style.removeProperty('--custom-quiz-bg');
+    }
+  }catch(e){}
+}
+function setQuizBgStatus(msg){
+  const el=document.getElementById('quiz-bg-status');
+  if(el){el.textContent=msg||'';if(msg)setTimeout(()=>{if(el.textContent===msg)el.textContent='';},2600);}
+}
+function handleQuizBackgroundFile(e){
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){alert('Choose an image file.');return;}
+  setQuizBgStatus('optimizing...');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        const maxW=760;
+        const scale=Math.min(1,maxW/img.width);
+        const w=Math.max(1,Math.round(img.width*scale));
+        const h=Math.max(1,Math.round(img.height*scale));
+        const cv=document.createElement('canvas');
+        cv.width=w;cv.height=h;
+        const ctx=cv.getContext('2d');
+        ctx.fillStyle='#eaf3ff';
+        ctx.fillRect(0,0,w,h);
+        if('filter' in ctx)ctx.filter='blur(1.8px) brightness(1.16) saturate(1.03)';
+        ctx.drawImage(img,0,0,w,h);
+        const url=cv.toDataURL('image/jpeg',0.48);
+        localStorage.setItem(QUIZ_BG_KEY,url);
+        applyQuizBackgroundFromStorage();
+        setQuizBgStatus('saved for this browser');
+        if(e.target)e.target.value='';
+      }catch(err){
+        console.warn(err);
+        alert('That image was too large to save in this browser. Try a smaller image.');
+        setQuizBgStatus('');
+      }
+    };
+    img.onerror=()=>{alert('Could not read that image.');setQuizBgStatus('');};
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function resetQuizBackground(){
+  try{localStorage.removeItem(QUIZ_BG_KEY);}catch(e){}
+  applyQuizBackgroundFromStorage();
+  setQuizBgStatus('default restored');
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.__appInit = async function(){
   // Guard: only run once even if called multiple times
   if(window.__appInitDone)return;
   window.__appInitDone=true;
   clearStaleAppCaches();
+  applyQuizBackgroundFromStorage();
   applySavedTheme();
   try{
     sb = supabase.createClient(SB_URL, SB_KEY);
