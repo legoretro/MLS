@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UA Tubular Flowchart</title>
+  <script src="interactive_theme.js"></script>
+  <link rel="stylesheet" href="interactive_learning.css">
+  <link rel="stylesheet" href="ua_flowchart_tools.css">
+</head>
+<body class="ua-flow-page mls-interactive">
+  <div id="ua-flow-app"></div>
+  <script>
+    window.UA_FLOWCHART_DATA={
+      title:'UA Tubular Flowchart',
+      color:'#2c83d6',
+      tint:'#e7f2ff',
+      summary:'Tubular disorders affect cells that reabsorb, secrete or respond to signals. Match the tubular clue chips to the correct disorder.',
+      startTitle:'Tubular cell or transport problem',
+      startNote:'Look for RTE cells, epithelial casts, low SG or substances that should be reabsorbed.',
+      branches:[
+        {
+          title:'Cell injury pattern',
+          diseases:[
+            {
+              id:'atn',
+              name:'Acute tubular necrosis',
+              note:'RTE cells are damaged by ischemia or toxins.',
+              urine:['mild protein','RTE cells','epithelial casts','granular casts','waxy casts','broad casts'],
+              other:['ischemia clue','toxin clue']
+            }
+          ]
+        },
+        {
+          title:'Proximal reabsorption failure',
+          diseases:[
+            {
+              id:'fanconi',
+              name:'Fanconi syndrome',
+              note:'Proximal tubule reabsorption fails for many substances.',
+              urine:['glucose','amino acids','phosphorus','sodium or potassium','bicarbonate','water loss'],
+              other:['PCT reabsorption failure']
+            }
+          ]
+        },
+        {
+          title:'Specific function problem',
+          diseases:[
+            {
+              id:'ndi',
+              name:'Nephrogenic DI',
+              note:'Tubules do not respond normally to ADH.',
+              urine:['low specific gravity','dilute urine'],
+              other:['frequent urination','ADH response problem']
+            },
+            {
+              id:'glycosuria',
+              name:'Renal glycosuria',
+              note:'Glucose handling is affected without high blood glucose.',
+              urine:['increased urine glucose'],
+              other:['normal serum glucose','glucose transporter problem']
+            }
+          ]
+        }
+      ]
+    };
+  </script>
+  <script src="ua_flowchart_tools.js"></script>
+</body>
+</html>

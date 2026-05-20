@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UA Interstitial Flowchart</title>
+  <script src="interactive_theme.js"></script>
+  <link rel="stylesheet" href="interactive_learning.css">
+  <link rel="stylesheet" href="ua_flowchart_tools.css">
+</head>
+<body class="ua-flow-page mls-interactive">
+  <div id="ua-flow-app"></div>
+  <script>
+    window.UA_FLOWCHART_DATA={
+      title:'UA Interstitial Flowchart',
+      color:'#1a8a4a',
+      tint:'#e6f6ed',
+      summary:'Interstitial disorders involve inflammation or infection around tubules. Match WBC, bacteria, cast and eosinophil clues to the correct pattern.',
+      startTitle:'Interstitial inflammation or infection',
+      startNote:'WBCs, bacteria, WBC casts and eosinophils help split the branches.',
+      branches:[
+        {
+          title:'Lower urinary tract',
+          diseases:[
+            {
+              id:'cystitis',
+              name:'Cystitis',
+              note:'Bladder infection pattern without the kidney cast clue.',
+              urine:['numerous WBCs','numerous bacteria','mild protein','RBCs'],
+              other:['bladder infection']
+            }
+          ]
+        },
+        {
+          title:'Upper urinary tract',
+          diseases:[
+            {
+              id:'acute-pyelo',
+              name:'Acute pyelonephritis',
+              note:'Kidney infection pattern with WBC casts.',
+              urine:['numerous WBCs','numerous bacteria','mild protein','RBCs','WBC casts'],
+              other:['upper UTI','flank or back pain clue']
+            },
+            {
+              id:'chronic-pyelo',
+              name:'Chronic pyelonephritis',
+              note:'Long-term kidney infection pattern with tubular damage.',
+              urine:['numerous WBCs','numerous bacteria','mild protein','RBCs','WBC casts','granular casts','waxy casts','broad casts'],
+              other:['permanent tubular damage']
+            }
+          ]
+        },
+        {
+          title:'Drug or allergy pattern',
+          diseases:[
+            {
+              id:'ain',
+              name:'Acute interstitial nephritis',
+              note:'Inflammation without the bacteria pattern.',
+              urine:['RBCs','protein','numerous WBCs','WBC casts','eosinophils','no bacteria'],
+              other:['medication reaction clue']
+            }
+          ]
+        }
+      ]
+    };
+  </script>
+  <script src="ua_flowchart_tools.js"></script>
+</body>
+</html>

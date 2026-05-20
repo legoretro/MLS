@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UA Glomerular Flowchart</title>
+  <script src="interactive_theme.js"></script>
+  <link rel="stylesheet" href="interactive_learning.css">
+  <link rel="stylesheet" href="ua_flowchart_tools.css">
+</head>
+<body class="ua-flow-page mls-interactive">
+  <div id="ua-flow-app"></div>
+  <script>
+    window.UA_FLOWCHART_DATA={
+      title:'UA Glomerular Flowchart',
+      color:'#c8a800',
+      tint:'#fff6c7',
+      summary:'Glomerular disease starts at the filtering membrane. Match the urine and serum clues to the glomerular pattern they belong with.',
+      startTitle:'Glomerular membrane injury',
+      startNote:'Blood, protein and casts point back to the filter.',
+      branches:[
+        {
+          title:'Inflammatory pattern',
+          diseases:[
+            {
+              id:'post-strep',
+              name:'Post-strep GN',
+              note:'Follows a recent strep infection pattern.',
+              urine:['RBCs','dysmorphic RBCs','WBCs','protein','RBC casts'],
+              other:['serum ASO may be elevated']
+            },
+            {
+              id:'rpgn',
+              name:'RPGN',
+              note:'Fast-moving glomerular injury pattern.',
+              urine:['marked protein','RBCs','RBC casts'],
+              other:['GFR decreases','renal function may worsen quickly']
+            }
+          ]
+        },
+        {
+          title:'Antibody or vessel pattern',
+          diseases:[
+            {
+              id:'goodpasture',
+              name:'Goodpasture syndrome',
+              note:'Autoantibody pattern involving kidney and lung basement membrane.',
+              urine:['protein','RBCs','RBC casts'],
+              other:['alveolar basement membrane involvement']
+            },
+            {
+              id:'vasculitis',
+              name:'Vasculitis GN',
+              note:'Systemic vascular inflammation can involve the glomerulus.',
+              urine:['protein','RBCs','RBC casts'],
+              other:['ANCA clue may appear','respiratory involvement may appear']
+            }
+          ]
+        },
+        {
+          title:'Protein-loss pattern',
+          diseases:[
+            {
+              id:'nephrotic',
+              name:'Nephrotic syndrome',
+              note:'Heavy protein loss with lipid findings.',
+              urine:['marked protein','RBCs','fat droplets','oval fat bodies','fatty casts','waxy casts'],
+              other:['low albumin','high lipids','edema']
+            },
+            {
+              id:'diabetic',
+              name:'Diabetic nephropathy',
+              note:'Basement membrane thickening and early albumin leakage.',
+              urine:['microalbuminuria'],
+              other:['basement membrane thickening','common ESRD cause']
+            }
+          ]
+        }
+      ]
+    };
+  </script>
+  <script src="ua_flowchart_tools.js"></script>
+</body>
+</html>
