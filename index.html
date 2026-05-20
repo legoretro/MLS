@@ -757,6 +757,8 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 /* Quiz arena */
 .bbq-overlay{
   --quiz-lab-bg:var(--custom-quiz-bg,url("assets/quiz-bg/lab-quiz-bg.jpg"));
+  --quiz-bg-blur:var(--custom-quiz-bg-blur,3.5px);
+  --quiz-bg-opacity:var(--custom-quiz-bg-opacity,.45);
   position:fixed;
   inset:0;
   background:var(--bg);
@@ -774,9 +776,9 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   background-blend-mode:normal;
   background-size:cover;
   background-position:center;
-  filter:none;
-  transform:none;
-  opacity:.94;
+  filter:blur(var(--quiz-bg-blur)) brightness(.92) saturate(.78);
+  transform:scale(1.02);
+  opacity:var(--quiz-bg-opacity);
   pointer-events:none;
 }
 .bbq-overlay::after{
@@ -927,10 +929,10 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
     background-blend-mode:normal;
     background-size:cover;
     background-position:center;
-    filter:none;
-    transform:none;
-    inset:0;
-    opacity:.92;
+    filter:blur(var(--quiz-bg-blur)) brightness(.92) saturate(.78);
+    transform:scale(1.03);
+    inset:-14px;
+    opacity:var(--quiz-bg-opacity);
   }
   .bbq-overlay::after{
     background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(236,244,255,.08),rgba(255,255,255,.05));
@@ -1041,6 +1043,12 @@ body.light-mode .option-letter{color:var(--text3) !important}
       <input type="file" accept="image/*" style="display:none" onchange="handleQuizBackgroundFile(event)">
     </label>
     <button class="btn btn-sm btn-ghost" onclick="resetQuizBackground()">Reset BG</button>
+    <label class="flex-center gap-6" style="font-size:11px;color:var(--text2)">BG Blur
+      <input id="quiz-bg-blur" type="range" min="0" max="10" step=".5" value="3.5" oninput="handleQuizBgBlur(this.value)" style="width:82px">
+    </label>
+    <label class="flex-center gap-6" style="font-size:11px;color:var(--text2)">BG Opacity
+      <input id="quiz-bg-opacity" type="range" min="15" max="100" value="45" oninput="handleQuizBgOpacity(this.value)" style="width:82px">
+    </label>
     <label class="btn btn-sm btn-ghost" style="cursor:pointer">Music
       <input type="file" accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav" style="display:none" onchange="handleQuizMusicFile(event)">
     </label>
@@ -1445,6 +1453,10 @@ function setMediaStatus(msg){
 function refreshQuizMediaAdminUi(){
   const vol=document.getElementById('quiz-music-volume');
   if(vol)vol.value=String(Math.round(getQuizMusicVolume()*100));
+  const blur=document.getElementById('quiz-bg-blur');
+  if(blur)blur.value=String(getQuizBgBlur());
+  const opacity=document.getElementById('quiz-bg-opacity');
+  if(opacity)opacity.value=String(Math.round(getQuizBgOpacity()*100));
 }
 
 function openQuizMediaDB(){
@@ -1579,6 +1591,29 @@ async function resetQuizMusic(){
 }
 
 const QUIZ_BG_KEY='mlsboc_quiz_bg';
+const QUIZ_BG_BLUR_KEY='mlsboc_quiz_bg_blur';
+const QUIZ_BG_OPACITY_KEY='mlsboc_quiz_bg_opacity';
+
+function clampNumber(value,min,max,fallback){
+  const n=Number(value);
+  if(!Number.isFinite(n))return fallback;
+  return Math.max(min,Math.min(max,n));
+}
+
+function getQuizBgBlur(){
+  return clampNumber(localStorage.getItem(QUIZ_BG_BLUR_KEY),0,10,3.5);
+}
+
+function getQuizBgOpacity(){
+  return clampNumber(localStorage.getItem(QUIZ_BG_OPACITY_KEY),.15,1,.45);
+}
+
+function applyQuizBackgroundSettings(){
+  const root=document.documentElement;
+  root.style.setProperty('--custom-quiz-bg-blur',`${getQuizBgBlur()}px`);
+  root.style.setProperty('--custom-quiz-bg-opacity',String(getQuizBgOpacity()));
+}
+
 function applyQuizBackgroundFromStorage(){
   try{
     const stored=localStorage.getItem(QUIZ_BG_KEY);
@@ -1587,6 +1622,7 @@ function applyQuizBackgroundFromStorage(){
     }else{
       document.documentElement.style.removeProperty('--custom-quiz-bg');
     }
+    applyQuizBackgroundSettings();
   }catch(e){}
 }
 function setQuizBgStatus(msg){
@@ -1629,9 +1665,24 @@ function handleQuizBackgroundFile(e){
   };
   reader.readAsDataURL(file);
 }
+function handleQuizBgBlur(value){
+  const blur=clampNumber(value,0,10,3.5);
+  localStorage.setItem(QUIZ_BG_BLUR_KEY,String(blur));
+  applyQuizBackgroundSettings();
+}
+function handleQuizBgOpacity(value){
+  const opacity=clampNumber(Number(value)/100,.15,1,.45);
+  localStorage.setItem(QUIZ_BG_OPACITY_KEY,String(opacity));
+  applyQuizBackgroundSettings();
+}
 function resetQuizBackground(){
-  try{localStorage.removeItem(QUIZ_BG_KEY);}catch(e){}
+  try{
+    localStorage.removeItem(QUIZ_BG_KEY);
+    localStorage.removeItem(QUIZ_BG_BLUR_KEY);
+    localStorage.removeItem(QUIZ_BG_OPACITY_KEY);
+  }catch(e){}
   applyQuizBackgroundFromStorage();
+  refreshQuizMediaAdminUi();
   setQuizBgStatus('default restored');
 }
 
