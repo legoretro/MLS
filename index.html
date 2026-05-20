@@ -770,13 +770,13 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   position:fixed;
   inset:-22px;
   background-image:var(--quiz-lab-bg);
-  background-color:#eaf3ff;
-  background-blend-mode:screen;
+  background-color:#111827;
+  background-blend-mode:normal;
   background-size:cover;
   background-position:center;
   filter:none;
   transform:none;
-  opacity:1;
+  opacity:.94;
   pointer-events:none;
 }
 .bbq-overlay::after{
@@ -784,8 +784,8 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   position:fixed;
   inset:0;
   background:
-    radial-gradient(circle at 18% 12%,rgba(79,142,247,.10),transparent 34%),
-    linear-gradient(135deg,rgba(255,255,255,.42),rgba(236,244,255,.30) 48%,rgba(255,255,255,.22));
+    radial-gradient(circle at 18% 12%,rgba(79,142,247,.08),transparent 34%),
+    linear-gradient(135deg,rgba(255,255,255,.14),rgba(236,244,255,.08) 48%,rgba(255,255,255,.06));
   pointer-events:none;
 }
 .bbq-overlay>*{position:relative;z-index:1}
@@ -923,17 +923,17 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
   .quiz-audio-note{display:none}
   .bbq-overlay::before{
     background-image:var(--quiz-lab-bg);
-    background-color:#eaf3ff;
-    background-blend-mode:screen;
+    background-color:#111827;
+    background-blend-mode:normal;
     background-size:cover;
     background-position:center;
     filter:none;
     transform:none;
     inset:0;
-    opacity:.9;
+    opacity:.92;
   }
   .bbq-overlay::after{
-    background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(236,244,255,.24),rgba(255,255,255,.18));
+    background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(236,244,255,.08),rgba(255,255,255,.05));
   }
   .bbq-header{background:rgba(255,255,255,.94)}
   body:not(.light-mode) .bbq-header{background:rgba(13,15,18,.94)}
@@ -1041,7 +1041,14 @@ body.light-mode .option-letter{color:var(--text3) !important}
       <input type="file" accept="image/*" style="display:none" onchange="handleQuizBackgroundFile(event)">
     </label>
     <button class="btn btn-sm btn-ghost" onclick="resetQuizBackground()">Reset BG</button>
-    <span id="quiz-bg-status" style="font-size:11px;color:var(--text3)"></span>
+    <label class="btn btn-sm btn-ghost" style="cursor:pointer">Music
+      <input type="file" accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav" style="display:none" onchange="handleQuizMusicFile(event)">
+    </label>
+    <button class="btn btn-sm btn-ghost" onclick="resetQuizMusic()">Reset Music</button>
+    <label class="flex-center gap-6" style="font-size:11px;color:var(--text2)">Vol
+      <input id="quiz-music-volume" type="range" min="0" max="100" value="45" oninput="handleQuizMusicVolume(this.value)" style="width:90px">
+    </label>
+    <span id="quiz-media-status" style="font-size:11px;color:var(--text3)"></span>
     <button class="btn btn-sm btn-ghost" onclick="exitAdmin()" style="margin-left:auto">Exit Admin</button>
   </div>
   <header>
@@ -1288,13 +1295,12 @@ let appState = {
   _quizResultMap:{} // idx -> 'right'|'wrong'
 };
 
-// Quiz music is generated in-browser, so there are no downloaded or copyrighted audio files.
-let quizAudio={ctx:null,master:null,source:null,on:false};
+let quizAudio={ctx:null,master:null,source:null,audio:null,customUrl:null,customReady:false,on:false};
 
 function activeQuizOverlay(){
   const overlay=document.querySelector('.bbq-overlay');
-  if(!overlay)return null;
   const subjectCaseQuizKeys=['uaQuizMode','immQuizMode','chemQuizMode','paraQuizMode','mycoQuizMode'];
+  const caseStudyActive=appState.view==='subject'&&appState.subjectTab==='cases';
   const caseQuizActive=appState.view==='subject'
     && appState.subjectTab==='cases'
     && (
@@ -1304,18 +1310,26 @@ function activeQuizOverlay(){
   const imageQuizActive=appState.view==='subject'
     && appState.subjectTab==='images'
     && (
+      appState.imgFlashMode
+      ||
       (appState.uaImgMode==='quiz'&&!appState.uaQuizDone)
       || (appState.hemeImgMode==='quiz'&&!appState.hemeQuizDone)
       || (appState.microImgMode==='quiz'&&!appState.microQuizDone)
     );
+  const classRecallActive=appState.view==='class'
+    && (
+      (appState.classView==='quiz'&&!appState.classQuizDone&&!window._classShowQuizResume)
+      || appState.classView==='flashcard'
+    );
   const active=(
     (appState.view==='subject'&&appState.subjectTab==='quiz'&&appState.quizStarted&&!appState.quizDone)
     || (appState.view==='all'&&appState.allStarted&&!appState.allDone)
-    || (appState.view==='class'&&appState.classView==='quiz'&&!appState.classQuizDone&&!window._classShowQuizResume)
+    || classRecallActive
     || imageQuizActive
+    || caseStudyActive
     || caseQuizActive
   );
-  return active?overlay:null;
+  return active?(overlay||document.body):null;
 }
 
 function syncQuizShell(){
@@ -1331,10 +1345,10 @@ function syncQuizShell(){
     dock.id='quiz-audio-dock';
     dock.className='quiz-audio-dock';
     dock.innerHTML=`
-      <button class="quiz-audio-btn" id="quiz-audio-btn" onclick="toggleQuizMusic()" title="Optional generated upbeat lo-fi hip-hop study loop">
-        <span id="quiz-audio-icon">♪</span><span id="quiz-audio-label">Lo-fi off</span>
+      <button class="quiz-audio-btn" id="quiz-audio-btn" onclick="toggleQuizMusic()" title="Optional music">
+        <span id="quiz-audio-icon">♪</span><span id="quiz-audio-label">Off</span>
       </button>
-      <span class="quiz-audio-note">generated locally</span>`;
+      <span class="quiz-audio-note">music</span>`;
     overlay.appendChild(dock);
   }else if(dock.parentElement!==overlay){
     overlay.appendChild(dock);
@@ -1349,7 +1363,7 @@ function updateQuizMusicButton(){
   if(!btn||!label||!icon)return;
   btn.classList.toggle('is-on',quizAudio.on);
   icon.textContent=quizAudio.on?'♫':'♪';
-  label.textContent=quizAudio.on?'Lo-fi on':'Lo-fi off';
+  label.textContent=quizAudio.on?'On':'Off';
 }
 
 function makeLofiHipHopLoop(ctx){
@@ -1410,30 +1424,84 @@ function makeLofiHipHopLoop(ctx){
   return buffer;
 }
 
+const QUIZ_MUSIC_DB='mlsboc_quiz_media';
+const QUIZ_MUSIC_STORE='files';
+const QUIZ_MUSIC_KEY='quiz_music';
+const QUIZ_MUSIC_META_KEY='mlsboc_quiz_music_meta';
+const QUIZ_MUSIC_VOLUME_KEY='mlsboc_quiz_music_volume';
+const QUIZ_MUSIC_MAX_SIZE=12*1024*1024;
+
+function getQuizMusicVolume(){
+  const raw=Number(localStorage.getItem(QUIZ_MUSIC_VOLUME_KEY));
+  if(Number.isFinite(raw))return Math.max(0,Math.min(1,raw));
+  return .45;
+}
+
+function setMediaStatus(msg){
+  const el=document.getElementById('quiz-media-status');
+  if(el){el.textContent=msg||'';if(msg)setTimeout(()=>{if(el.textContent===msg)el.textContent='';},3200);}
+}
+
+function refreshQuizMediaAdminUi(){
+  const vol=document.getElementById('quiz-music-volume');
+  if(vol)vol.value=String(Math.round(getQuizMusicVolume()*100));
+}
+
+function openQuizMediaDB(){
+  return new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error('IndexedDB is not supported in this browser.'));return;}
+    const req=indexedDB.open(QUIZ_MUSIC_DB,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains(QUIZ_MUSIC_STORE))db.createObjectStore(QUIZ_MUSIC_STORE);
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('Could not open music storage.'));
+  });
+}
+
+async function quizMusicStore(mode,fn){
+  const db=await openQuizMediaDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(QUIZ_MUSIC_STORE,mode);
+    const store=tx.objectStore(QUIZ_MUSIC_STORE);
+    const req=fn(store);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('Music storage failed.'));
+    tx.oncomplete=()=>db.close();
+    tx.onerror=()=>{try{db.close();}catch(e){};reject(tx.error||new Error('Music storage failed.'));};
+  });
+}
+
+async function loadQuizMusicUrl(){
+  if(quizAudio.customUrl)return quizAudio.customUrl;
+  try{
+    const rec=await quizMusicStore('readonly',store=>store.get(QUIZ_MUSIC_KEY));
+    if(!rec||!rec.blob)return '';
+    quizAudio.customUrl=URL.createObjectURL(rec.blob);
+    quizAudio.customReady=true;
+    return quizAudio.customUrl;
+  }catch(e){
+    console.warn('Music load failed',e);
+    return '';
+  }
+}
+
 async function startQuizMusic(){
   try{
     if(quizAudio.on)return;
-    const AudioContext=window.AudioContext||window.webkitAudioContext;
-    if(!AudioContext){alert('Audio is not supported in this browser.');return;}
-    if(!quizAudio.ctx)quizAudio.ctx=new AudioContext();
-    if(quizAudio.ctx.state==='suspended')await quizAudio.ctx.resume();
-    if(!quizAudio.master){
-      quizAudio.master=quizAudio.ctx.createGain();
-      quizAudio.master.gain.value=.20;
-      const filter=quizAudio.ctx.createBiquadFilter();
-      filter.type='lowpass';
-      filter.frequency.value=1450;
-      filter.Q.value=.45;
-      filter.connect(quizAudio.ctx.destination);
-      quizAudio.master.connect(filter);
+    const url=await loadQuizMusicUrl();
+    if(!url){
+      alert('No music file loaded yet. Log in as Admin, click Music, and choose an audio file first.');
+      return;
     }
-    if(quizAudio.source){try{quizAudio.source.stop();}catch(e){}}
-    const src=quizAudio.ctx.createBufferSource();
-    src.buffer=makeLofiHipHopLoop(quizAudio.ctx);
-    src.loop=true;
-    src.connect(quizAudio.master);
-    src.start();
-    quizAudio.source=src;
+    if(quizAudio.audio){try{quizAudio.audio.pause();}catch(e){}}
+    const audio=new Audio(url);
+    audio.loop=true;
+    audio.volume=getQuizMusicVolume();
+    audio.preload='auto';
+    await audio.play();
+    quizAudio.audio=audio;
     quizAudio.on=true;
     updateQuizMusicButton();
   }catch(err){
@@ -1444,6 +1512,10 @@ async function startQuizMusic(){
 
 function stopQuizMusic(persist=true){
   if(quizAudio.source){try{quizAudio.source.stop();}catch(e){}quizAudio.source=null;}
+  if(quizAudio.audio){
+    try{quizAudio.audio.pause();quizAudio.audio.currentTime=0;}catch(e){}
+    quizAudio.audio=null;
+  }
   quizAudio.on=false;
   updateQuizMusicButton();
 }
@@ -1451,6 +1523,59 @@ function stopQuizMusic(persist=true){
 function toggleQuizMusic(){
   if(quizAudio.on)stopQuizMusic(true);
   else startQuizMusic();
+}
+
+async function handleQuizMusicFile(e){
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('audio/')&&!/\.(mp3|m4a|aac|ogg|wav)$/i.test(file.name||'')){
+    alert('Choose an audio file, like MP3, M4A, OGG, or WAV.');
+    return;
+  }
+  if(file.size>QUIZ_MUSIC_MAX_SIZE){
+    alert('Music file is too large. Please use a file under 12 MB.');
+    if(e.target)e.target.value='';
+    return;
+  }
+  try{
+    setMediaStatus('saving music...');
+    await quizMusicStore('readwrite',store=>store.put({
+      blob:file,
+      name:file.name||'music',
+      type:file.type||'audio/mpeg',
+      size:file.size,
+      updatedAt:new Date().toISOString()
+    },QUIZ_MUSIC_KEY));
+    localStorage.setItem(QUIZ_MUSIC_META_KEY,JSON.stringify({name:file.name||'music',size:file.size,type:file.type||''}));
+    if(quizAudio.customUrl){URL.revokeObjectURL(quizAudio.customUrl);quizAudio.customUrl=null;}
+    if(quizAudio.on){stopQuizMusic(false);await startQuizMusic();}
+    setMediaStatus('music saved');
+    if(e.target)e.target.value='';
+  }catch(err){
+    console.warn(err);
+    alert('Music upload failed: '+(err.message||err));
+    setMediaStatus('');
+  }
+}
+
+function handleQuizMusicVolume(value){
+  const vol=Math.max(0,Math.min(1,Number(value)/100));
+  localStorage.setItem(QUIZ_MUSIC_VOLUME_KEY,String(vol));
+  if(quizAudio.audio)quizAudio.audio.volume=vol;
+}
+
+async function resetQuizMusic(){
+  try{
+    stopQuizMusic(false);
+    await quizMusicStore('readwrite',store=>store.delete(QUIZ_MUSIC_KEY));
+    localStorage.removeItem(QUIZ_MUSIC_META_KEY);
+    if(quizAudio.customUrl){URL.revokeObjectURL(quizAudio.customUrl);quizAudio.customUrl=null;}
+    quizAudio.customReady=false;
+    setMediaStatus('music reset');
+  }catch(err){
+    console.warn(err);
+    alert('Could not reset music: '+(err.message||err));
+  }
 }
 
 const QUIZ_BG_KEY='mlsboc_quiz_bg';
@@ -1465,8 +1590,7 @@ function applyQuizBackgroundFromStorage(){
   }catch(e){}
 }
 function setQuizBgStatus(msg){
-  const el=document.getElementById('quiz-bg-status');
-  if(el){el.textContent=msg||'';if(msg)setTimeout(()=>{if(el.textContent===msg)el.textContent='';},2600);}
+  setMediaStatus(msg);
 }
 function handleQuizBackgroundFile(e){
   const file=e.target.files&&e.target.files[0];
@@ -1485,11 +1609,11 @@ function handleQuizBackgroundFile(e){
         const cv=document.createElement('canvas');
         cv.width=w;cv.height=h;
         const ctx=cv.getContext('2d');
-        ctx.fillStyle='#eaf3ff';
+        ctx.fillStyle='#111827';
         ctx.fillRect(0,0,w,h);
-        if('filter' in ctx)ctx.filter='blur(1.8px) brightness(1.16) saturate(1.03)';
+        if('filter' in ctx)ctx.filter='blur(.7px) brightness(1.03) saturate(1.03)';
         ctx.drawImage(img,0,0,w,h);
-        const url=cv.toDataURL('image/jpeg',0.48);
+        const url=cv.toDataURL('image/jpeg',0.62);
         localStorage.setItem(QUIZ_BG_KEY,url);
         applyQuizBackgroundFromStorage();
         setQuizBgStatus('saved for this browser');
@@ -1831,6 +1955,7 @@ async function checkAdmin(){
   if(hashHex===ADMIN_PW_HASH){
     isAdmin=true;
     document.getElementById('admin-bar-el').classList.remove('hidden');
+    refreshQuizMediaAdminUi();
     closeAdminModal();renderView();
   }else{document.getElementById('admin-err').textContent='Wrong password.';}
 }
