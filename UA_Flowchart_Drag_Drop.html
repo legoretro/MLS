@@ -14,7 +14,7 @@
       background:linear-gradient(180deg,#f7f8fc 0,#eef1f8 48%,#f0f2f8 100%);
       font-family:var(--mls-sans);
     }
-    .ua-wrap{max-width:1400px;margin:0 auto;padding:22px 18px 34px}
+    .ua-wrap{max-width:1180px;margin:0 auto;padding:22px 18px 34px}
     .ua-hero,.toolbar,.bank,.board,.flow-panel{
       background:var(--mls-bg2);
       border:1px solid var(--mls-border);
@@ -60,7 +60,7 @@
     .flow-note{font-size:12px;color:var(--mls-text3);font-family:var(--mls-mono)}
     .flow-map{
       display:grid;
-      grid-template-columns:180px repeat(4,minmax(0,1fr));
+      grid-template-columns:170px repeat(3,minmax(0,1fr));
       gap:10px;
       align-items:stretch;
     }
@@ -118,7 +118,7 @@
     .route-sub{font-size:12px;color:var(--mls-text2);line-height:1.45;margin-top:5px}
     .game{
       display:grid;
-      grid-template-columns:minmax(250px,320px) 1fr;
+      grid-template-columns:minmax(240px,300px) 1fr;
       gap:14px;
       align-items:start;
     }
@@ -176,13 +176,13 @@
     }
     .board-title{font-size:15px;font-weight:800;color:var(--mls-text)}
     .board-sub{font-size:12px;color:var(--mls-text3);font-family:var(--mls-mono);margin-top:3px}
-    .endpoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .endpoint-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
     .endpoint-card{
       border:1px solid var(--mls-border);
       background:#fbfcff;
       border-radius:var(--mls-r2);
       overflow:hidden;
-      min-height:236px;
+      min-height:184px;
     }
     .endpoint-head{
       display:flex;
@@ -218,7 +218,7 @@
       margin-bottom:7px;
     }
     .slot{
-      min-height:126px;
+      min-height:84px;
       border:1.5px dashed var(--mls-border2);
       background:#f8faff;
       border-radius:var(--mls-r);
@@ -230,7 +230,7 @@
     }
     .slot.over{border-color:var(--mls-accent);background:#2563d40d}
     .slot.empty::before{
-      content:"drop findings";
+      content:"drop clue";
       color:var(--mls-text3);
       font-family:var(--mls-mono);
       font-size:11px;
@@ -250,7 +250,7 @@
       .flow-map{grid-template-columns:1fr 1fr}
       .flow-node.start{grid-column:1/-1}
       .flow-node.start::after,.flow-route::before,.flow-route::after{display:none}
-      .endpoint-grid{grid-template-columns:1fr}
+      .endpoint-grid{grid-template-columns:1fr 1fr}
     }
     @media(max-width:920px){
       .game{grid-template-columns:1fr}
@@ -260,6 +260,7 @@
     @media(max-width:560px){
       h1{font-size:24px}
       .flow-map{grid-template-columns:1fr}
+      .endpoint-grid{grid-template-columns:1fr}
       .slot-grid{grid-template-columns:1fr}
     }
   </style>
@@ -278,7 +279,7 @@
       <div>
         <div class="ua-kicker">Urinalysis</div>
         <h1>UA Flowchart Drag and Drop</h1>
-        <p class="ua-sub">Start with the case pattern, follow the branch, then sort macro and microscopic findings into the endpoint that best fits. It keeps the final case calls for practice.</p>
+        <p class="ua-sub">A simple starter map for UA cases. First choose the big pattern, then match one outside clue and one microscope clue to each card.</p>
       </div>
       <div class="ua-badge">Practice mode</div>
     </section>
@@ -292,19 +293,19 @@
 
     <section class="flow-panel">
       <div class="flow-title">
-        <strong>1. Flowchart first</strong>
-        <span class="flow-note">Ask which pattern dominates before matching findings.</span>
+        <strong>1. Pick the big clue group</strong>
+        <span class="flow-note">Outside clue = color, strip, symptoms. Microscope clue = what you see under the microscope.</span>
       </div>
       <div class="flow-map" id="flow-map"></div>
     </section>
 
     <section class="game">
       <aside class="bank">
-        <div class="bank-title">2. Finding Bank</div>
+        <div class="bank-title">2. Clue Bank</div>
         <div class="bank-tabs">
           <button class="tab active" id="tab-all" onclick="setFilter('all')">All</button>
-          <button class="tab" id="tab-macro" onclick="setFilter('macro')">Macro</button>
-          <button class="tab" id="tab-micro" onclick="setFilter('micro')">Micro</button>
+          <button class="tab" id="tab-macro" onclick="setFilter('macro')">Outside</button>
+          <button class="tab" id="tab-micro" onclick="setFilter('micro')">Microscope</button>
         </div>
         <div class="chip-list" id="bank"></div>
       </aside>
@@ -312,8 +313,8 @@
       <section class="board">
         <div class="board-head">
           <div>
-            <div class="board-title">3. Endpoint matching</div>
-            <div class="board-sub">Drop macro and micro findings into the final pattern cards.</div>
+            <div class="board-title">3. Match the pattern cards</div>
+            <div class="board-sub">Each card gets one outside clue and one microscope clue.</div>
           </div>
         </div>
         <div class="endpoint-grid" id="branches"></div>
@@ -324,43 +325,30 @@
 
   <script>
     const routes=[
-      {id:'bloodProtein',tag:'Blood + protein',color:'#c8a800',question:'Is the case dominated by blood/protein or renal function clues?',sub:'Think filter barrier, nephritic/nephrotic, or chronic damage.'},
-      {id:'tubular',tag:'Tubular function',color:'#2f86c5',question:'Is concentration, reabsorption, or tubular cell injury the main clue?',sub:'Compare glucose, SG, serum context, and tubular cells/casts.'},
-      {id:'infection',tag:'WBC / bacteria',color:'#32a66a',question:'Do leukocytes, nitrite, bacteria, or inflammation dominate?',sub:'Separate lower tract, upper tract, and sterile inflammation.'},
-      {id:'colorCrystal',tag:'Color / crystals',color:'#d24b52',question:'Is the main clue color, pigment, crystals, pH, or stone pain?',sub:'Correlate dipstick blood, microscopy, specimen change, and crystals.'}
+      {id:'bloodProtein',tag:'Blood / protein',color:'#c8a800',question:'Do blood or protein stand out?',sub:'Think kidney filter or protein spill.'},
+      {id:'infection',tag:'WBC / bacteria',color:'#32a66a',question:'Do infection clues stand out?',sub:'Look for LE, nitrite, WBCs, bacteria, fever, or flank pain.'},
+      {id:'tubuleCrystal',tag:'Tubules / crystals',color:'#2f86c5',question:'Do tubule or crystal clues stand out?',sub:'Look for concentration problems, renal cells, crystals, pain, or pH clues.'}
     ];
 
     const endpoints=[
-      {id:'pigment',route:'colorCrystal',abbr:'PG',title:'Pigment or Color Clue',color:'#a060b8',
-        macro:['red, brown, or black color shift','blood pad stronger than RBC count'],
-        micro:['few intact RBCs or lysed cells','microscopy does not fully explain color']},
-      {id:'threshold',route:'tubular',abbr:'SG',title:'Concentration / Threshold',color:'#2f86c5',
-        macro:['specific gravity scale problem','glucose result needs serum context'],
-        micro:['bland sediment pattern','few formed elements']},
-      {id:'glomerular',route:'bloodProtein',abbr:'GN',title:'Glomerular Inflammation',color:'#c8a800',
-        macro:['blood plus protein dominate','edema or renal function clue'],
-        micro:['dysmorphic RBC pattern','RBC cast clue']},
-      {id:'nephrotic',route:'bloodProtein',abbr:'NP',title:'Protein-Loss Pattern',color:'#bd7d16',
-        macro:['heavy protein with edema','low albumin or lipid clue'],
-        micro:['fat droplets or oval fat bodies','fatty or waxy cast clue']},
-      {id:'tubularInjury',route:'tubular',abbr:'TB',title:'Tubular Injury / Reabsorption',color:'#2579b8',
-        macro:['mild protein or concentrating defect','urine glucose with normal serum clue'],
-        micro:['renal tubular epithelial cells','epithelial or granular casts']},
-      {id:'lowerUti',route:'infection',abbr:'LU',title:'Lower UTI Pattern',color:'#32a66a',
-        macro:['cloudy urine with LE or nitrite clue','mild protein with urinary symptoms'],
-        micro:['many WBCs and bacteria','squamous contamination check']},
-      {id:'upperUti',route:'infection',abbr:'UP',title:'Upper UTI / Pyelo Pattern',color:'#24915a',
-        macro:['UTI pattern with flank or systemic clue','mild blood and protein possible'],
-        micro:['WBC casts point upward','bacterial cast or renal epithelial clue']},
-      {id:'interstitial',route:'infection',abbr:'IN',title:'Interstitial Inflammation',color:'#8c62c8',
-        macro:['sterile leukocyte pattern','recent drug or allergy clue'],
-        micro:['WBC casts without bacteria','eosinophil-type clue']},
-      {id:'failure',route:'bloodProtein',abbr:'RF',title:'Renal Failure Progression',color:'#5f6f89',
-        macro:['poor concentrating ability','protein or glucose with declining function'],
-        micro:['granular, waxy, or broad casts','RTE and cast mix suggests renal source']},
-      {id:'lithiasis',route:'colorCrystal',abbr:'ST',title:'Stone / Crystal Irritation',color:'#d24b52',
-        macro:['blood with pain or obstruction clue','pH and crystal chemistry matter'],
-        micro:['RBCs from tissue irritation','crystals in fresh urine']}
+      {id:'filter',route:'bloodProtein',abbr:'KF',title:'Kidney Filter Irritation',color:'#c8a800',
+        macro:['blood and protein together'],
+        micro:['RBC casts or odd-shaped RBCs']},
+      {id:'proteinSpill',route:'bloodProtein',abbr:'PS',title:'Protein Spill Pattern',color:'#bd7d16',
+        macro:['very high protein with swelling'],
+        micro:['fat droplets or oval fat bodies']},
+      {id:'bladderUti',route:'infection',abbr:'BI',title:'Bladder Infection Pattern',color:'#32a66a',
+        macro:['cloudy urine with LE or nitrite'],
+        micro:['many WBCs and bacteria']},
+      {id:'kidneyInfection',route:'infection',abbr:'KI',title:'Kidney Infection Pattern',color:'#24915a',
+        macro:['UTI clues plus fever or flank pain'],
+        micro:['WBC casts']},
+      {id:'tubuleDamage',route:'tubuleCrystal',abbr:'TD',title:'Tubule Damage Pattern',color:'#2579b8',
+        macro:['poor concentration or glucose mismatch'],
+        micro:['renal tubular cells or granular casts']},
+      {id:'crystalStone',route:'tubuleCrystal',abbr:'CS',title:'Crystal / Stone Pattern',color:'#d24b52',
+        macro:['pain with blood or pH clue'],
+        micro:['crystals with RBCs']}
     ];
 
     const chips=endpoints.flatMap(b=>
@@ -392,8 +380,8 @@
       const root=document.getElementById('flow-map');
       root.innerHTML=`
         <div class="flow-node start">
-          <div>Start with UA case data</div>
-          <div style="font:700 11px/1.4 var(--mls-mono);opacity:.86;margin-top:6px">color + strip + SG + microscopy</div>
+          <div>Start with UA clues</div>
+          <div style="font:700 11px/1.4 var(--mls-mono);opacity:.86;margin-top:6px">outside clues + microscope clues</div>
         </div>
         ${routes.map(r=>`
           <div class="flow-node flow-route" style="--route:${r.color}">
@@ -416,7 +404,7 @@
       el.className='chip '+chip.kind+(selected===chip.id?' selected':'');
       el.draggable=true;
       el.dataset.id=chip.id;
-      el.innerHTML=`${chip.text}<small>${chip.kind}</small>`;
+      el.innerHTML=`${chip.text}<small>${chip.kind==='macro'?'outside clue':'microscope clue'}</small>`;
       el.addEventListener('dragstart',ev=>{
         ev.dataTransfer.setData('text/plain',chip.id);
       });
@@ -459,11 +447,11 @@
           </div>
           <div class="slot-grid">
             <div>
-              <div class="slot-title">Macro findings</div>
+              <div class="slot-title">Outside clue</div>
               <div class="slot empty" data-branch="${branch.id}" data-kind="macro"></div>
             </div>
             <div>
-              <div class="slot-title">Micro findings</div>
+              <div class="slot-title">Microscope clue</div>
               <div class="slot empty" data-branch="${branch.id}" data-kind="micro"></div>
             </div>
           </div>`;
@@ -526,7 +514,7 @@
 
     function updateScore(){
       const placedCount=Object.keys(placed).length;
-      document.getElementById('score').textContent=`${placedCount}/${chips.length} placed`;
+      document.getElementById('score').textContent=`${placedCount}/${chips.length} clues placed`;
     }
 
     function checkAnswers(){
@@ -540,8 +528,8 @@
       msg.className='message '+(correct===chips.length?'good':'bad');
       const remaining=chips.length-placedIds.length;
       msg.textContent=correct===chips.length
-        ?'Complete. All placed findings fit their endpoint.'
-        :`${correct}/${placedIds.length||0} placed chips fit so far. ${remaining} still in the bank. Click any placed chip to send it back.`;
+        ?'Complete. Every clue matches its pattern card.'
+        :`${correct}/${placedIds.length||0} placed clues fit so far. ${remaining} still in the bank. Click any placed clue to send it back.`;
       renderPlaced();
     }
 

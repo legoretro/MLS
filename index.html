@@ -113,16 +113,26 @@ select option{background:var(--bg3)}
 .class-material-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
 .class-material-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px}
 .class-material-arrow{margin-left:auto;color:var(--text3);font-size:18px;line-height:1}
-.interactive-tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.interactive-tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:104px;text-align:left;width:100%;position:relative;overflow:hidden}
+.interactive-tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;align-items:start}
+.interactive-tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:104px;text-align:left;width:100%;position:relative;overflow:visible}
 .interactive-tool-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--tool-color,var(--accent));opacity:.9}
-.interactive-tool-card:hover{border-color:color-mix(in srgb,var(--tool-color,var(--accent)) 55%,var(--border));background:var(--bg3);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.interactive-tool-card:hover,.interactive-tool-card:focus-within{border-color:color-mix(in srgb,var(--tool-color,var(--accent)) 55%,var(--border));background:var(--bg3);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.12);z-index:20}
 .interactive-tool-bubble{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,var(--tool-color,var(--accent)),color-mix(in srgb,var(--tool-color,var(--accent)) 64%,#fff));color:#fff;font-family:var(--mono);font-size:15px;font-weight:800;letter-spacing:.2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.16)}
 .interactive-tool-thumb{width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border)}
 .interactive-tool-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
 .interactive-tool-desc{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px;line-height:1.35}
 .interactive-tool-topic{font-size:10px;color:var(--tool-color,var(--accent));font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .interactive-tool-arrow{margin-left:auto;color:var(--text3);font-size:18px;line-height:1}
+.interactive-tool-preview{position:absolute;left:12px;right:12px;top:calc(100% + 8px);background:var(--bg2);border:1px solid color-mix(in srgb,var(--tool-color,var(--accent)) 45%,var(--border));border-radius:var(--r2);box-shadow:0 18px 38px rgba(24,35,70,.20);padding:12px;opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .16s ease,transform .16s ease;z-index:50}
+.interactive-tool-card:hover .interactive-tool-preview,.interactive-tool-card:focus-within .interactive-tool-preview{opacity:1;transform:translateY(0)}
+.interactive-preview-label{font-size:10px;font-weight:800;color:var(--tool-color,var(--accent));text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.interactive-preview-shot{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;min-height:84px;display:grid;gap:7px}
+.interactive-preview-row{display:flex;gap:6px;align-items:center}
+.interactive-preview-pill{height:18px;border-radius:999px;background:color-mix(in srgb,var(--tool-color,var(--accent)) 72%,#fff);opacity:.9}
+.interactive-preview-pill.muted{background:var(--border2);opacity:.75}
+.interactive-preview-mini-card{border:1px dashed var(--border2);border-radius:8px;padding:7px;font-size:10px;font-family:var(--mono);color:var(--text2);background:var(--bg2)}
+.interactive-preview-note{font-size:11px;line-height:1.4;color:var(--text2);margin-top:8px}
+@media(hover:none){.interactive-tool-preview{display:none}}
 .theme-toggle-btn{min-width:148px;justify-content:center}
 .resource-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .resource-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px}
@@ -1114,7 +1124,7 @@ const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'BB Groups: Usual Suspects',url:'BB_Group_Usual.html',description:'Drag-match common blood group systems and antibody rules',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'BB Groups: Unusual Suspects',url:'BB_Group_Unusual.html',description:'Drag-match uncommon systems, codes and serology clues',topic:'Blood Bank',icon:'BB',color:'#b22222'},
   {title:'UA Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'UA',color:'#c8a800'},
-  {title:'UA Flowchart Drag and Drop',url:'UA_Flowchart_Drag_Drop.html',description:'Match macro and micro renal findings into disease-pattern branches',topic:'Urinalysis',icon:'FC',color:'#c8a800'},
+  {title:'UA Flowchart Drag and Drop',url:'UA_Flowchart_Drag_Drop.html',description:'Simple starter map: match one dipstick/body clue and one microscope clue to each UA pattern',topic:'Urinalysis',icon:'FC',color:'#c8a800'},
   {title:'Urine Color & Clarity',url:'Urine_Color_and_Clarity.html',description:'Match urine appearance to causes and findings',topic:'Urinalysis',icon:'UC',color:'#c8a800'},
   {title:'Urinary System Labeling',url:'urinary_labeling.html',description:'Label renal and urinary anatomy',topic:'Urinalysis',icon:'RN',color:'#c8a800'},
   {title:'Thyroid Lab Findings',url:'Thyroid_Label.html',description:'Drag thyroid hormones into the interpretation table',topic:'Chemistry',icon:'TH',color:'#2980b9'},
@@ -2301,7 +2311,7 @@ async function loadInteractiveLinks(){
         const media = lnk.image_url && !lnk.force_icon
           ? '<img class="interactive-tool-thumb" src="'+esc(lnk.image_url)+'" alt="">'
           : '<div class="interactive-tool-bubble" style="--tool-color:'+color+'">'+esc(lnk.icon||'GO')+'</div>';
-        return '<div class="interactive-tool-card" style="--tool-color:'+color+'" onclick="'+action+'">'
+        return '<div class="interactive-tool-card" tabindex="0" style="--tool-color:'+color+'" onclick="'+action+'">'
           + media
           + '<div style="flex:1;min-width:0">'
           + '<div class="interactive-tool-topic">'+esc(lnk.topic || (lnk._builtin?'Interactive':'Saved Link'))+'</div>'
@@ -2309,6 +2319,7 @@ async function loadInteractiveLinks(){
           + (lnk.description ? '<div class="interactive-tool-desc">'+esc(lnk.description)+'</div>' : '')
           + '</div>'
           + '<div class="interactive-tool-arrow">›</div>'
+          + renderInteractivePreview(lnk)
           + (isAdmin && !lnk._builtin ? '<div style="display:flex;gap:6px;position:absolute;right:8px;bottom:8px" onclick="event.stopPropagation()">'
             + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">Edit</button>'
             + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">Remove</button>'
@@ -2334,6 +2345,54 @@ async function loadInteractiveLinks(){
       + '<button class="btn btn-primary btn-sm" onclick="addInteractiveLink()">Add Link</button>'
       + '</div>';
   }
+}
+
+function renderInteractivePreview(lnk){
+  const title=String(lnk.title||'').toLowerCase();
+  const url=String(lnk.url||'').toLowerCase();
+  const label=lnk.image_url?'Image preview':'Quick preview';
+  let shot='';
+  let note=lnk.description||'Open this tool to practice the activity.';
+  if(lnk.image_url){
+    shot='<div class="interactive-preview-shot" style="padding:0;overflow:hidden"><img src="'+esc(lnk.image_url)+'" alt="" style="width:100%;height:112px;object-fit:cover;display:block"></div>';
+  }else if(url.includes('ua_flowchart')||title.includes('flowchart')){
+    note='A simple UA map: choose the big pattern, then match one macro clue and one microscope clue.';
+    shot='<div class="interactive-preview-shot">'
+      + '<div class="interactive-preview-row"><span class="interactive-preview-pill" style="width:36%"></span><span class="interactive-preview-pill muted" style="width:26%"></span></div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+      + '<div class="interactive-preview-mini-card">Macro clue</div><div class="interactive-preview-mini-card">Micro clue</div>'
+      + '<div class="interactive-preview-mini-card">Pattern card</div><div class="interactive-preview-mini-card">Check</div>'
+      + '</div></div>';
+  }else if(/frequency|ranking|rank|haplotype/.test(title+url)){
+    note='Drag numbers or names into a small table/ranking activity.';
+    shot='<div class="interactive-preview-shot">'
+      + '<div class="interactive-preview-row"><span class="interactive-preview-pill" style="width:24%"></span><span class="interactive-preview-pill muted" style="width:62%"></span></div>'
+      + '<div class="interactive-preview-mini-card">Table cells</div><div class="interactive-preview-mini-card">Answer bank</div>'
+      + '</div>';
+  }else if(/structure|secretor|lewis/.test(title+url)){
+    note='Build or match blood-group structures using guided pieces.';
+    shot='<div class="interactive-preview-shot">'
+      + '<div class="interactive-preview-row"><span class="interactive-preview-pill muted" style="width:28%"></span><span class="interactive-preview-pill" style="width:44%"></span></div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px"><div class="interactive-preview-mini-card">Sugar</div><div class="interactive-preview-mini-card">Gene</div><div class="interactive-preview-mini-card">Name</div></div>'
+      + '</div>';
+  }else if(/reagent|color|clarity|thyroid|parathyroid|label/.test(title+url)){
+    note='Match labels or findings into a guided practice board.';
+    shot='<div class="interactive-preview-shot">'
+      + '<div class="interactive-preview-mini-card">Drag chip</div>'
+      + '<div class="interactive-preview-row"><span class="interactive-preview-pill" style="width:48%"></span><span class="interactive-preview-pill muted" style="width:32%"></span></div>'
+      + '<div class="interactive-preview-mini-card">Drop zone</div>'
+      + '</div>';
+  }else{
+    shot='<div class="interactive-preview-shot">'
+      + '<div class="interactive-preview-mini-card">Practice board</div>'
+      + '<div class="interactive-preview-row"><span class="interactive-preview-pill" style="width:42%"></span><span class="interactive-preview-pill muted" style="width:38%"></span></div>'
+      + '</div>';
+  }
+  return '<div class="interactive-tool-preview" onclick="event.stopPropagation()">'
+    + '<div class="interactive-preview-label">'+label+'</div>'
+    + shot
+    + '<div class="interactive-preview-note">'+esc(note)+'</div>'
+    + '</div>';
 }
 
 function normalizeInteractiveUrl(url){
