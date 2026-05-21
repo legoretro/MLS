@@ -3942,12 +3942,33 @@ function openCondition(id){
         </div>`:`<div class="condition-features heme-missing-text" style="margin-bottom:16px">Key features blank</div>`}
       ${isAdmin?`
         <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Edit title and key features</div>
+        ${buildConditionDetailsEditor(data)}
+        <div class="divider"></div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images, magnification, and PB/BM label</div>
         ${buildConditionImageEditor(data)}
       `:''}
     `;
     document.getElementById('condition-modal').classList.remove('hidden');
   });
+}
+
+function buildConditionDetailsEditor(condition){
+  const id=condition.id;
+  const features=(condition.key_features||[]).filter(Boolean).join('\n');
+  return `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="heme-edit-name-${id}" value="${esc(condition.name||'')}" placeholder="Condition title">
+      </div>
+      <div class="form-group">
+        <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
+        <textarea id="heme-edit-features-${id}" style="min-height:90px" placeholder="Feature 1&#10;Feature 2">${esc(features)}</textarea>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveHemeConditionDetails('${id}')">Save Title & Key Features</button>
+    </div>
+  `;
 }
 
 function buildConditionImageEditor(condition){
@@ -4069,6 +4090,18 @@ async function handleConditionBulkFiles(files,conditionId,startSlot=0){
   await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
   window._hemeCondsCache=null;
   openCondition(conditionId);
+}
+
+async function saveHemeConditionDetails(conditionId){
+  const name=document.getElementById(`heme-edit-name-${conditionId}`)?.value.trim();
+  const featText=document.getElementById(`heme-edit-features-${conditionId}`)?.value||'';
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!name){alert('Title is required.');return;}
+  const {error}=await sb.from('mlsboc_heme_conditions').update({name,key_features:features}).eq('id',conditionId);
+  if(error){alert('Save failed: '+error.message);return;}
+  window._hemeCondsCache=null;
+  openCondition(conditionId);
+  renderTab();
 }
 
 async function updateConditionImageMeta(conditionId,slot,field,value){
