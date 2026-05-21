@@ -1802,7 +1802,7 @@ function getUID(){
 
 // ─── SHARED IMAGE SECTION PDF GENERATOR ──────────────────────────────────────
 // Layout: 2x2 image grid on top (like the app cards), name + key features below
-async function generateImageSectionPDF(items, title, filename){
+async function generateImageSectionPDF(items, title, filename, options={}){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const pageW=doc.internal.pageSize.getWidth();
@@ -1823,24 +1823,32 @@ async function generateImageSectionPDF(items, title, filename){
   for(const item of items){
     if(!first)doc.addPage(); first=false;
     // ── 2x2 image grid (top of page, like the card)
-    const imgs=(item.images||[]).map(imageEntrySrc).filter(Boolean).slice(0,4);
+    const imgs=(item.images||[]).slice(0,4);
     for(let i=0;i<4;i++){
       const col=i%2,row=Math.floor(i/2);
       const cx=margin+col*(gridW+gap);
       const cy=gridY+row*(gridH+gap);
+      const entry=imgs[i];
+      const src=imageEntrySrc(entry);
+      const labelH=options.showImageMeta?5:0;
+      const imageH=gridH-labelH;
       doc.setFillColor(245,245,245);doc.rect(cx,cy,gridW,gridH,'F');
       doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(cx,cy,gridW,gridH,'S');
-      if(imgs[i]){
+      if(src){
         try{
           let dims={w:4,h:3};
-          try{dims=await getImgDims(imgs[i]);}catch(e){}
-          const ar=dims.w/dims.h,car=gridW/gridH;
+          try{dims=await getImgDims(src);}catch(e){}
+          const ar=dims.w/dims.h,car=gridW/imageH;
           let dw,dh;
-          if(ar>car){dw=gridW;dh=gridW/ar;}else{dh=gridH;dw=gridH*ar;}
-          const ox=cx+(gridW-dw)/2,oy=cy+(gridH-dh)/2;
-          const fmt=(imgs[i].startsWith('data:image/png')||imgs[i].toLowerCase().includes('.png'))?'PNG':'JPEG';
-          doc.addImage(imgs[i],fmt,ox,oy,dw,dh,'','NONE');
+          if(ar>car){dw=gridW;dh=gridW/ar;}else{dh=imageH;dw=imageH*ar;}
+          const ox=cx+(gridW-dw)/2,oy=cy+(imageH-dh)/2;
+          const fmt=(src.startsWith('data:image/png')||src.toLowerCase().includes('.png'))?'PNG':'JPEG';
+          doc.addImage(src,fmt,ox,oy,dw,dh,'','NONE');
         }catch(e){}
+        if(options.showImageMeta){
+          doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor(80,80,95);
+          doc.text(hemeImageLabel(entry,i),cx+gridW/2,cy+gridH-1.8,{align:'center'});
+        }
       }
     }
     // ── Divider line between images and text
@@ -1859,6 +1867,9 @@ async function generateImageSectionPDF(items, title, filename){
       const featLines=doc.splitTextToSize(feats.join('  |  '),pageW-margin*2);
       featLines.forEach(l=>{doc.text(l,margin,ty);ty+=4.5;});
       ty+=3;
+    }else if(options.missingFeaturesText){
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(190,45,65);
+      doc.text(options.missingFeaturesText,margin,ty);ty+=5;
     }
     // ── Notes
     if(item.notes&&item.notes.trim()){
@@ -3898,7 +3909,10 @@ async function generateHemeConditionsPDF(){
     if(!all||!all.length){alert('Could not load conditions.');return;}
     const {jsPDF}=window.jspdf;
 
-    await generateImageSectionPDF(all,'Hematology Conditions','hematology_conditions.pdf');
+    await generateImageSectionPDF(all,'Hematology Conditions','hematology_conditions.pdf',{
+      showImageMeta:true,
+      missingFeaturesText:'No key features need to add'
+    });
   }catch(err){
     console.error(err);alert('PDF generation failed: '+err.message);
     if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
