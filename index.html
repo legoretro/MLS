@@ -674,9 +674,23 @@ select option{background:var(--bg3)}
 .condition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .condition-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s;display:flex;flex-direction:column}
 .condition-card:hover{border-color:#4f8ef766;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.condition-card.heme-missing-features{background:#fff2f4;border-color:#f0a7b3}
+.condition-card.heme-missing-features .condition-body{background:#fff2f4}
+body:not(.light-mode) .condition-card.heme-missing-features{background:#3a1820;border-color:#f0647488}
+body:not(.light-mode) .condition-card.heme-missing-features .condition-body{background:#3a1820}
 .condition-imgs{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;height:160px;background:var(--bg3);flex-shrink:0}
 .condition-imgs img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:var(--bg3);display:block}
 .condition-imgs .img-ph{width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px}
+.condition-imgs .heme-thumb-wrap{position:relative;min-width:0;min-height:0;background:var(--bg3);overflow:hidden}
+.condition-imgs .heme-thumb-wrap img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:var(--bg3);display:block}
+.heme-img-wrap{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.heme-img-wrap img{width:100%;height:200px;object-fit:contain;display:block;cursor:zoom-in;background:var(--bg3)}
+.heme-img-meta{position:absolute;top:6px;left:6px;background:rgba(10,15,28,.78);color:#fff;border-radius:999px;padding:3px 7px;font:800 10px/1 var(--mono);letter-spacing:.3px}
+.heme-slot-tile{display:flex;flex-direction:column;gap:6px;min-width:0}
+.heme-slot-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.heme-slot-meta input,.heme-slot-meta select{height:28px;padding:4px 6px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px}
+.heme-editor-img-wrap{position:relative}
+.heme-missing-text{color:#ba3448!important;font-style:italic}
 /* UA single-image card — full width, taller */
 .ua-single-img{height:160px;background:var(--bg3);overflow:hidden}
 .ua-single-img img{width:100%;height:100%;object-fit:contain;background:var(--bg3)}
@@ -1808,7 +1822,7 @@ async function generateImageSectionPDF(items, title, filename){
   for(const item of items){
     if(!first)doc.addPage(); first=false;
     // ── 2x2 image grid (top of page, like the card)
-    const imgs=(item.images||[]).filter(Boolean).slice(0,4);
+    const imgs=(item.images||[]).map(imageEntrySrc).filter(Boolean).slice(0,4);
     for(let i=0;i<4;i++){
       const col=i%2,row=Math.floor(i/2);
       const cx=margin+col*(gridW+gap);
@@ -1913,7 +1927,7 @@ async function generateUASingleImagePDF(items, title, filename){
     const x=margin+col*(cardW+gap);
     const y=margin+row*(cardH+gap);
     const imgX=x+3,imgY=y+3,imgW=cardW-6;
-    const img=(item.images||[]).filter(Boolean)[0];
+    const img=(item.images||[]).map(imageEntrySrc).filter(Boolean)[0];
     doc.setFillColor(248,248,248);doc.rect(x,y,cardW,cardH,'F');
     doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(x,y,cardW,cardH,'S');
     doc.setFillColor(245,245,245);doc.rect(imgX,imgY,imgW,imgH,'F');
@@ -3000,14 +3014,15 @@ function renderImageFlashcard(el){
   }
 
   const item=items[idx];
-  const imgs=(item.images||[]).filter(Boolean);
+  const imgs=(item.images||[]).map(imageEntrySrc).filter(Boolean);
   const features=item.key_features||[];
+  const showNotes=appState.subject!=='hematology'&&item.notes;
 
   const frontContent=`
     <div style="padding:20px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
       ${imgs.length
         ?`<div style="display:grid;grid-template-columns:${imgs.length===1?'1fr':'1fr 1fr'};gap:6px;width:100%;margin-bottom:12px">
-            ${imgs.slice(0,4).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:${imgs.length<=2?'220px':'140px'};object-fit:contain;background:var(--bg3);border-radius:var(--r);cursor:zoom-in" alt="">`).join('')}
+            ${imgs.slice(0,4).map(url=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" style="width:100%;height:${imgs.length<=2?'220px':'140px'};object-fit:contain;background:var(--bg3);border-radius:var(--r);cursor:zoom-in" alt="">`).join('')}
           </div>`
         :`<div style="font-size:64px;margin-bottom:20px">🖼️</div>`}
       <div style="font-size:13px;color:var(--text);opacity:.5;text-transform:uppercase;letter-spacing:.8px;font-weight:600">What is this?</div>
@@ -3017,8 +3032,8 @@ function renderImageFlashcard(el){
     <div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px">
       <div style="font-size:13px;color:var(--text);opacity:.5;margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Answer</div>
       <div style="font-size:34px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${features.length?'16px':'0'}">${item.name||'?'}</div>
-      ${features.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px">${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}</div>`:''}
-      ${item.notes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;max-width:480px;line-height:1.6">${item.notes}</div>`:''}
+      ${features.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px">${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}</div>`:''}
+      ${showNotes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;max-width:480px;line-height:1.6">${esc(item.notes)}</div>`:''}
     </div>`;
 
   const uaNav=appState.subject==='urinalysis';
@@ -3661,7 +3676,7 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
   const item=items[idx];
   const answered=ans[idx]!==undefined;
   const chosen=ans[idx];
-  const imgs=(item.images||[]).filter(Boolean);
+  const imgs=(item.images||[]).map(imageEntrySrc).filter(Boolean);
   const pct=Math.round((idx+1)/items.length*100);
   const pool=items.filter(x=>x.id!==item.id);
   const wrongItems=shuffle(pool).slice(0,Math.min(3,pool.length));
@@ -3673,7 +3688,7 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
 
   const imgsHtml=imgs.length
     ?'<div style="display:grid;grid-template-columns:'+(imgs.length===1?'1fr':'1fr 1fr')+';gap:6px;margin-bottom:16px">'
-      +imgs.slice(0,4).map(url=>'<img src="'+url+'" onclick="openImgViewer(\''+url+'\')" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
+      +imgs.slice(0,4).map(url=>'<img src="'+esc(url)+'" onclick="openImgViewer(\''+jsAttr(url)+'\')" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
     :'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:12px">'+placeholder+'</div>';
 
   const optsHtml=opts.map((o,oi)=>{
@@ -3712,6 +3727,33 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
 }
 
 // Hematology images — folder system
+function normalizeHemeFolderKey(key){
+  const map={
+    reactive_physiologic:'reactive',
+    non_malignant_morphologic:'non_malignant',
+    chronic_leukemias:'malignancies_chronic',
+    acute_leukemias:'malignancies_acute',
+    other_malignancies:'malignancies_other'
+  };
+  return map[key]||key||'non_malignant';
+}
+
+function hemeFolderFromType(type,name){
+  const t=String(type||'').toLowerCase();
+  const n=String(name||'').toLowerCase();
+  if(t.includes('acute leukemia')||n.includes('acute'))return 'malignancies_acute';
+  if(t.includes('hemolytic anemia')||t.includes('non-hemolytic anemia')||t==='anemia'||n.includes('anemia')||n.includes('thalassemia'))return 'anemias';
+  if(n.includes('malaria')||n.includes('bacteria')||n.includes('spirochete')||n.includes('viral'))return 'infectious';
+  if(n.includes('leukemoid')||n.includes('reactive')||n.includes('kiddie'))return 'reactive';
+  if(n.includes('pelger')||n.includes('platelet')||n.includes('nrbc'))return 'non_malignant';
+  if(t.includes('lymphoproliferative')){
+    if(n.includes('myeloma')||n.includes('plasma')||n.includes('sezary'))return 'malignancies_other';
+    return 'malignancies_chronic';
+  }
+  if(t.includes('myeloproliferative')||t.includes('myelodysplastic'))return 'malignancies_chronic';
+  return 'non_malignant';
+}
+
 async function renderHemeImages(el){
   if(appState.hemeImgMode==='quiz'){
     renderHemeImageQuiz(el);return;
@@ -3730,7 +3772,11 @@ async function renderHemeImages(el){
 
   // Group by folder preserving HEME_FOLDER_GROUPS order
   const byFolder={};
-  conditions.forEach(c=>{ if(!byFolder[c.folder])byFolder[c.folder]=[]; byFolder[c.folder].push(c); });
+  conditions.forEach(c=>{
+    const folder=normalizeHemeFolderKey(c.folder);
+    if(!byFolder[folder])byFolder[folder]=[];
+    byFolder[folder].push(c);
+  });
   const allFolderKeys=HEME_FOLDER_GROUPS.flatMap(g=>g.keys);
   // also catch any folder key not in the predefined list
   Object.keys(byFolder).forEach(k=>{ if(!allFolderKeys.includes(k))allFolderKeys.push(k); });
@@ -3759,17 +3805,21 @@ async function renderHemeImages(el){
           <div class="heme-section mb-24" data-folder="${fkey}">
             <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${folderLabel} <span style="font-weight:400;font-size:11px">(${items.length})</span></div>
             <div class="condition-grid">
-              ${items.map(c=>`
-                <div class="condition-card heme-item" data-name="${esc(c.name.toLowerCase())}" onclick="openCondition('${c.id}')">
+              ${items.map(c=>{
+                const features=(c.key_features||[]).filter(Boolean);
+                const missing=!features.length;
+                return `
+                <div class="condition-card heme-item ${missing?'heme-missing-features':''}" data-name="${esc((c.name||'').toLowerCase())}" onclick="openCondition('${c.id}')">
                   <div class="condition-imgs">${buildConditionThumbs(c)}</div>
                   <div class="condition-body">
-                    <div class="condition-name">${c.name}</div>
-                    ${c.key_features?`<div class="condition-features">${(c.key_features||[]).slice(0,3).join(' · ')}</div>`:''}
+                    <div class="condition-name">${esc(c.name||'')}</div>
+                    ${features.length?`<div class="condition-features">${features.slice(0,3).map(esc).join(' · ')}</div>`:`<div class="condition-features heme-missing-text">Key features blank</div>`}
                     ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
                       <button class="btn btn-danger btn-xs" onclick="deleteCondition('${c.id}')">Delete</button>
                     </div>`:''}
                   </div>
-                </div>`).join('')}
+                </div>`;
+              }).join('')}
             </div>
           </div>`;
       }).join('')}
@@ -3797,7 +3847,11 @@ async function openHemeExportModal(){
   if(!conditions||!conditions.length){alert('No conditions to export.');return;}
 
   const byFolder={};
-  conditions.forEach(c=>{ if(!byFolder[c.folder])byFolder[c.folder]=[]; byFolder[c.folder].push(c); });
+  conditions.forEach(c=>{
+    const folder=normalizeHemeFolderKey(c.folder);
+    if(!byFolder[folder])byFolder[folder]=[];
+    byFolder[folder].push(c);
+  });
 
   let html=`
     <div class="flex-center gap-8 mb-16">
@@ -3855,7 +3909,8 @@ function buildConditionThumbs(c){
   const slots=4;
   let html='';
   for(let i=0;i<slots;i++){
-    if(imgs[i]) html+=`<img src="${imgs[i]}" alt="" onerror="this.style.display='none'">`;
+    const src=imageEntrySrc(imgs[i]);
+    if(src) html+=`<div class="heme-thumb-wrap"><img src="${esc(src)}" alt="" onerror="this.style.display='none'"><span class="heme-img-meta">${esc(hemeImageLabel(imgs[i]))}</span></div>`;
     else html+=`<div class="img-ph">${i===0?'🖼️':''}</div>`;
   }
   return html;
@@ -3865,26 +3920,28 @@ function openCondition(id){
   // Show modal
   sb.from('mlsboc_heme_conditions').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=data.images||[];
-    const features=data.key_features||[];
+    const imgs=(data.images||[]).filter(imageEntrySrc);
+    const features=(data.key_features||[]).filter(Boolean);
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
-        <div class="section-title" style="font-size:16px">${data.name}</div>
+        <div class="section-title" style="font-size:16px">${esc(data.name||'')}</div>
         <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
       </div>
       ${imgs.length?`
         <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
-          ${imgs.map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+          ${imgs.map(entry=>{
+            const src=imageEntrySrc(entry);
+            return `<div class="heme-img-wrap"><img src="${esc(src)}" onclick="openImgViewer('${jsAttr(src)}')" alt=""><span class="heme-img-meta">${esc(hemeImageLabel(entry))}</span></div>`;
+          }).join('')}
         </div>`:''}
       ${features.length?`
         <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-          ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
-        </div>`:''}
-      ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
+          ${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}
+        </div>`:`<div class="condition-features heme-missing-text" style="margin-bottom:16px">Key features blank</div>`}
       ${isAdmin?`
         <div class="divider"></div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images (drag & drop or click)</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images, magnification, and PB/BM label</div>
         ${buildConditionImageEditor(data)}
       `:''}
     `;
@@ -3896,16 +3953,31 @@ function buildConditionImageEditor(condition){
   const imgs=condition.images||[];
   return `
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
-      ${[0,1,2,3].map(i=>`
-        <div class="drop-zone" id="dz-${condition.id}-${i}"
-          ondrop="handleConditionImgDrop(event,'${condition.id}',${i})"
-          ondragover="event.preventDefault();this.classList.add('dragover')"
-          ondragleave="this.classList.remove('dragover')"
-          onclick="document.getElementById('cimg-${condition.id}-${i}').click()"
-        >
-          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
-          <input type="file" accept="image/*" id="cimg-${condition.id}-${i}" style="display:none" onchange="handleConditionImgFile(event,'${condition.id}',${i})">
-        </div>`).join('')}
+      ${[0,1,2,3].map(i=>{
+        const entry=imgs[i];
+        const src=imageEntrySrc(entry);
+        const mag=imageEntryMag(entry);
+        const specimen=imageEntrySpecimen(entry);
+        return `
+        <div class="heme-slot-tile">
+          <div class="drop-zone" id="dz-${condition.id}-${i}"
+            ondrop="handleConditionImgDrop(event,'${condition.id}',${i})"
+            ondragover="event.preventDefault();this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')"
+            onclick="document.getElementById('cimg-${condition.id}-${i}').click()"
+          >
+            ${src?`<div class="heme-editor-img-wrap"><img src="${esc(src)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px"><span class="heme-img-meta">${esc(hemeImageLabel(entry))}</span></div>`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+            <input type="file" accept="image/*" id="cimg-${condition.id}-${i}" style="display:none" onchange="handleConditionImgFile(event,'${condition.id}',${i})">
+          </div>
+          <div class="heme-slot-meta">
+            <input type="text" value="${esc(mag)}" placeholder="100x" aria-label="Magnification" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'mag',this.value)">
+            <select aria-label="Specimen" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'specimen',this.value)">
+              <option value="PB" ${specimen==='PB'?'selected':''}>PB</option>
+              <option value="BM" ${specimen==='BM'?'selected':''}>BM</option>
+            </select>
+          </div>
+        </div>`;
+      }).join('')}
     </div>
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
   `;
@@ -3919,8 +3991,9 @@ async function handleConditionImgFile(e, conditionId, slot){
     const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
     const imgs=[...(data?.images||[])];
     while(imgs.length<=slot)imgs.push(null);
-    imgs[slot]=dataUrl;
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot]);
     await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+    window._hemeCondsCache=null;
     openCondition(conditionId);
   };
   reader.readAsDataURL(file);
@@ -3936,11 +4009,26 @@ async function handleConditionImgDrop(e, conditionId, slot){
     const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
     const imgs=[...(data?.images||[])];
     while(imgs.length<=slot)imgs.push(null);
-    imgs[slot]=dataUrl;
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot]);
     await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+    window._hemeCondsCache=null;
     openCondition(conditionId);
   };
   reader.readAsDataURL(file);
+}
+
+async function updateConditionImageMeta(conditionId,slot,field,value){
+  const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+  const imgs=[...(data?.images||[])];
+  while(imgs.length<=slot)imgs.push(null);
+  const current=imgs[slot];
+  const next=typeof current==='object'&&current?{...current}:{url:imageEntrySrc(current),mag:imageEntryMag(current),specimen:imageEntrySpecimen(current)};
+  if(field==='specimen')next.specimen=String(value||'PB').toUpperCase()==='BM'?'BM':'PB';
+  else next.mag=String(value||'100x').trim()||'100x';
+  imgs[slot]=next;
+  await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+  window._hemeCondsCache=null;
+  openCondition(conditionId);
 }
 
 function openHemeFolder(key){
@@ -3951,7 +4039,7 @@ function openHemeFolder(key){
 // Hematology image quiz
 async function startHemeQuiz(){
   const {data}=await sb.from('mlsboc_heme_conditions').select('*').not('images','is',null);
-  const valid=(data||[]).filter(c=>c.images&&c.images.filter(Boolean).length>0);
+  const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No conditions with images to quiz on yet.');return;}
   appState.hemeImgMode='quiz';
   window._kqOpts={};appState.hemeQuizItems=shuffle(valid);
@@ -3980,7 +4068,7 @@ async function startUAFlashcard(){
 
 async function startHemeQuizFolder(folder){
   const {data}=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',folder);
-  const valid=(data||[]).filter(c=>c.images&&c.images.filter(Boolean).length>0);
+  const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No conditions with images in this folder yet.');return;}
   appState.hemeImgMode='quiz';
   window._kqOpts={};appState.hemeQuizItems=shuffle(valid);
@@ -8006,10 +8094,11 @@ function adminHemeImageControls(){
       <button class="btn btn-primary" onclick="showAddConditionModal(null)">+ Add New Condition</button>
       <div class="divider"></div>
       <label class="btn btn-ghost" style="cursor:pointer;display:inline-flex">Bulk CSV Upload
-        <input type="file" accept=".csv" style="display:none" onchange="adminBulkConditions(event)">
+        <input type="file" accept=".csv,text/csv" style="display:none" onchange="adminBulkConditions(event)">
       </label>
-      <button class="btn btn-ghost btn-sm mt-8" onclick="dlCSV([['name','folder','key_features','notes'],['Iron Deficiency Anemia','anemias','Microcytic; Hypochromic; Low ferritin; High TIBC','Pencil cells and target cells seen on peripheral smear']],'conditions_template.csv')">Download Template</button>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: name, folder (anemias/malignancies_acute/etc.), key_features (semicolon-separated), notes. Images added separately via drag & drop.</div>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="dlCSV([['name','folder','type','key_features'],['Iron Deficiency Anemia','anemias','Non-Hemolytic Anemia','Microcytic; Hypochromic; Low ferritin; High TIBC']],'conditions_template.csv')">Download Template</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: name, folder or type, key_features (semicolon-separated). Images are added separately by drag/drop.</div>
+      <div id="heme-bulk-status" style="font-size:11px;color:var(--text2);margin-top:8px"></div>
     </div>`;
 }
 
@@ -8024,7 +8113,6 @@ function showAddConditionModal(folder){
       </select>
     </div>
     <div class="form-group"><label>Key Features (one per line)</label><textarea id="cond-features" placeholder="Microcytic&#10;Hypochromic&#10;Low ferritin"></textarea></div>
-    <div class="form-group"><label>Notes</label><textarea id="cond-notes"></textarea></div>
     <div class="flex gap-8 mt-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
       <button class="btn btn-primary" onclick="adminAddCondition()">Add Condition</button>
@@ -8037,27 +8125,47 @@ async function adminAddCondition(){
   const name=document.getElementById('cond-name')?.value.trim();
   const folder=document.getElementById('cond-folder')?.value;
   const featText=document.getElementById('cond-features')?.value||'';
-  const notes=document.getElementById('cond-notes')?.value.trim();
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
   if(!name||!folder){alert('Name and folder required.');return;}
-  const {error}=await sb.from('mlsboc_heme_conditions').insert({name,folder,key_features:features,notes:notes||'',images:[]});
+  const {error}=await sb.from('mlsboc_heme_conditions').insert({name,folder,key_features:features,notes:'',images:[]});
   if(error)alert('Error: '+error.message);
-  else{document.getElementById('condition-modal').classList.add('hidden');renderTab();}
+  else{window._hemeCondsCache=null;document.getElementById('condition-modal').classList.add('hidden');renderTab();}
 }
 
 async function adminBulkConditions(e){
-  const rows=parseCSV(await e.target.files[0].text());
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  const status=document.getElementById('heme-bulk-status');
+  if(status)status.textContent='Uploading...';
+  const text=await file.text();
+  const records=parseCSVRecords(text);
+  const rows=records.length?records:parseCSV(text);
+  const existing=await sb.from('mlsboc_heme_conditions').select('name');
+  const seen=new Set((existing.data||[]).map(r=>String(r.name||'').trim().toLowerCase()).filter(Boolean));
+  let inserted=0,skipped=0,failed=0;
   for(const r of rows){
-    if(!r[0])continue;
-    const features=(r[2]||'').split(';').map(x=>x.trim()).filter(Boolean);
-    try{await sb.from('mlsboc_heme_conditions').insert({name:r[0],folder:r[1]||'anemias',key_features:features,notes:r[3]||'',images:[]});}catch(e){}
+    const name=String(csvField(r,['name','diagnosis','possible_diagnosis','condition','title'],0)||'').trim();
+    if(!name){skipped++;continue;}
+    const key=name.toLowerCase();
+    if(seen.has(key)){skipped++;continue;}
+    const type=String(csvField(r,['type','category'],2)||'').trim();
+    const folder=normalizeHemeFolderKey(String(csvField(r,['folder'],1)||'').trim()||hemeFolderFromType(type,name));
+    const featureText=String(csvField(r,['key_features','key_feature','features'],3)||csvField(r,['key_features','key_feature','features'],2)||'');
+    const features=featureText.split(/;|\n/).map(x=>x.trim()).filter(Boolean);
+    const {error}=await sb.from('mlsboc_heme_conditions').insert({name,folder,key_features:features,notes:'',images:[]});
+    if(error)failed++;
+    else{inserted++;seen.add(key);}
   }
+  window._hemeCondsCache=null;
+  if(status)status.textContent=`Bulk upload complete: ${inserted} added, ${skipped} skipped, ${failed} failed.`;
+  e.target.value='';
   renderTab();
 }
 
 async function deleteCondition(id){
   if(!confirm('Delete this condition?'))return;
   await sb.from('mlsboc_heme_conditions').delete().eq('id',id);
+  window._hemeCondsCache=null;
   renderTab();
 }
 
@@ -9353,6 +9461,30 @@ function csvField(row,names,idx){
     if(Object.prototype.hasOwnProperty.call(row,key))return row[key]||'';
   }
   return '';
+}
+function imageEntrySrc(entry){
+  if(!entry)return '';
+  if(typeof entry==='string')return entry;
+  return entry.url||entry.src||entry.dataUrl||entry.image_url||'';
+}
+function imageEntryMag(entry){
+  if(entry&&typeof entry==='object'&&entry.mag)return String(entry.mag);
+  if(entry&&typeof entry==='object'&&entry.magnification)return String(entry.magnification);
+  return '100x';
+}
+function imageEntrySpecimen(entry){
+  if(entry&&typeof entry==='object'&&entry.specimen)return String(entry.specimen).toUpperCase();
+  if(entry&&typeof entry==='object'&&entry.source)return String(entry.source).toUpperCase();
+  return 'PB';
+}
+function hemeImageLabel(entry){
+  return imageEntryMag(entry)+' · '+imageEntrySpecimen(entry);
+}
+function hemeImageEntry(url, existing){
+  return {url, mag:imageEntryMag(existing), specimen:imageEntrySpecimen(existing)};
+}
+function hasUsableImages(item){
+  return !!(item&&Array.isArray(item.images)&&item.images.some(imageEntrySrc));
 }
 function normalizeQuizCSVRow(row){
   const payload={
