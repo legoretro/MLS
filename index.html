@@ -1841,13 +1841,15 @@ async function generateImageSectionPDF(items, title, filename, options={}){
           const ar=dims.w/dims.h,car=gridW/imageH;
           let dw,dh;
           if(ar>car){dw=gridW;dh=gridW/ar;}else{dh=imageH;dw=imageH*ar;}
-          const ox=cx+(gridW-dw)/2,oy=cy+(imageH-dh)/2;
+          const ox=cx+(gridW-dw)/2;
+          const centeredY=cy+(gridH-dh)/2;
+          const oy=Math.min(centeredY,cy+gridH-labelH-dh);
           const fmt=(src.startsWith('data:image/png')||src.toLowerCase().includes('.png'))?'PNG':'JPEG';
           doc.addImage(src,fmt,ox,oy,dw,dh,'','NONE');
         }catch(e){}
         if(options.showImageMeta){
           doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor(80,80,95);
-          doc.text(hemeImageLabel(entry,i),cx+gridW/2,cy+gridH-1.8,{align:'center'});
+          doc.text(hemeImageLabel(entry,i),cx+3,cy+gridH-1.8);
         }
       }
     }
@@ -3908,8 +3910,9 @@ async function generateHemeConditionsPDF(){
     const {data:all}=await sb.from('mlsboc_heme_conditions').select('*').in('id',selectedIds);
     if(!all||!all.length){alert('Could not load conditions.');return;}
     const {jsPDF}=window.jspdf;
+    const ordered=selectedIds.map(id=>all.find(item=>item.id===id)).filter(Boolean);
 
-    await generateImageSectionPDF(all,'Hematology Conditions','hematology_conditions.pdf',{
+    await generateImageSectionPDF(ordered,'Hematology Conditions','hematology_conditions.pdf',{
       showImageMeta:true,
       missingFeaturesText:'No key features need to add'
     });
