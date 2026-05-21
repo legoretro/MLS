@@ -690,6 +690,7 @@ body:not(.light-mode) .condition-card.heme-missing-features .condition-body{back
 .heme-slot-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .heme-slot-meta input,.heme-slot-meta select{height:28px;padding:4px 6px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px}
 .heme-editor-img-wrap{position:relative}
+.heme-bulk-zone{padding:14px;margin-bottom:12px;min-height:74px;display:flex;align-items:center;justify-content:center}
 .heme-missing-text{color:#ba3448!important;font-style:italic}
 /* UA single-image card — full width, taller */
 .ua-single-img{height:160px;background:var(--bg3);overflow:hidden}
@@ -3910,7 +3911,7 @@ function buildConditionThumbs(c){
   let html='';
   for(let i=0;i<slots;i++){
     const src=imageEntrySrc(imgs[i]);
-    if(src) html+=`<div class="heme-thumb-wrap"><img src="${esc(src)}" alt="" onerror="this.style.display='none'"><span class="heme-img-meta">${esc(hemeImageLabel(imgs[i]))}</span></div>`;
+    if(src) html+=`<div class="heme-thumb-wrap"><img src="${esc(src)}" alt="" onerror="this.style.display='none'"><span class="heme-img-meta">${esc(hemeImageLabel(imgs[i],i))}</span></div>`;
     else html+=`<div class="img-ph">${i===0?'🖼️':''}</div>`;
   }
   return html;
@@ -3920,7 +3921,7 @@ function openCondition(id){
   // Show modal
   sb.from('mlsboc_heme_conditions').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=(data.images||[]).filter(imageEntrySrc);
+    const imgs=(data.images||[]).map((entry,index)=>({entry,index})).filter(x=>imageEntrySrc(x.entry));
     const features=(data.key_features||[]).filter(Boolean);
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
@@ -3929,9 +3930,9 @@ function openCondition(id){
       </div>
       ${imgs.length?`
         <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
-          ${imgs.map(entry=>{
+          ${imgs.map(({entry,index})=>{
             const src=imageEntrySrc(entry);
-            return `<div class="heme-img-wrap"><img src="${esc(src)}" onclick="openImgViewer('${jsAttr(src)}')" alt=""><span class="heme-img-meta">${esc(hemeImageLabel(entry))}</span></div>`;
+            return `<div class="heme-img-wrap"><img src="${esc(src)}" onclick="openImgViewer('${jsAttr(src)}')" alt=""><span class="heme-img-meta">${esc(hemeImageLabel(entry,index))}</span></div>`;
           }).join('')}
         </div>`:''}
       ${features.length?`
@@ -3952,12 +3953,25 @@ function openCondition(id){
 function buildConditionImageEditor(condition){
   const imgs=condition.images||[];
   return `
+    <div class="drop-zone heme-bulk-zone" id="dz-${condition.id}-bulk"
+      ondrop="handleConditionBulkImgDrop(event,'${condition.id}')"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      onclick="document.getElementById('cimg-${condition.id}-bulk').click()"
+    >
+      <div>
+        <div style="font-size:22px;margin-bottom:4px">📁</div>
+        <div style="font-weight:700;color:var(--text2)">Add up to 4 images at once</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">They fill slots 1-4 in order: 50x PB, then 100x PB.</div>
+      </div>
+      <input type="file" accept="image/*" multiple id="cimg-${condition.id}-bulk" style="display:none" onchange="handleConditionBulkImgFile(event,'${condition.id}')">
+    </div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
       ${[0,1,2,3].map(i=>{
         const entry=imgs[i];
         const src=imageEntrySrc(entry);
-        const mag=imageEntryMag(entry);
-        const specimen=imageEntrySpecimen(entry);
+        const mag=imageEntryMag(entry,i);
+        const specimen=imageEntrySpecimen(entry,i);
         return `
         <div class="heme-slot-tile">
           <div class="drop-zone" id="dz-${condition.id}-${i}"
@@ -3966,11 +3980,11 @@ function buildConditionImageEditor(condition){
             ondragleave="this.classList.remove('dragover')"
             onclick="document.getElementById('cimg-${condition.id}-${i}').click()"
           >
-            ${src?`<div class="heme-editor-img-wrap"><img src="${esc(src)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px"><span class="heme-img-meta">${esc(hemeImageLabel(entry))}</span></div>`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+            ${src?`<div class="heme-editor-img-wrap"><img src="${esc(src)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px"><span class="heme-img-meta">${esc(hemeImageLabel(entry,i))}</span></div>`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
             <input type="file" accept="image/*" id="cimg-${condition.id}-${i}" style="display:none" onchange="handleConditionImgFile(event,'${condition.id}',${i})">
           </div>
           <div class="heme-slot-meta">
-            <input type="text" value="${esc(mag)}" placeholder="100x" aria-label="Magnification" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'mag',this.value)">
+            <input type="text" value="${esc(mag)}" placeholder="${i===0?'50x':'100x'}" aria-label="Magnification" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'mag',this.value)">
             <select aria-label="Specimen" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'specimen',this.value)">
               <option value="PB" ${specimen==='PB'?'selected':''}>PB</option>
               <option value="BM" ${specimen==='BM'?'selected':''}>BM</option>
@@ -3991,7 +4005,7 @@ async function handleConditionImgFile(e, conditionId, slot){
     const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
     const imgs=[...(data?.images||[])];
     while(imgs.length<=slot)imgs.push(null);
-    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot]);
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
     await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
     window._hemeCondsCache=null;
     openCondition(conditionId);
@@ -4002,14 +4016,16 @@ async function handleConditionImgFile(e, conditionId, slot){
 async function handleConditionImgDrop(e, conditionId, slot){
   e.preventDefault();
   e.currentTarget.classList.remove('dragover');
-  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const files=Array.from(e.dataTransfer.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(files.length>1){await handleConditionBulkFiles(files,conditionId,slot);return;}
+  const file=files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async ev=>{
     const dataUrl=ev.target.result;
     const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
     const imgs=[...(data?.images||[])];
     while(imgs.length<=slot)imgs.push(null);
-    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot]);
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
     await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
     window._hemeCondsCache=null;
     openCondition(conditionId);
@@ -4017,12 +4033,50 @@ async function handleConditionImgDrop(e, conditionId, slot){
   reader.readAsDataURL(file);
 }
 
+function readHemeImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=ev=>resolve(ev.target.result);
+    reader.onerror=()=>reject(reader.error||new Error('Could not read image'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleConditionBulkImgFile(e,conditionId){
+  const files=Array.from(e.target.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(files.length)await handleConditionBulkFiles(files,conditionId,0);
+  e.target.value='';
+}
+
+async function handleConditionBulkImgDrop(e,conditionId){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const files=Array.from(e.dataTransfer.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(files.length)await handleConditionBulkFiles(files,conditionId,0);
+}
+
+async function handleConditionBulkFiles(files,conditionId,startSlot=0){
+  const imageFiles=files.filter(file=>file&&file.type.startsWith('image/')).slice(0,4-startSlot);
+  if(!imageFiles.length)return;
+  const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+  const imgs=[...(data?.images||[])];
+  while(imgs.length<4)imgs.push(null);
+  for(let i=0;i<imageFiles.length;i++){
+    const slot=startSlot+i;
+    const dataUrl=await readHemeImageFile(imageFiles[i]);
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
+  }
+  await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+  window._hemeCondsCache=null;
+  openCondition(conditionId);
+}
+
 async function updateConditionImageMeta(conditionId,slot,field,value){
   const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
   const imgs=[...(data?.images||[])];
   while(imgs.length<=slot)imgs.push(null);
   const current=imgs[slot];
-  const next=typeof current==='object'&&current?{...current}:{url:imageEntrySrc(current),mag:imageEntryMag(current),specimen:imageEntrySpecimen(current)};
+  const next=typeof current==='object'&&current?{...current}:{url:imageEntrySrc(current),mag:imageEntryMag(current,slot),specimen:imageEntrySpecimen(current,slot)};
   if(field==='specimen')next.specimen=String(value||'PB').toUpperCase()==='BM'?'BM':'PB';
   else next.mag=String(value||'100x').trim()||'100x';
   imgs[slot]=next;
@@ -9467,21 +9521,24 @@ function imageEntrySrc(entry){
   if(typeof entry==='string')return entry;
   return entry.url||entry.src||entry.dataUrl||entry.image_url||'';
 }
-function imageEntryMag(entry){
+function hemeSlotDefaultMag(slot){
+  return Number(slot)===0?'50x':'100x';
+}
+function imageEntryMag(entry,slot){
   if(entry&&typeof entry==='object'&&entry.mag)return String(entry.mag);
   if(entry&&typeof entry==='object'&&entry.magnification)return String(entry.magnification);
-  return '100x';
+  return hemeSlotDefaultMag(slot);
 }
-function imageEntrySpecimen(entry){
+function imageEntrySpecimen(entry,slot){
   if(entry&&typeof entry==='object'&&entry.specimen)return String(entry.specimen).toUpperCase();
   if(entry&&typeof entry==='object'&&entry.source)return String(entry.source).toUpperCase();
   return 'PB';
 }
-function hemeImageLabel(entry){
-  return imageEntryMag(entry)+' · '+imageEntrySpecimen(entry);
+function hemeImageLabel(entry,slot){
+  return imageEntryMag(entry,slot)+' · '+imageEntrySpecimen(entry,slot);
 }
-function hemeImageEntry(url, existing){
-  return {url, mag:imageEntryMag(existing), specimen:imageEntrySpecimen(existing)};
+function hemeImageEntry(url, existing, slot){
+  return {url, mag:imageEntryMag(existing,slot), specimen:imageEntrySpecimen(existing,slot)};
 }
 function hasUsableImages(item){
   return !!(item&&Array.isArray(item.images)&&item.images.some(imageEntrySrc));
