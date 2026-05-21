@@ -1830,12 +1830,15 @@ async function generateImageSectionPDF(items, title, filename, options={}){
       const cy=gridY+row*(gridH+gap);
       const entry=imgs[i];
       const src=imageEntrySrc(entry);
-      const labelH=options.showImageMeta?5:0;
+      const overlayMeta=options.imageMetaPosition==='overlay';
+      const labelH=options.showImageMeta&&!overlayMeta?5:0;
       const imgPad=Number(options.imagePadding||0);
       const imageW=gridW-imgPad*2;
       const imageH=gridH-labelH-imgPad*2;
-      doc.setFillColor(245,245,245);doc.rect(cx,cy,gridW,gridH,'F');
-      doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(cx,cy,gridW,gridH,'S');
+      if(options.imageFrame!==false){
+        doc.setFillColor(245,245,245);doc.rect(cx,cy,gridW,gridH,'F');
+        doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(cx,cy,gridW,gridH,'S');
+      }
       if(src){
         try{
           let dims={w:4,h:3};
@@ -1847,8 +1850,16 @@ async function generateImageSectionPDF(items, title, filename, options={}){
           const oy=cy+imgPad+(imageH-dh)/2;
           const fmt=(src.startsWith('data:image/png')||src.toLowerCase().includes('.png'))?'PNG':'JPEG';
           doc.addImage(src,fmt,ox,oy,dw,dh,'','NONE');
+          if(options.showImageMeta&&overlayMeta){
+            const meta=hemeImageLabel(entry,i);
+            doc.setFontSize(7.5);doc.setFont('helvetica','bold');
+            const pillW=doc.getTextWidth(meta)+4;
+            const pillX=ox+1.4,pillY=oy+dh-5.4;
+            doc.setFillColor(255,255,255);doc.roundedRect(pillX,pillY,pillW,4.6,1.4,1.4,'F');
+            doc.setTextColor(70,70,88);doc.text(meta,pillX+2,pillY+3.2);
+          }
         }catch(e){}
-        if(options.showImageMeta){
+        if(options.showImageMeta&&!overlayMeta){
           doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.setTextColor(80,80,95);
           doc.text(hemeImageLabel(entry,i),cx+3,cy+gridH-1.8);
         }
@@ -3928,7 +3939,9 @@ async function generateHemeConditionsPDF(){
 
     await generateImageSectionPDF(ordered,'Hematology Conditions','hematology_conditions.pdf',{
       showImageMeta:true,
-      imagePadding:3,
+      imageFrame:false,
+      imagePadding:0,
+      imageMetaPosition:'overlay',
       showCategory:true,
       missingFeaturesText:'No key features need to add'
     });
