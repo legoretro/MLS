@@ -1831,19 +1831,20 @@ async function generateImageSectionPDF(items, title, filename, options={}){
       const entry=imgs[i];
       const src=imageEntrySrc(entry);
       const labelH=options.showImageMeta?5:0;
-      const imageH=gridH-labelH;
+      const imgPad=Number(options.imagePadding||0);
+      const imageW=gridW-imgPad*2;
+      const imageH=gridH-labelH-imgPad*2;
       doc.setFillColor(245,245,245);doc.rect(cx,cy,gridW,gridH,'F');
       doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(cx,cy,gridW,gridH,'S');
       if(src){
         try{
           let dims={w:4,h:3};
           try{dims=await getImgDims(src);}catch(e){}
-          const ar=dims.w/dims.h,car=gridW/imageH;
+          const ar=dims.w/dims.h,car=imageW/imageH;
           let dw,dh;
-          if(ar>car){dw=gridW;dh=gridW/ar;}else{dh=imageH;dw=imageH*ar;}
-          const ox=cx+(gridW-dw)/2;
-          const centeredY=cy+(gridH-dh)/2;
-          const oy=Math.min(centeredY,cy+gridH-labelH-dh);
+          if(ar>car){dw=imageW;dh=imageW/ar;}else{dh=imageH;dw=imageH*ar;}
+          const ox=cx+imgPad+(imageW-dw)/2;
+          const oy=cy+imgPad+(imageH-dh)/2;
           const fmt=(src.startsWith('data:image/png')||src.toLowerCase().includes('.png'))?'PNG':'JPEG';
           doc.addImage(src,fmt,ox,oy,dw,dh,'','NONE');
         }catch(e){}
@@ -1856,12 +1857,19 @@ async function generateImageSectionPDF(items, title, filename, options={}){
     // ── Divider line between images and text
     doc.setDrawColor(200,200,200);doc.setLineWidth(0.4);
     doc.line(margin,textY-3,pageW-margin,textY-3);
+    let nameY=textY+3;
+    if(options.showCategory){
+      const category=hemeFolderLabel(item.folder);
+      doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(80,80,105);
+      doc.text('Category: '+category,margin,nameY);
+      nameY+=6;
+    }
     // ── Name (bold, larger) — below images like the app card
     doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
-    doc.text(item.name||'',margin,textY+3);
+    doc.text(item.name||'',margin,nameY);
     // ── Key features
     const feats=(item.key_features||[]).filter(Boolean);
-    let ty=textY+10;
+    let ty=nameY+7;
     if(feats.length){
       doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(40,40,80);
       doc.text('Key Features',margin,ty);ty+=5;
@@ -3752,6 +3760,12 @@ function normalizeHemeFolderKey(key){
   return map[key]||key||'non_malignant';
 }
 
+function hemeFolderLabel(key){
+  const normalized=normalizeHemeFolderKey(key);
+  const folderDef=HEME_FOLDERS.find(x=>x.key===normalized);
+  return folderDef?folderDef.name:normalized;
+}
+
 function hemeFolderFromType(type,name){
   const t=String(type||'').toLowerCase();
   const n=String(name||'').toLowerCase();
@@ -3914,6 +3928,8 @@ async function generateHemeConditionsPDF(){
 
     await generateImageSectionPDF(ordered,'Hematology Conditions','hematology_conditions.pdf',{
       showImageMeta:true,
+      imagePadding:3,
+      showCategory:true,
       missingFeaturesText:'No key features need to add'
     });
   }catch(err){
