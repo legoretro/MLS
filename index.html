@@ -109,8 +109,15 @@ select option{background:var(--bg3)}
 .home-kicker{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));color:var(--accent);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
 .home-title{font-size:clamp(30px,4vw,48px);line-height:1.02;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:10px}
 .home-subtitle{font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:620px;line-height:1.45}
-.home-hero-mark{width:184px;aspect-ratio:1/1;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 14%,var(--bg2)),color-mix(in srgb,#c7d7ff 18%,var(--bg3)));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 34px rgba(41,78,150,.13);overflow:hidden}
+.home-hero-mark{position:relative;width:196px;aspect-ratio:1/1;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 14%,var(--bg2)),color-mix(in srgb,#c7d7ff 18%,var(--bg3)));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 34px rgba(41,78,150,.13);overflow:hidden}
 .home-hero-mark svg{width:100%;height:100%;display:block}
+.home-mascot-art{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transform:scale(1.02);animation:mascotFloat 8.5s ease-in-out infinite}
+.home-mascot-glow{position:absolute;inset:0;background:radial-gradient(circle at 30% 18%,rgba(255,255,255,.38),transparent 35%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(29,48,94,.14));pointer-events:none}
+.home-mascot-chip{position:absolute;right:12px;bottom:12px;background:rgba(255,255,255,.88);border:1px solid rgba(142,163,214,.65);color:#384766;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;letter-spacing:.08em;box-shadow:0 8px 18px rgba(28,48,89,.18);animation:chipPop 8.5s ease-in-out infinite}
+.home-mascot-spark{position:absolute;width:9px;height:9px;border-radius:50%;background:#8ea7f2;box-shadow:0 0 0 5px rgba(142,167,242,.14);animation:mascotSpark 8.5s ease-in-out infinite}
+.home-mascot-spark.one{left:22px;top:24px}
+.home-mascot-spark.two{right:30px;top:34px;animation-delay:1.2s;background:#d3b6ff}
+.home-mascot-spark.three{left:28px;bottom:34px;animation-delay:2.1s;background:#80c7d9}
 .pip-pipette{transform-origin:108px 83px;animation:pipetteRaise 7.5s ease-in-out infinite}
 .pip-drop{animation:dropFall 7.5s ease-in-out infinite}
 .pip-spinny{transform-origin:49px 50px;animation:spinnyMove 7.5s ease-in-out infinite}
@@ -123,18 +130,18 @@ select option{background:var(--bg3)}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
 .home-section-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.01em}
 .home-section-sub{font-size:13px;color:var(--text2)}
-.home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--subject-color,var(--accent));border-radius:18px;padding:16px;min-height:136px;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden}
+.home-subject-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--subject-color,var(--accent));border-radius:18px;padding:15px;min-height:0;aspect-ratio:1/1;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden;display:flex;flex-direction:column}
 .home-subject-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--subject-color,var(--accent)) 38%,var(--border));box-shadow:0 16px 34px rgba(18,35,74,.12);background:color-mix(in srgb,var(--bg2) 96%,var(--subject-color,var(--accent)))}
 .home-subject-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .home-subject-mark{display:flex;align-items:center;gap:9px;min-width:0}
-.home-subject-icon{width:38px;height:38px;border-radius:13px;background:color-mix(in srgb,var(--subject-color,var(--accent)) 13%,var(--bg3));border:1px solid color-mix(in srgb,var(--subject-color,var(--accent)) 22%,var(--border));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--subject-color,var(--accent));font-size:20px;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.home-subject-icon{width:44px;height:44px;border-radius:15px;background:color-mix(in srgb,var(--subject-color,var(--accent)) 13%,var(--bg3));border:1px solid color-mix(in srgb,var(--subject-color,var(--accent)) 22%,var(--border));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--subject-color,var(--accent));font-size:22px;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
 .home-subject-icon img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
-.home-subject-code{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--subject-color,var(--accent));font-family:var(--mono)}
+.home-subject-code{display:none}
 .home-subject-arrow{color:var(--text3);font-size:22px;line-height:1}
 .home-subject-name{font-size:16px;font-weight:750;color:var(--text);line-height:1.18;margin-bottom:7px;letter-spacing:-.01em}
 .home-subject-desc{font-size:12px;color:var(--text2);line-height:1.35;margin-bottom:10px}
-.home-subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.home-subject-count{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:auto}
 .home-utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
 .home-utility-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;transition:all .18s ease;box-shadow:0 8px 20px rgba(18,35,74,.06)}
 .home-utility-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 30%,var(--border));box-shadow:0 13px 28px rgba(18,35,74,.10)}
@@ -150,10 +157,17 @@ select option{background:var(--bg3)}
 .home-hubs-preview{position:relative;min-height:168px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 9%,var(--bg3)),var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 20%,var(--border));overflow:hidden;padding:16px}
 .home-hubs-preview-track{display:flex;gap:12px;position:absolute;left:16px;top:16px;animation:hub-preview-slide 16s linear infinite}
 .home-hubs-card:hover .home-hubs-preview-track{animation-duration:9s}
-.home-hub-tile{width:158px;height:132px;border-radius:16px;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--hub-color,var(--accent));padding:13px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 22px rgba(18,35,74,.12)}
-.home-hub-tile-dot{width:34px;height:34px;border-radius:12px;background:color-mix(in srgb,var(--hub-color,var(--accent)) 13%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--hub-color,var(--accent));font-weight:800}
+.home-hub-tile{position:relative;width:236px;height:146px;border-radius:16px;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--hub-color,var(--accent));padding:0;display:block;box-shadow:0 10px 22px rgba(18,35,74,.12);overflow:hidden}
+.home-hub-tile img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;filter:saturate(.98) contrast(.98)}
+.home-hub-tile-dot{position:absolute;left:10px;top:10px;width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.86);display:flex;align-items:center;justify-content:center;color:var(--hub-color,var(--accent));font-weight:800;box-shadow:0 6px 14px rgba(18,35,74,.16)}
+.home-hub-tile-caption{position:absolute;left:0;right:0;bottom:0;padding:22px 11px 10px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.82));color:#fff}
 .home-hub-tile-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
-.home-hub-tile-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px}
+.home-hub-tile-caption .home-hub-tile-title{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.home-hub-tile-sub{font-size:10px;color:rgba(255,255,255,.76);font-family:var(--mono);margin-top:4px;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.interactive-topic-section{margin-top:26px}
+.interactive-topic-head{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.interactive-topic-title{color:var(--topic-color,var(--accent));font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.interactive-topic-head::after{content:'';height:1px;background:color-mix(in srgb,var(--topic-color,var(--accent)) 28%,var(--border));flex:1}
 .home-recall-card{position:relative;overflow:hidden;width:100%;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 11%,var(--bg2)),var(--bg2));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));border-radius:22px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;cursor:pointer;box-shadow:0 16px 36px rgba(18,35,74,.10);transition:all .18s ease}
 .home-recall-card:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(18,35,74,.14);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
 .home-recall-label{font-size:12px;color:var(--accent);font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px}
@@ -168,11 +182,14 @@ select option{background:var(--bg3)}
 @keyframes scopeyBob{0%,48%,100%{transform:translateY(0)}54%,64%{transform:translateY(-4px)}}
 @keyframes qcPop{0%,63%,100%{opacity:.8;transform:scale(.92)}70%,88%{opacity:1;transform:scale(1.08)}94%{opacity:.92;transform:scale(.98)}}
 @keyframes sparkle{0%,20%,100%{opacity:.25;transform:scale(.8)}27%,42%{opacity:1;transform:scale(1.12)}}
-@keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-850px)}}
-@media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@keyframes mascotFloat{0%,100%{transform:scale(1.02) translateY(0)}45%{transform:scale(1.055) translateY(-4px)}70%{transform:scale(1.035) translateY(2px)}}
+@keyframes chipPop{0%,56%,100%{transform:translateY(0) scale(.96);opacity:.88}64%,82%{transform:translateY(-4px) scale(1);opacity:1}}
+@keyframes mascotSpark{0%,100%{transform:scale(.75);opacity:.35}30%,48%{transform:scale(1.2);opacity:1}}
+@keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-1488px)}}
+@media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(220px,72vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-hubs-preview{min-height:145px}}
-@media(max-width:560px){main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:auto;min-height:104px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
-@media(prefers-reduced-motion:reduce){.pip-pipette,.pip-drop,.pip-spinny,.pip-slidy,.pip-lavvy,.pip-scopey,.pip-qc,.pip-spark,.home-hubs-preview-track{animation:none!important}.pip-drop{opacity:.85;transform:translateY(10px)}}
+@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:154px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:auto;min-height:104px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
+@media(prefers-reduced-motion:reduce){.pip-pipette,.pip-drop,.pip-spinny,.pip-slidy,.pip-lavvy,.pip-scopey,.pip-qc,.pip-spark,.home-mascot-art,.home-mascot-chip,.home-mascot-spark,.home-hubs-preview-track{animation:none!important}.pip-drop{opacity:.85;transform:translateY(10px)}.home-mascot-art{transform:scale(1.02)}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
 .class-material-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--cm-accent,var(--accent));opacity:.9}
@@ -2271,7 +2288,7 @@ function getSubjectIcon(key,fallback){
 }
 
 const HOME_SUBJECT_DETAILS={
-  blood_bank:'Questions, images, case studies, simulations',
+  blood_bank:'Questions, images, case studies',
   clinical_chemistry:'Questions, formulas, ranges, flowcharts',
   hematology:'Questions, images, morphology, cases',
   microbiology:'Questions, images, cases, organism ID',
@@ -2288,16 +2305,12 @@ const HOME_SUBJECT_COLORS={
 };
 
 const HOME_HUB_PREVIEWS=[
-  {code:'BB',title:'Simulation Lab',sub:'crossmatch + ABO cases',color:'#b93b44'},
-  {code:'BB',title:'Antigram Panels',sub:'rule-outs + reactions',color:'#b93b44'},
-  {code:'BB',title:'Antigen Maps',sub:'RBC systems + chromosome map',color:'#b93b44'},
-  {code:'CC',title:'Organ Flowcharts',sub:'chemistry branch maps',color:'#2f7dd1'},
-  {code:'CC',title:'Hormone Map',sub:'source + target review',color:'#2f7dd1'},
-  {code:'UA',title:'Renal Flowcharts',sub:'glomerular/tubular/interstitial',color:'#c8a800'},
-  {code:'UA',title:'UA Simulation',sub:'macro, strip, micro cases',color:'#c8a800'},
-  {code:'MI',title:'Gram Flowcharts',sub:'organism ID paths',color:'#2fa66a'},
-  {code:'MI',title:'Species Images',sub:'plates + thumbnails',color:'#2fa66a'},
-  {code:'HE',title:'Smear Simulation',sub:'RBC/WBC morphology',color:'#c74656'}
+  {code:'BB',title:'Blood Structures',sub:'ABH + Lewis build board',color:'#b93b44',img:'assets/interactive-previews/abo_lewis_structures.png'},
+  {code:'BB',title:'Usual Suspects',sub:'blood group matching',color:'#b93b44',img:'assets/interactive-previews/bb_group_usual.png'},
+  {code:'BB',title:'Antigen Frequencies',sub:'donor table practice',color:'#b93b44',img:'assets/interactive-previews/antigen_donor_frequencies.png'},
+  {code:'UA',title:'Renal Flowcharts',sub:'glomerular/tubular/interstitial',color:'#c8a800',img:'assets/interactive-previews/ua_glomerular_flowchart.png'},
+  {code:'UA',title:'Reagent Strip Match',sub:'false results + significance',color:'#c8a800',img:'assets/interactive-previews/ua_reagent_strip_match.png'},
+  {code:'CC',title:'Thyroid Lab Findings',sub:'hormone interpretation table',color:'#2f7dd1',img:'assets/interactive-previews/thyroid_lab_findings.png'}
 ];
 
 function homeSubjectColor(key){
@@ -2314,6 +2327,14 @@ function homeSubjectCode(key,fallback){
 }
 
 function homeMascotScene(){
+  return `<div class="home-hero-mark home-mascot-card" role="img" aria-label="Chaotic MLS study mascot scene">
+    <img class="home-mascot-art" src="assets/home/mls-study-chaos-mascot.jpg" alt="">
+    <span class="home-mascot-glow" aria-hidden="true"></span>
+    <span class="home-mascot-spark one" aria-hidden="true"></span>
+    <span class="home-mascot-spark two" aria-hidden="true"></span>
+    <span class="home-mascot-spark three" aria-hidden="true"></span>
+    <span class="home-mascot-chip" aria-hidden="true">PIP MODE</span>
+  </div>`;
   return `<div class="home-hero-mark" role="img" aria-label="Pip the MLS study mascot with small lab helpers">
     <svg class="pip-scene" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
       <title>Pip the MLS study mascot</title>
@@ -2407,7 +2428,7 @@ function homeSubjectMark(key,fallback){
   const icon=stored
     ? '<img src="'+stored+'" alt="">'
     : '<span aria-hidden="true">'+(fallbackIcons[key]||homeSubjectCode(key,fallback))+'</span>';
-  return '<div class="home-subject-mark"><div class="home-subject-icon">'+icon+'</div><div class="home-subject-code">'+homeSubjectCode(key,fallback)+'</div></div>';
+  return '<div class="home-subject-mark"><div class="home-subject-icon">'+icon+'</div></div>';
 }
 
 function homeAdminIconUpload(key){
@@ -2461,9 +2482,9 @@ async function renderHome(v){
     + '</section>'
     + '<section class="home-section">'
     + '<div class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}">'
-    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Curated lab topic hubs</div><div class="home-hubs-copy">Open the existing hub space for deeper class resources, simulations, maps, and subject-specific review pages.</div><div class="home-hubs-button">Enter Specialized Hubs <span>›</span></div></div>'
+    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Specialized Hubs</div><div class="home-hubs-copy">Open the existing hub space for deeper class resources, flowcharts, simulations, maps, and subject-specific review pages.</div><div class="home-hubs-button">Enter Specialized Hubs <span>›</span></div></div>'
     + '<div class="home-hubs-preview" aria-hidden="true"><div class="home-hubs-preview-track">'
-    + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><div class="home-hub-tile-dot">'+item.code+'</div><div><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div></div></div>').join('')
+    + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><img src="'+item.img+'" alt=""><div class="home-hub-tile-dot">'+item.code+'</div><div class="home-hub-tile-caption"><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div></div></div>').join('')
     + '</div></div></div></section>'
     + '<section class="home-section">'
     + '<button class="home-recall-card" onclick="goInteractive()">'
@@ -2556,6 +2577,52 @@ function renderResourcesView(v){
     </div>
   `;
 }
+
+function renderInteractiveLinkCard(lnk){
+  const url = lnk.url || '#';
+  const action = isLocalInteractiveUrl(url) ? "window.location.href='" + jsAttr(url) + "'" : "window.open('" + jsAttr(url) + "','_blank')";
+  const color = lnk.color || 'var(--accent)';
+  const media = lnk.image_url && !lnk.force_icon
+    ? '<img class="interactive-tool-thumb" src="'+esc(lnk.image_url)+'" alt="">'
+    : '<div class="interactive-tool-bubble" style="--tool-color:'+color+'">'+esc(lnk.icon||'GO')+'</div>';
+  return '<div class="interactive-tool-card" tabindex="0" style="--tool-color:'+color+'" onclick="'+action+'">'
+    + media
+    + '<div style="flex:1;min-width:0">'
+    + '<div class="interactive-tool-topic">'+esc(lnk.topic || (lnk._builtin?'Interactive':'Saved Link'))+'</div>'
+    + '<div class="interactive-tool-title">'+esc(lnk.title)+'</div>'
+    + (lnk.description ? '<div class="interactive-tool-desc">'+esc(lnk.description)+'</div>' : '')
+    + '</div>'
+    + '<div class="interactive-tool-arrow">›</div>'
+    + renderInteractivePreview(lnk)
+    + (isAdmin && !lnk._builtin ? '<div style="display:flex;gap:6px;position:absolute;right:8px;bottom:8px" onclick="event.stopPropagation()">'
+      + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">Edit</button>'
+      + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">Remove</button>'
+      + '</div>' : '')
+    + '</div>';
+}
+
+function renderInteractiveTopicGroups(allLinks){
+  const groups={};
+  allLinks.forEach(lnk=>{
+    const topic=lnk.topic || (lnk._builtin?'Interactive':'Saved Links');
+    if(!groups[topic])groups[topic]=[];
+    groups[topic].push(lnk);
+  });
+  const preferred=['Blood Bank','Urinalysis','Chemistry','Hematology','Microbiology','Lab Operations','Immunology','Saved Links','Interactive'];
+  const ordered=[
+    ...preferred.filter(topic=>groups[topic]),
+    ...Object.keys(groups).filter(topic=>!preferred.includes(topic)).sort()
+  ];
+  return ordered.map(topic=>{
+    const items=groups[topic]||[];
+    const color=(items[0]&&items[0].color)||'var(--accent)';
+    return '<section class="interactive-topic-section" style="--topic-color:'+color+'">'
+      + '<div class="interactive-topic-head"><div class="interactive-topic-title">'+esc(topic)+'</div></div>'
+      + '<div class="interactive-tool-grid">' + items.map(renderInteractiveLinkCard).join('') + '</div>'
+      + '</section>';
+  }).join('');
+}
+
 async function loadInteractiveLinks(){
   let links=[];
   try{
@@ -2574,29 +2641,7 @@ async function loadInteractiveLinks(){
     if(!allLinks.length){
       grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.' + (isAdmin?' Use the form below to add one.':'') + '</div>';
     } else {
-      grid.innerHTML = '<div class="interactive-tool-grid">' + allLinks.map((lnk) => {
-        const url = lnk.url || '#';
-        const action = isLocalInteractiveUrl(url) ? "window.location.href='" + jsAttr(url) + "'" : "window.open('" + jsAttr(url) + "','_blank')";
-        const color = lnk.color || 'var(--accent)';
-        const media = lnk.image_url && !lnk.force_icon
-          ? '<img class="interactive-tool-thumb" src="'+esc(lnk.image_url)+'" alt="">'
-          : '<div class="interactive-tool-bubble" style="--tool-color:'+color+'">'+esc(lnk.icon||'GO')+'</div>';
-        return '<div class="interactive-tool-card" tabindex="0" style="--tool-color:'+color+'" onclick="'+action+'">'
-          + media
-          + '<div style="flex:1;min-width:0">'
-          + '<div class="interactive-tool-topic">'+esc(lnk.topic || (lnk._builtin?'Interactive':'Saved Link'))+'</div>'
-          + '<div class="interactive-tool-title">'+esc(lnk.title)+'</div>'
-          + (lnk.description ? '<div class="interactive-tool-desc">'+esc(lnk.description)+'</div>' : '')
-          + '</div>'
-          + '<div class="interactive-tool-arrow">›</div>'
-          + renderInteractivePreview(lnk)
-          + (isAdmin && !lnk._builtin ? '<div style="display:flex;gap:6px;position:absolute;right:8px;bottom:8px" onclick="event.stopPropagation()">'
-            + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">Edit</button>'
-            + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">Remove</button>'
-            + '</div>' : '')
-          + '</div>';
-      }
-      ).join('') + '</div>';
+      grid.innerHTML = renderInteractiveTopicGroups(allLinks);
     }
   }
 
