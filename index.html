@@ -104,6 +104,49 @@ select option{background:var(--bg3)}
 .subject-icon{font-size:22px}
 .subject-name{font-size:14px;font-weight:600;color:var(--text)}
 .subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.home-dashboard{max-width:1180px;margin:0 auto;padding-bottom:28px}
+.home-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--bg2) 94%,var(--accent)),var(--bg2));border:1px solid var(--border);border-radius:22px;padding:30px;box-shadow:0 18px 42px rgba(18,35,74,.10);display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
+.home-kicker{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));color:var(--accent);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
+.home-title{font-size:clamp(30px,4vw,48px);line-height:1.02;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:10px}
+.home-subtitle{font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:620px;line-height:1.45}
+.home-hero-mark{width:112px;height:112px;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 18%,var(--bg2)),var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.home-hero-mark svg{width:72px;height:72px;color:var(--accent)}
+.home-section{margin-top:26px}
+.home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
+.home-section-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.home-section-sub{font-size:13px;color:var(--text2)}
+.home-subject-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;min-height:142px;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden}
+.home-subject-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 34%,var(--border));box-shadow:0 16px 34px rgba(18,35,74,.12);background:color-mix(in srgb,var(--bg2) 94%,var(--accent))}
+.home-subject-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}
+.home-subject-icon{width:48px;height:48px;border-radius:15px;background:color-mix(in srgb,var(--accent) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 20%,var(--border));display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:24px;font-weight:800;overflow:hidden}
+.home-subject-icon img{width:100%;height:100%;object-fit:cover}
+.home-subject-arrow{color:var(--text3);font-size:22px;line-height:1}
+.home-subject-name{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:6px}
+.home-subject-desc{font-size:12px;color:var(--text2);line-height:1.35;margin-bottom:10px}
+.home-subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.home-utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.home-utility-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;transition:all .18s ease;box-shadow:0 8px 20px rgba(18,35,74,.06)}
+.home-utility-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 30%,var(--border));box-shadow:0 13px 28px rgba(18,35,74,.10)}
+.home-utility-icon{width:40px;height:40px;border-radius:13px;background:color-mix(in srgb,var(--accent) 9%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:20px;flex-shrink:0}
+.home-utility-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.2}
+.home-utility-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.35}
+.home-hubs-card{position:relative;overflow:hidden;background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,460px);gap:22px;align-items:center;box-shadow:0 16px 38px rgba(18,35,74,.10);cursor:pointer;transition:all .2s ease}
+.home-hubs-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 36%,var(--border));box-shadow:0 20px 46px rgba(18,35,74,.14)}
+.home-hubs-label{font-size:12px;color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.home-hubs-title{font-size:25px;font-weight:750;color:var(--text);letter-spacing:-.02em;margin-bottom:7px}
+.home-hubs-copy{font-size:14px;color:var(--text2);max-width:520px;line-height:1.45;margin-bottom:16px}
+.home-hubs-button{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border-radius:999px;padding:10px 15px;font-size:13px;font-weight:700;box-shadow:0 9px 18px color-mix(in srgb,var(--accent) 24%,transparent)}
+.home-hubs-preview{position:relative;min-height:168px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 9%,var(--bg3)),var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 20%,var(--border));overflow:hidden;padding:16px}
+.home-hubs-preview-track{display:flex;gap:12px;position:absolute;left:16px;top:16px;animation:hub-preview-slide 16s linear infinite}
+.home-hubs-card:hover .home-hubs-preview-track{animation-duration:9s}
+.home-hub-tile{width:132px;height:132px;border-radius:16px;background:var(--bg2);border:1px solid var(--border);padding:14px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 22px rgba(18,35,74,.12)}
+.home-hub-tile-dot{width:34px;height:34px;border-radius:12px;background:color-mix(in srgb,var(--accent) 13%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800}
+.home-hub-tile-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
+.home-hub-tile-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px}
+@keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-576px)}}
+@media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{display:none}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-hubs-preview{min-height:145px}}
+@media(max-width:560px){main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:auto;min-height:104px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
 .class-material-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--cm-accent,var(--accent));opacity:.9}
@@ -2201,75 +2244,82 @@ function getSubjectIcon(key,fallback){
   return '<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0">'+fallback+'</div>';
 }
 
+const HOME_SUBJECT_DETAILS={
+  blood_bank:'ABO/Rh, antibody workups, transfusion practice',
+  clinical_chemistry:'Analytes, formulas, endocrine and metabolic review',
+  hematology:'CBC patterns, morphology, coagulation and image review',
+  microbiology:'Organisms, ID clues, images and case-style practice',
+  urinalysis:'Reagent strip, microscopy, renal patterns and body fluids',
+  lab_operations:'QC, safety, statistics, methods and management',
+  immunology:'Serology, immune testing and infectious disease review',
+  para_myco:'Parasites, fungi and organism recognition'
+};
+
+function homeSubjectMark(key,fallback){
+  const stored=iconCache[key];
+  if(stored)return '<div class="home-subject-icon"><img src="'+stored+'" alt=""></div>';
+  const short={
+    blood_bank:'BB',clinical_chemistry:'CH',hematology:'HE',
+    microbiology:'MI',urinalysis:'UA',lab_operations:'LO',
+    immunology:'IM',para_myco:'PM',all:'ALL',formulas:'Fx'
+  };
+  return '<div class="home-subject-icon">'+(short[key]||fallback||'?')+'</div>';
+}
+
+function homeAdminIconUpload(key){
+  if(!isAdmin)return '';
+  return '<label style="position:absolute;bottom:10px;right:10px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:999px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">Icon<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\''+key+'\')" onclick="event.stopPropagation()"></label>';
+}
+
 async function renderHome(v){
   const cards = SUBJECTS.filter(s=>!s._hidden).map(s=>{
     const isCombined=s._combined&&s._combined.length;
-    const uploadBtn = isAdmin && !isCombined
-      ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'' + s.key + '\')"></label>'
-      : '';
     // Combined card (Parasitology / Mycology) — dual icon, click goes to parasitology by default
     if(isCombined){
-      const pmIcon=getSubjectIcon('para_myco','');
-      const pmUpload=isAdmin?'<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'para_myco\')"></label>':'';
-      const pmIconHtml=iconCache['para_myco']
-        ?pmIcon
-        :'<div style="width:100%;height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0"><div style="font-size:36px">🍄</div><div style="font-size:36px">🪱</div></div>';
       return '<div style="position:relative">'
-        + '<div class="subject-card" onclick="goSubject(\'para_myco\')" style="cursor:pointer">'
-        + '<div id="sicon-para_myco">' + pmIconHtml + '</div>'
-        + '<div style="padding:8px 12px 6px">'
-        + '<div class="subject-name">' + s.name + '</div>'
-        + '<div id="cnt-para_myco" class="subject-count">loading...</div>'
-        + '</div></div>'
-        + pmUpload
+        + '<button class="home-subject-card" onclick="goSubject(\'para_myco\')">'
+        + '<div class="home-subject-top"><div id="sicon-para_myco">'+homeSubjectMark('para_myco','PM')+'</div><div class="home-subject-arrow">›</div></div>'
+        + '<div class="home-subject-name">'+s.name+'</div>'
+        + '<div class="home-subject-desc">'+(HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice')+'</div>'
+        + '<div id="cnt-para_myco" class="home-subject-count">loading...</div>'
+        + '</button>'
+        + homeAdminIconUpload('para_myco')
         + '</div>';
     }
     return '<div style="position:relative">'
-      + '<div class="subject-card" onclick="goSubject(\'' + s.key + '\')">'
-      + '<div id="sicon-' + s.key + '">' + getSubjectIcon(s.key, s.icon) + '</div>'
-      + '<div style="padding:10px 12px 12px">'
-      + '<div class="subject-name">' + s.name + '</div>'
-      + '<div class="subject-count" id="cnt-' + s.key + '">loading...</div>'
-      + '</div></div>'
-      + uploadBtn + '</div>';
+      + '<button class="home-subject-card" onclick="goSubject(\'' + s.key + '\')">'
+      + '<div class="home-subject-top"><div id="sicon-' + s.key + '">' + homeSubjectMark(s.key, s.icon) + '</div><div class="home-subject-arrow">›</div></div>'
+      + '<div class="home-subject-name">' + s.name + '</div>'
+      + '<div class="home-subject-desc">' + (HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice') + '</div>'
+      + '<div class="home-subject-count" id="cnt-' + s.key + '">loading...</div>'
+      + '</button>'
+      + homeAdminIconUpload(s.key) + '</div>';
   }).join('');
 
-  const fmlAdminDrop = isAdmin ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'formulas\')"></label>' : '';
-
-  v.innerHTML = '<div class="mb-16"><div class="section-title">BOC Exam Prep</div><div class="section-sub">Medical Laboratory Scientist · ASCP Board of Certification</div></div>'
-    + '<div class="subject-grid">' + cards
-    + '<div style="position:relative">'
-    + '<div class="subject-card all-subjects" onclick="goAll()">'
-    + getSubjectIcon('all','📋')
-    + '<div style="padding:10px 12px 12px"><div class="subject-name">All Subjects</div><div class="subject-count">Practice Exam · 100 questions · Timed</div></div>'
-    + '</div>'
-    + (isAdmin ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\'all\')"></label>' : '')
-    + '</div>'
-    + '<div style="position:relative">'
-    + '<div class="subject-card" style="border-color:#f5a62344" onclick="goFormulas()">'
-    + '<div id="sicon-formulas">' + getSubjectIcon('formulas','📐') + '</div>'
-    + '<div style="padding:10px 12px 12px"><div class="subject-name">Calculations / Reference Ranges</div><div class="subject-count" id="cnt-formulas">loading...</div></div>'
-    + '</div>'
-    + fmlAdminDrop + '</div>'
-    + '</div>'
-    + '<div class="mt-16">'
-    + '<button onclick="window.open(HUB_URL,\'_blank\')" style="width:100%;cursor:pointer;background:linear-gradient(135deg,#6c3ddc,#4f8ef7,#3ddc84);border:none;border-radius:var(--r2);padding:16px 20px;display:flex;align-items:center;gap:14px;transition:opacity .2s;box-shadow:0 4px 20px #4f8ef740" onmouseover="this.style.opacity=\'0.88\'" onmouseout="this.style.opacity=\'1\'">'
-    + '<div style="font-size:26px;flex-shrink:0">🌐</div>'
-    + '<div style="flex:1;text-align:left"><div style="font-size:14px;font-weight:700;color:#fff;letter-spacing:0.2px">Specialized Hubs</div><div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px">Your curated deep-dives →</div></div>'
-    + '<div style="font-size:18px;color:rgba(255,255,255,0.8)">›</div>'
-    + '</button></div>'
-    + '<div class="mt-8">'
-    + '<div onclick="goInteractive()" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--border2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
-    + '<div style="font-size:28px;flex-shrink:0">🔗</div>'
-    + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Interactive Learning</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Built-in study tools and saved resources</div></div>'
-    + '<div style="font-size:18px;color:var(--text3)">›</div>'
-    + '</div></div>'
-    + '<div class="mt-8">'
-    + '<div onclick="goResources()" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--border2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
-    + '<div style="font-size:28px;flex-shrink:0">📚</div>'
-    + '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">Resources</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Citation starter list for study materials</div></div>'
-    + '<div style="font-size:18px;color:var(--text3)">›</div>'
-    + '</div></div>'
+  v.innerHTML = '<div class="home-dashboard">'
+    + '<section class="home-hero">'
+    + '<div><div class="home-kicker">Student Created • For Studying Purposes Only</div>'
+    + '<h1 class="home-title">MLS BOC Study Hub</h1>'
+    + '<div class="home-subtitle">Practice, image review, and interactive lab tools</div></div>'
+    + '<div class="home-hero-mark" aria-hidden="true"><svg viewBox="0 0 96 96" fill="none"><path d="M27 18h42v52c0 11.6-9.4 21-21 21s-21-9.4-21-21V18Z" stroke="currentColor" stroke-width="5"/><path d="M21 18h54" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M32 48h32M32 62h32" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".55"/><circle cx="39" cy="34" r="4" fill="currentColor"/><circle cx="56" cy="37" r="3" fill="currentColor" opacity=".6"/></svg></div>'
+    + '</section>'
+    + '<section class="home-section">'
+    + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div><div class="home-section-sub">Start with a subject, then practice or review images.</div></div></div>'
+    + '<div class="home-subject-grid">' + cards + '</div>'
+    + '<div class="home-utility-grid">'
+    + '<div style="position:relative"><button class="home-utility-card" onclick="goAll()"><div id="sicon-all">'+homeSubjectMark('all','ALL')+'</div><div style="min-width:0;flex:1"><div class="home-utility-title">All Subjects</div><div class="home-utility-sub">Practice Exam · 100 questions · Timed</div></div><div class="home-subject-arrow">›</div></button>'+homeAdminIconUpload('all')+'</div>'
+    + '<div style="position:relative"><button class="home-utility-card" onclick="goFormulas()"><div id="sicon-formulas">'+homeSubjectMark('formulas','Fx')+'</div><div style="min-width:0;flex:1"><div class="home-utility-title">Calculations / Reference Ranges</div><div class="home-utility-sub" id="cnt-formulas">loading...</div></div><div class="home-subject-arrow">›</div></button>'+homeAdminIconUpload('formulas')+'</div>'
+    + '<button class="home-utility-card" onclick="goInteractive()"><div class="home-utility-icon">↔</div><div style="min-width:0;flex:1"><div class="home-utility-title">Interactive Learning</div><div class="home-utility-sub">Built-in study tools and saved resources</div></div><div class="home-subject-arrow">›</div></button>'
+    + '</div></section>'
+    + '<section class="home-section">'
+    + '<div class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}">'
+    + '<div><div class="home-hubs-label">Lab Hubs</div><div class="home-hubs-title">Curated lab topic hubs</div><div class="home-hubs-copy">Open the existing Lab Hubs space for deeper class resources and subject-specific review pages.</div><div class="home-hubs-button">Enter Lab Hubs <span>›</span></div></div>'
+    + '<div class="home-hubs-preview" aria-hidden="true"><div class="home-hubs-preview-track">'
+    + ['Blood Bank','Hematology','Chemistry','Microbiology','Urinalysis','Lab Ops','Blood Bank','Hematology','Chemistry','Microbiology'].map((name,i)=>'<div class="home-hub-tile"><div class="home-hub-tile-dot">'+name.split(' ').map(w=>w[0]).join('').slice(0,2)+'</div><div><div class="home-hub-tile-title">'+name+'</div><div class="home-hub-tile-sub">hub preview</div></div></div>').join('')
+    + '</div></div></div></section>'
+    + '<section class="home-section"><div class="home-utility-grid" style="grid-template-columns:1fr">'
+    + '<button class="home-utility-card" onclick="goResources()"><div class="home-utility-icon">📚</div><div style="min-width:0;flex:1"><div class="home-utility-title">Resources</div><div class="home-utility-sub">Citation starter list for study materials</div></div><div class="home-subject-arrow">›</div></button>'
+    + '</div></section>'
     + '<div class="mt-24">'
     + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
     + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
@@ -2284,7 +2334,8 @@ async function renderHome(v){
       }).join('')
     + '</div>'
     + '</div>'
-    + '<div class="mt-24" id="attempts-home"></div>';
+    + '<div class="mt-24" id="attempts-home"></div>'
+    + '</div>';
 
   SUBJECTS.filter(s=>!s._hidden).forEach(async s=>{
     if(s._combined){
