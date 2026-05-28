@@ -111,13 +111,13 @@ select option{background:var(--bg3)}
 .home-subtitle{font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:620px;line-height:1.45}
 .home-hero-mark{position:relative;width:196px;aspect-ratio:1/1;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 14%,var(--bg2)),color-mix(in srgb,#c7d7ff 18%,var(--bg3)));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 34px rgba(41,78,150,.13);overflow:hidden}
 .home-hero-mark svg{width:100%;height:100%;display:block}
-.home-mascot-art{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transform:scale(1.02);animation:mascotFloat 8.5s ease-in-out infinite}
-.home-mascot-glow{position:absolute;inset:0;background:radial-gradient(circle at 30% 18%,rgba(255,255,255,.38),transparent 35%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(29,48,94,.14));pointer-events:none}
-.home-mascot-chip{position:absolute;right:12px;bottom:12px;background:rgba(255,255,255,.88);border:1px solid rgba(142,163,214,.65);color:#384766;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;letter-spacing:.08em;box-shadow:0 8px 18px rgba(28,48,89,.18);animation:chipPop 8.5s ease-in-out infinite}
-.home-mascot-spark{position:absolute;width:9px;height:9px;border-radius:50%;background:#8ea7f2;box-shadow:0 0 0 5px rgba(142,167,242,.14);animation:mascotSpark 8.5s ease-in-out infinite}
-.home-mascot-spark.one{left:22px;top:24px}
-.home-mascot-spark.two{right:30px;top:34px;animation-delay:1.2s;background:#d3b6ff}
-.home-mascot-spark.three{left:28px;bottom:34px;animation-delay:2.1s;background:#80c7d9}
+.lab-loop-pipette{transform-origin:151px 70px;animation:labLoopPipette 5.8s ease-in-out infinite}
+.lab-loop-drop{animation:labLoopDrop 5.8s ease-in-out infinite}
+.lab-loop-spinny{transform-origin:51px 54px;animation:labLoopSpin 5.8s ease-in-out infinite}
+.lab-loop-slide{animation:labLoopSlide 5.8s ease-in-out infinite}
+.lab-loop-tube{animation:labLoopBounce 5.8s ease-in-out infinite}
+.lab-loop-check{transform-origin:172px 58px;animation:labLoopCheck 5.8s ease-in-out infinite}
+.lab-loop-glint{animation:labLoopGlint 5.8s ease-in-out infinite}
 .pip-pipette{transform-origin:108px 83px;animation:pipetteRaise 7.5s ease-in-out infinite}
 .pip-drop{animation:dropFall 7.5s ease-in-out infinite}
 .pip-spinny{transform-origin:49px 50px;animation:spinnyMove 7.5s ease-in-out infinite}
@@ -130,7 +130,7 @@ select option{background:var(--bg3)}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
 .home-section-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.01em}
 .home-section-sub{font-size:13px;color:var(--text2)}
-.home-subject-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--subject-color,var(--accent));border-radius:18px;padding:15px;min-height:0;aspect-ratio:1/1;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden;display:flex;flex-direction:column}
 .home-subject-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--subject-color,var(--accent)) 38%,var(--border));box-shadow:0 16px 34px rgba(18,35,74,.12);background:color-mix(in srgb,var(--bg2) 96%,var(--subject-color,var(--accent)))}
 .home-subject-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -148,6 +148,16 @@ select option{background:var(--bg3)}
 .home-utility-icon{width:40px;height:40px;border-radius:13px;background:color-mix(in srgb,var(--accent) 9%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:20px;flex-shrink:0}
 .home-utility-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.2}
 .home-utility-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.35}
+.home-practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.home-practice-card{position:relative;overflow:hidden;min-height:152px;border:0;border-radius:20px;padding:20px;text-align:left;color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 18px 36px rgba(18,35,74,.16);background:linear-gradient(135deg,var(--practice-color),color-mix(in srgb,var(--practice-color) 74%,#0f172a));transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+.home-practice-card::before{content:'';position:absolute;inset:-30% -10% auto auto;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.18)}
+.home-practice-card::after{content:'';position:absolute;inset:auto 18px 18px auto;width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22)}
+.home-practice-card:hover{transform:translateY(-2px);box-shadow:0 23px 46px rgba(18,35,74,.22);filter:saturate(1.05)}
+.home-practice-card.featured{grid-column:span 2}
+.home-practice-icon{position:relative;z-index:1;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.26);font-size:23px;font-weight:900;margin-bottom:18px}
+.home-practice-title{position:relative;z-index:1;font-size:22px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:8px;max-width:420px}
+.home-practice-sub{position:relative;z-index:1;font-size:13px;line-height:1.4;color:rgba(255,255,255,.83);max-width:520px}
+.home-practice-meta{position:relative;z-index:1;margin-top:20px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.76)}
 .home-hubs-card{position:relative;overflow:hidden;background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,460px);gap:22px;align-items:center;box-shadow:0 16px 38px rgba(18,35,74,.10);cursor:pointer;transition:all .2s ease}
 .home-hubs-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 36%,var(--border));box-shadow:0 20px 46px rgba(18,35,74,.14)}
 .home-hubs-label{font-size:12px;color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
@@ -158,12 +168,13 @@ select option{background:var(--bg3)}
 .home-hubs-preview-track{display:flex;gap:12px;position:absolute;left:16px;top:16px;animation:hub-preview-slide 16s linear infinite}
 .home-hubs-card:hover .home-hubs-preview-track{animation-duration:9s}
 .home-hub-tile{position:relative;width:236px;height:146px;border-radius:16px;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--hub-color,var(--accent));padding:0;display:block;box-shadow:0 10px 22px rgba(18,35,74,.12);overflow:hidden}
-.home-hub-tile img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;filter:saturate(.98) contrast(.98)}
-.home-hub-tile-dot{position:absolute;left:10px;top:10px;width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.86);display:flex;align-items:center;justify-content:center;color:var(--hub-color,var(--accent));font-weight:800;box-shadow:0 6px 14px rgba(18,35,74,.16)}
-.home-hub-tile-caption{position:absolute;left:0;right:0;bottom:0;padding:22px 11px 10px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.82));color:#fff}
+.home-hub-tile::after{content:'';position:absolute;right:-28px;top:-30px;width:110px;height:110px;border-radius:50%;background:color-mix(in srgb,var(--hub-color,var(--accent)) 16%,transparent)}
+.home-hub-tile-dot{position:absolute;left:12px;top:12px;width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--hub-color,var(--accent)) 13%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--hub-color,var(--accent));font-weight:800;border:1px solid color-mix(in srgb,var(--hub-color,var(--accent)) 24%,var(--border));box-shadow:0 6px 14px rgba(18,35,74,.10)}
+.home-hub-tile-caption{position:absolute;left:12px;right:12px;bottom:12px;top:56px;color:var(--text)}
 .home-hub-tile-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
-.home-hub-tile-caption .home-hub-tile-title{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.35)}
-.home-hub-tile-sub{font-size:10px;color:rgba(255,255,255,.76);font-family:var(--mono);margin-top:4px;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.home-hub-tile-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px;line-height:1.25}
+.home-hub-feature-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.home-hub-feature-list span{display:inline-flex;border-radius:999px;background:color-mix(in srgb,var(--hub-color,var(--accent)) 9%,var(--bg3));border:1px solid color-mix(in srgb,var(--hub-color,var(--accent)) 18%,var(--border));color:color-mix(in srgb,var(--hub-color,var(--accent)) 82%,var(--text));font-size:9px;font-weight:700;padding:3px 6px;line-height:1}
 .interactive-topic-section{margin-top:26px}
 .interactive-topic-head{display:flex;align-items:center;gap:14px;margin-bottom:12px}
 .interactive-topic-title{color:var(--topic-color,var(--accent));font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
@@ -182,14 +193,18 @@ select option{background:var(--bg3)}
 @keyframes scopeyBob{0%,48%,100%{transform:translateY(0)}54%,64%{transform:translateY(-4px)}}
 @keyframes qcPop{0%,63%,100%{opacity:.8;transform:scale(.92)}70%,88%{opacity:1;transform:scale(1.08)}94%{opacity:.92;transform:scale(.98)}}
 @keyframes sparkle{0%,20%,100%{opacity:.25;transform:scale(.8)}27%,42%{opacity:1;transform:scale(1.12)}}
-@keyframes mascotFloat{0%,100%{transform:scale(1.02) translateY(0)}45%{transform:scale(1.055) translateY(-4px)}70%{transform:scale(1.035) translateY(2px)}}
-@keyframes chipPop{0%,56%,100%{transform:translateY(0) scale(.96);opacity:.88}64%,82%{transform:translateY(-4px) scale(1);opacity:1}}
-@keyframes mascotSpark{0%,100%{transform:scale(.75);opacity:.35}30%,48%{transform:scale(1.2);opacity:1}}
+@keyframes labLoopPipette{0%,100%{transform:translateY(0) rotate(0)}16%,34%{transform:translateY(-4px) rotate(-7deg)}45%,70%{transform:translateY(0) rotate(0)}}
+@keyframes labLoopDrop{0%,18%{opacity:0;transform:translateY(-12px)}25%{opacity:1}39%{opacity:0;transform:translateY(26px)}100%{opacity:0;transform:translateY(26px)}}
+@keyframes labLoopSpin{0%,35%,100%{transform:rotate(0deg) scale(1)}48%,63%{transform:rotate(360deg) scale(1.06)}70%{transform:rotate(380deg) scale(1)}}
+@keyframes labLoopSlide{0%,42%,100%{transform:translateX(0)}54%,70%{transform:translateX(13px)}78%{transform:translateX(0)}}
+@keyframes labLoopBounce{0%,58%,100%{transform:translateY(0)}66%{transform:translateY(-10px)}72%{transform:translateY(0)}77%{transform:translateY(-4px)}82%{transform:translateY(0)}}
+@keyframes labLoopCheck{0%,64%,100%{opacity:.72;transform:scale(.94)}72%,88%{opacity:1;transform:scale(1.06)}}
+@keyframes labLoopGlint{0%,100%{opacity:.35;transform:scale(.8)}22%,38%{opacity:1;transform:scale(1.12)}}
 @keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-1488px)}}
-@media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(220px,72vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-hubs-preview{min-height:145px}}
-@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:154px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:auto;min-height:104px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
-@media(prefers-reduced-motion:reduce){.pip-pipette,.pip-drop,.pip-spinny,.pip-slidy,.pip-lavvy,.pip-scopey,.pip-qc,.pip-spark,.home-mascot-art,.home-mascot-chip,.home-mascot-spark,.home-hubs-preview-track{animation:none!important}.pip-drop{opacity:.85;transform:translateY(10px)}.home-mascot-art{transform:scale(1.02)}}
+@media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(220px,72vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-practice-grid{grid-template-columns:1fr}.home-practice-card.featured{grid-column:auto}.home-hubs-preview{min-height:145px}}
+@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:154px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:auto;min-height:132px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
+@media(prefers-reduced-motion:reduce){.pip-pipette,.pip-drop,.pip-spinny,.pip-slidy,.pip-lavvy,.pip-scopey,.pip-qc,.pip-spark,.lab-loop-pipette,.lab-loop-drop,.lab-loop-spinny,.lab-loop-slide,.lab-loop-tube,.lab-loop-check,.lab-loop-glint,.home-hubs-preview-track{animation:none!important}.pip-drop,.lab-loop-drop{opacity:.85;transform:translateY(10px)}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
 .class-material-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--cm-accent,var(--accent));opacity:.9}
@@ -2305,12 +2320,12 @@ const HOME_SUBJECT_COLORS={
 };
 
 const HOME_HUB_PREVIEWS=[
-  {code:'BB',title:'Blood Structures',sub:'ABH + Lewis build board',color:'#b93b44',img:'assets/interactive-previews/abo_lewis_structures.png'},
-  {code:'BB',title:'Usual Suspects',sub:'blood group matching',color:'#b93b44',img:'assets/interactive-previews/bb_group_usual.png'},
-  {code:'BB',title:'Antigen Frequencies',sub:'donor table practice',color:'#b93b44',img:'assets/interactive-previews/antigen_donor_frequencies.png'},
-  {code:'UA',title:'Renal Flowcharts',sub:'glomerular/tubular/interstitial',color:'#c8a800',img:'assets/interactive-previews/ua_glomerular_flowchart.png'},
-  {code:'UA',title:'Reagent Strip Match',sub:'false results + significance',color:'#c8a800',img:'assets/interactive-previews/ua_reagent_strip_match.png'},
-  {code:'CC',title:'Thyroid Lab Findings',sub:'hormone interpretation table',color:'#2f7dd1',img:'assets/interactive-previews/thyroid_lab_findings.png'}
+  {code:'BB',title:'Blood Bank Hub',sub:'encyclopedia, RBC antigen map, chromosome map',color:'#b93b44',features:['Encyclopedia','RBC antigens','Chromosome map']},
+  {code:'BB',title:'Simulation Lab',sub:'crossmatch, ABO typing, antigram practice',color:'#b93b44',features:['Crossmatch','ABO cases','Antigram']},
+  {code:'MB',title:'Microbiology Hub',sub:'Gram groups, media/tests, organism flowcharts',color:'#2fa66a',features:['Gram +/-','Media tests','Flowcharts']},
+  {code:'UA',title:'Urinalysis Hub',sub:'macroscopic, microscopic, renal diseases',color:'#c8a800',features:['Macroscopic','Microscopic','Renal']},
+  {code:'CC',title:'Chemistry Hub',sub:'organ flowcharts and hormone mapping',color:'#2f7dd1',features:['Organ flows','Hormone map','Simulation']},
+  {code:'HE',title:'Hematology Hub',sub:'RBC/WBC tables and smear review planning',color:'#c74656',features:['RBC','WBC','Smear review']}
 ];
 
 function homeSubjectColor(key){
@@ -2327,92 +2342,66 @@ function homeSubjectCode(key,fallback){
 }
 
 function homeMascotScene(){
-  return `<div class="home-hero-mark home-mascot-card" role="img" aria-label="Chaotic MLS study mascot scene">
-    <img class="home-mascot-art" src="assets/home/mls-study-chaos-mascot.jpg" alt="">
-    <span class="home-mascot-glow" aria-hidden="true"></span>
-    <span class="home-mascot-spark one" aria-hidden="true"></span>
-    <span class="home-mascot-spark two" aria-hidden="true"></span>
-    <span class="home-mascot-spark three" aria-hidden="true"></span>
-    <span class="home-mascot-chip" aria-hidden="true">PIP MODE</span>
-  </div>`;
-  return `<div class="home-hero-mark" role="img" aria-label="Pip the MLS study mascot with small lab helpers">
-    <svg class="pip-scene" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <title>Pip the MLS study mascot</title>
+  return `<div class="home-hero-mark" role="img" aria-label="Professional looping MLS lab mascot animation">
+    <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <title>Pip the MLS study mascot in a lab loop</title>
       <defs>
-        <linearGradient id="pipBg" x1="18" y1="14" x2="204" y2="210" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#eef5ff"/>
-          <stop offset="1" stop-color="#e6e2ff"/>
+        <linearGradient id="labLoopBg" x1="24" y1="14" x2="202" y2="207" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#f7fbff"/>
+          <stop offset="1" stop-color="#e8edff"/>
         </linearGradient>
-        <linearGradient id="pipCoat" x1="87" y1="105" x2="145" y2="187" gradientUnits="userSpaceOnUse">
+        <linearGradient id="labLoopCoat" x1="89" y1="100" x2="142" y2="186" gradientUnits="userSpaceOnUse">
           <stop stop-color="#ffffff"/>
-          <stop offset="1" stop-color="#e9effc"/>
+          <stop offset="1" stop-color="#e8eef9"/>
         </linearGradient>
-        <filter id="pipShadow" x="-20%" y="-20%" width="140%" height="150%">
-          <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#2e4d86" flood-opacity=".18"/>
+        <filter id="labLoopShadow" x="-18%" y="-18%" width="136%" height="145%">
+          <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#324c7d" flood-opacity=".16"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="220" height="220" rx="28" fill="url(#pipBg)"/>
-      <circle class="pip-spark" cx="66" cy="77" r="3" fill="#8ea7f2"/>
-      <circle class="pip-spark" cx="160" cy="118" r="2.8" fill="#78c7d9"/>
-      <path class="pip-spark" d="M137 37l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6Z" fill="#b6a8ff"/>
+      <rect width="220" height="220" rx="28" fill="url(#labLoopBg)"/>
+      <path d="M26 164h168" stroke="#c8d4ee" stroke-width="2" stroke-linecap="round"/>
+      <path class="lab-loop-glint" d="M55 26l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z" fill="#91a9ee"/>
+      <circle class="lab-loop-glint" cx="169" cy="132" r="4" fill="#82c7d7"/>
 
-      <g class="pip-spinny" filter="url(#pipShadow)">
-        <rect x="25" y="30" width="49" height="43" rx="15" fill="#dfe9ff" stroke="#9eb3df" stroke-width="2"/>
-        <path d="M36 44h27" stroke="#6a7fae" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="49.5" cy="55" r="11" fill="#f7fbff" stroke="#6a7fae" stroke-width="2"/>
-        <path d="M49.5 46v18M40.5 55h18" stroke="#6a7fae" stroke-width="3" stroke-linecap="round"/>
+      <g class="lab-loop-spinny" filter="url(#labLoopShadow)">
+        <rect x="28" y="36" width="46" height="38" rx="14" fill="#eff5ff" stroke="#9eb2de" stroke-width="2"/>
+        <circle cx="51" cy="57" r="11" fill="#fff" stroke="#768bb7" stroke-width="2"/>
+        <path d="M51 47v20M41 57h20" stroke="#6680b3" stroke-width="3" stroke-linecap="round"/>
       </g>
 
-      <g class="pip-qc" filter="url(#pipShadow)">
-        <rect x="154" y="28" width="42" height="52" rx="10" fill="#fffaf0" stroke="#9eb3df" stroke-width="2"/>
-        <rect x="165" y="22" width="20" height="12" rx="5" fill="#c6d6fb" stroke="#8ea7d6" stroke-width="2"/>
-        <path d="M164 50l6 6 14-16" stroke="#2fa66a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M164 66h22" stroke="#a5b0cc" stroke-width="3" stroke-linecap="round"/>
+      <g class="lab-loop-check" filter="url(#labLoopShadow)">
+        <rect x="154" y="36" width="42" height="48" rx="12" fill="#fffaf4" stroke="#a9b7dc" stroke-width="2"/>
+        <path d="M164 60l7 7 15-19" stroke="#35a46f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
 
-      <g class="pip-scopey" filter="url(#pipShadow)">
-        <path d="M34 151h33" stroke="#566985" stroke-width="7" stroke-linecap="round"/>
-        <path d="M44 150l18-38" stroke="#566985" stroke-width="7" stroke-linecap="round"/>
-        <rect x="54" y="104" width="22" height="12" rx="5" transform="rotate(23 54 104)" fill="#dfe9ff" stroke="#566985" stroke-width="3"/>
-        <rect x="27" y="161" width="52" height="11" rx="5" fill="#dfe9ff" stroke="#566985" stroke-width="3"/>
-      </g>
-
-      <g class="pip-lavvy" filter="url(#pipShadow)">
-        <rect x="166" y="126" width="26" height="51" rx="11" fill="#f8fbff" stroke="#8ea0c9" stroke-width="2"/>
-        <path d="M169 148h20v18c0 5.5-4.5 10-10 10s-10-4.5-10-10v-18Z" fill="#b39cf7"/>
-        <rect x="166" y="121" width="26" height="8" rx="3" fill="#9c86df"/>
-        <circle cx="175" cy="157" r="2" fill="#e7dbff" opacity=".8"/>
-      </g>
-
-      <g class="pip-slidy" filter="url(#pipShadow)">
-        <rect x="48" y="178" width="84" height="18" rx="7" fill="#f9fcff" stroke="#9eb3df" stroke-width="2"/>
-        <path d="M64 187c14-7 31 7 49 0" stroke="#d67ca5" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="120" cy="187" r="3" fill="#7c89b4"/>
-      </g>
-
-      <g filter="url(#pipShadow)">
-        <ellipse cx="112" cy="192" rx="39" ry="8" fill="#6276a2" opacity=".18"/>
-        <path d="M83 125c0-21 15-38 34-38s34 17 34 38v52H83v-52Z" fill="url(#pipCoat)" stroke="#9eb3df" stroke-width="3"/>
-        <path d="M98 125l17 18 18-18M115 143v35" stroke="#bdc9e3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="116" cy="74" r="31" fill="#ffd9c7" stroke="#d79a85" stroke-width="3"/>
-        <path d="M88 70c7-20 24-32 47-23 10 4 15 13 15 23-18-5-35-3-62 0Z" fill="#303f66"/>
-        <circle cx="105" cy="77" r="4.3" fill="#1f2a44"/>
-        <circle cx="128" cy="77" r="4.3" fill="#1f2a44"/>
-        <path d="M106 92c8 6 15 6 22 0" stroke="#b7506c" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="96" cy="88" r="5" fill="#ff9ca7" opacity=".75"/>
-        <circle cx="138" cy="88" r="5" fill="#ff9ca7" opacity=".75"/>
-        <path d="M83 135c-17 6-24 0-27-10" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
-        <path d="M151 136c17 0 25-7 27-17" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
-        <circle cx="56" cy="124" r="7" fill="#74b6ff" stroke="#4176b7" stroke-width="2"/>
-        <circle cx="178" cy="118" r="7" fill="#74b6ff" stroke="#4176b7" stroke-width="2"/>
-        <g class="pip-pipette">
-          <path d="M134 107l36-50" stroke="#4d6491" stroke-width="6" stroke-linecap="round"/>
-          <path d="M165 50l16-22" stroke="#4d6491" stroke-width="8" stroke-linecap="round"/>
-          <path d="M126 118l11-16" stroke="#74b6ff" stroke-width="8" stroke-linecap="round"/>
+      <g filter="url(#labLoopShadow)">
+        <ellipse cx="112" cy="191" rx="39" ry="8" fill="#526b9b" opacity=".14"/>
+        <path d="M81 124c0-22 16-40 35-40s35 18 35 40v54H81v-54Z" fill="url(#labLoopCoat)" stroke="#9eb2de" stroke-width="3"/>
+        <path d="M96 124l19 21 20-21M115 145v34" stroke="#bec9df" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="116" cy="73" r="30" fill="#ffdccb" stroke="#d79a85" stroke-width="3"/>
+        <path d="M90 70c8-20 29-29 49-17 8 5 12 11 12 19-22-6-38-4-61-2Z" fill="#3b4d77"/>
+        <circle cx="105" cy="78" r="4" fill="#1f2a44"/>
+        <circle cx="128" cy="78" r="4" fill="#1f2a44"/>
+        <path d="M107 91c7 5 14 5 21 0" stroke="#b7506c" stroke-width="4" stroke-linecap="round"/>
+        <path d="M82 134c-17 6-23 1-27-9" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
+        <path d="M151 135c15 1 23-7 25-16" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="55" cy="125" r="7" fill="#71b5f8" stroke="#4075b7" stroke-width="2"/>
+        <circle cx="176" cy="119" r="7" fill="#71b5f8" stroke="#4075b7" stroke-width="2"/>
+        <g class="lab-loop-pipette">
+          <path d="M132 108l35-50" stroke="#536990" stroke-width="6" stroke-linecap="round"/>
+          <path d="M164 51l15-22" stroke="#536990" stroke-width="8" stroke-linecap="round"/>
+          <path d="M125 119l11-16" stroke="#71b5f8" stroke-width="8" stroke-linecap="round"/>
         </g>
-        <circle class="pip-drop" cx="157" cy="112" r="4" fill="#3aa8ff"/>
-        <path d="M148 150h24v34c0 6.6-5.4 12-12 12s-12-5.4-12-12v-34Z" fill="#eef5ff" stroke="#7d90bd" stroke-width="3"/>
-        <path d="M151 169h18v16c0 5-4 9-9 9s-9-4-9-9v-16Z" fill="#94d4ff"/>
+        <circle class="lab-loop-drop" cx="156" cy="112" r="4" fill="#2698f0"/>
+        <g class="lab-loop-tube">
+          <path d="M148 150h24v32c0 6.6-5.4 12-12 12s-12-5.4-12-12v-32Z" fill="#f4f8ff" stroke="#7d90bd" stroke-width="3"/>
+          <path d="M151 169h18v14c0 5-4 9-9 9s-9-4-9-9v-14Z" fill="#8dd5ff"/>
+        </g>
+      </g>
+
+      <g class="lab-loop-slide" filter="url(#labLoopShadow)">
+        <rect x="46" y="174" width="84" height="18" rx="7" fill="#fbfdff" stroke="#a8b8dc" stroke-width="2"/>
+        <path d="M62 183c14-6 30 6 49 0" stroke="#d583ad" stroke-width="4" stroke-linecap="round"/>
       </g>
     </svg>
   </div>`;
@@ -2448,6 +2437,13 @@ function homeSubjectCardHtml(cfg){
     + '</div>';
 }
 
+function homePracticeCardHtml(cfg){
+  return '<button class="home-practice-card '+(cfg.featured?'featured':'')+'" style="--practice-color:'+cfg.color+'" onclick="'+cfg.onclick+'">'
+    + '<div><div class="home-practice-icon">'+cfg.icon+'</div><div class="home-practice-title">'+cfg.title+'</div><div class="home-practice-sub">'+cfg.desc+'</div></div>'
+    + '<div class="home-practice-meta" id="'+cfg.metaId+'">'+cfg.meta+'</div>'
+    + '</button>';
+}
+
 async function renderHome(v){
   const cards = SUBJECTS.filter(s=>!s._hidden).map(s=>{
     const isCombined=s._combined&&s._combined.length;
@@ -2464,9 +2460,9 @@ async function renderHome(v){
     });
   }).join('');
 
-  const examCards=[
-    homeSubjectCardHtml({key:'all',name:'All Subjects',desc:'Timed practice exam across every subject',countId:'cnt-all',countText:'Practice Exam · 100 questions',onclick:'goAll()',uploadKey:'all'}),
-    homeSubjectCardHtml({key:'formulas',name:'Calculations / Reference Ranges',desc:'Formulas, reference ranges, blank practice exports',countId:'cnt-formulas',countText:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()',uploadKey:'formulas'})
+  const practiceCards=[
+    homePracticeCardHtml({featured:true,color:'#6d5bd8',icon:'📝',title:'Practice Exam',desc:'Timed all-subject BOC-style practice across the full study bank.',metaId:'cnt-all',meta:'Practice Exam · 100 questions',onclick:'goAll()'}),
+    homePracticeCardHtml({color:'#2f7dd1',icon:'∑',title:'Calculations / Reference Ranges',desc:'Formula review, reference ranges, and blank memorization exports.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
   v.innerHTML = '<div class="home-dashboard">'
@@ -2478,13 +2474,17 @@ async function renderHome(v){
     + '</section>'
     + '<section class="home-section">'
     + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div><div class="home-section-sub">Start with a subject, then practice or review images.</div></div></div>'
-    + '<div class="home-subject-grid">' + cards + examCards + '</div>'
+    + '<div class="home-subject-grid">' + cards + '</div>'
+    + '</section>'
+    + '<section class="home-section">'
+    + '<div class="home-section-head"><div><div class="home-section-title">Exam Practice</div><div class="home-section-sub">Timed exams, formulas, and ranges live here instead of mixed into subjects.</div></div></div>'
+    + '<div class="home-practice-grid">' + practiceCards + '</div>'
     + '</section>'
     + '<section class="home-section">'
     + '<div class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}">'
-    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Specialized Hubs</div><div class="home-hubs-copy">Open the existing hub space for deeper class resources, flowcharts, simulations, maps, and subject-specific review pages.</div><div class="home-hubs-button">Enter Specialized Hubs <span>›</span></div></div>'
+    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Specialized Hubs</div><div class="home-hubs-copy">Open the existing hub space for Blood Bank maps and simulations, Microbiology flow builders, Urinalysis renal tools, Chemistry organ maps, and Hematology tables.</div><div class="home-hubs-button">Enter Specialized Hubs <span>›</span></div></div>'
     + '<div class="home-hubs-preview" aria-hidden="true"><div class="home-hubs-preview-track">'
-    + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><img src="'+item.img+'" alt=""><div class="home-hub-tile-dot">'+item.code+'</div><div class="home-hub-tile-caption"><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div></div></div>').join('')
+    + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><div class="home-hub-tile-dot">'+item.code+'</div><div class="home-hub-tile-caption"><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div><div class="home-hub-feature-list">'+item.features.map(feature=>'<span>'+feature+'</span>').join('')+'</div></div></div>').join('')
     + '</div></div></div></section>'
     + '<section class="home-section">'
     + '<button class="home-recall-card" onclick="goInteractive()">'
