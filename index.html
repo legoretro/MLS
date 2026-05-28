@@ -109,20 +109,30 @@ select option{background:var(--bg3)}
 .home-kicker{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));color:var(--accent);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
 .home-title{font-size:clamp(30px,4vw,48px);line-height:1.02;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:10px}
 .home-subtitle{font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:620px;line-height:1.45}
-.home-hero-mark{width:112px;height:112px;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 18%,var(--bg2)),var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
-.home-hero-mark svg{width:72px;height:72px;color:var(--accent)}
+.home-hero-mark{width:184px;aspect-ratio:1/1;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 14%,var(--bg2)),color-mix(in srgb,#c7d7ff 18%,var(--bg3)));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 34px rgba(41,78,150,.13);overflow:hidden}
+.home-hero-mark svg{width:100%;height:100%;display:block}
+.pip-pipette{transform-origin:108px 83px;animation:pipetteRaise 7.5s ease-in-out infinite}
+.pip-drop{animation:dropFall 7.5s ease-in-out infinite}
+.pip-spinny{transform-origin:49px 50px;animation:spinnyMove 7.5s ease-in-out infinite}
+.pip-slidy{animation:slideScoot 7.5s ease-in-out infinite}
+.pip-lavvy{animation:lavvyBounce 7.5s ease-in-out infinite}
+.pip-scopey{animation:scopeyBob 7.5s ease-in-out infinite}
+.pip-qc{transform-origin:169px 55px;animation:qcPop 7.5s ease-in-out infinite}
+.pip-spark{animation:sparkle 7.5s ease-in-out infinite}
 .home-section{margin-top:26px}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
 .home-section-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.01em}
 .home-section-sub{font-size:13px;color:var(--text2)}
-.home-subject-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;min-height:142px;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden}
-.home-subject-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 34%,var(--border));box-shadow:0 16px 34px rgba(18,35,74,.12);background:color-mix(in srgb,var(--bg2) 94%,var(--accent))}
-.home-subject-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}
-.home-subject-icon{width:48px;height:48px;border-radius:15px;background:color-mix(in srgb,var(--accent) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 20%,var(--border));display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:24px;font-weight:800;overflow:hidden}
-.home-subject-icon img{width:100%;height:100%;object-fit:cover}
+.home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--subject-color,var(--accent));border-radius:18px;padding:16px;min-height:136px;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden}
+.home-subject-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--subject-color,var(--accent)) 38%,var(--border));box-shadow:0 16px 34px rgba(18,35,74,.12);background:color-mix(in srgb,var(--bg2) 96%,var(--subject-color,var(--accent)))}
+.home-subject-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.home-subject-mark{display:flex;align-items:center;gap:9px;min-width:0}
+.home-subject-icon{width:38px;height:38px;border-radius:13px;background:color-mix(in srgb,var(--subject-color,var(--accent)) 13%,var(--bg3));border:1px solid color-mix(in srgb,var(--subject-color,var(--accent)) 22%,var(--border));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--subject-color,var(--accent));font-size:20px;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.home-subject-icon img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
+.home-subject-code{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--subject-color,var(--accent));font-family:var(--mono)}
 .home-subject-arrow{color:var(--text3);font-size:22px;line-height:1}
-.home-subject-name{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:6px}
+.home-subject-name{font-size:16px;font-weight:750;color:var(--text);line-height:1.18;margin-bottom:7px;letter-spacing:-.01em}
 .home-subject-desc{font-size:12px;color:var(--text2);line-height:1.35;margin-bottom:10px}
 .home-subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
 .home-utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
@@ -140,13 +150,29 @@ select option{background:var(--bg3)}
 .home-hubs-preview{position:relative;min-height:168px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 9%,var(--bg3)),var(--bg3));border:1px solid color-mix(in srgb,var(--accent) 20%,var(--border));overflow:hidden;padding:16px}
 .home-hubs-preview-track{display:flex;gap:12px;position:absolute;left:16px;top:16px;animation:hub-preview-slide 16s linear infinite}
 .home-hubs-card:hover .home-hubs-preview-track{animation-duration:9s}
-.home-hub-tile{width:132px;height:132px;border-radius:16px;background:var(--bg2);border:1px solid var(--border);padding:14px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 22px rgba(18,35,74,.12)}
-.home-hub-tile-dot{width:34px;height:34px;border-radius:12px;background:color-mix(in srgb,var(--accent) 13%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800}
+.home-hub-tile{width:158px;height:132px;border-radius:16px;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--hub-color,var(--accent));padding:13px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 22px rgba(18,35,74,.12)}
+.home-hub-tile-dot{width:34px;height:34px;border-radius:12px;background:color-mix(in srgb,var(--hub-color,var(--accent)) 13%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--hub-color,var(--accent));font-weight:800}
 .home-hub-tile-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
 .home-hub-tile-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px}
-@keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-576px)}}
-@media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{display:none}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-hubs-preview{min-height:145px}}
+.home-recall-card{position:relative;overflow:hidden;width:100%;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 11%,var(--bg2)),var(--bg2));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));border-radius:22px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;cursor:pointer;box-shadow:0 16px 36px rgba(18,35,74,.10);transition:all .18s ease}
+.home-recall-card:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(18,35,74,.14);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
+.home-recall-label{font-size:12px;color:var(--accent);font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px}
+.home-recall-title{font-size:22px;color:var(--text);font-weight:750;letter-spacing:-.02em;line-height:1.15}
+.home-recall-sub{font-size:13px;color:var(--text2);margin-top:6px;line-height:1.4}
+.home-recall-pill{flex-shrink:0;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:800;padding:10px 15px}
+@keyframes pipetteRaise{0%,100%{transform:rotate(0deg)}10%,28%{transform:rotate(-10deg)}42%,72%{transform:rotate(0deg)}}
+@keyframes dropFall{0%,18%{opacity:0;transform:translate(0,-10px)}24%{opacity:1}36%{opacity:0;transform:translate(0,27px)}100%{opacity:0;transform:translate(0,27px)}}
+@keyframes spinnyMove{0%,33%,100%{transform:rotate(0deg) scale(1)}40%,52%{transform:rotate(360deg) scale(1.07)}56%{transform:rotate(380deg) scale(1)}}
+@keyframes slideScoot{0%,43%,100%{transform:translateX(0)}50%,66%{transform:translateX(16px)}72%{transform:translateX(0)}}
+@keyframes lavvyBounce{0%,58%,100%{transform:translateY(0)}63%{transform:translateY(-12px)}68%{transform:translateY(0)}71%{transform:translateY(-5px)}75%{transform:translateY(0)}}
+@keyframes scopeyBob{0%,48%,100%{transform:translateY(0)}54%,64%{transform:translateY(-4px)}}
+@keyframes qcPop{0%,63%,100%{opacity:.8;transform:scale(.92)}70%,88%{opacity:1;transform:scale(1.08)}94%{opacity:.92;transform:scale(.98)}}
+@keyframes sparkle{0%,20%,100%{opacity:.25;transform:scale(.8)}27%,42%{opacity:1;transform:scale(1.12)}}
+@keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-850px)}}
+@media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(220px,72vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-hubs-preview{min-height:145px}}
 @media(max-width:560px){main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:auto;min-height:104px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
+@media(prefers-reduced-motion:reduce){.pip-pipette,.pip-drop,.pip-spinny,.pip-slidy,.pip-lavvy,.pip-scopey,.pip-qc,.pip-spark,.home-hubs-preview-track{animation:none!important}.pip-drop{opacity:.85;transform:translateY(10px)}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
 .class-material-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--cm-accent,var(--accent));opacity:.9}
@@ -2206,7 +2232,7 @@ function renderClassMaterialCard(s,countId,iconId){
     + '<div id="'+iconId+'">'+getClassMaterialBubble(s)+'</div>'
     + '<div style="min-width:0;flex:1">'
     + '<div class="class-material-title">'+s.name+'</div>'
-    + (countId?'<div class="class-material-sub" id="'+countId+'">loading...</div>':'<div class="class-material-sub">Question sets</div>')
+    + (countId?'<div class="class-material-sub" id="'+countId+'">0 sets</div>':'<div class="class-material-sub">Question sets</div>')
     + '</div>'
     + '<div class="class-material-arrow">›</div>'
     + '</div>';
@@ -2245,25 +2271,143 @@ function getSubjectIcon(key,fallback){
 }
 
 const HOME_SUBJECT_DETAILS={
-  blood_bank:'ABO/Rh, antibody workups, transfusion practice',
-  clinical_chemistry:'Analytes, formulas, endocrine and metabolic review',
-  hematology:'CBC patterns, morphology, coagulation and image review',
-  microbiology:'Organisms, ID clues, images and case-style practice',
-  urinalysis:'Reagent strip, microscopy, renal patterns and body fluids',
-  lab_operations:'QC, safety, statistics, methods and management',
-  immunology:'Serology, immune testing and infectious disease review',
-  para_myco:'Parasites, fungi and organism recognition'
+  blood_bank:'Questions, images, case studies, simulations',
+  clinical_chemistry:'Questions, formulas, ranges, flowcharts',
+  hematology:'Questions, images, morphology, cases',
+  microbiology:'Questions, images, cases, organism ID',
+  urinalysis:'Questions, images, case studies, renal charts',
+  lab_operations:'Questions, QC, statistics, safety',
+  immunology:'Questions, serology, cases',
+  para_myco:'Questions, images, organism recognition'
 };
 
-function homeSubjectMark(key,fallback){
-  const stored=iconCache[key];
-  if(stored)return '<div class="home-subject-icon"><img src="'+stored+'" alt=""></div>';
+const HOME_SUBJECT_COLORS={
+  blood_bank:'#b93b44',clinical_chemistry:'#2f7dd1',hematology:'#c74656',
+  microbiology:'#2fa66a',urinalysis:'#c8a800',lab_operations:'#6b6fd6',
+  immunology:'#7b61ff',para_myco:'#2fa66a',all:'#7b61ff',formulas:'#2f7dd1'
+};
+
+const HOME_HUB_PREVIEWS=[
+  {code:'BB',title:'Simulation Lab',sub:'crossmatch + ABO cases',color:'#b93b44'},
+  {code:'BB',title:'Antigram Panels',sub:'rule-outs + reactions',color:'#b93b44'},
+  {code:'BB',title:'Antigen Maps',sub:'RBC systems + chromosome map',color:'#b93b44'},
+  {code:'CC',title:'Organ Flowcharts',sub:'chemistry branch maps',color:'#2f7dd1'},
+  {code:'CC',title:'Hormone Map',sub:'source + target review',color:'#2f7dd1'},
+  {code:'UA',title:'Renal Flowcharts',sub:'glomerular/tubular/interstitial',color:'#c8a800'},
+  {code:'UA',title:'UA Simulation',sub:'macro, strip, micro cases',color:'#c8a800'},
+  {code:'MI',title:'Gram Flowcharts',sub:'organism ID paths',color:'#2fa66a'},
+  {code:'MI',title:'Species Images',sub:'plates + thumbnails',color:'#2fa66a'},
+  {code:'HE',title:'Smear Simulation',sub:'RBC/WBC morphology',color:'#c74656'}
+];
+
+function homeSubjectColor(key){
+  return HOME_SUBJECT_COLORS[key]||'#2563d4';
+}
+
+function homeSubjectCode(key,fallback){
   const short={
     blood_bank:'BB',clinical_chemistry:'CH',hematology:'HE',
     microbiology:'MI',urinalysis:'UA',lab_operations:'LO',
-    immunology:'IM',para_myco:'PM',all:'ALL',formulas:'Fx'
+    immunology:'IM',para_myco:'PM',all:'ALL',formulas:'CALC'
   };
-  return '<div class="home-subject-icon">'+(short[key]||fallback||'?')+'</div>';
+  return short[key]||String(fallback||'?').slice(0,4).toUpperCase();
+}
+
+function homeMascotScene(){
+  return `<div class="home-hero-mark" role="img" aria-label="Pip the MLS study mascot with small lab helpers">
+    <svg class="pip-scene" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <title>Pip the MLS study mascot</title>
+      <defs>
+        <linearGradient id="pipBg" x1="18" y1="14" x2="204" y2="210" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#eef5ff"/>
+          <stop offset="1" stop-color="#e6e2ff"/>
+        </linearGradient>
+        <linearGradient id="pipCoat" x1="87" y1="105" x2="145" y2="187" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#ffffff"/>
+          <stop offset="1" stop-color="#e9effc"/>
+        </linearGradient>
+        <filter id="pipShadow" x="-20%" y="-20%" width="140%" height="150%">
+          <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#2e4d86" flood-opacity=".18"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="220" height="220" rx="28" fill="url(#pipBg)"/>
+      <circle class="pip-spark" cx="66" cy="77" r="3" fill="#8ea7f2"/>
+      <circle class="pip-spark" cx="160" cy="118" r="2.8" fill="#78c7d9"/>
+      <path class="pip-spark" d="M137 37l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6Z" fill="#b6a8ff"/>
+
+      <g class="pip-spinny" filter="url(#pipShadow)">
+        <rect x="25" y="30" width="49" height="43" rx="15" fill="#dfe9ff" stroke="#9eb3df" stroke-width="2"/>
+        <path d="M36 44h27" stroke="#6a7fae" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="49.5" cy="55" r="11" fill="#f7fbff" stroke="#6a7fae" stroke-width="2"/>
+        <path d="M49.5 46v18M40.5 55h18" stroke="#6a7fae" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <g class="pip-qc" filter="url(#pipShadow)">
+        <rect x="154" y="28" width="42" height="52" rx="10" fill="#fffaf0" stroke="#9eb3df" stroke-width="2"/>
+        <rect x="165" y="22" width="20" height="12" rx="5" fill="#c6d6fb" stroke="#8ea7d6" stroke-width="2"/>
+        <path d="M164 50l6 6 14-16" stroke="#2fa66a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M164 66h22" stroke="#a5b0cc" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <g class="pip-scopey" filter="url(#pipShadow)">
+        <path d="M34 151h33" stroke="#566985" stroke-width="7" stroke-linecap="round"/>
+        <path d="M44 150l18-38" stroke="#566985" stroke-width="7" stroke-linecap="round"/>
+        <rect x="54" y="104" width="22" height="12" rx="5" transform="rotate(23 54 104)" fill="#dfe9ff" stroke="#566985" stroke-width="3"/>
+        <rect x="27" y="161" width="52" height="11" rx="5" fill="#dfe9ff" stroke="#566985" stroke-width="3"/>
+      </g>
+
+      <g class="pip-lavvy" filter="url(#pipShadow)">
+        <rect x="166" y="126" width="26" height="51" rx="11" fill="#f8fbff" stroke="#8ea0c9" stroke-width="2"/>
+        <path d="M169 148h20v18c0 5.5-4.5 10-10 10s-10-4.5-10-10v-18Z" fill="#b39cf7"/>
+        <rect x="166" y="121" width="26" height="8" rx="3" fill="#9c86df"/>
+        <circle cx="175" cy="157" r="2" fill="#e7dbff" opacity=".8"/>
+      </g>
+
+      <g class="pip-slidy" filter="url(#pipShadow)">
+        <rect x="48" y="178" width="84" height="18" rx="7" fill="#f9fcff" stroke="#9eb3df" stroke-width="2"/>
+        <path d="M64 187c14-7 31 7 49 0" stroke="#d67ca5" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="120" cy="187" r="3" fill="#7c89b4"/>
+      </g>
+
+      <g filter="url(#pipShadow)">
+        <ellipse cx="112" cy="192" rx="39" ry="8" fill="#6276a2" opacity=".18"/>
+        <path d="M83 125c0-21 15-38 34-38s34 17 34 38v52H83v-52Z" fill="url(#pipCoat)" stroke="#9eb3df" stroke-width="3"/>
+        <path d="M98 125l17 18 18-18M115 143v35" stroke="#bdc9e3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="116" cy="74" r="31" fill="#ffd9c7" stroke="#d79a85" stroke-width="3"/>
+        <path d="M88 70c7-20 24-32 47-23 10 4 15 13 15 23-18-5-35-3-62 0Z" fill="#303f66"/>
+        <circle cx="105" cy="77" r="4.3" fill="#1f2a44"/>
+        <circle cx="128" cy="77" r="4.3" fill="#1f2a44"/>
+        <path d="M106 92c8 6 15 6 22 0" stroke="#b7506c" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="96" cy="88" r="5" fill="#ff9ca7" opacity=".75"/>
+        <circle cx="138" cy="88" r="5" fill="#ff9ca7" opacity=".75"/>
+        <path d="M83 135c-17 6-24 0-27-10" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
+        <path d="M151 136c17 0 25-7 27-17" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="56" cy="124" r="7" fill="#74b6ff" stroke="#4176b7" stroke-width="2"/>
+        <circle cx="178" cy="118" r="7" fill="#74b6ff" stroke="#4176b7" stroke-width="2"/>
+        <g class="pip-pipette">
+          <path d="M134 107l36-50" stroke="#4d6491" stroke-width="6" stroke-linecap="round"/>
+          <path d="M165 50l16-22" stroke="#4d6491" stroke-width="8" stroke-linecap="round"/>
+          <path d="M126 118l11-16" stroke="#74b6ff" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <circle class="pip-drop" cx="157" cy="112" r="4" fill="#3aa8ff"/>
+        <path d="M148 150h24v34c0 6.6-5.4 12-12 12s-12-5.4-12-12v-34Z" fill="#eef5ff" stroke="#7d90bd" stroke-width="3"/>
+        <path d="M151 169h18v16c0 5-4 9-9 9s-9-4-9-9v-16Z" fill="#94d4ff"/>
+      </g>
+    </svg>
+  </div>`;
+}
+
+function homeSubjectMark(key,fallback){
+  const stored=iconCache[key];
+  const fallbackIcons={
+    blood_bank:'🩸',clinical_chemistry:'⚗️',hematology:'🔴',
+    microbiology:'🦠',urinalysis:'🧪',lab_operations:'📋',
+    immunology:'🔬',para_myco:'🍄',all:'🧭',formulas:'∑'
+  };
+  const icon=stored
+    ? '<img src="'+stored+'" alt="">'
+    : '<span aria-hidden="true">'+(fallbackIcons[key]||homeSubjectCode(key,fallback))+'</span>';
+  return '<div class="home-subject-mark"><div class="home-subject-icon">'+icon+'</div><div class="home-subject-code">'+homeSubjectCode(key,fallback)+'</div></div>';
 }
 
 function homeAdminIconUpload(key){
@@ -2271,52 +2415,61 @@ function homeAdminIconUpload(key){
   return '<label style="position:absolute;bottom:10px;right:10px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:999px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">Icon<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,\''+key+'\')" onclick="event.stopPropagation()"></label>';
 }
 
+function homeSubjectCardHtml(cfg){
+  return '<div style="position:relative">'
+    + '<button class="home-subject-card" style="--subject-color:'+homeSubjectColor(cfg.key)+'" onclick="'+cfg.onclick+'">'
+    + '<div class="home-subject-top">'+homeSubjectMark(cfg.key,cfg.code||cfg.name)+'<div class="home-subject-arrow">›</div></div>'
+    + '<div class="home-subject-name">'+cfg.name+'</div>'
+    + '<div class="home-subject-desc">'+cfg.desc+'</div>'
+    + '<div class="home-subject-count" id="'+cfg.countId+'">'+cfg.countText+'</div>'
+    + '</button>'
+    + (cfg.uploadKey?homeAdminIconUpload(cfg.uploadKey):'')
+    + '</div>';
+}
+
 async function renderHome(v){
   const cards = SUBJECTS.filter(s=>!s._hidden).map(s=>{
     const isCombined=s._combined&&s._combined.length;
     // Combined card (Parasitology / Mycology) — dual icon, click goes to parasitology by default
     if(isCombined){
-      return '<div style="position:relative">'
-        + '<button class="home-subject-card" onclick="goSubject(\'para_myco\')">'
-        + '<div class="home-subject-top"><div id="sicon-para_myco">'+homeSubjectMark('para_myco','PM')+'</div><div class="home-subject-arrow">›</div></div>'
-        + '<div class="home-subject-name">'+s.name+'</div>'
-        + '<div class="home-subject-desc">'+(HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice')+'</div>'
-        + '<div id="cnt-para_myco" class="home-subject-count">loading...</div>'
-        + '</button>'
-        + homeAdminIconUpload('para_myco')
-        + '</div>';
+      return homeSubjectCardHtml({
+        key:'para_myco',name:s.name,desc:HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice',
+        countId:'cnt-para_myco',countText:'0 questions',onclick:"goSubject('para_myco')",uploadKey:'para_myco'
+      });
     }
-    return '<div style="position:relative">'
-      + '<button class="home-subject-card" onclick="goSubject(\'' + s.key + '\')">'
-      + '<div class="home-subject-top"><div id="sicon-' + s.key + '">' + homeSubjectMark(s.key, s.icon) + '</div><div class="home-subject-arrow">›</div></div>'
-      + '<div class="home-subject-name">' + s.name + '</div>'
-      + '<div class="home-subject-desc">' + (HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice') + '</div>'
-      + '<div class="home-subject-count" id="cnt-' + s.key + '">loading...</div>'
-      + '</button>'
-      + homeAdminIconUpload(s.key) + '</div>';
+    return homeSubjectCardHtml({
+      key:s.key,name:s.name,desc:HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice',
+      countId:'cnt-'+s.key,countText:'0 questions',onclick:"goSubject('"+s.key+"')",uploadKey:s.key
+    });
   }).join('');
+
+  const examCards=[
+    homeSubjectCardHtml({key:'all',name:'All Subjects',desc:'Timed practice exam across every subject',countId:'cnt-all',countText:'Practice Exam · 100 questions',onclick:'goAll()',uploadKey:'all'}),
+    homeSubjectCardHtml({key:'formulas',name:'Calculations / Reference Ranges',desc:'Formulas, reference ranges, blank practice exports',countId:'cnt-formulas',countText:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()',uploadKey:'formulas'})
+  ].join('');
 
   v.innerHTML = '<div class="home-dashboard">'
     + '<section class="home-hero">'
     + '<div><div class="home-kicker">Student Created • For Studying Purposes Only</div>'
-    + '<h1 class="home-title">MLS BOC Study Hub</h1>'
+    + '<h1 class="home-title">Welcome to the MLS BOC Study Hub</h1>'
     + '<div class="home-subtitle">Practice, image review, and interactive lab tools</div></div>'
-    + '<div class="home-hero-mark" aria-hidden="true"><svg viewBox="0 0 96 96" fill="none"><path d="M27 18h42v52c0 11.6-9.4 21-21 21s-21-9.4-21-21V18Z" stroke="currentColor" stroke-width="5"/><path d="M21 18h54" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M32 48h32M32 62h32" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".55"/><circle cx="39" cy="34" r="4" fill="currentColor"/><circle cx="56" cy="37" r="3" fill="currentColor" opacity=".6"/></svg></div>'
+    + homeMascotScene()
     + '</section>'
     + '<section class="home-section">'
     + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div><div class="home-section-sub">Start with a subject, then practice or review images.</div></div></div>'
-    + '<div class="home-subject-grid">' + cards + '</div>'
-    + '<div class="home-utility-grid">'
-    + '<div style="position:relative"><button class="home-utility-card" onclick="goAll()"><div id="sicon-all">'+homeSubjectMark('all','ALL')+'</div><div style="min-width:0;flex:1"><div class="home-utility-title">All Subjects</div><div class="home-utility-sub">Practice Exam · 100 questions · Timed</div></div><div class="home-subject-arrow">›</div></button>'+homeAdminIconUpload('all')+'</div>'
-    + '<div style="position:relative"><button class="home-utility-card" onclick="goFormulas()"><div id="sicon-formulas">'+homeSubjectMark('formulas','Fx')+'</div><div style="min-width:0;flex:1"><div class="home-utility-title">Calculations / Reference Ranges</div><div class="home-utility-sub" id="cnt-formulas">loading...</div></div><div class="home-subject-arrow">›</div></button>'+homeAdminIconUpload('formulas')+'</div>'
-    + '<button class="home-utility-card" onclick="goInteractive()"><div class="home-utility-icon">↔</div><div style="min-width:0;flex:1"><div class="home-utility-title">Interactive Learning</div><div class="home-utility-sub">Built-in study tools and saved resources</div></div><div class="home-subject-arrow">›</div></button>'
-    + '</div></section>'
+    + '<div class="home-subject-grid">' + cards + examCards + '</div>'
+    + '</section>'
     + '<section class="home-section">'
     + '<div class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}">'
-    + '<div><div class="home-hubs-label">Lab Hubs</div><div class="home-hubs-title">Curated lab topic hubs</div><div class="home-hubs-copy">Open the existing Lab Hubs space for deeper class resources and subject-specific review pages.</div><div class="home-hubs-button">Enter Lab Hubs <span>›</span></div></div>'
+    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Curated lab topic hubs</div><div class="home-hubs-copy">Open the existing hub space for deeper class resources, simulations, maps, and subject-specific review pages.</div><div class="home-hubs-button">Enter Specialized Hubs <span>›</span></div></div>'
     + '<div class="home-hubs-preview" aria-hidden="true"><div class="home-hubs-preview-track">'
-    + ['Blood Bank','Hematology','Chemistry','Microbiology','Urinalysis','Lab Ops','Blood Bank','Hematology','Chemistry','Microbiology'].map((name,i)=>'<div class="home-hub-tile"><div class="home-hub-tile-dot">'+name.split(' ').map(w=>w[0]).join('').slice(0,2)+'</div><div><div class="home-hub-tile-title">'+name+'</div><div class="home-hub-tile-sub">hub preview</div></div></div>').join('')
+    + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><div class="home-hub-tile-dot">'+item.code+'</div><div><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div></div></div>').join('')
     + '</div></div></div></section>'
+    + '<section class="home-section">'
+    + '<button class="home-recall-card" onclick="goInteractive()">'
+    + '<div><div class="home-recall-label">Recall Interactive Learning</div><div class="home-recall-title">Drag, match, label, and practice quick recall</div><div class="home-recall-sub">Separate interactive tools for active learning outside the subject quiz cards.</div></div>'
+    + '<div class="home-recall-pill">Open Recall Tools ›</div>'
+    + '</button></section>'
     + '<section class="home-section"><div class="home-utility-grid" style="grid-template-columns:1fr">'
     + '<button class="home-utility-card" onclick="goResources()"><div class="home-utility-icon">📚</div><div style="min-width:0;flex:1"><div class="home-utility-title">Resources</div><div class="home-utility-sub">Citation starter list for study materials</div></div><div class="home-subject-arrow">›</div></button>'
     + '</div></section>'

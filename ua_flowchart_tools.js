@@ -58,11 +58,6 @@
           <h1>${esc(data.title)}</h1>
           <p class="ua-flow-sub">${esc(data.summary)}</p>
         </div>
-        <div class="ua-flow-actions">
-          <a class="ua-flow-link-btn" href="UA_Glomerular_Flowchart.html">Glomerular</a>
-          <a class="ua-flow-link-btn" href="UA_Tubular_Flowchart.html">Tubular</a>
-          <a class="ua-flow-link-btn" href="UA_Interstitial_Flowchart.html">Interstitial</a>
-        </div>
       </section>
 
       <section class="ua-flow-panel">
