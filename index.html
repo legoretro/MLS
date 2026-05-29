@@ -110,22 +110,7 @@ select option{background:var(--bg3)}
 .home-title{font-size:clamp(30px,4vw,48px);line-height:1.02;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:10px}
 .home-subtitle{font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:620px;line-height:1.45}
 .home-hero-mark{position:relative;width:196px;aspect-ratio:1/1;border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 14%,var(--bg2)),color-mix(in srgb,#c7d7ff 18%,var(--bg3)));border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 34px rgba(41,78,150,.13);overflow:hidden}
-.home-hero-mark svg{width:100%;height:100%;display:block}
-.lab-loop-pipette{transform-origin:151px 70px;animation:labLoopPipette 5.8s ease-in-out infinite}
-.lab-loop-drop{animation:labLoopDrop 5.8s ease-in-out infinite}
-.lab-loop-spinny{transform-origin:51px 54px;animation:labLoopSpin 5.8s ease-in-out infinite}
-.lab-loop-slide{animation:labLoopSlide 5.8s ease-in-out infinite}
-.lab-loop-tube{animation:labLoopBounce 5.8s ease-in-out infinite}
-.lab-loop-check{transform-origin:172px 58px;animation:labLoopCheck 5.8s ease-in-out infinite}
-.lab-loop-glint{animation:labLoopGlint 5.8s ease-in-out infinite}
-.pip-pipette{transform-origin:108px 83px;animation:pipetteRaise 7.5s ease-in-out infinite}
-.pip-drop{animation:dropFall 7.5s ease-in-out infinite}
-.pip-spinny{transform-origin:49px 50px;animation:spinnyMove 7.5s ease-in-out infinite}
-.pip-slidy{animation:slideScoot 7.5s ease-in-out infinite}
-.pip-lavvy{animation:lavvyBounce 7.5s ease-in-out infinite}
-.pip-scopey{animation:scopeyBob 7.5s ease-in-out infinite}
-.pip-qc{transform-origin:169px 55px;animation:qcPop 7.5s ease-in-out infinite}
-.pip-spark{animation:sparkle 7.5s ease-in-out infinite}
+.home-hero-mark img,.home-hero-mark svg{width:100%;height:100%;display:block;object-fit:cover}
 .home-section{margin-top:26px}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
 .home-section-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.01em}
@@ -186,26 +171,11 @@ select option{background:var(--bg3)}
 .home-recall-title{font-size:22px;color:var(--text);font-weight:750;letter-spacing:-.02em;line-height:1.15}
 .home-recall-sub{font-size:13px;color:var(--text2);margin-top:6px;line-height:1.4}
 .home-recall-pill{flex-shrink:0;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:800;padding:10px 15px}
-@keyframes pipetteRaise{0%,100%{transform:rotate(0deg)}10%,28%{transform:rotate(-10deg)}42%,72%{transform:rotate(0deg)}}
-@keyframes dropFall{0%,18%{opacity:0;transform:translate(0,-10px)}24%{opacity:1}36%{opacity:0;transform:translate(0,27px)}100%{opacity:0;transform:translate(0,27px)}}
-@keyframes spinnyMove{0%,33%,100%{transform:rotate(0deg) scale(1)}40%,52%{transform:rotate(360deg) scale(1.07)}56%{transform:rotate(380deg) scale(1)}}
-@keyframes slideScoot{0%,43%,100%{transform:translateX(0)}50%,66%{transform:translateX(16px)}72%{transform:translateX(0)}}
-@keyframes lavvyBounce{0%,58%,100%{transform:translateY(0)}63%{transform:translateY(-12px)}68%{transform:translateY(0)}71%{transform:translateY(-5px)}75%{transform:translateY(0)}}
-@keyframes scopeyBob{0%,48%,100%{transform:translateY(0)}54%,64%{transform:translateY(-4px)}}
-@keyframes qcPop{0%,63%,100%{opacity:.8;transform:scale(.92)}70%,88%{opacity:1;transform:scale(1.08)}94%{opacity:.92;transform:scale(.98)}}
-@keyframes sparkle{0%,20%,100%{opacity:.25;transform:scale(.8)}27%,42%{opacity:1;transform:scale(1.12)}}
-@keyframes labLoopPipette{0%,100%{transform:translateY(0) rotate(0)}16%,34%{transform:translateY(-4px) rotate(-7deg)}45%,70%{transform:translateY(0) rotate(0)}}
-@keyframes labLoopDrop{0%,18%{opacity:0;transform:translateY(-12px)}25%{opacity:1}39%{opacity:0;transform:translateY(26px)}100%{opacity:0;transform:translateY(26px)}}
-@keyframes labLoopSpin{0%,35%,100%{transform:rotate(0deg) scale(1)}48%,63%{transform:rotate(360deg) scale(1.06)}70%{transform:rotate(380deg) scale(1)}}
-@keyframes labLoopSlide{0%,42%,100%{transform:translateX(0)}54%,70%{transform:translateX(13px)}78%{transform:translateX(0)}}
-@keyframes labLoopBounce{0%,58%,100%{transform:translateY(0)}66%{transform:translateY(-10px)}72%{transform:translateY(0)}77%{transform:translateY(-4px)}82%{transform:translateY(0)}}
-@keyframes labLoopCheck{0%,64%,100%{opacity:.72;transform:scale(.94)}72%,88%{opacity:1;transform:scale(1.06)}}
-@keyframes labLoopGlint{0%,100%{opacity:.35;transform:scale(.8)}22%,38%{opacity:1;transform:scale(1.12)}}
 @keyframes hub-preview-slide{0%{transform:translateX(0)}100%{transform:translateX(-1632px)}}
 @media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(220px,72vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-practice-grid{grid-template-columns:1fr}.home-practice-card.featured{grid-column:auto}.home-hubs-preview{min-height:145px}}
 @media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:130px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview-track{position:static;display:grid;grid-template-columns:1fr 1fr;animation:none}.home-hub-tile{width:auto;height:132px;min-height:132px}.home-hubs-preview{padding:12px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
-@media(prefers-reduced-motion:reduce){.pip-pipette,.pip-drop,.pip-spinny,.pip-slidy,.pip-lavvy,.pip-scopey,.pip-qc,.pip-spark,.lab-loop-pipette,.lab-loop-drop,.lab-loop-spinny,.lab-loop-slide,.lab-loop-tube,.lab-loop-check,.lab-loop-glint,.home-hubs-preview-track{animation:none!important}.pip-drop,.lab-loop-drop{opacity:.85;transform:translateY(10px)}}
+@media(prefers-reduced-motion:reduce){.home-hubs-preview-track{animation:none!important}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
 .class-material-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--cm-accent,var(--accent));opacity:.9}
@@ -2343,69 +2313,10 @@ function homeSubjectCode(key,fallback){
 }
 
 function homeMascotScene(){
-  return `<div class="home-hero-mark" role="img" aria-label="Professional looping MLS lab mascot animation">
-    <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <title>Pip the MLS study mascot in a lab loop</title>
-      <defs>
-        <linearGradient id="labLoopBg" x1="24" y1="14" x2="202" y2="207" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#f7fbff"/>
-          <stop offset="1" stop-color="#e8edff"/>
-        </linearGradient>
-        <linearGradient id="labLoopCoat" x1="89" y1="100" x2="142" y2="186" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#ffffff"/>
-          <stop offset="1" stop-color="#e8eef9"/>
-        </linearGradient>
-        <filter id="labLoopShadow" x="-18%" y="-18%" width="136%" height="145%">
-          <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#324c7d" flood-opacity=".16"/>
-        </filter>
-      </defs>
-      <rect width="220" height="220" rx="28" fill="url(#labLoopBg)"/>
-      <path d="M26 164h168" stroke="#c8d4ee" stroke-width="2" stroke-linecap="round"/>
-      <path class="lab-loop-glint" d="M55 26l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z" fill="#91a9ee"/>
-      <circle class="lab-loop-glint" cx="169" cy="132" r="4" fill="#82c7d7"/>
-
-      <g class="lab-loop-spinny" filter="url(#labLoopShadow)">
-        <rect x="28" y="36" width="46" height="38" rx="14" fill="#eff5ff" stroke="#9eb2de" stroke-width="2"/>
-        <circle cx="51" cy="57" r="11" fill="#fff" stroke="#768bb7" stroke-width="2"/>
-        <path d="M51 47v20M41 57h20" stroke="#6680b3" stroke-width="3" stroke-linecap="round"/>
-      </g>
-
-      <g class="lab-loop-check" filter="url(#labLoopShadow)">
-        <rect x="154" y="36" width="42" height="48" rx="12" fill="#fffaf4" stroke="#a9b7dc" stroke-width="2"/>
-        <path d="M164 60l7 7 15-19" stroke="#35a46f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      </g>
-
-      <g filter="url(#labLoopShadow)">
-        <ellipse cx="112" cy="191" rx="39" ry="8" fill="#526b9b" opacity=".14"/>
-        <path d="M81 124c0-22 16-40 35-40s35 18 35 40v54H81v-54Z" fill="url(#labLoopCoat)" stroke="#9eb2de" stroke-width="3"/>
-        <path d="M96 124l19 21 20-21M115 145v34" stroke="#bec9df" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="116" cy="73" r="30" fill="#ffdccb" stroke="#d79a85" stroke-width="3"/>
-        <path d="M90 70c8-20 29-29 49-17 8 5 12 11 12 19-22-6-38-4-61-2Z" fill="#3b4d77"/>
-        <circle cx="105" cy="78" r="4" fill="#1f2a44"/>
-        <circle cx="128" cy="78" r="4" fill="#1f2a44"/>
-        <path d="M107 91c7 5 14 5 21 0" stroke="#b7506c" stroke-width="4" stroke-linecap="round"/>
-        <path d="M82 134c-17 6-23 1-27-9" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
-        <path d="M151 135c15 1 23-7 25-16" stroke="#f8fbff" stroke-width="12" stroke-linecap="round"/>
-        <circle cx="55" cy="125" r="7" fill="#71b5f8" stroke="#4075b7" stroke-width="2"/>
-        <circle cx="176" cy="119" r="7" fill="#71b5f8" stroke="#4075b7" stroke-width="2"/>
-        <g class="lab-loop-pipette">
-          <path d="M132 108l35-50" stroke="#536990" stroke-width="6" stroke-linecap="round"/>
-          <path d="M164 51l15-22" stroke="#536990" stroke-width="8" stroke-linecap="round"/>
-          <path d="M125 119l11-16" stroke="#71b5f8" stroke-width="8" stroke-linecap="round"/>
-        </g>
-        <circle class="lab-loop-drop" cx="156" cy="112" r="4" fill="#2698f0"/>
-        <g class="lab-loop-tube">
-          <path d="M148 150h24v32c0 6.6-5.4 12-12 12s-12-5.4-12-12v-32Z" fill="#f4f8ff" stroke="#7d90bd" stroke-width="3"/>
-          <path d="M151 169h18v14c0 5-4 9-9 9s-9-4-9-9v-14Z" fill="#8dd5ff"/>
-        </g>
-      </g>
-
-      <g class="lab-loop-slide" filter="url(#labLoopShadow)">
-        <rect x="46" y="174" width="84" height="18" rx="7" fill="#fbfdff" stroke="#a8b8dc" stroke-width="2"/>
-        <path d="M62 183c14-6 30 6 49 0" stroke="#d583ad" stroke-width="4" stroke-linecap="round"/>
-      </g>
-    </svg>
-  </div>`;
+  // Mascot asset source/license: self-made SVG in assets/mascots; no external assets used.
+  return '<div class="home-hero-mark" role="img" aria-label="Animated MLS lab item mascots: EDTA tube, test tube, blood drop, petri dish, urine cup, and centrifuge">'
+    + '<img src="assets/mascots/mls-lab-item-mascots.svg" alt="">'
+    + '</div>';
 }
 
 function homeSubjectMark(key,fallback){
