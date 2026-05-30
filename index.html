@@ -143,8 +143,8 @@ select option{background:var(--bg3)}
 .home-practice-title{position:relative;z-index:1;font-size:22px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:8px;max-width:420px}
 .home-practice-sub{position:relative;z-index:1;font-size:13px;line-height:1.4;color:rgba(255,255,255,.83);max-width:520px}
 .home-practice-meta{position:relative;z-index:1;margin-top:20px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.76)}
-.home-hubs-card{position:relative;overflow:hidden;background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,460px);gap:22px;align-items:center;box-shadow:0 16px 38px rgba(18,35,74,.10);cursor:pointer;transition:all .2s ease}
-.home-hubs-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 36%,var(--border));box-shadow:0 20px 46px rgba(18,35,74,.14)}
+.home-hubs-card{position:relative;overflow:hidden;background:color-mix(in srgb,var(--accent) 24%,var(--bg2));border:2px solid color-mix(in srgb,var(--accent) 52%,var(--border));border-radius:22px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,460px);gap:22px;align-items:center;box-shadow:0 18px 42px color-mix(in srgb,var(--accent) 18%,rgba(18,35,74,.16));cursor:pointer;transition:all .2s ease}
+.home-hubs-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 62%,var(--border));box-shadow:0 24px 52px color-mix(in srgb,var(--accent) 22%,rgba(18,35,74,.20))}
 .home-hubs-label{font-size:12px;color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
 .home-hubs-title{font-size:25px;font-weight:750;color:var(--text);letter-spacing:-.02em;margin-bottom:7px}
 .home-hubs-copy{font-size:14px;color:var(--text2);max-width:520px;line-height:1.45;margin-bottom:16px}
@@ -1228,10 +1228,10 @@ const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Rh Haplotype Frequency',url:'Rh_Haplotype_Frequency.html',description:'Rank Rh haplotypes by population pattern',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/rh_haplotype_frequency.png'},
   {title:'BB Groups: Usual Suspects',url:'BB_Group_Usual.html',description:'Drag-match common blood group systems and antibody rules',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/bb_group_usual.png'},
   {title:'BB Groups: Unusual Suspects',url:'BB_Group_Unusual.html',description:'Drag-match uncommon systems, codes and serology clues',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/bb_group_unusual.png'},
-  {title:'UA Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'UA',color:'#c8a800',preview_url:'assets/interactive-previews/ua_reagent_strip_match.png'},
-  {title:'UA Glomerular Flowchart',url:'UA_Glomerular_Flowchart.html',description:'Flowchart for glomerular urine and serum clues',topic:'Urinalysis',icon:'G',color:'#c8a800',preview_url:'assets/interactive-previews/ua_glomerular_flowchart.png'},
-  {title:'UA Tubular Flowchart',url:'UA_Tubular_Flowchart.html',description:'Flowchart for tubular injury and transport clues',topic:'Urinalysis',icon:'T',color:'#c8a800',preview_url:'assets/interactive-previews/ua_tubular_flowchart.png'},
-  {title:'UA Interstitial Flowchart',url:'UA_Interstitial_Flowchart.html',description:'Flowchart for WBC, bacteria and eosinophil clues',topic:'Urinalysis',icon:'I',color:'#c8a800',preview_url:'assets/interactive-previews/ua_interstitial_flowchart.png'},
+  {title:'Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'RS',color:'#c8a800',preview_url:'assets/interactive-previews/ua_reagent_strip_match.png'},
+  {title:'Glomerular Flowchart',url:'UA_Glomerular_Flowchart.html',description:'Flowchart for glomerular urine and serum clues',topic:'Urinalysis',icon:'G',color:'#c8a800',preview_url:'assets/interactive-previews/ua_glomerular_flowchart.png'},
+  {title:'Tubular Flowchart',url:'UA_Tubular_Flowchart.html',description:'Flowchart for tubular injury and transport clues',topic:'Urinalysis',icon:'T',color:'#c8a800',preview_url:'assets/interactive-previews/ua_tubular_flowchart.png'},
+  {title:'Interstitial Flowchart',url:'UA_Interstitial_Flowchart.html',description:'Flowchart for WBC, bacteria and eosinophil clues',topic:'Urinalysis',icon:'I',color:'#c8a800',preview_url:'assets/interactive-previews/ua_interstitial_flowchart.png'},
   {title:'Urine Color & Clarity',url:'Urine_Color_and_Clarity.html',description:'Match urine appearance to causes and findings',topic:'Urinalysis',icon:'UC',color:'#c8a800',preview_url:'assets/interactive-previews/urine_color_clarity.png'},
   {title:'Urinary System Labeling',url:'urinary_labeling.html',description:'Label renal and urinary anatomy',topic:'Urinalysis',icon:'RN',color:'#c8a800',preview_url:'assets/interactive-previews/urinary_system_labeling.png'},
   {title:'Thyroid Lab Findings',url:'Thyroid_Label.html',description:'Drag thyroid hormones into the interpretation table',topic:'Chemistry',icon:'TH',color:'#2980b9',preview_url:'assets/interactive-previews/thyroid_lab_findings.png'},
@@ -2279,7 +2279,7 @@ const HOME_SUBJECT_DETAILS={
   clinical_chemistry:'Questions, formulas, ranges, flowcharts',
   hematology:'Questions, images, morphology, cases',
   microbiology:'Questions, images, cases, organism ID',
-  urinalysis:'Questions, images, case studies, renal charts',
+  urinalysis:'Questions, images, case studies',
   lab_operations:'Questions, QC, statistics, safety',
   immunology:'Questions, serology, cases',
   para_myco:'Questions, images, organism recognition'
@@ -2382,7 +2382,7 @@ async function renderHome(v){
     + '<section class="home-hero">'
     + '<div><div class="home-kicker">Student Created • For Studying Purposes Only</div>'
     + '<h1 class="home-title">Welcome to the MLS BOC Study Hub</h1>'
-    + '<div class="home-subtitle">Practice, image review, and interactive lab tools</div></div>'
+    + '<div class="home-subtitle">Practice, image review, and interactive tools</div></div>'
     + homeMascotScene()
     + '</section>'
     + '<section class="home-section">'
