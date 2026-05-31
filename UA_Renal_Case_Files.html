@@ -133,6 +133,11 @@ body.ua-case-files{
 }
 .unit-card h2{margin:8px 0 8px;font-size:1.3rem}
 .unit-card p{margin:0;color:var(--muted);line-height:1.45}
+.unit-card:disabled{
+  cursor:default;
+  opacity:1;
+}
+.unit-card.is-empty:hover{transform:none}
 .unit-card:hover .door-glow,
 .unit-card:focus-visible .door-glow{opacity:1}
 .unit-card.door-opening .unit-door.left{transform:translateX(-70%)}
@@ -140,12 +145,14 @@ body.ua-case-files{
 .unit-card.door-opening .door-alert{opacity:1;transform:translateY(0)}
 .department-entry{
   position:relative;
-  min-height:168px;
-  border-radius:20px 20px 26px 26px;
+  width:min(100%,330px);
+  justify-self:center;
+  min-height:214px;
+  border-radius:18px 18px 24px 24px;
   border:2px solid #c8d1e5;
   background:
     radial-gradient(circle at 20% 12%,rgba(255,255,255,.95),transparent 8rem),
-    linear-gradient(90deg,#e8edf6 0 8%,transparent 8% 92%,#e8edf6 92%),
+    linear-gradient(90deg,#e8edf6 0 12%,transparent 12% 88%,#e8edf6 88%),
     linear-gradient(180deg,#f8fbff 0 32%,#e5ebf6 32% 100%);
   box-shadow:
     inset 0 -18px 0 rgba(112,126,158,.16),
@@ -155,8 +162,8 @@ body.ua-case-files{
 .department-entry::before{
   content:"";
   position:absolute;
-  left:7%;
-  right:7%;
+  left:11%;
+  right:11%;
   bottom:8px;
   height:8px;
   border-radius:999px;
@@ -167,7 +174,7 @@ body.ua-case-files{
   content:"";
   position:absolute;
   left:50%;
-  top:33px;
+  top:38px;
   width:72px;
   height:12px;
   transform:translateX(-50%);
@@ -195,9 +202,9 @@ body.ua-case-files{
 }
 .door-track{
   position:absolute;
-  left:7%;
-  right:7%;
-  top:44px;
+  left:12%;
+  right:12%;
+  top:54px;
   height:20px;
   border-radius:12px 12px 4px 4px;
   background:linear-gradient(180deg,#d8dee9,#8d98ac 55%,#6e7a90);
@@ -207,24 +214,24 @@ body.ua-case-files{
 }
 .unit-door{
   position:absolute;
-  top:64px;
-  bottom:16px;
-  width:43%;
+  top:72px;
+  bottom:18px;
+  width:36%;
   background:
     linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.16) 36%,transparent 76%),
     linear-gradient(180deg,#f3f7fb,#c5cfdd);
-  border:2px solid #9eaabd;
+  border:3px solid #9eaabd;
   transition:transform .62s cubic-bezier(.2,.8,.2,1);
   box-shadow:inset 0 0 0 4px rgba(255,255,255,.25);
 }
-.unit-door.left{left:7%;border-radius:6px 2px 2px 6px;border-right:3px solid #7c879c}
-.unit-door.right{right:7%;border-radius:2px 6px 6px 2px;border-left:3px solid #7c879c}
+.unit-door.left{left:14%;border-radius:8px 2px 2px 8px;border-right:4px solid #7c879c}
+.unit-door.right{right:14%;border-radius:2px 8px 8px 2px;border-left:4px solid #7c879c}
 .unit-door::before{
   content:"";
   position:absolute;
   top:18px;
-  width:62%;
-  height:58px;
+  width:64%;
+  height:86px;
   border-radius:4px;
   background:
     linear-gradient(135deg,rgba(255,255,255,.7),transparent 38%),
@@ -243,11 +250,11 @@ body.ua-case-files{
   background:linear-gradient(180deg,#a6b1c2,#7b8798);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
 }
-.unit-door.left::before{right:18px}
-.unit-door.right::before{left:18px}
+.unit-door.left::before{right:15px}
+.unit-door.right::before{left:15px}
 .door-glow{
   position:absolute;
-  inset:62px 32% 18px;
+  inset:72px 38% 18px;
   border-radius:20px 20px 4px 4px;
   background:
     radial-gradient(circle at 50% 22%,rgba(255,241,165,.48),transparent 45%),
@@ -270,6 +277,20 @@ body.ua-case-files{
   padding:6px 10px;
   letter-spacing:.05em;
   text-transform:uppercase;
+}
+.coming-soon-pill{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  border-radius:999px;
+  border:1px solid #cfbc58;
+  background:#fff4bd;
+  color:#6d5700;
+  font-weight:950;
+  font-size:.78rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:7px 11px;
 }
 .progress-track{
   height:10px;
@@ -627,6 +648,11 @@ body.ua-case-files{
   body.ua-case-files .site-header{flex-wrap:wrap}
   .game-wrap{width:min(100% - 18px,480px);padding-top:12px}
   .game-hero,.unit-head,.chart-panel,.room-panel{padding:14px;border-radius:17px}
+  .department-entry{min-height:190px;max-width:286px}
+  .unit-door{top:68px;bottom:18px;width:37%}
+  .unit-door.left{left:13%}
+  .unit-door.right{right:13%}
+  .unit-door::before{height:72px}
   .room-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .room-card{min-height:158px;padding:10px}
   .room-door{top:14px;width:74px;height:96px}
@@ -697,6 +723,11 @@ html[data-mls-theme="dark"] body.ua-case-files .room-number{
   background:#111827;
   color:#f2d96a;
   border-color:#6f6230;
+}
+html[data-mls-theme="dark"] body.ua-case-files .coming-soon-pill{
+  background:#302916;
+  color:#f8df76;
+  border-color:#8c7b36;
 }
 html[data-mls-theme="dark"] body.ua-case-files .clipboard{
   background:#121827;
@@ -935,6 +966,35 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
 
 <script>
 // Add future hospital units and rooms here. Keep each case in this local array.
+const renalUnits = [
+  {
+    unitId: 1,
+    unitName: "Hospital Unit 1",
+    department: "Glomerulonephritis Department",
+    codePrefix: "G"
+  },
+  {
+    unitId: 2,
+    unitName: "Hospital Unit 2",
+    department: "Nephrotic Syndrome Department",
+    codePrefix: "NS"
+  },
+  {
+    unitId: 3,
+    unitName: "Hospital Unit 3",
+    department: "Tubular Disease Department",
+    codePrefix: "T",
+    comingSoon: "Tubular case files coming soon"
+  },
+  {
+    unitId: 4,
+    unitName: "Hospital Unit 4",
+    department: "Interstitial Disease Department",
+    codePrefix: "I",
+    comingSoon: "Interstitial case files coming soon"
+  }
+];
+
 const renalCaseFiles = [
   {
     "unitId": 1,
@@ -1152,17 +1212,18 @@ function caseKey(item){
 }
 
 function caseCode(item){
-  return item.unitId === 1 ? `G${item.room}` : `NS${item.room}`;
+  const unit = renalUnits.find(unit => unit.unitId === item.unitId);
+  return `${unit?.codePrefix || "R"}${item.room}`;
 }
 
 function units(){
-  const seen = new Map();
+  const seen = new Map(renalUnits.map(unit => [unit.unitId, {...unit}]));
   renalCaseFiles.forEach(item => {
     if(!seen.has(item.unitId)){
       seen.set(item.unitId, {unitId:item.unitId, unitName:item.unitName, department:item.department});
     }
   });
-  return [...seen.values()];
+  return [...seen.values()].sort((a,b) => a.unitId - b.unitId);
 }
 
 function casesForUnit(unitId){
@@ -1196,12 +1257,15 @@ function renderStart(){
       ${units().map(unit => {
         const cases = casesForUnit(unit.unitId);
         const closed = closedCases(unit.unitId).length;
-        const pct = Math.round((closed / cases.length) * 100);
-        return `<button class="unit-card" type="button" onclick="enterUnit(${unit.unitId}, this)">
+        const isEmpty = cases.length === 0;
+        const pct = isEmpty ? 0 : Math.round((closed / cases.length) * 100);
+        const countCopy = isEmpty ? (unit.comingSoon || "Case files coming soon") : `${cases.length} rooms / ${cases.length} medical cases`;
+        const progressCopy = isEmpty ? "Ready for future case files" : `Cases Closed ${closed}/${cases.length}`;
+        return `<button class="unit-card ${isEmpty ? "is-empty" : ""}" type="button" ${isEmpty ? "disabled" : `onclick="enterUnit(${unit.unitId}, this)"`}>
           <div>
             <div class="eyebrow">${esc(unit.unitName)}</div>
             <h2>${esc(unit.department)}</h2>
-            <p>${cases.length} rooms / ${cases.length} medical cases</p>
+            <p>${esc(countCopy)}</p>
           </div>
           <div class="department-entry" aria-hidden="true">
             <div class="department-sign">Automatic Department Doors</div>
@@ -1212,7 +1276,8 @@ function renderStart(){
             <div class="door-alert">Opening</div>
           </div>
           <div class="progress-track"><div class="progress-fill" style="--progress:${pct}%"></div></div>
-          <div class="progress-copy">Cases Closed ${closed}/${cases.length}</div>
+          <div class="progress-copy">${esc(progressCopy)}</div>
+          ${isEmpty ? '<div class="coming-soon-pill">Coming soon</div>' : ""}
         </button>`;
       }).join("")}
     </div>
@@ -1224,6 +1289,22 @@ function renderStart(){
 function renderUnit(){
   const unitCases = casesForUnit(activeUnitId);
   const unit = units().find(item => item.unitId === activeUnitId);
+  if(!unitCases.length){
+    return `
+      <section class="unit-panel">
+        <div class="unit-head">
+          <div>
+            <div class="eyebrow">${esc(unit.unitName)}</div>
+            <h2>${esc(unit.department)}</h2>
+            <p>${esc(unit.comingSoon || "Case files coming soon")}</p>
+          </div>
+          <div class="action-row" style="margin-top:0">
+            <button class="game-btn ghost" type="button" onclick="backToUnits()">Hospital Lobby</button>
+          </div>
+        </div>
+      </section>
+    `;
+  }
   const closed = closedCases(activeUnitId).length;
   const completion = closed === unitCases.length
     ? `<div class="completion">${esc(unit.department)} Complete - ${closed}/${unitCases.length} cases closed.</div>`
@@ -1427,7 +1508,7 @@ function renderPrintable(){
   for(let i = 0; i < renalCaseFiles.length; i += 2){
     cardPages.push(`<div class="print-card-page">${renalCaseFiles.slice(i,i+2).map(renderPrintCard).join("")}</div>`);
   }
-  const tokens = units().map(unit => {
+  const tokens = units().filter(unit => casesForUnit(unit.unitId).length).map(unit => {
     const diagnoses = casesForUnit(unit.unitId).map(item => item.diagnosis);
     return `<div class="print-token-section">
       <h2 class="print-section-title">${esc(unit.unitName)} - ${esc(unit.department)} Diagnosis Tokens</h2>
