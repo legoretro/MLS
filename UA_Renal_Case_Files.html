@@ -20,8 +20,12 @@
   --red:#c0303f;
   --shadow:0 16px 40px rgba(42,55,105,.12);
 }
+*,
+*::before,
+*::after{box-sizing:border-box}
 body.ua-case-files{
   margin:0;
+  overflow-x:hidden;
   background:
     radial-gradient(circle at 8% 8%,rgba(200,168,0,.14),transparent 26rem),
     linear-gradient(180deg,#fafbff,#edf1f9 60%,#f5f7fb);
@@ -33,6 +37,7 @@ body.ua-case-files{
   width:min(1120px,calc(100% - 28px));
   margin:0 auto;
   padding:18px 0 34px;
+  max-width:100%;
 }
 .game-hero{
   background:linear-gradient(135deg,#fffdf5,#ffffff 62%,#eef4ff);
@@ -45,7 +50,9 @@ body.ua-case-files{
   grid-template-columns:minmax(0,1fr) auto;
   gap:18px;
   align-items:center;
+  min-width:0;
 }
+.game-hero > *{min-width:0}
 .eyebrow{
   color:var(--ua-dark);
   font-size:.78rem;
@@ -65,6 +72,7 @@ body.ua-case-files{
   font-size:1.02rem;
   line-height:1.45;
   max-width:720px;
+  overflow-wrap:anywhere;
 }
 .hero-badge{
   min-width:138px;
@@ -127,25 +135,51 @@ body.ua-case-files{
 .unit-card p{margin:0;color:var(--muted);line-height:1.45}
 .unit-card:hover .door-glow,
 .unit-card:focus-visible .door-glow{opacity:1}
-.unit-card.door-opening .unit-door.left{transform:translateX(-62%)}
-.unit-card.door-opening .unit-door.right{transform:translateX(62%)}
+.unit-card.door-opening .unit-door.left{transform:translateX(-70%)}
+.unit-card.door-opening .unit-door.right{transform:translateX(70%)}
 .unit-card.door-opening .door-alert{opacity:1;transform:translateY(0)}
 .department-entry{
   position:relative;
-  min-height:152px;
-  border-radius:18px;
-  border:3px solid #dde3f2;
+  min-height:168px;
+  border-radius:20px 20px 26px 26px;
+  border:2px solid #c8d1e5;
   background:
-    linear-gradient(90deg,rgba(255,255,255,.6) 0 12%,transparent 12% 88%,rgba(255,255,255,.6) 88%),
-    linear-gradient(180deg,#eef4ff,#dce6f6);
-  box-shadow:inset 0 -12px 0 rgba(38,54,95,.08);
+    radial-gradient(circle at 20% 12%,rgba(255,255,255,.95),transparent 8rem),
+    linear-gradient(90deg,#e8edf6 0 8%,transparent 8% 92%,#e8edf6 92%),
+    linear-gradient(180deg,#f8fbff 0 32%,#e5ebf6 32% 100%);
+  box-shadow:
+    inset 0 -18px 0 rgba(112,126,158,.16),
+    inset 0 0 0 8px rgba(255,255,255,.38);
   overflow:hidden;
+}
+.department-entry::before{
+  content:"";
+  position:absolute;
+  left:7%;
+  right:7%;
+  bottom:8px;
+  height:8px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#8996ad,#e4e9f3,#8996ad);
+  box-shadow:0 -1px 0 rgba(255,255,255,.7);
+}
+.department-entry::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:33px;
+  width:72px;
+  height:12px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:#313947;
+  box-shadow:0 8px 18px rgba(17,24,39,.22);
 }
 .department-sign{
   position:absolute;
   z-index:4;
   left:50%;
-  top:10px;
+  top:8px;
   transform:translateX(-50%);
   border-radius:999px;
   background:#ffffff;
@@ -161,45 +195,63 @@ body.ua-case-files{
 }
 .door-track{
   position:absolute;
-  left:8%;
-  right:8%;
-  top:48px;
-  height:6px;
-  border-radius:999px;
-  background:#9ba8c7;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+  left:7%;
+  right:7%;
+  top:44px;
+  height:20px;
+  border-radius:12px 12px 4px 4px;
+  background:linear-gradient(180deg,#d8dee9,#8d98ac 55%,#6e7a90);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 8px 16px rgba(38,54,95,.16);
 }
 .unit-door{
   position:absolute;
-  top:56px;
-  bottom:0;
-  width:50%;
+  top:64px;
+  bottom:16px;
+  width:43%;
   background:
-    linear-gradient(90deg,rgba(255,255,255,.62),rgba(255,255,255,.12) 30%,transparent 70%),
-    linear-gradient(180deg,#f7fbff,#d7e2f3);
-  border:1px solid #b9c4dd;
+    linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.16) 36%,transparent 76%),
+    linear-gradient(180deg,#f3f7fb,#c5cfdd);
+  border:2px solid #9eaabd;
   transition:transform .62s cubic-bezier(.2,.8,.2,1);
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.25);
 }
-.unit-door.left{left:0;border-right:2px solid #8b96b2}
-.unit-door.right{right:0;border-left:2px solid #8b96b2}
+.unit-door.left{left:7%;border-radius:6px 2px 2px 6px;border-right:3px solid #7c879c}
+.unit-door.right{right:7%;border-radius:2px 6px 6px 2px;border-left:3px solid #7c879c}
 .unit-door::before{
   content:"";
   position:absolute;
-  top:28px;
-  width:58%;
-  height:38px;
-  border-radius:12px;
-  background:linear-gradient(180deg,#dff0ff,#b9d7f0);
-  border:1px solid #9eb3cf;
+  top:18px;
+  width:62%;
+  height:58px;
+  border-radius:4px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.7),transparent 38%),
+    linear-gradient(180deg,#dff2ff,#a9c8dd);
+  border:2px solid #8fa0b4;
   box-shadow:inset 0 0 0 4px rgba(255,255,255,.42);
+}
+.unit-door::after{
+  content:"";
+  position:absolute;
+  left:12%;
+  right:12%;
+  bottom:13px;
+  height:18px;
+  border-radius:3px;
+  background:linear-gradient(180deg,#a6b1c2,#7b8798);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
 }
 .unit-door.left::before{right:18px}
 .unit-door.right::before{left:18px}
 .door-glow{
   position:absolute;
-  inset:52px 28% 0;
-  border-radius:28px 28px 0 0;
-  background:radial-gradient(circle at 50% 42%,rgba(255,235,120,.44),transparent 62%);
+  inset:62px 32% 18px;
+  border-radius:20px 20px 4px 4px;
+  background:
+    radial-gradient(circle at 50% 22%,rgba(255,241,165,.48),transparent 45%),
+    linear-gradient(180deg,rgba(255,255,255,.35),rgba(47,107,216,.12));
   opacity:.45;
   transition:opacity .2s ease;
 }
@@ -314,63 +366,66 @@ body.ua-case-files{
 }
 .room-card{
   position:relative;
-  min-height:150px;
+  min-height:164px;
   border:1px solid var(--line);
   border-radius:17px;
-  background:linear-gradient(180deg,#f8fbff,#eef3fc);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.62),transparent 42%),
+    linear-gradient(180deg,#f8fbff,#eef3fc);
   padding:12px;
   text-align:left;
   cursor:pointer;
   overflow:hidden;
 }
-.room-card.selected .room-door-panel.left{transform:translateX(-28%)}
-.room-card.selected .room-door-panel.right{transform:translateX(28%)}
-.room-card.closed .room-door-panel{filter:saturate(.72)}
+.room-card.selected .room-door{transform:translateX(-50%) translateY(-3px) rotate(-1.5deg)}
+.room-card.closed .room-door{filter:saturate(.72)}
 .room-door{
   position:absolute;
-  inset:12px;
-  border-radius:14px;
-  background:#d9e1ef;
-  border:2px solid #c1cada;
-  box-shadow:inset 0 8px 0 rgba(255,255,255,.36);
-  overflow:hidden;
-}
-.room-door-panel{
-  position:absolute;
-  top:22px;
-  bottom:0;
-  width:50%;
+  left:50%;
+  top:16px;
+  width:84px;
+  height:108px;
+  transform:translateX(-50%);
+  border-radius:7px 7px 2px 2px;
   background:
-    linear-gradient(90deg,rgba(255,255,255,.5),transparent 46%),
-    linear-gradient(180deg,#fdfefe,#d9e3f1);
-  border-top:1px solid #adbad1;
-  transition:transform .28s ease;
+    linear-gradient(90deg,rgba(255,255,255,.22),transparent 28%,rgba(122,83,35,.08) 78%),
+    linear-gradient(180deg,#f4d99a,#d2a85e);
+  border:5px solid #8e99a9;
+  border-bottom-width:7px;
+  box-shadow:
+    0 8px 18px rgba(42,55,105,.16),
+    inset 0 0 0 2px rgba(255,255,255,.28);
+  transition:transform .2s ease;
 }
-.room-door-panel.left{left:0;border-right:1px solid #9faac0}
-.room-door-panel.right{right:0;border-left:1px solid #9faac0}
+.room-door::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:4px;
+  border:2px solid rgba(116,82,37,.22);
+}
 .room-door-window{
   position:absolute;
   z-index:2;
-  top:40px;
+  top:14px;
   left:50%;
-  width:54px;
-  height:28px;
+  width:42px;
+  height:22px;
   transform:translateX(-50%);
-  border-radius:11px;
+  border-radius:5px;
   background:linear-gradient(180deg,#e5f5ff,#bfd8ef);
   border:1px solid #9eadc8;
 }
 .room-door-handle{
   position:absolute;
   z-index:2;
-  top:82px;
-  left:50%;
-  width:8px;
-  height:8px;
-  transform:translateX(-50%);
+  top:60px;
+  right:12px;
+  width:9px;
+  height:9px;
   border-radius:50%;
-  background:#7d879d;
-  box-shadow:-16px 0 0 #7d879d;
+  background:#4c5564;
+  box-shadow:0 0 0 2px rgba(255,255,255,.22);
 }
 .room-number{
   position:relative;
@@ -391,7 +446,7 @@ body.ua-case-files{
   position:relative;
   z-index:3;
 }
-.room-card h3{margin:56px 0 3px;font-size:1rem}
+.room-card h3{margin:76px 0 3px;font-size:1rem}
 .room-card p{margin:0;color:var(--muted);font-size:.85rem}
 .stamp{
   position:absolute;
@@ -459,20 +514,6 @@ body.ua-case-files{
   font-size:1rem;
   font-weight:760;
 }
-.evidence-list li::before{
-  content:"Pattern";
-  display:inline-flex;
-  margin-right:8px;
-  border-radius:999px;
-  background:#fff3b8;
-  color:#6e5700;
-  padding:2px 7px;
-  font-size:.7rem;
-  font-weight:950;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  vertical-align:middle;
-}
 .diagnosis-bank{
   border:1px solid var(--line);
   border-radius:18px;
@@ -523,6 +564,56 @@ body.ua-case-files{
   border-radius:16px;
   font-weight:950;
 }
+.answer-key-panel{
+  margin-top:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(180deg,#ffffff,#f8fbff);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.answer-key-panel summary{
+  cursor:pointer;
+  padding:14px 16px;
+  font-weight:950;
+  color:var(--ink);
+  list-style:none;
+}
+.answer-key-panel summary::-webkit-details-marker{display:none}
+.answer-key-panel summary::after{
+  content:"+";
+  float:right;
+  color:var(--blue);
+  font-weight:950;
+}
+.answer-key-panel[open] summary::after{content:"-"}
+.answer-key-grid{
+  border-top:1px solid var(--line);
+  padding:14px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:10px;
+}
+.answer-key-item{
+  display:grid;
+  grid-template-columns:58px 1fr;
+  gap:10px;
+  align-items:center;
+  border:1px solid #dbe2f1;
+  border-radius:14px;
+  background:#ffffff;
+  padding:10px;
+}
+.answer-key-item strong{
+  display:grid;
+  place-items:center;
+  min-height:38px;
+  border-radius:12px;
+  background:#fff4bd;
+  color:#6d5700;
+  font-weight:950;
+}
+.answer-key-item span{font-weight:850;color:#2b3148}
 .printable-game{display:none}
 @media(max-width:860px){
   .game-hero{grid-template-columns:1fr}
@@ -533,11 +624,13 @@ body.ua-case-files{
   .chart-layout{grid-template-columns:1fr}
 }
 @media(max-width:560px){
+  body.ua-case-files .site-header{flex-wrap:wrap}
   .game-wrap{width:min(100% - 18px,480px);padding-top:12px}
   .game-hero,.unit-head,.chart-panel,.room-panel{padding:14px;border-radius:17px}
   .room-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .room-card{min-height:142px;padding:10px}
-  .room-card h3{margin-top:50px}
+  .room-card{min-height:158px;padding:10px}
+  .room-door{top:14px;width:74px;height:96px}
+  .room-card h3{margin-top:72px}
   .game-btn{width:100%;justify-content:center}
 }
 html[data-mls-theme="dark"] body.ua-case-files{
@@ -586,8 +679,7 @@ html[data-mls-theme="dark"] body.ua-case-files .room-card{
   background:linear-gradient(180deg,#222a3f,#141a29);
   border-color:#4d5876;
 }
-html[data-mls-theme="dark"] body.ua-case-files .unit-door,
-html[data-mls-theme="dark"] body.ua-case-files .room-door-panel{
+html[data-mls-theme="dark"] body.ua-case-files .unit-door{
   background:
     linear-gradient(90deg,rgba(255,255,255,.13),rgba(255,255,255,.04) 38%,transparent 70%),
     linear-gradient(180deg,#2c354b,#1d2537);
@@ -595,7 +687,9 @@ html[data-mls-theme="dark"] body.ua-case-files .room-door-panel{
 }
 html[data-mls-theme="dark"] body.ua-case-files .room-door,
 html[data-mls-theme="dark"] body.ua-case-files .department-hall-door{
-  background:#20283c;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.14),transparent 34%,rgba(0,0,0,.08) 78%),
+    linear-gradient(180deg,#caa46a,#9b7642);
   border-color:#59637c;
 }
 html[data-mls-theme="dark"] body.ua-case-files .department-sign,
@@ -618,6 +712,16 @@ html[data-mls-theme="dark"] body.ua-case-files .status-card{
   color:#f4f6ff;
   border-color:var(--line);
 }
+html[data-mls-theme="dark"] body.ua-case-files .answer-key-panel{
+  background:linear-gradient(180deg,#1b2132,#141a29);
+  border-color:var(--line);
+}
+html[data-mls-theme="dark"] body.ua-case-files .answer-key-grid{border-top-color:var(--line)}
+html[data-mls-theme="dark"] body.ua-case-files .answer-key-item{
+  background:#121827;
+  border-color:var(--line);
+}
+html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6ff}
 @media print{
   @page{size:letter landscape;margin:.25in}
   body{background:#fff!important;color:#000!important}
@@ -744,6 +848,20 @@ html[data-mls-theme="dark"] body.ua-case-files .status-card{
     color:#172554;
     background:#fffef7;
   }
+  .token-target .case-code{
+    display:block;
+    font-size:21pt;
+    line-height:1;
+    letter-spacing:.03em;
+  }
+  .token-target small{
+    display:block;
+    margin-top:.04in;
+    max-width:1.1in;
+    font-size:7.5pt;
+    line-height:1.05;
+    color:#4b5563;
+  }
   .stamp-box{
     border:2px solid #172554;
     border-radius:.1in;
@@ -774,6 +892,13 @@ html[data-mls-theme="dark"] body.ua-case-files .status-card{
     font-weight:800;
     padding:.08in;
   }
+  .print-token span{display:block}
+  .print-token small{
+    display:block;
+    margin-top:.06in;
+    font-size:7pt;
+    font-weight:700;
+  }
 }
 </style>
 </head>
@@ -792,7 +917,7 @@ html[data-mls-theme="dark"] body.ua-case-files .status-card{
       <div>
         <div class="eyebrow">Urinalysis Renal Case Files</div>
         <h1>UA Renal Case Files</h1>
-        <p>Solve the renal UA case files by matching patient pattern clues to the correct diagnosis token.</p>
+        <p>Solve the renal UA case files by matching patient chart clues to the correct diagnosis token.</p>
         <div class="action-row">
           <button class="game-btn ghost" type="button" onclick="printMode('cases')">Print Case Cards</button>
           <button class="game-btn ghost" type="button" onclick="printMode('tokens')">Print Diagnosis Tokens</button>
@@ -818,10 +943,10 @@ const renalCaseFiles = [
     "room": 1,
     "caseTitle": "Medical Case 1",
     "patientResults": [
-      "History: 14-year-old recently recovered from sore throat; now has edema and hematuria.",
-      "Chemistry pattern: BUN elevated; ASO elevated.",
-      "UA pattern: red/cloudy urine with heavy protein, large blood, nitrite negative, and trace leukocytes.",
-      "Microscopy pattern: many RBCs with dysmorphic forms, RBC casts, and mild WBCs."
+      "History: Pediatric patient recently recovered from sore throat; now has edema and hematuria.",
+      "Chemistry: BUN elevated; ASO elevated.",
+      "UA: red/cloudy urine; protein marked; blood large; glucose negative; nitrite negative; leukocytes trace.",
+      "Microscopy: RBCs very increased with many dysmorphic forms; RBC casts present; WBCs mildly increased."
     ],
     "diagnosis": "Acute Poststreptococcal GN / AGN"
   },
@@ -833,7 +958,7 @@ const renalCaseFiles = [
     "caseTitle": "Medical Case 2",
     "patientResults": [
       "History: Patient rapidly progresses with worsening renal function and poor prognosis.",
-      "UA pattern: nephritic picture with hematuria, proteinuria, dysmorphic RBCs, and RBC casts.",
+      "UA: nephritic picture with hematuria, proteinuria, dysmorphic RBCs, and RBC casts.",
       "Pathology clue: crescent formation in glomeruli.",
       "Immune clue: macrophage involvement may be seen; autoimmune pattern may be present."
     ],
@@ -846,10 +971,10 @@ const renalCaseFiles = [
     "room": 3,
     "caseTitle": "Medical Case 3",
     "patientResults": [
-      "History: Adult patient with BUN elevated and ASO normal.",
-      "Serology: anti-GBM antibody is high.",
-      "UA pattern: red/cloudy urine with heavy protein, large blood, nitrite negative, and trace leukocytes.",
-      "Microscopy pattern: many RBCs with dysmorphic forms, RBC casts, and mild WBCs."
+      "History: Adult patient with BUN elevated; ASO normal.",
+      "Serology: anti-GBM antibody elevated.",
+      "UA: red/cloudy urine; protein marked; blood large; nitrite negative; leukocytes trace.",
+      "Microscopy: RBCs very increased with many dysmorphic forms; RBC casts present; WBCs mildly increased."
     ],
     "diagnosis": "Goodpasture Syndrome"
   },
@@ -860,9 +985,9 @@ const renalCaseFiles = [
     "room": 4,
     "caseTitle": "Medical Case 4",
     "patientResults": [
-      "Serology: anti-GBM antibody is normal.",
-      "Serology: ANCA is elevated.",
-      "UA pattern: proteinuria, hematuria, dysmorphic RBCs, and RBC casts.",
+      "Serology: anti-GBM antibody normal.",
+      "Serology: ANCA elevated.",
+      "UA: proteinuria, hematuria, dysmorphic RBCs, and RBC casts.",
       "Immune clue: immune-mediated vasculitis caused by autoantibodies."
     ],
     "diagnosis": "Wegener's / Granulomatosis with Polyangiitis"
@@ -876,8 +1001,8 @@ const renalCaseFiles = [
     "patientResults": [
       "History: Child presents with red/purple patches on skin.",
       "UA: hematuria pattern with RBCs and RBC casts.",
-      "Blood clue: platelets are elevated/not low.",
-      "Pattern clue: small-vessel vasculitis with renal involvement."
+      "Blood clue: platelets elevated or not decreased.",
+      "Clinical clue: small-vessel vasculitis with renal involvement."
     ],
     "diagnosis": "Henoch-Schonlein Purpura / IgA Vasculitis"
   },
@@ -889,7 +1014,7 @@ const renalCaseFiles = [
     "caseTitle": "Medical Case 6",
     "patientResults": [
       "History: Patient has history of gold/mercury treatment or exposure.",
-      "UA/lab clue: proteinuria with increased thrombosis risk.",
+      "UA/lab clue: proteinuria with thrombosis risk increased.",
       "Immune clue: IgG immune complexes deposit in the glomerular membrane.",
       "Pathology clue: glomerular membrane thickening is present."
     ],
@@ -904,7 +1029,7 @@ const renalCaseFiles = [
     "patientResults": [
       "History: Child with poor prognosis.",
       "Serology: complement is decreased.",
-      "UA pattern: mixed nephritic/nephrotic findings may be seen.",
+      "UA: mixed nephritic/nephrotic findings may be seen.",
       "Pathology clue: thickened capillary walls and/or dense deposits in the GBM."
     ],
     "diagnosis": "Membranoproliferative GN"
@@ -917,9 +1042,9 @@ const renalCaseFiles = [
     "caseTitle": "Medical Case 8",
     "patientResults": [
       "History: Recurrent episodes of macroscopic hematuria.",
-      "Serology/immune clue: high IgA levels.",
-      "UA pattern: hematuria with glomerular findings may be present.",
-      "Pattern clue: most common cause of glomerulonephritis."
+      "Serology/immune clue: IgA elevated.",
+      "UA: hematuria with glomerular findings may be present.",
+      "Key clue: common glomerulonephritis pattern."
     ],
     "diagnosis": "IgA Nephropathy"
   },
@@ -930,10 +1055,10 @@ const renalCaseFiles = [
     "room": 1,
     "caseTitle": "Medical Case 1",
     "patientResults": [
-      "History: 45-year-old patient develops massive edema.",
-      "Chemistry pattern: BUN elevated with cholesterol and triglycerides elevated.",
-      "Protein pattern: serum protein and albumin low with very heavy urine protein.",
-      "UA/Microscopy pattern: cloudy yellow urine with heavy protein, moderate blood, fat droplets, fatty casts, cholesterol crystals, and oval fat bodies."
+      "History: Adult patient develops massive edema.",
+      "Chemistry: BUN elevated; cholesterol elevated; triglycerides elevated.",
+      "Protein studies: serum protein low; albumin low; urine protein markedly increased.",
+      "UA/Microscopy: cloudy yellow urine; protein marked; blood moderate; fat droplets, fatty casts, cholesterol crystals, and oval fat bodies."
     ],
     "diagnosis": "Nephrotic Syndrome General"
   },
@@ -946,8 +1071,8 @@ const renalCaseFiles = [
     "patientResults": [
       "History: Child presents with edema.",
       "UA: marked proteinuria with fat droplets/oval fat bodies.",
-      "Pattern clue: minimal change lipid nephrosis pattern.",
-      "Genetic/association clue: HLA-B12."
+      "Key clue: minimal change lipid nephrosis pattern.",
+      "Genetic/association clue: HLA association."
     ],
     "diagnosis": "Minimal Change Disease"
   },
@@ -989,7 +1114,7 @@ const renalCaseFiles = [
       "History: Diabetic patient with renal monitoring.",
       "UA/lab clue: marked proteinuria monitored by microalbuminuria.",
       "Pathology clue: mesangial cell proliferation with vascular sclerosis.",
-      "Pattern clue: most common cause of end-stage renal disease."
+      "Key clue: common end-stage kidney disease pattern."
     ],
     "diagnosis": "Diabetic Nephropathy"
   }
@@ -1024,6 +1149,10 @@ function saveProgress(){
 
 function caseKey(item){
   return `${item.unitId}-${item.room}`;
+}
+
+function caseCode(item){
+  return item.unitId === 1 ? `G${item.room}` : `NS${item.room}`;
 }
 
 function units(){
@@ -1088,6 +1217,7 @@ function renderStart(){
       }).join("")}
     </div>
     ${completeMessage}
+    ${renderAnswerKey()}
   `;
 }
 
@@ -1143,12 +1273,10 @@ function renderRoomCard(item){
   const selected = activeRoom && activeRoom.unitId === item.unitId && activeRoom.room === item.room;
   return `<button class="room-card ${closed ? "closed" : ""} ${selected ? "selected" : ""}" type="button" onclick="openRoom(${item.unitId},${item.room})">
     <div class="room-door" aria-hidden="true">
-      <div class="room-door-panel left"></div>
-      <div class="room-door-panel right"></div>
       <div class="room-door-window"></div>
       <div class="room-door-handle"></div>
     </div>
-    <span class="room-number">Room ${item.room}</span>
+    <span class="room-number">${caseCode(item)}</span>
     <h3>Room ${item.room}</h3>
     <p>${esc(item.caseTitle)}</p>
     ${closed ? '<div class="stamp">Case Closed</div>' : ""}
@@ -1168,16 +1296,16 @@ function renderChart(item){
   return `<div class="chart-panel" id="patientChart">
     <div class="chart-title-row">
       <div>
-        <h2>Patient Chart - Room ${item.room}</h2>
+        <h2>Patient Chart - ${caseCode(item)} / Room ${item.room}</h2>
         <p>${esc(item.unitName)} / ${esc(item.department)} / ${esc(item.caseTitle)}</p>
       </div>
       <button class="game-btn ghost" type="button" onclick="closeChart()">Close Chart</button>
     </div>
     <div class="chart-layout">
       <div class="clipboard">
-        <div class="clipboard-head"><span>Patient Pattern</span><span>UA Pattern</span></div>
+        <div class="clipboard-head"><span>Patient Results</span><span>UA Evidence</span></div>
         <ul class="evidence-list">
-          ${patternClues(item).map(result => `<li>${esc(result)}</li>`).join("")}
+          ${caseClues(item).map(result => `<li>${esc(result)}</li>`).join("")}
         </ul>
       </div>
       <aside class="diagnosis-bank">
@@ -1282,6 +1410,18 @@ function resetWholeGame(){
   render();
 }
 
+function renderAnswerKey(){
+  return `<details class="answer-key-panel">
+    <summary>Answer Sheet - check only, not printed</summary>
+    <div class="answer-key-grid">
+      ${renalCaseFiles.map(item => `<div class="answer-key-item">
+        <strong>${caseCode(item)}</strong>
+        <span>${esc(item.diagnosis)}</span>
+      </div>`).join("")}
+    </div>
+  </details>`;
+}
+
 function renderPrintable(){
   const cardPages = [];
   for(let i = 0; i < renalCaseFiles.length; i += 2){
@@ -1292,9 +1432,9 @@ function renderPrintable(){
     return `<div class="print-token-section">
       <h2 class="print-section-title">${esc(unit.unitName)} - ${esc(unit.department)} Diagnosis Tokens</h2>
       <div class="print-token-grid">
-        ${diagnoses.map(diagnosis => `<div class="print-token">${esc(diagnosis)}</div>`).join("")}
-        <div class="print-token">Blank Token</div>
-        <div class="print-token">Blank Token</div>
+        ${diagnoses.map(diagnosis => `<div class="print-token"><span>${esc(diagnosis)}</span><small>Code: ____</small></div>`).join("")}
+        <div class="print-token"><span>Blank Token</span><small>Code: ____</small></div>
+        <div class="print-token"><span>Blank Token</span><small>Code: ____</small></div>
       </div>
     </div>`;
   }).join("");
@@ -1308,112 +1448,25 @@ function renderPrintable(){
 }
 
 function renderPrintCard(item){
-  const clues = patternClues(item);
+  const clues = caseClues(item);
   return `<article class="print-card">
     <div class="print-hospital-icon" aria-hidden="true">+</div>
-    <h2>${esc(item.unitName)}</h2>
+    <h2>${caseCode(item)} - ${esc(item.unitName)}</h2>
     <div class="meta">
       <strong>${esc(item.department)}</strong><br>
       Room ${item.room} / ${esc(item.caseTitle)}
     </div>
     <div>
-      <div class="clue-title">Patient Pattern Clues</div>
+      <div class="clue-title">Patient Results / UA Evidence</div>
       <div class="print-clue-list">${clues.map(result => `<div class="print-clue">${esc(result)}</div>`).join("")}</div>
     </div>
-    <div class="token-target">Place Diagnosis Token Here</div>
+    <div class="token-target"><span class="case-code">${caseCode(item)}</span><small>write matching diagnosis token code</small></div>
     <div class="stamp-box">Case Closed Stamp</div>
   </article>`;
 }
 
-function patternClues(item){
-  const key = caseKey(item);
-  const clueMap = {
-    "1-1": [
-      "Recent sore throat + edema + red urine",
-      "BUN elevated; ASO elevated",
-      "Protein heavy; blood large; nitrite negative",
-      "Many RBCs, dysmorphic RBCs, RBC casts, mild WBCs"
-    ],
-    "1-2": [
-      "Renal function worsening fast",
-      "Nephritic pattern: blood + protein",
-      "Dysmorphic RBCs and RBC casts",
-      "Crescent pattern / aggressive glomerular injury"
-    ],
-    "1-3": [
-      "BUN elevated; ASO normal",
-      "Anti-GBM elevated",
-      "Protein heavy; blood large; nitrite negative",
-      "Many dysmorphic RBCs, RBC casts, mild WBCs"
-    ],
-    "1-4": [
-      "Anti-GBM normal",
-      "ANCA elevated",
-      "Protein + blood + dysmorphic RBCs",
-      "RBC casts with vasculitis pattern"
-    ],
-    "1-5": [
-      "Child with red/purple skin patches",
-      "Hematuria pattern",
-      "RBCs and RBC casts",
-      "Platelets not low"
-    ],
-    "1-6": [
-      "Gold/mercury exposure clue",
-      "Proteinuria pattern",
-      "Thrombosis risk increased",
-      "Immune complexes + thickened glomerular membrane"
-    ],
-    "1-7": [
-      "Child with poor prognosis",
-      "Complement decreased",
-      "Mixed nephritic/nephrotic pattern",
-      "Thickened capillary wall / dense deposit pattern"
-    ],
-    "1-8": [
-      "Recurrent visible hematuria",
-      "IgA elevated",
-      "Glomerular hematuria pattern",
-      "Common glomerulonephritis pattern"
-    ],
-    "2-1": [
-      "Massive edema",
-      "Cholesterol and triglycerides elevated",
-      "Serum protein and albumin low",
-      "Protein very heavy + fat droplets, fatty casts, oval fat bodies"
-    ],
-    "2-2": [
-      "Child with edema",
-      "Marked proteinuria",
-      "Fat droplets / oval fat bodies",
-      "Minimal-change lipid pattern"
-    ],
-    "2-3": [
-      "HIV history clue",
-      "Proteinuria + RBCs",
-      "IgM/C3 deposits",
-      "Patchy segmental sclerosis pattern"
-    ],
-    "2-4": [
-      "Inherited kidney disorder",
-      "Proteinuria with possible hematuria",
-      "GBM thinning / layering",
-      "No antibody pattern"
-    ],
-    "2-5": [
-      "Diabetes history clue",
-      "Proteinuria monitored by microalbumin",
-      "Mesangial proliferation + vascular sclerosis",
-      "Common end-stage kidney disease pattern"
-    ]
-  };
-  return clueMap[key] || item.patientResults.map(result => result
-    .replace(/\bBUN\s+\d+\s*mg\/dL\b/gi, "BUN pattern")
-    .replace(/\bASO titer elevated at\s+[\w\s.]+/gi, "ASO elevated")
-    .replace(/\bSG\s+\d\.\d+\b/gi, "specific gravity pattern")
-    .replace(/\bpH\s+\d\.\d+\b/gi, "pH pattern")
-    .replace(/>\d+\s*RBC\/hpf/gi, "many RBCs")
-    .replace(/\d+-\d+\s*WBC\/hpf/gi, "WBC pattern"));
+function caseClues(item){
+  return item.patientResults;
 }
 
 function printMode(mode){
