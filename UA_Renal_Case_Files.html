@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UA Renal Case Files</title>
+<script src="interactive_theme.js"></script>
+<link rel="stylesheet" href="interactive_learning.css" />
+<style>
+:root{
+  --ua:#c8a800;
+  --ua-dark:#806700;
+  --ink:#171b2f;
+  --muted:#59627f;
+  --soft:#f6f3df;
+  --panel:#ffffff;
+  --line:#c8cce0;
+  --blue:#2f6bd8;
+  --green:#1a8a4a;
+  --red:#c0303f;
+  --shadow:0 16px 40px rgba(42,55,105,.12);
+}
+body.ua-case-files{
+  margin:0;
+  background:
+    radial-gradient(circle at 8% 8%,rgba(200,168,0,.14),transparent 26rem),
+    linear-gradient(180deg,#fafbff,#edf1f9 60%,#f5f7fb);
+  color:var(--ink);
+  font-family:var(--mls-sans,Inter,system-ui,sans-serif);
+}
+.screen-shell{min-height:100vh}
+.game-wrap{
+  width:min(1120px,calc(100% - 28px));
+  margin:0 auto;
+  padding:18px 0 34px;
+}
+.game-hero{
+  background:linear-gradient(135deg,#fffdf5,#ffffff 62%,#eef4ff);
+  border:1px solid var(--line);
+  border-top:6px solid var(--ua);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:22px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:center;
+}
+.eyebrow{
+  color:var(--ua-dark);
+  font-size:.78rem;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.game-hero h1{
+  margin:6px 0 6px;
+  font-size:clamp(2rem,4vw,3.8rem);
+  line-height:.96;
+}
+.game-hero p{
+  margin:0;
+  color:var(--muted);
+  font-size:1.02rem;
+  line-height:1.45;
+  max-width:720px;
+}
+.hero-badge{
+  min-width:138px;
+  aspect-ratio:1;
+  border-radius:26px;
+  background:linear-gradient(145deg,#fff9d7,#dbe8ff);
+  border:1px solid #d4dbef;
+  display:grid;
+  place-items:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 14px 28px rgba(42,55,105,.12);
+  color:var(--ua-dark);
+  font-weight:950;
+  text-align:center;
+}
+.hero-badge span{font-size:2.4rem;display:block;margin-bottom:5px}
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+.game-btn{
+  border:0;
+  border-radius:999px;
+  padding:11px 16px;
+  background:#e7eaf3;
+  color:#454c68;
+  font:900 .9rem/1 var(--mls-sans,Inter,system-ui,sans-serif);
+  cursor:pointer;
+  transition:transform .14s ease,box-shadow .14s ease,background .14s ease;
+}
+.game-btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(42,55,105,.12)}
+.game-btn.primary{background:var(--blue);color:white}
+.game-btn.ua{background:var(--ua);color:#2c2400}
+.game-btn.warn{background:#fff1f1;color:#9b1c2d;border:1px solid #f1b9c0}
+.game-btn.ghost{background:#fff;border:1px solid var(--line)}
+.unit-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+  margin-top:18px;
+}
+.unit-card{
+  border:1px solid var(--line);
+  border-left:7px solid var(--ua);
+  border-radius:20px;
+  background:var(--panel);
+  box-shadow:var(--shadow);
+  padding:20px;
+  text-align:left;
+  cursor:pointer;
+  color:var(--ink);
+}
+.unit-card h2{margin:8px 0 8px;font-size:1.3rem}
+.unit-card p{margin:0;color:var(--muted);line-height:1.45}
+.progress-track{
+  height:10px;
+  background:#edf1fa;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:14px;
+  border:1px solid #d8dfef;
+}
+.progress-fill{
+  height:100%;
+  width:var(--progress,0%);
+  background:linear-gradient(90deg,var(--ua),#e7c945);
+}
+.progress-copy{
+  color:#4c5570;
+  font-weight:900;
+  font-size:.88rem;
+  margin-top:8px;
+}
+.unit-panel{
+  margin-top:18px;
+  display:grid;
+  gap:16px;
+}
+.unit-head,
+.chart-panel,
+.room-panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+.unit-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+}
+.unit-head h2{margin:4px 0 4px;font-size:1.8rem}
+.unit-head p{margin:0;color:var(--muted)}
+.room-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
+  gap:12px;
+}
+.room-card{
+  position:relative;
+  min-height:126px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:linear-gradient(180deg,#ffffff,#f7f9fe);
+  padding:14px;
+  text-align:left;
+  cursor:pointer;
+  overflow:hidden;
+}
+.room-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:8px;
+  background:var(--ua);
+}
+.room-number{
+  display:inline-grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  background:#fff6c7;
+  color:#7a6200;
+  font-weight:950;
+  margin-top:8px;
+}
+.room-card h3{margin:12px 0 4px;font-size:1rem}
+.room-card p{margin:0;color:var(--muted);font-size:.85rem}
+.stamp{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  border:3px solid var(--green);
+  color:var(--green);
+  border-radius:10px;
+  padding:5px 7px;
+  font-weight:950;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transform:rotate(-8deg);
+  background:rgba(255,255,255,.9);
+  animation:stampIn .34s ease both;
+}
+@keyframes stampIn{
+  from{opacity:0;transform:scale(1.7) rotate(-12deg)}
+  to{opacity:1;transform:scale(1) rotate(-8deg)}
+}
+.chart-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
+  gap:16px;
+}
+.chart-title-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:start;
+  margin-bottom:12px;
+}
+.chart-title-row h2{margin:0;font-size:1.45rem}
+.chart-title-row p{margin:3px 0 0;color:var(--muted)}
+.clipboard{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#fffdf8;
+  overflow:hidden;
+}
+.clipboard-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  background:#f3e7aa;
+  color:#4f4100;
+  padding:10px 14px;
+  font-weight:950;
+}
+.evidence-list{
+  list-style:none;
+  margin:0;
+  padding:12px;
+  display:grid;
+  gap:10px;
+}
+.evidence-list li{
+  border:1px solid #e4dcae;
+  background:white;
+  border-radius:12px;
+  padding:10px 12px;
+  color:#303751;
+  line-height:1.42;
+}
+.diagnosis-bank{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#f8faff;
+  padding:14px;
+}
+.diagnosis-bank h3{margin:0 0 5px;font-size:1rem}
+.diagnosis-bank p{margin:0 0 12px;color:var(--muted);font-size:.88rem}
+.token-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+.diagnosis-token{
+  border:2px solid #b89a12;
+  background:linear-gradient(180deg,#fff6ba,#e0bd26);
+  color:#322800;
+  border-radius:999px;
+  padding:9px 12px;
+  font-weight:900;
+  font-size:.84rem;
+  cursor:pointer;
+  box-shadow:0 4px 0 rgba(104,82,0,.18);
+}
+.diagnosis-token.selected{
+  outline:4px solid rgba(47,107,216,.22);
+  border-color:#2f6bd8;
+  background:#fff;
+  color:#18366c;
+}
+.status-card{
+  margin-top:12px;
+  min-height:44px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 12px;
+  color:#4c5570;
+  font-weight:900;
+  background:white;
+}
+.status-card.good{border-color:#9ad3b0;background:#ebf8ef;color:var(--green)}
+.status-card.bad{border-color:#f0b6bf;background:#fff1f3;color:#a42033}
+.completion{
+  border:1px solid #9ad3b0;
+  background:#ebf8ef;
+  color:#0d6b3e;
+  padding:13px 14px;
+  border-radius:16px;
+  font-weight:950;
+}
+.printable-game{display:none}
+@media(max-width:860px){
+  .game-hero{grid-template-columns:1fr}
+  .hero-badge{width:118px;min-width:118px;justify-self:start}
+  .unit-grid{grid-template-columns:1fr}
+  .unit-head{display:grid}
+  .chart-layout{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .game-wrap{width:min(100% - 18px,480px);padding-top:12px}
+  .game-hero,.unit-head,.chart-panel,.room-panel{padding:14px;border-radius:17px}
+  .room-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .room-card{min-height:116px;padding:12px}
+  .game-btn{width:100%;justify-content:center}
+}
+@media print{
+  @page{size:letter landscape;margin:.25in}
+  body{background:#fff!important;color:#000!important}
+  .screen-shell,.site-header{display:none!important}
+  .printable-game{display:block!important;font-family:Arial,sans-serif;color:#000}
+  body.print-cases .print-token-section{display:none!important}
+  body.print-tokens .print-case-section{display:none!important}
+  body.print-tokens .print-card-page{display:none!important}
+  body.print-full .printable-game{display:block!important}
+  .print-section-title{font-size:18pt;font-weight:800;margin:0 0 .15in}
+  .print-card-page{
+    page-break-after:always;
+    display:grid;
+    grid-template-columns:4in 4in;
+    gap:.35in;
+    align-items:start;
+    justify-content:center;
+  }
+  .print-card{
+    width:4in;
+    height:6in;
+    border:2px dashed #000;
+    border-radius:.12in;
+    padding:.16in;
+    page-break-inside:avoid;
+    display:grid;
+    grid-template-rows:auto auto 1fr auto auto;
+    gap:.08in;
+  }
+  .print-card h2{font-size:14pt;margin:0}
+  .print-card .meta{font-size:9pt;line-height:1.25;border-bottom:1px solid #000;padding-bottom:.06in}
+  .print-card ul{margin:.04in 0 0;padding-left:.16in;font-size:8.8pt;line-height:1.24}
+  .token-target{
+    border:2px solid #000;
+    border-radius:50%;
+    width:1.55in;
+    height:1.55in;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    font-size:8pt;
+    font-weight:800;
+    justify-self:center;
+  }
+  .stamp-box{
+    border:1px solid #000;
+    height:.45in;
+    display:grid;
+    place-items:center;
+    font-size:8pt;
+    font-weight:800;
+  }
+  .print-token-section{page-break-before:always}
+  .print-token-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1.45in);
+    gap:.22in;
+    align-items:start;
+  }
+  .print-token{
+    width:1.45in;
+    height:1.45in;
+    border:2px dashed #000;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    font-size:8pt;
+    font-weight:800;
+    padding:.08in;
+  }
+}
+</style>
+</head>
+<body class="mls-interactive ua-case-files">
+<div class="screen-shell">
+  <header class="site-header">
+    <div>
+      <div class="logo">MLS/BOC PREP</div>
+      <div class="logo-sub">Interactive Learning</div>
+    </div>
+    <a class="mls-home-btn" href="index.html">← MLS Home</a>
+  </header>
+
+  <main class="game-wrap">
+    <section class="game-hero">
+      <div>
+        <div class="eyebrow">Urinalysis Renal Case Files</div>
+        <h1>UA Renal Case Files</h1>
+        <p>Solve the renal UA case files by matching patient results to the correct diagnosis token.</p>
+        <div class="action-row">
+          <button class="game-btn ghost" type="button" onclick="printMode('cases')">Print Case Cards</button>
+          <button class="game-btn ghost" type="button" onclick="printMode('tokens')">Print Diagnosis Tokens</button>
+          <button class="game-btn ghost" type="button" onclick="printMode('full')">Print Full Game Pack</button>
+        </div>
+      </div>
+      <div class="hero-badge" aria-hidden="true"><div><span>🏥</span>Case<br>Files</div></div>
+    </section>
+
+    <section id="gameRoot"></section>
+  </main>
+</div>
+
+<section class="printable-game" id="printableGame"></section>
+
+<script>
+// Add future hospital units and rooms here. Keep each case in this local array.
+const renalCaseFiles = [
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 1,
+    "caseTitle": "Medical Case 1",
+    "patientResults": [
+      "History: 14-year-old recently recovered from sore throat; now has edema and hematuria.",
+      "Chemistry: BUN 30 mg/dL; ASO titer elevated at 933 Todd units.",
+      "UA: red/cloudy; SG 1.020; pH 5.0; protein 3+; blood large; glucose negative; nitrite negative; leukocyte trace.",
+      "Microscopy: >100 RBC/hpf with many dysmorphic forms; 0-1 RBC casts/lpf; 5-8 WBC/hpf."
+    ],
+    "diagnosis": "Acute Poststreptococcal GN / AGN"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 2,
+    "caseTitle": "Medical Case 2",
+    "patientResults": [
+      "History: Patient rapidly progresses with worsening renal function and poor prognosis.",
+      "UA pattern: nephritic picture with hematuria, proteinuria, dysmorphic RBCs, and RBC casts.",
+      "Pathology clue: crescent formation in glomeruli.",
+      "Immune clue: macrophage involvement may be seen; autoimmune pattern may be present."
+    ],
+    "diagnosis": "Rapidly Progressive GN"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 3,
+    "caseTitle": "Medical Case 3",
+    "patientResults": [
+      "History: 39-year-old female with BUN 60 mg/dL; ASO titer normal.",
+      "Serology: anti-GBM antibody is high.",
+      "UA: red/cloudy; SG 1.020; pH 5.0; protein 3+; blood large; nitrite negative; leukocyte trace.",
+      "Microscopy: >100 RBC/hpf with many dysmorphic forms; 0-1 RBC casts/lpf; 5-8 WBC/hpf."
+    ],
+    "diagnosis": "Goodpasture Syndrome"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 4,
+    "caseTitle": "Medical Case 4",
+    "patientResults": [
+      "Serology: anti-GBM antibody is normal.",
+      "Serology: ANCA is elevated.",
+      "UA pattern: proteinuria, hematuria, dysmorphic RBCs, and RBC casts.",
+      "Immune clue: immune-mediated vasculitis caused by autoantibodies."
+    ],
+    "diagnosis": "Wegener's / Granulomatosis with Polyangiitis"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 5,
+    "caseTitle": "Medical Case 5",
+    "patientResults": [
+      "History: Child presents with red/purple patches on skin.",
+      "UA: hematuria pattern with RBCs and RBC casts.",
+      "Blood clue: platelets are elevated/not low.",
+      "Pattern clue: small-vessel vasculitis with renal involvement."
+    ],
+    "diagnosis": "Henoch-Schonlein Purpura / IgA Vasculitis"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 6,
+    "caseTitle": "Medical Case 6",
+    "patientResults": [
+      "History: Patient has history of gold/mercury treatment or exposure.",
+      "UA/lab clue: proteinuria with increased thrombosis risk.",
+      "Immune clue: IgG immune complexes deposit in the glomerular membrane.",
+      "Pathology clue: glomerular membrane thickening is present."
+    ],
+    "diagnosis": "Membranous GN"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 7,
+    "caseTitle": "Medical Case 7",
+    "patientResults": [
+      "History: Child with poor prognosis.",
+      "Serology: complement is decreased.",
+      "UA pattern: mixed nephritic/nephrotic findings may be seen.",
+      "Pathology clue: thickened capillary walls and/or dense deposits in the GBM."
+    ],
+    "diagnosis": "Membranoproliferative GN"
+  },
+  {
+    "unitId": 1,
+    "unitName": "Hospital Unit 1",
+    "department": "Glomerulonephritis Department",
+    "room": 8,
+    "caseTitle": "Medical Case 8",
+    "patientResults": [
+      "History: Recurrent episodes of macroscopic hematuria.",
+      "Serology/immune clue: high IgA levels.",
+      "UA pattern: hematuria with glomerular findings may be present.",
+      "Pattern clue: most common cause of glomerulonephritis."
+    ],
+    "diagnosis": "IgA Nephropathy"
+  },
+  {
+    "unitId": 2,
+    "unitName": "Hospital Unit 2",
+    "department": "Nephrotic Syndrome Department",
+    "room": 1,
+    "caseTitle": "Medical Case 1",
+    "patientResults": [
+      "History: 45-year-old patient develops massive edema.",
+      "Chemistry: BUN 30 mg/dL; cholesterol 400 mg/dL; triglycerides 840 mg/dL.",
+      "Protein studies: serum protein 4.5 g/dL; albumin 2.5 g/dL; total urine protein 3.8 g/day.",
+      "UA/Microscopy: cloudy yellow; protein 4+; blood moderate; free fat droplets, fatty casts, cholesterol crystals, and oval fat bodies."
+    ],
+    "diagnosis": "Nephrotic Syndrome General"
+  },
+  {
+    "unitId": 2,
+    "unitName": "Hospital Unit 2",
+    "department": "Nephrotic Syndrome Department",
+    "room": 2,
+    "caseTitle": "Medical Case 2",
+    "patientResults": [
+      "History: Child presents with edema.",
+      "UA: marked proteinuria with fat droplets/oval fat bodies.",
+      "Pattern clue: minimal change lipid nephrosis pattern.",
+      "Genetic/association clue: HLA-B12."
+    ],
+    "diagnosis": "Minimal Change Disease"
+  },
+  {
+    "unitId": 2,
+    "unitName": "Hospital Unit 2",
+    "department": "Nephrotic Syndrome Department",
+    "room": 3,
+    "caseTitle": "Medical Case 3",
+    "patientResults": [
+      "History: Patient has HIV.",
+      "UA: elevated proteinuria with RBCs in urine.",
+      "Immune clue: IgM/C3 deposits are present.",
+      "Pathology clue: only certain glomeruli are affected; segmental sclerosis pattern."
+    ],
+    "diagnosis": "Focal Segmental Glomerulosclerosis"
+  },
+  {
+    "unitId": 2,
+    "unitName": "Hospital Unit 2",
+    "department": "Nephrotic Syndrome Department",
+    "room": 4,
+    "caseTitle": "Medical Case 4",
+    "patientResults": [
+      "History: Inherited kidney disorder.",
+      "UA/lab clue: marked proteinuria; hematuria may be present.",
+      "Pathology clue: GBM thinning/layering is present.",
+      "Immune clue: no antibodies present."
+    ],
+    "diagnosis": "Alport Syndrome"
+  },
+  {
+    "unitId": 2,
+    "unitName": "Hospital Unit 2",
+    "department": "Nephrotic Syndrome Department",
+    "room": 5,
+    "caseTitle": "Medical Case 5",
+    "patientResults": [
+      "History: Diabetic patient with renal monitoring.",
+      "UA/lab clue: marked proteinuria monitored by microalbuminuria.",
+      "Pathology clue: mesangial cell proliferation with vascular sclerosis.",
+      "Pattern clue: most common cause of end-stage renal disease."
+    ],
+    "diagnosis": "Diabetic Nephropathy"
+  }
+];
+
+const storageKey = "mls.uaRenalCaseFiles.v1";
+let progress = loadProgress();
+let activeUnitId = null;
+let activeRoom = null;
+let selectedDiagnosis = "";
+let chartMessage = "";
+let chartMessageState = "";
+
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[ch]));
+}
+
+function loadProgress(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    return saved && typeof saved === "object" ? {closed:saved.closed || {}} : {closed:{}};
+  }catch(error){
+    return {closed:{}};
+  }
+}
+
+function saveProgress(){
+  localStorage.setItem(storageKey, JSON.stringify(progress));
+}
+
+function caseKey(item){
+  return `${item.unitId}-${item.room}`;
+}
+
+function units(){
+  const seen = new Map();
+  renalCaseFiles.forEach(item => {
+    if(!seen.has(item.unitId)){
+      seen.set(item.unitId, {unitId:item.unitId, unitName:item.unitName, department:item.department});
+    }
+  });
+  return [...seen.values()];
+}
+
+function casesForUnit(unitId){
+  return renalCaseFiles.filter(item => item.unitId === Number(unitId)).sort((a,b) => a.room - b.room);
+}
+
+function closedCases(unitId){
+  return casesForUnit(unitId).filter(item => progress.closed[caseKey(item)]);
+}
+
+function usedDiagnoses(unitId){
+  return new Set(closedCases(unitId).map(item => item.diagnosis));
+}
+
+function render(){
+  const root = document.getElementById("gameRoot");
+  root.innerHTML = activeUnitId ? renderUnit() : renderStart();
+  document.querySelectorAll(".diagnosis-token").forEach(button => {
+    button.addEventListener("click", () => selectDiagnosis(button.dataset.diagnosis));
+  });
+}
+
+function renderStart(){
+  const totalClosed = Object.keys(progress.closed).length;
+  const totalCases = renalCaseFiles.length;
+  const completeMessage = totalClosed === totalCases
+    ? '<div class="completion" style="margin-top:18px">UA Renal Case Files Complete - 13/13 medical cases closed.</div>'
+    : "";
+  return `
+    <div class="unit-grid">
+      ${units().map(unit => {
+        const cases = casesForUnit(unit.unitId);
+        const closed = closedCases(unit.unitId).length;
+        const pct = Math.round((closed / cases.length) * 100);
+        return `<button class="unit-card" type="button" onclick="enterUnit(${unit.unitId})">
+          <div class="eyebrow">${esc(unit.unitName)}</div>
+          <h2>Enter ${esc(unit.unitName)} - ${esc(unit.department)}</h2>
+          <p>${cases.length} rooms / ${cases.length} medical cases</p>
+          <div class="progress-track"><div class="progress-fill" style="--progress:${pct}%"></div></div>
+          <div class="progress-copy">Cases Closed ${closed}/${cases.length}</div>
+        </button>`;
+      }).join("")}
+    </div>
+    ${completeMessage}
+  `;
+}
+
+function renderUnit(){
+  const unitCases = casesForUnit(activeUnitId);
+  const unit = units().find(item => item.unitId === activeUnitId);
+  const closed = closedCases(activeUnitId).length;
+  const completion = closed === unitCases.length
+    ? `<div class="completion">${esc(unit.department)} Complete - ${closed}/${unitCases.length} cases closed.</div>`
+    : "";
+  return `
+    <section class="unit-panel">
+      <div class="unit-head">
+        <div>
+          <div class="eyebrow">${esc(unit.unitName)}</div>
+          <h2>${esc(unit.department)}</h2>
+          <p>Open a room, review the patient chart, then choose a diagnosis token.</p>
+          <div class="progress-track"><div class="progress-fill" style="--progress:${Math.round((closed / unitCases.length) * 100)}%"></div></div>
+          <div class="progress-copy">Cases Closed ${closed}/${unitCases.length}</div>
+        </div>
+        <div class="action-row" style="margin-top:0">
+          <button class="game-btn ghost" type="button" onclick="backToUnits()">Hospital Lobby</button>
+          <button class="game-btn warn" type="button" onclick="resetUnit(${activeUnitId})">Reset Unit</button>
+          <button class="game-btn warn" type="button" onclick="resetWholeGame()">Reset Whole Game</button>
+        </div>
+      </div>
+      ${completion}
+      <div class="room-panel">
+        <div class="chart-title-row">
+          <div>
+            <h2>Hospital Rooms</h2>
+            <p>Case Closed rooms keep their stamp.</p>
+          </div>
+        </div>
+        <div class="room-grid">
+          ${unitCases.map(renderRoomCard).join("")}
+        </div>
+      </div>
+      ${activeRoom ? renderChart(activeRoom) : ""}
+    </section>
+  `;
+}
+
+function renderRoomCard(item){
+  const closed = progress.closed[caseKey(item)];
+  return `<button class="room-card" type="button" onclick="openRoom(${item.unitId},${item.room})">
+    <span class="room-number">${item.room}</span>
+    <h3>Room ${item.room}</h3>
+    <p>${esc(item.caseTitle)}</p>
+    ${closed ? '<div class="stamp">Case Closed</div>' : ""}
+  </button>`;
+}
+
+function renderChart(item){
+  const closed = progress.closed[caseKey(item)];
+  const unitUsed = usedDiagnoses(item.unitId);
+  const available = casesForUnit(item.unitId)
+    .map(caseFile => caseFile.diagnosis)
+    .filter(diagnosis => !unitUsed.has(diagnosis));
+  const message = closed
+    ? "Case Closed. This room is sealed."
+    : (chartMessage || "Choose a diagnosis token, then confirm the chart.");
+  const messageState = closed ? "good" : chartMessageState;
+  return `<div class="chart-panel" id="patientChart">
+    <div class="chart-title-row">
+      <div>
+        <h2>Patient Chart - Room ${item.room}</h2>
+        <p>${esc(item.unitName)} / ${esc(item.department)} / ${esc(item.caseTitle)}</p>
+      </div>
+      <button class="game-btn ghost" type="button" onclick="closeChart()">Close Chart</button>
+    </div>
+    <div class="chart-layout">
+      <div class="clipboard">
+        <div class="clipboard-head"><span>Patient Results</span><span>UA Evidence</span></div>
+        <ul class="evidence-list">
+          ${item.patientResults.map(result => `<li>${esc(result)}</li>`).join("")}
+        </ul>
+      </div>
+      <aside class="diagnosis-bank">
+        <h3>Diagnosis Bank</h3>
+        <p>${closed ? "This room no longer needs a token." : "Pick one diagnosis token for this patient chart."}</p>
+        <div class="token-grid">
+          ${closed ? "" : available.map(diagnosis => `<button type="button" class="diagnosis-token ${selectedDiagnosis === diagnosis ? "selected" : ""}" data-diagnosis="${esc(diagnosis)}">${esc(diagnosis)}</button>`).join("")}
+        </div>
+        <div class="status-card ${messageState}">${esc(message)}</div>
+        ${closed ? "" : `<div class="action-row"><button class="game-btn primary" type="button" onclick="confirmDiagnosis()">Confirm Diagnosis</button></div>`}
+      </aside>
+    </div>
+  </div>`;
+}
+
+function enterUnit(unitId){
+  activeUnitId = unitId;
+  activeRoom = null;
+  selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
+  render();
+}
+
+function backToUnits(){
+  activeUnitId = null;
+  activeRoom = null;
+  selectedDiagnosis = "";
+  render();
+}
+
+function openRoom(unitId, room){
+  activeUnitId = unitId;
+  activeRoom = renalCaseFiles.find(item => item.unitId === unitId && item.room === room);
+  selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
+  render();
+  setTimeout(() => document.getElementById("patientChart")?.scrollIntoView({behavior:"smooth",block:"start"}), 40);
+}
+
+function closeChart(){
+  activeRoom = null;
+  selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
+  render();
+}
+
+function selectDiagnosis(diagnosis){
+  selectedDiagnosis = diagnosis;
+  chartMessage = "Diagnosis token selected. Confirm when ready.";
+  chartMessageState = "";
+  render();
+}
+
+function confirmDiagnosis(){
+  if(!activeRoom){return;}
+  if(!selectedDiagnosis){
+    chartMessage = "Choose a diagnosis token first.";
+    chartMessageState = "bad";
+    render();
+    return;
+  }
+  if(selectedDiagnosis === activeRoom.diagnosis){
+    progress.closed[caseKey(activeRoom)] = selectedDiagnosis;
+    saveProgress();
+    chartMessage = "Case Closed.";
+    chartMessageState = "good";
+    selectedDiagnosis = "";
+    render();
+    return;
+  }
+  chartMessage = "Recheck the Chart.";
+  chartMessageState = "bad";
+  render();
+}
+
+function resetUnit(unitId){
+  casesForUnit(unitId).forEach(item => delete progress.closed[caseKey(item)]);
+  saveProgress();
+  activeRoom = null;
+  selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
+  render();
+}
+
+function resetWholeGame(){
+  progress = {closed:{}};
+  saveProgress();
+  activeRoom = null;
+  selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
+  render();
+}
+
+function renderPrintable(){
+  const cardPages = [];
+  for(let i = 0; i < renalCaseFiles.length; i += 2){
+    cardPages.push(`<div class="print-card-page">${renalCaseFiles.slice(i,i+2).map(renderPrintCard).join("")}</div>`);
+  }
+  const tokens = units().map(unit => {
+    const diagnoses = casesForUnit(unit.unitId).map(item => item.diagnosis);
+    return `<div class="print-token-section">
+      <h2 class="print-section-title">${esc(unit.unitName)} - ${esc(unit.department)} Diagnosis Tokens</h2>
+      <div class="print-token-grid">
+        ${diagnoses.map(diagnosis => `<div class="print-token">${esc(diagnosis)}</div>`).join("")}
+        <div class="print-token">Blank Token</div>
+        <div class="print-token">Blank Token</div>
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("printableGame").innerHTML = `
+    <div class="print-case-section">
+      <h1 class="print-section-title">UA Renal Case Files - Case Cards</h1>
+      ${cardPages.join("")}
+    </div>
+    ${tokens}
+  `;
+}
+
+function renderPrintCard(item){
+  return `<article class="print-card">
+    <h2>${esc(item.unitName)}</h2>
+    <div class="meta">
+      <strong>${esc(item.department)}</strong><br>
+      Room ${item.room} / ${esc(item.caseTitle)}
+    </div>
+    <div>
+      <strong>Patient Results / UA Evidence</strong>
+      <ul>${item.patientResults.map(result => `<li>${esc(result)}</li>`).join("")}</ul>
+    </div>
+    <div class="token-target">Place Diagnosis Token Here</div>
+    <div class="stamp-box">Case Closed Stamp</div>
+  </article>`;
+}
+
+function printMode(mode){
+  renderPrintable();
+  document.body.classList.remove("print-cases","print-tokens","print-full");
+  document.body.classList.add(`print-${mode}`);
+  setTimeout(() => window.print(), 80);
+}
+
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("print-cases","print-tokens","print-full");
+});
+
+renderPrintable();
+render();
+</script>
+</body>
+</html>
