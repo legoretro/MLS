@@ -925,18 +925,24 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
     line-height:1;
     letter-spacing:.03em;
   }
-  .print-token-section{page-break-before:always}
+  .print-token-section{
+    page-break-before:auto;
+    page-break-after:always;
+  }
+  .print-case-section + .print-token-section,
   .print-token-section.back-side{page-break-before:always}
+  body.print-tokens .print-case-section + .print-token-section{page-break-before:auto}
   .print-token-grid{
     display:grid;
     grid-template-columns:repeat(5,1.837in);
-    gap:.18in;
+    gap:.17in;
     align-items:start;
+    justify-content:center;
   }
   .print-token{
     width:1.837in;
     height:1.837in;
-    border:2px dashed #000;
+    border:2.5px dashed #172554;
     border-radius:50%;
     display:grid;
     place-items:center;
@@ -947,9 +953,20 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
     padding:.1in;
     page-break-inside:avoid;
     overflow-wrap:anywhere;
+    background:
+      radial-gradient(circle at 28% 20%,rgba(255,244,189,.8),transparent 34%),
+      linear-gradient(180deg,#ffffff,#f8fbff);
+    box-shadow:inset 0 0 0 2px #d7e2f4;
   }
   .print-token span{display:block}
+  .print-token.ns-token{
+    border-color:#7a4f00;
+    background:
+      radial-gradient(circle at 28% 20%,rgba(255,236,187,.9),transparent 34%),
+      linear-gradient(180deg,#fffdf7,#ffffff);
+  }
   .print-token.back{
+    border-style:solid;
     font-size:28pt;
     font-weight:950;
     letter-spacing:.03em;
@@ -1524,21 +1541,19 @@ function renderPrintable(){
   for(let i = 0; i < renalCaseFiles.length; i += 2){
     cardPages.push(`<div class="print-card-page">${renalCaseFiles.slice(i,i+2).map(renderPrintCard).join("")}</div>`);
   }
-  const tokens = units().filter(unit => casesForUnit(unit.unitId).length).map(unit => {
-    const unitCases = casesForUnit(unit.unitId);
-    return `<div class="print-token-section">
-      <h2 class="print-section-title">${esc(unit.unitName)} - ${esc(unit.department)} Diagnosis Tokens - Front</h2>
-      <div class="print-token-grid">
-        ${unitCases.map(item => `<div class="print-token"><span>${esc(item.diagnosis)}</span></div>`).join("")}
-      </div>
+  const tokenCases = [...renalCaseFiles].sort((a,b) => a.unitId - b.unitId || a.room - b.room);
+  const tokens = `<div class="print-token-section">
+    <h2 class="print-section-title">UA Renal Diagnosis Tokens - Front</h2>
+    <div class="print-token-grid">
+      ${tokenCases.map(renderPrintTokenFront).join("")}
     </div>
-    <div class="print-token-section back-side">
-      <h2 class="print-section-title">${esc(unit.unitName)} - ${esc(unit.department)} Diagnosis Tokens - Back</h2>
-      <div class="print-token-grid">
-        ${unitCases.map(item => `<div class="print-token back"><span>${caseCode(item)}</span></div>`).join("")}
-      </div>
-    </div>`;
-  }).join("");
+  </div>
+  <div class="print-token-section back-side">
+    <h2 class="print-section-title">UA Renal Diagnosis Tokens - Back</h2>
+    <div class="print-token-grid">
+      ${tokenCases.map(renderPrintTokenBack).join("")}
+    </div>
+  </div>`;
   document.getElementById("printableGame").innerHTML = `
     <div class="print-case-section">
       <h1 class="print-section-title">UA Renal Case Files - Case Cards</h1>
@@ -1546,6 +1561,18 @@ function renderPrintable(){
     </div>
     ${tokens}
   `;
+}
+
+function printTokenClass(item, extra = ""){
+  return `print-token ${item.unitId === 2 ? "ns-token" : ""} ${extra}`.trim();
+}
+
+function renderPrintTokenFront(item){
+  return `<div class="${printTokenClass(item)}"><span>${esc(item.diagnosis)}</span></div>`;
+}
+
+function renderPrintTokenBack(item){
+  return `<div class="${printTokenClass(item, "back")}"><span>${caseCode(item)}</span></div>`;
 }
 
 function renderPrintCard(item){
