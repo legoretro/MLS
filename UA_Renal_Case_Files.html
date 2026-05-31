@@ -121,18 +121,69 @@ body.ua-case-files{
   border-radius:20px;
   background:linear-gradient(180deg,#ffffff,#f9fbff);
   box-shadow:var(--shadow);
-  padding:16px;
+  padding:18px;
   text-align:left;
   cursor:pointer;
   color:var(--ink);
   overflow:hidden;
-  min-height:280px;
+  min-height:168px;
   display:grid;
-  grid-template-rows:auto 1fr auto;
-  gap:12px;
+  grid-template-columns:78px 1fr;
+  grid-template-rows:auto auto auto;
+  column-gap:16px;
+  row-gap:10px;
+  align-items:center;
 }
-.unit-card h2{margin:8px 0 8px;font-size:1.3rem}
+.unit-card h2{margin:6px 0 6px;font-size:1.22rem}
 .unit-card p{margin:0;color:var(--muted);line-height:1.45}
+.unit-summary{min-width:0}
+.unit-lobby-icon{
+  grid-row:1 / span 2;
+  position:relative;
+  width:72px;
+  height:72px;
+  border-radius:18px;
+  border:2px solid #c8d1e5;
+  background:
+    linear-gradient(180deg,#fefefe,#dfe7f5);
+  box-shadow:
+    inset 0 0 0 5px rgba(255,255,255,.58),
+    0 10px 24px rgba(34,48,92,.14);
+}
+.unit-lobby-icon::before{
+  content:"";
+  position:absolute;
+  left:17px;
+  right:17px;
+  bottom:13px;
+  height:36px;
+  border-radius:8px 8px 5px 5px;
+  background:
+    linear-gradient(90deg,transparent 42%,#fff 42% 58%,transparent 58%),
+    linear-gradient(180deg,#91b9da,#5d86b3);
+  border:2px solid #446a95;
+  box-shadow:
+    -9px 12px 0 -5px #b9cbe0,
+    9px 12px 0 -5px #b9cbe0;
+}
+.unit-lobby-icon::after{
+  content:"+";
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:28px;
+  height:28px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:#fff4bd;
+  border:2px solid #d7bc39;
+  color:#6d5700;
+  font-size:1.35rem;
+  font-weight:950;
+  line-height:1;
+}
 .unit-card:disabled{
   cursor:default;
   opacity:1;
@@ -279,9 +330,9 @@ body.ua-case-files{
   text-transform:uppercase;
 }
 .coming-soon-pill{
-  position:absolute;
-  right:14px;
-  bottom:14px;
+  grid-column:2;
+  justify-self:start;
+  position:static;
   border-radius:999px;
   border:1px solid #cfbc58;
   background:#fff4bd;
@@ -293,6 +344,7 @@ body.ua-case-files{
   padding:7px 11px;
 }
 .progress-track{
+  grid-column:1 / -1;
   height:10px;
   background:#edf1fa;
   border-radius:999px;
@@ -306,6 +358,7 @@ body.ua-case-files{
   background:linear-gradient(90deg,var(--ua),#e7c945);
 }
 .progress-copy{
+  grid-column:1 / -1;
   color:#4c5570;
   font-weight:900;
   font-size:.88rem;
@@ -648,6 +701,10 @@ body.ua-case-files{
   body.ua-case-files .site-header{flex-wrap:wrap}
   .game-wrap{width:min(100% - 18px,480px);padding-top:12px}
   .game-hero,.unit-head,.chart-panel,.room-panel{padding:14px;border-radius:17px}
+  .unit-card{grid-template-columns:64px 1fr;min-height:148px;padding:14px}
+  .unit-lobby-icon{width:58px;height:58px;border-radius:15px}
+  .unit-lobby-icon::before{left:14px;right:14px;bottom:10px;height:29px;border-radius:7px 7px 4px 4px}
+  .unit-lobby-icon::after{top:7px;width:24px;height:24px;border-radius:8px;font-size:1.1rem}
   .department-entry{min-height:190px;max-width:286px}
   .unit-door{top:68px;bottom:18px;width:37%}
   .unit-door.left{left:13%}
@@ -723,6 +780,10 @@ html[data-mls-theme="dark"] body.ua-case-files .room-number{
   background:#111827;
   color:#f2d96a;
   border-color:#6f6230;
+}
+html[data-mls-theme="dark"] body.ua-case-files .unit-lobby-icon{
+  background:linear-gradient(180deg,#26314a,#171e2d);
+  border-color:#4d5876;
 }
 html[data-mls-theme="dark"] body.ua-case-files .coming-soon-pill{
   background:#302916;
@@ -1261,19 +1322,12 @@ function renderStart(){
         const pct = isEmpty ? 0 : Math.round((closed / cases.length) * 100);
         const countCopy = isEmpty ? (unit.comingSoon || "Case files coming soon") : `${cases.length} rooms / ${cases.length} medical cases`;
         const progressCopy = isEmpty ? "Ready for future case files" : `Cases Closed ${closed}/${cases.length}`;
-        return `<button class="unit-card ${isEmpty ? "is-empty" : ""}" type="button" ${isEmpty ? "disabled" : `onclick="enterUnit(${unit.unitId}, this)"`}>
-          <div>
+        return `<button class="unit-card ${isEmpty ? "is-empty" : ""}" type="button" ${isEmpty ? "disabled" : `onclick="enterUnit(${unit.unitId})"`}>
+          <div class="unit-lobby-icon" aria-hidden="true"></div>
+          <div class="unit-summary">
             <div class="eyebrow">${esc(unit.unitName)}</div>
             <h2>${esc(unit.department)}</h2>
             <p>${esc(countCopy)}</p>
-          </div>
-          <div class="department-entry" aria-hidden="true">
-            <div class="department-sign">Automatic Department Doors</div>
-            <div class="door-track"></div>
-            <div class="door-glow"></div>
-            <div class="unit-door left"></div>
-            <div class="unit-door right"></div>
-            <div class="door-alert">Opening</div>
           </div>
           <div class="progress-track"><div class="progress-fill" style="--progress:${pct}%"></div></div>
           <div class="progress-copy">${esc(progressCopy)}</div>
