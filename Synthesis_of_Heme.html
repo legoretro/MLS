@@ -34,7 +34,7 @@ body{
     var(--bg);
 }
 .wrap{
-  width:min(1120px,calc(100% - 24px));
+  width:min(860px,calc(100% - 24px));
   margin:0 auto;
   padding:14px 0 28px;
 }
@@ -71,7 +71,7 @@ h1{
 }
 .hero{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 230px;
+  grid-template-columns:minmax(0,1fr) 205px;
   gap:12px;
   align-items:stretch;
   background:rgba(255,255,255,.9);
@@ -156,39 +156,40 @@ button{
 .score.bad{background:#fff0f0;color:var(--bad)}
 .workspace{
   display:grid;
-  grid-template-columns:190px minmax(0,1fr) 190px;
-  gap:10px;
+  grid-template-columns:132px minmax(0,520px) 132px;
+  justify-content:center;
+  gap:8px;
   align-items:start;
 }
 .bank{
   background:rgba(255,255,255,.92);
   border:2px solid var(--line);
   border-radius:16px;
-  padding:10px;
+  padding:7px;
   box-shadow:var(--shadow);
   position:sticky;
   top:12px;
 }
 .bank h2{
   margin:0;
-  font-size:.84rem;
+  font-size:.72rem;
 }
 .bank p{
-  margin:5px 0 9px;
+  margin:4px 0 8px;
   color:var(--muted);
   line-height:1.35;
-  font-size:.73rem;
+  font-size:.62rem;
 }
 .chip{
   width:100%;
   border:2px solid #c9d4ed;
   background:#fff;
   color:var(--ink);
-  border-radius:10px;
-  padding:7px 8px;
-  margin:6px 0;
+  border-radius:9px;
+  padding:5px 6px;
+  margin:4px 0;
   font-weight:850;
-  font-size:.76rem;
+  font-size:.6rem;
   text-align:center;
   cursor:grab;
   box-shadow:0 4px 0 rgba(38,59,105,.10);
@@ -212,8 +213,9 @@ button{
   background:rgba(255,255,255,.92);
   border:2px solid var(--line);
   border-radius:18px;
-  padding:10px;
+  padding:8px;
   box-shadow:var(--shadow);
+  max-width:520px;
 }
 .cell-title{
   display:flex;
@@ -224,92 +226,76 @@ button{
 }
 .cell-title h2{
   margin:0;
-  font-size:1rem;
+  font-size:.9rem;
 }
 .cell-title span{
   color:var(--muted);
   font-weight:850;
-  font-size:.78rem;
+  font-size:.68rem;
 }
-.pathway-board{
-  position:relative;
-  min-height:360px;
-  border:3px solid var(--cytosol-line);
-  border-radius:18px;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 16% 16%,rgba(255,255,255,.6),transparent 10rem),
-    linear-gradient(135deg,rgba(184,217,223,.52),rgba(235,246,249,.82));
+.step-guide{
+  border:2px solid #d0dbf0;
+  border-radius:16px;
+  background:linear-gradient(180deg,#fbfdff,#f4f8ff);
+  padding:7px;
+  display:grid;
+  gap:5px;
 }
-.pathway-board::before{
-  content:"";
-  position:absolute;
-  inset:7% 5%;
-  border-radius:48% 52% 46% 54% / 42% 45% 55% 58%;
-  border:3px solid rgba(45,143,161,.5);
-  background:
-    radial-gradient(circle at 28% 32%,rgba(255,255,255,.45),transparent 10%),
-    radial-gradient(circle at 72% 70%,rgba(255,255,255,.28),transparent 18%),
-    rgba(184,217,223,.64);
-  pointer-events:none;
-  z-index:0;
+.guide-row{
+  display:grid;
+  grid-template-columns:30px 74px minmax(0,1fr);
+  gap:5px;
+  align-items:center;
+  border:1px solid #dbe4f3;
+  border-left:5px solid var(--cytosol-line);
+  border-radius:12px;
+  padding:4px 5px;
+  background:#fff;
 }
-.mitochondrion{
-  position:absolute;
-  left:7%;
-  top:17%;
-  width:35%;
-  height:68%;
-  border:2px solid var(--mito-line);
-  border-radius:58% 42% 55% 45% / 44% 58% 42% 56%;
-  background:
-    radial-gradient(ellipse at 36% 20%,rgba(255,255,255,.48),transparent 18%),
-    var(--mito);
-  opacity:.96;
-  z-index:0;
-  transform:rotate(-8deg);
-  box-shadow:inset 0 0 0 10px rgba(255,255,255,.22);
+.guide-row.mito{
+  border-left-color:var(--mito-line);
+  background:#fffaf0;
 }
-.mitochondrion::before,
-.mitochondrion::after{
-  content:"";
-  position:absolute;
-  border:8px solid rgba(181,119,18,.32);
-  border-left:0;
-  border-bottom:0;
-  border-radius:50%;
-  pointer-events:none;
+.guide-number{
+  width:23px;
+  height:23px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:#eaf2ff;
+  color:#284d87;
+  font-size:.64rem;
+  font-weight:950;
 }
-.mitochondrion::before{
-  width:40%;
-  height:34%;
-  left:34%;
-  top:22%;
-  transform:rotate(22deg);
+.guide-row.mito .guide-number{
+  background:#fff0c9;
+  color:#7b4b00;
 }
-.mitochondrion::after{
-  width:46%;
-  height:28%;
-  left:21%;
-  bottom:19%;
-  transform:rotate(205deg);
+.guide-compartment{
+  color:#59627f;
+  font-size:.5rem;
+  font-weight:950;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  line-height:1.15;
 }
-.compartment{
-  position:absolute;
-  z-index:2;
-  font-weight:900;
-  font-size:.74rem;
-  color:#142131;
+.guide-body{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:3px;
 }
-.compartment.mito{left:9%;bottom:8%}
-.compartment.cyto{right:5%;bottom:8%}
-.arrows{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:1;
-  pointer-events:none;
+.guide-enzyme-line,
+.guide-main-line{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-width:0;
+}
+.guide-arrow{
+  color:#7c869f;
+  font-weight:950;
+  font-size:.7rem;
 }
 .slot{
   position:absolute;
@@ -317,18 +303,35 @@ button{
   left:var(--x);
   top:var(--y);
   transform:translate(-50%,-50%);
-  width:clamp(74px,7vw,104px);
-  min-height:28px;
+  width:clamp(50px,5.6vw,64px);
+  min-height:21px;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  padding:4px 6px;
-  line-height:1.12;
+  padding:3px 4px;
+  line-height:1.08;
   font-weight:850;
-  font-size:.62rem;
+  font-size:.45rem;
   cursor:pointer;
   overflow-wrap:anywhere;
+}
+.step-guide .slot{
+  position:relative;
+  left:auto;
+  top:auto;
+  transform:none;
+}
+.step-guide .slot.step{
+  width:min(100%,182px);
+  min-height:23px;
+}
+.step-guide .slot.enzyme{
+  width:min(100%,128px);
+  min-height:21px;
+}
+.step-guide .slot.cofactor{
+  width:42px;
 }
 .slot.step{
   border:2px dashed #224f8f;
@@ -337,30 +340,30 @@ button{
   color:#2a3a5c;
 }
 .slot.enzyme{
-  width:clamp(72px,6.8vw,98px);
-  min-height:26px;
+  width:clamp(52px,5.4vw,66px);
+  min-height:21px;
   border:2px solid var(--enzyme-line);
   border-radius:999px;
   background:rgba(242,185,77,.7);
   color:#5d3c00;
 }
 .slot.cofactor{
-  width:48px;
-  min-height:28px;
+  width:38px;
+  min-height:21px;
   border-radius:8px;
 }
 .slot-label{
   position:absolute;
-  left:5px;
+  left:4px;
   top:2px;
   color:#667296;
-  font-size:.42rem;
+  font-size:.31rem;
   letter-spacing:.08em;
   text-transform:uppercase;
 }
 .slot .value{
   display:block;
-  padding-top:5px;
+  padding-top:4px;
 }
 .slot.filled.step{
   border-style:solid;
@@ -395,10 +398,16 @@ button{
   color:#4b1019!important;
 }
 .slot.reject{animation:reject .22s ease}
+.step-guide .slot.reject{animation:reject-static .22s ease}
 @keyframes reject{
   0%,100%{transform:translate(-50%,-50%)}
   40%{transform:translate(calc(-50% - 5px),-50%)}
   75%{transform:translate(calc(-50% + 5px),-50%)}
+}
+@keyframes reject-static{
+  0%,100%{transform:translateX(0)}
+  40%{transform:translateX(-5px)}
+  75%{transform:translateX(5px)}
 }
 .empty{color:#8a92ad;font-weight:800}
 @media (max-width:1120px){
@@ -416,16 +425,16 @@ button{
   .wrap{width:min(100% - 18px,680px);padding-top:12px}
   .topbar{align-items:flex-start;flex-direction:column}
   .hero{padding:12px;border-radius:16px}
-  .cell-card{overflow-x:auto}
-  .pathway-board{
-    min-width:640px;
-    min-height:360px;
+  .cell-card{overflow-x:visible}
+  .guide-row{
+    grid-template-columns:30px 76px minmax(0,1fr);
+    gap:5px;
   }
   .slot{
-    width:84px;
-    font-size:.58rem;
+    width:58px;
+    font-size:.43rem;
   }
-  .slot.enzyme{width:80px}
+  .slot.enzyme{width:60px}
 }
 </style>
 </head>
@@ -442,8 +451,8 @@ button{
   <section class="hero">
     <div>
       <div class="kicker">Drag + Label Pathway</div>
-      <h1>Simple heme pathway label map.</h1>
-      <p>Drag the 10 pathway labels into the dashed boxes. Drag the 8 enzyme labels into the solid gold enzyme spots.</p>
+      <h1>Simple heme step guide.</h1>
+      <p>Drag the 10 pathway labels into the dashed boxes. Drag the 8 enzyme labels into the solid gold enzyme spots above each step.</p>
     </div>
     <aside class="legend" aria-label="Legend">
       <div class="legend-item"><span class="legend-swatch"></span>Pathway labels</div>
@@ -469,27 +478,10 @@ button{
 
     <section class="cell-card">
       <div class="cell-title">
-        <h2>Pathway Map</h2>
+        <h2>Step Guide Chart</h2>
         <span>8 enzymes + 10 pathway labels</span>
       </div>
-      <div class="pathway-board" id="cellBoard">
-        <div class="mitochondrion"></div>
-        <div class="compartment mito">Mitochondrion</div>
-        <div class="compartment cyto">Cytosol</div>
-        <svg class="arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L8,4 L0,8 Z" fill="#111827"></path>
-            </marker>
-          </defs>
-          <path d="M18 22 H71" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-          <path d="M82 22 V42" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-          <path d="M82 42 H46" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-          <path d="M46 42 V62" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-          <path d="M46 62 H82" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-          <path d="M82 62 C76 73 62 77 47 77" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-          <path d="M47 77 H19" stroke="#243858" stroke-width=".28" opacity=".38" marker-end="url(#arrow)" fill="none"/>
-        </svg>
+      <div class="step-guide" id="cellBoard">
         <div id="slotLayer"></div>
       </div>
     </section>
@@ -529,24 +521,36 @@ const ENZYME_LABELS = [
 ];
 
 const SLOTS = [
-  {id:"slot-s1", kind:"step", answer:"s1", label:"Start", compartment:"Mitochondrion", x:"17%", y:"22%"},
-  {id:"slot-e1", kind:"enzyme", answer:"e1", label:"Enzyme", compartment:"Mitochondrion", x:"29%", y:"22%"},
-  {id:"slot-s2", kind:"step", answer:"s2", label:"Product", compartment:"Cytosol", x:"41%", y:"22%"},
-  {id:"slot-e2", kind:"enzyme", answer:"e2", label:"Enzyme", compartment:"Cytosol", x:"53%", y:"22%"},
-  {id:"slot-s3", kind:"step", answer:"s3", label:"Product", compartment:"Cytosol", x:"65%", y:"22%"},
-  {id:"slot-e3", kind:"enzyme", answer:"e3", label:"Enzyme", compartment:"Cytosol", x:"77%", y:"22%"},
-  {id:"slot-s4", kind:"step", answer:"s4", label:"Product", compartment:"Cytosol", x:"82%", y:"42%"},
-  {id:"slot-e4", kind:"enzyme", answer:"e4", label:"Enzyme", compartment:"Cytosol", x:"70%", y:"42%"},
-  {id:"slot-s5", kind:"step", answer:"s5", label:"Product", compartment:"Cytosol", x:"58%", y:"42%"},
-  {id:"slot-e5", kind:"enzyme", answer:"e5", label:"Enzyme", compartment:"Cytosol", x:"46%", y:"42%"},
-  {id:"slot-s6", kind:"step", answer:"s6", label:"Product", compartment:"Cytosol", x:"46%", y:"62%"},
-  {id:"slot-e6", kind:"enzyme", answer:"e6", label:"Enzyme", compartment:"Mitochondrion", x:"58%", y:"62%"},
-  {id:"slot-s7", kind:"step", answer:"s7", label:"Product", compartment:"Mitochondrion", x:"70%", y:"62%"},
-  {id:"slot-e7", kind:"enzyme", answer:"e7", label:"Enzyme", compartment:"Mitochondrion", x:"82%", y:"62%"},
-  {id:"slot-s8", kind:"step", answer:"s8", label:"Product", compartment:"Mitochondrion", x:"47%", y:"78%"},
-  {id:"slot-s10", kind:"step", answer:"s10", label:"Fe", compartment:"Mitochondrion", x:"36%", y:"78%", extraClass:"cofactor"},
-  {id:"slot-e8", kind:"enzyme", answer:"e8", label:"Enzyme", compartment:"Mitochondrion", x:"25%", y:"78%"},
-  {id:"slot-s9", kind:"step", answer:"s9", label:"Final", compartment:"Mitochondrion", x:"14%", y:"78%"}
+  {id:"slot-s1", kind:"step", answer:"s1", label:"Start", compartment:"Mitochondrion"},
+  {id:"slot-e1", kind:"enzyme", answer:"e1", label:"Enzyme", compartment:"Mitochondrion"},
+  {id:"slot-s2", kind:"step", answer:"s2", label:"Product", compartment:"Cytosol"},
+  {id:"slot-e2", kind:"enzyme", answer:"e2", label:"Enzyme", compartment:"Cytosol"},
+  {id:"slot-s3", kind:"step", answer:"s3", label:"Product", compartment:"Cytosol"},
+  {id:"slot-e3", kind:"enzyme", answer:"e3", label:"Enzyme", compartment:"Cytosol"},
+  {id:"slot-s4", kind:"step", answer:"s4", label:"Product", compartment:"Cytosol"},
+  {id:"slot-e4", kind:"enzyme", answer:"e4", label:"Enzyme", compartment:"Cytosol"},
+  {id:"slot-s5", kind:"step", answer:"s5", label:"Product", compartment:"Cytosol"},
+  {id:"slot-e5", kind:"enzyme", answer:"e5", label:"Enzyme", compartment:"Cytosol"},
+  {id:"slot-s6", kind:"step", answer:"s6", label:"Product", compartment:"Cytosol to mitochondrion"},
+  {id:"slot-e6", kind:"enzyme", answer:"e6", label:"Enzyme", compartment:"Mitochondrion"},
+  {id:"slot-s7", kind:"step", answer:"s7", label:"Product", compartment:"Mitochondrion"},
+  {id:"slot-e7", kind:"enzyme", answer:"e7", label:"Enzyme", compartment:"Mitochondrion"},
+  {id:"slot-s8", kind:"step", answer:"s8", label:"Product", compartment:"Mitochondrion"},
+  {id:"slot-e8", kind:"enzyme", answer:"e8", label:"Enzyme", compartment:"Mitochondrion"},
+  {id:"slot-s10", kind:"step", answer:"s10", label:"Fe", compartment:"Mitochondrion", extraClass:"cofactor"},
+  {id:"slot-s9", kind:"step", answer:"s9", label:"Final", compartment:"Mitochondrion"}
+];
+
+const GUIDE_ROWS = [
+  {number:1, compartment:"Mitochondrion", step:"slot-s1", enzyme:"slot-e1"},
+  {number:2, compartment:"Cytosol", step:"slot-s2", enzyme:"slot-e2"},
+  {number:3, compartment:"Cytosol", step:"slot-s3", enzyme:"slot-e3"},
+  {number:4, compartment:"Cytosol", step:"slot-s4", enzyme:"slot-e4"},
+  {number:5, compartment:"Cytosol", step:"slot-s5", enzyme:"slot-e5"},
+  {number:6, compartment:"Cytosol -> mitochondrion", step:"slot-s6", enzyme:"slot-e6"},
+  {number:7, compartment:"Mitochondrion", step:"slot-s7", enzyme:"slot-e7"},
+  {number:8, compartment:"Mitochondrion", step:"slot-s8", enzyme:"slot-e8", cofactor:"slot-s10"},
+  {number:9, compartment:"Mitochondrion", step:"slot-s9"}
 ];
 
 const allLabels = [...STEP_LABELS.map(item => ({...item, kind:"step"})), ...ENZYME_LABELS.map(item => ({...item, kind:"enzyme"}))];
@@ -606,15 +610,18 @@ function renderBank(targetId, order, kind){
 
 function renderSlots(){
   const layer = document.getElementById("slotLayer");
-  layer.innerHTML = SLOTS.map(slot => {
-    const placedId = placements[slot.id];
-    const placed = placedId ? labelById.get(placedId).label : "";
-    const filled = placedId ? " filled" : "";
-    const state = feedback[slot.id] || "";
-    const extraClass = slot.extraClass || "";
-    return `<div class="slot ${slot.kind} ${extraClass}${filled} ${state}" data-slot="${slot.id}" data-kind="${slot.kind}" style="--x:${slot.x};--y:${slot.y}" role="button" tabindex="0">
-      <span class="slot-label">${slot.label}</span>
-      <span class="value">${placed || "drop " + (slot.kind === "enzyme" ? "enzyme" : "label")}</span>
+  layer.innerHTML = GUIDE_ROWS.map(row => {
+    const compartmentClass = row.compartment.toLowerCase().includes("mitochondrion") ? "mito" : "cyto";
+    const enzymeLine = row.enzyme
+      ? `<div class="guide-enzyme-line">${slotHtml(row.enzyme)}${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}</div>`
+      : "";
+    return `<div class="guide-row ${compartmentClass}">
+      <div class="guide-number">${row.number}</div>
+      <div class="guide-compartment">${row.compartment}</div>
+      <div class="guide-body">
+        ${enzymeLine}
+        <div class="guide-main-line">${slotHtml(row.step)}</div>
+      </div>
     </div>`;
   }).join("");
   layer.querySelectorAll(".slot").forEach(slotEl => {
@@ -631,6 +638,19 @@ function renderSlots(){
       placeChip(slotEl.dataset.slot, event.dataTransfer.getData("text/plain"));
     });
   });
+}
+
+function slotHtml(slotId){
+  const slot = slotById.get(slotId);
+  const placedId = placements[slot.id];
+  const placed = placedId ? labelById.get(placedId).label : "";
+  const filled = placedId ? " filled" : "";
+  const state = feedback[slot.id] || "";
+  const extraClass = slot.extraClass || "";
+  return `<div class="slot ${slot.kind} ${extraClass}${filled} ${state}" data-slot="${slot.id}" data-kind="${slot.kind}" role="button" tabindex="0">
+    <span class="slot-label">${slot.label}</span>
+    <span class="value">${placed || "drop " + (slot.kind === "enzyme" ? "enzyme" : "label")}</span>
+  </div>`;
 }
 
 function selectChip(chipId){
