@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hematology Case Game</title>
 <script src="interactive_theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="interactive_learning.css">
 <style>
 :root{
@@ -72,6 +73,25 @@ body.heme-case-game{
 .status{margin-top:12px;padding:11px 12px;border:2px solid #c7d2ea;border-radius:14px;font-weight:900;color:#465071;background:#fff}
 .status.good{border-color:#86c99d;color:#1f6f3a;background:#effaf1}
 .status.bad{border-color:#e7a8a8;color:#8a2020;background:#fff0f0}
+.start-card{text-align:center;padding:34px 22px}
+.start-card h2{font-size:30px;margin:8px 0;color:var(--ink)}
+.start-card p{font-size:16px;color:var(--muted);margin:0 auto 18px;max-width:560px}
+.morph-preview-card{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fff8f8,#f4f8ff);border:2px solid #e4bfd0;border-radius:22px;padding:12px;margin:0 0 14px;overflow:hidden}
+.morph-wheel{position:relative;width:112px;height:112px;flex:0 0 112px;border-radius:50%;background:#fff;border:3px solid #d6b2c2;box-shadow:inset 0 0 0 8px #fff5f7,0 8px 18px rgba(43,59,102,.12);overflow:hidden}
+.morph-slide{position:absolute;inset:10px;border-radius:50%;opacity:0;animation:morphFade 8s ease-in-out infinite;background:radial-gradient(circle at 45% 45%,#fff 0 7%,#f4a0ad 8% 54%,#d76071 55% 100%)}
+.morph-slide img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.morph-slide:nth-child(2){animation-delay:2s;background:radial-gradient(circle at 50% 50%,#f9fdff 0 25%,#a9c8ff 26% 100%)}
+.morph-slide:nth-child(3){animation-delay:4s;background:radial-gradient(circle at 48% 42%,#fff 0 10%,#c58be8 11% 58%,#7d50bc 59% 100%)}
+.morph-slide:nth-child(4){animation-delay:6s;background:radial-gradient(circle at 50% 50%,#dff8ee 0 30%,#66bd8a 31% 100%)}
+.morph-slide::after{content:"";position:absolute;inset:24px;border-radius:50%;border:8px solid rgba(255,255,255,.55);border-left-color:transparent;transform:rotate(-20deg)}
+.morph-preview-text{min-width:0}
+.morph-preview-text strong{display:block;font-size:14px;color:var(--heme-dark);margin-bottom:4px}
+.morph-preview-text span{display:block;font-size:13px;color:var(--muted);line-height:1.35}
+@keyframes morphFade{0%,18%{opacity:1;transform:scale(1)}23%,100%{opacity:0;transform:scale(.92)}}
+@media(prefers-reduced-motion:reduce){
+  .morph-slide{animation:none;opacity:0}
+  .morph-slide:first-child{opacity:1}
+}
 html[data-mls-theme="dark"] body.heme-case-game{background:#0d111c;color:#f4f6ff}
 html[data-mls-theme="dark"] .heme-hero,
 html[data-mls-theme="dark"] .department-card,
@@ -89,6 +109,10 @@ html[data-mls-theme="dark"] .room-btn,
 html[data-mls-theme="dark"] .clue,
 html[data-mls-theme="dark"] .status{background:#101625;color:#f4f6ff;border-color:#33405f}
 html[data-mls-theme="dark"] .bank-card{background:#1b1a12;border-color:#8c762d}
+html[data-mls-theme="dark"] .start-card h2{color:#f4f6ff}
+html[data-mls-theme="dark"] .morph-preview-card{background:#101625;border-color:#33405f}
+html[data-mls-theme="dark"] .morph-preview-text strong{color:#ffb6b6}
+html[data-mls-theme="dark"] .morph-preview-text span{color:#c3cae2}
 @media(max-width:860px){
   .heme-wrap{padding:14px}
   .heme-hero{grid-template-columns:1fr;padding:20px}
@@ -177,11 +201,14 @@ const deptStyles={
   'Reactive / Physiologic':{icon:'✨',color:'#3a9c66'},
   'Infectious':{icon:'🦠',color:'#24806a'}
 };
-let currentDept='Anemias';
+let currentDept=null;
 let currentCase=null;
 let selectedToken='';
 let closed={};
 let tokenOrder={};
+let hemeImageMap={};
+const SB_URL='https://rbdvjwipedbxfbedjgoa.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
 
 function toggleTheme(){
   const current=document.documentElement.dataset.mlsTheme||'light';
@@ -197,6 +224,46 @@ function shuffle(list){
     [copy[i],copy[j]]=[copy[j],copy[i]];
   }
   return copy;
+}
+function normName(value){
+  return String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+function imageEntrySrc(entry){
+  if(!entry)return '';
+  if(typeof entry==='string')return entry;
+  return entry.url||entry.src||entry.dataUrl||entry.data_url||entry.image_url||entry.imageUrl||entry.data||'';
+}
+function imageEntryList(images){
+  if(!images)return [];
+  if(Array.isArray(images))return images;
+  if(typeof images==='string'){
+    const trimmed=images.trim();
+    if(!trimmed)return [];
+    if(trimmed.startsWith('[')||trimmed.startsWith('{')){
+      try{
+        const parsed=JSON.parse(trimmed);
+        return Array.isArray(parsed)?parsed:[parsed];
+      }catch(e){}
+    }
+    return [trimmed];
+  }
+  return [images];
+}
+async function loadHemePreviewImages(){
+  if(!window.supabase)return;
+  try{
+    const sb=window.supabase.createClient(SB_URL,SB_KEY);
+    const {data,error}=await sb.from('mlsboc_heme_conditions').select('name,images');
+    if(error)throw error;
+    hemeImageMap={};
+    (data||[]).forEach(row=>{
+      const urls=imageEntryList(row.images).map(imageEntrySrc).filter(Boolean);
+      if(urls.length)hemeImageMap[normName(row.name)]=urls.slice(0,4);
+    });
+    render();
+  }catch(err){
+    hemeImageMap={};
+  }
 }
 function casesForDept(dept){return hemeCases.filter(item=>item.dept===dept);}
 function tokenBank(dept){
@@ -245,15 +312,44 @@ function renderDepartments(){
   }).join('');
 }
 function renderRoomGrid(){
+  if(!currentDept)return '';
   return `<div class="room-grid">${casesForDept(currentDept).map(item=>`
     <button class="room-btn ${currentCase&&currentCase.code===item.code?'active':''} ${closed[item.code]?'closed':''}" onclick="setCase('${item.code}')">
       <span class="room-code">${item.code}</span>
       <span class="room-label">${closed[item.code]?'Closed':'Open case'}</span>
     </button>`).join('')}</div>`;
 }
+function renderMorphPreview(item){
+  const labels=(item?.clues||['RBC pattern','WBC pattern','Platelet clue','Smear clue']).slice(0,4);
+  while(labels.length<4)labels.push(labels[labels.length-1]||'Morphology clue');
+  const previewUrls=item
+    ?(hemeImageMap[normName(item.name)]||[])
+    :Object.values(hemeImageMap).flat().slice(0,4);
+  const slides=previewUrls.length
+    ? previewUrls.slice(0,4).map(url=>`<div class="morph-slide"><img src="${String(url).replace(/"/g,'&quot;')}" alt=""></div>`)
+    : '<div class="morph-slide"></div><div class="morph-slide"></div><div class="morph-slide"></div><div class="morph-slide"></div>';
+  return `<div class="morph-preview-card" aria-label="Rotating morphology preview">
+    <div class="morph-wheel" aria-hidden="true">
+      ${slides}
+    </div>
+    <div class="morph-preview-text">
+      <strong>Circular morphology preview</strong>
+      <span>${labels.map(label=>String(label).replace(/</g,'&lt;')).join(' • ')}</span>
+    </div>
+  </div>`;
+}
 function renderCaseArea(message='', good=null){
   const area=document.getElementById('caseArea');
-  if(!currentCase){area.innerHTML='<div class="chart-card">Pick a department.</div>';return;}
+  if(!currentDept){
+    area.innerHTML=`<section class="chart-card start-card">
+      <div class="kicker">Choose Main Department</div>
+      <h2>Pick a hematology department first</h2>
+      <p>Then open a case room, read the pattern clues, and match the diagnosis token.</p>
+      ${renderMorphPreview(null)}
+    </section>`;
+    return;
+  }
+  if(!currentCase){area.innerHTML='<div class="chart-card">Pick a case room.</div>';return;}
   const bank=tokenBank(currentDept);
   area.innerHTML=`<section class="chart-card">
     <div class="chart-head">
@@ -264,6 +360,7 @@ function renderCaseArea(message='', good=null){
     <div class="answer-row" style="margin-top:16px">
       <div>
         <div class="kicker">Morphology Pattern</div>
+        ${renderMorphPreview(currentCase)}
         <div class="clue-list">${currentCase.clues.map(clue=>`<div class="clue">${clue}</div>`).join('')}</div>
       </div>
       <aside class="bank-card">
@@ -280,6 +377,7 @@ function render(){
   renderCaseArea();
 }
 render();
+loadHemePreviewImages();
 </script>
 </body>
 </html>

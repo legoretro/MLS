@@ -1937,7 +1937,7 @@ async function generateImageSectionPDF(items, title, filename, options={}){
   for(const item of items){
     if(!first)doc.addPage(); first=false;
     // ── 2x2 image grid (top of page, like the card)
-    const imgs=(item.images||[]).slice(0,4);
+    const imgs=imageEntryList(item.images).slice(0,4);
     for(let i=0;i<4;i++){
       const col=i%2,row=Math.floor(i/2);
       const cx=margin+col*(gridW+gap);
@@ -2074,7 +2074,7 @@ async function generateUASingleImagePDF(items, title, filename){
     const x=margin+col*(cardW+gap);
     const y=margin+row*(cardH+gap);
     const imgX=x+3,imgY=y+3,imgW=cardW-6;
-    const img=(item.images||[]).map(imageEntrySrc).filter(Boolean)[0];
+    const img=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean)[0];
     doc.setFillColor(248,248,248);doc.rect(x,y,cardW,cardH,'F');
     doc.setDrawColor(210,210,210);doc.setLineWidth(0.3);doc.rect(x,y,cardW,cardH,'S');
     doc.setFillColor(245,245,245);doc.rect(imgX,imgY,imgW,imgH,'F');
@@ -3250,7 +3250,7 @@ function renderImageFlashcard(el){
   }
 
   const item=items[idx];
-  const imgs=(item.images||[]).map(imageEntrySrc).filter(Boolean);
+  const imgs=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean);
   const features=item.key_features||[];
   const showNotes=appState.subject!=='hematology'&&item.notes;
 
@@ -3356,7 +3356,7 @@ async function renderImagesTab(el){
 
 // Generic images (non-hematology/micro/ua) — mycology, parasitology, etc.
 async function renderGenericImages(el){
-  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
+  el.innerHTML=imageLoadingHTML();
   let data;
   if(appState.subject==='para_myco'){
     const [r1,r2]=await Promise.all([
@@ -3382,7 +3382,7 @@ async function renderGenericImages(el){
         <div class="condition-card">
           <div class="condition-imgs">
             ${img.image_url
-              ?`<img src="${img.image_url}" alt="${esc(img.title)}" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="this.style.opacity='.3'">`
+              ?`<img src="${esc(img.image_url)}" alt="${esc(img.title)}" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="retryImageLoad(this)">`
               :`<div class="img-ph">🖼️</div>`}
           </div>
           <div class="condition-body">
@@ -3446,7 +3446,7 @@ async function startGenericFlashcard(){
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
   // Show skeleton immediately
-  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
+  el.innerHTML=imageLoadingHTML();
   // Use cache
   if(!window._uaCache){
     try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}
@@ -3537,15 +3537,16 @@ async function generateUAPDF(){
 }
 
 function buildUAThumbs(img){
-  const imgs=(img.images||[]).filter(Boolean);
-  if(imgs[0]) return `<img src="${imgs[0]}" alt="" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="this.style.display='none'">`;
+  const imgs=imageEntryList(img.images).filter(entry=>imageEntrySrc(entry));
+  if(imgs[0]) return `<img src="${esc(imageEntrySrc(imgs[0]))}" alt="" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="retryImageLoad(this)">`;
   return `<div class="img-ph" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div>`;
 }
 
 function openUAImage(id){
   sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=(data.images||[]).filter(Boolean);
+    const imgs=imageEntryList(data.images).filter(entry=>imageEntrySrc(entry));
+    const firstSrc=imageEntrySrc(imgs[0]);
     const features=data.key_features||[];
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
@@ -3555,7 +3556,7 @@ function openUAImage(id){
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
         </div>
       </div>
-      ${imgs[0]?`<img src="${imgs[0]}" onclick="openImgViewer('${imgs[0]}')" style="width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3);margin-bottom:16px" alt="">`:'<div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px">🧪</div>'}
+      ${firstSrc?`<img src="${esc(firstSrc)}" onclick="openImgViewer('${jsAttr(firstSrc)}')" onerror="retryImageLoad(this)" style="width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3);margin-bottom:16px" alt="">`:'<div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px">🧪</div>'}
       ${features.length?`
         <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
@@ -3570,7 +3571,7 @@ function openUAImage(id){
 function openUAEditModal(id){
   sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=(data.images||[]).filter(Boolean);
+    const imgs=imageEntryList(data.images).filter(entry=>imageEntrySrc(entry));
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
         <div style="font-size:16px;font-weight:600">Edit UA Finding</div>
@@ -3638,7 +3639,7 @@ async function clearUAImage(id){
 }
 
 function buildUAImageEditor(item){
-  const imgs=item.images||[];
+  const imgs=imageEntryList(item.images);
   return `
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
       ${[0,1,2,3].map(i=>`
@@ -3648,7 +3649,7 @@ function buildUAImageEditor(item){
           ondragleave="this.classList.remove('dragover')"
           onclick="document.getElementById('uaimg-${item.id}-${i}').click()"
         >
-          ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          ${imageEntrySrc(imgs[i])?`<img src="${esc(imageEntrySrc(imgs[i]))}" onerror="retryImageLoad(this)" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
           <input type="file" accept="image/*" id="uaimg-${item.id}-${i}" style="display:none" onchange="handleUAImgFile(event,'${item.id}',${i})">
         </div>`).join('')}
     </div>
@@ -3661,7 +3662,7 @@ async function handleUAImgFile(e,itemId,slot){
   const reader=new FileReader();
   reader.onload=async ev=>{
     const {data}=await sb.from('mlsboc_ua_images').select('images').eq('id',itemId).single();
-    const imgs=[...(data?.images||[])];
+    const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=ev.target.result;
     await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);
@@ -3676,7 +3677,7 @@ async function handleUAImgDrop(e,itemId,slot){
   const reader=new FileReader();
   reader.onload=async ev=>{
     const {data}=await sb.from('mlsboc_ua_images').select('images').eq('id',itemId).single();
-    const imgs=[...(data?.images||[])];
+    const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=ev.target.result;
     await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);
@@ -3912,7 +3913,7 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
   const item=items[idx];
   const answered=ans[idx]!==undefined;
   const chosen=ans[idx];
-  const imgs=(item.images||[]).map(imageEntrySrc).filter(Boolean);
+  const imgs=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean);
   const pct=Math.round((idx+1)/items.length*100);
   const pool=items.filter(x=>x.id!==item.id);
   const wrongItems=shuffle(pool).slice(0,Math.min(3,pool.length));
@@ -3924,7 +3925,7 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
 
   const imgsHtml=imgs.length
     ?'<div style="display:grid;grid-template-columns:'+(imgs.length===1?'1fr':'1fr 1fr')+';gap:6px;margin-bottom:16px">'
-      +imgs.slice(0,4).map(url=>'<img src="'+esc(url)+'" onclick="openImgViewer(\''+jsAttr(url)+'\')" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
+      +imgs.slice(0,4).map(url=>'<img src="'+esc(url)+'" onclick="openImgViewer(\''+jsAttr(url)+'\')" onerror="retryImageLoad(this)" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
     :'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:12px">'+placeholder+'</div>';
 
   const optsHtml=opts.map((o,oi)=>{
@@ -4014,7 +4015,7 @@ async function renderHemeImages(el){
     renderHemeImageQuiz(el);return;
   }
   // Show skeleton immediately
-  el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
+  el.innerHTML=imageLoadingHTML();
   // Use cache
   if(!window._hemeCondsCache){
     try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=hemeConditionsOrDefaults(r.data||[]);}
@@ -4182,12 +4183,12 @@ async function generateHemeConditionsPDF(){
 }
 
 function buildConditionThumbs(c){
-  const imgs=c.images||[];
+  const imgs=imageEntryList(c.images);
   const slots=4;
   let html='';
   for(let i=0;i<slots;i++){
     const src=imageEntrySrc(imgs[i]);
-    if(src) html+=`<div class="heme-thumb-wrap"><img src="${esc(src)}" alt="" onerror="this.style.display='none'"><span class="heme-img-meta">${esc(hemeImageLabel(imgs[i],i))}</span></div>`;
+    if(src) html+=`<div class="heme-thumb-wrap"><img src="${esc(src)}" alt="" onerror="retryImageLoad(this)"><span class="heme-img-meta">${esc(hemeImageLabel(imgs[i],i))}</span></div>`;
     else html+=`<div class="img-ph">${i===0?'🖼️':''}</div>`;
   }
   return html;
@@ -4198,7 +4199,7 @@ function openCondition(id){
   const cached=(window._hemeCondsCache||hemeDefaultConditions()).find(item=>String(item.id)===String(id));
   const openWithData=(data)=>{
     if(!data)return;
-    const imgs=(data.images||[]).map((entry,index)=>({entry,index})).filter(x=>imageEntrySrc(x.entry));
+    const imgs=imageEntryList(data.images).map((entry,index)=>({entry,index})).filter(x=>imageEntrySrc(x.entry));
     const features=(data.key_features||[]).filter(Boolean);
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
@@ -4209,7 +4210,7 @@ function openCondition(id){
         <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
           ${imgs.map(({entry,index})=>{
             const src=imageEntrySrc(entry);
-            return `<div class="heme-img-wrap"><img src="${esc(src)}" onclick="openImgViewer('${jsAttr(src)}')" alt=""><span class="heme-img-meta">${esc(hemeImageLabel(entry,index))}</span></div>`;
+            return `<div class="heme-img-wrap"><img src="${esc(src)}" onclick="openImgViewer('${jsAttr(src)}')" alt="" onerror="retryImageLoad(this)"><span class="heme-img-meta">${esc(hemeImageLabel(entry,index))}</span></div>`;
           }).join('')}
         </div>`:''}
       ${features.length?`
@@ -4253,7 +4254,7 @@ function buildConditionDetailsEditor(condition){
 }
 
 function buildConditionImageEditor(condition){
-  const imgs=condition.images||[];
+  const imgs=imageEntryList(condition.images);
   return `
     <div class="drop-zone heme-bulk-zone" id="dz-${condition.id}-bulk"
       ondrop="handleConditionBulkImgDrop(event,'${condition.id}')"
@@ -4282,7 +4283,7 @@ function buildConditionImageEditor(condition){
             ondragleave="this.classList.remove('dragover')"
             onclick="document.getElementById('cimg-${condition.id}-${i}').click()"
           >
-            ${src?`<div class="heme-editor-img-wrap"><img src="${esc(src)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px"><span class="heme-img-meta">${esc(hemeImageLabel(entry,i))}</span></div>`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          ${src?`<div class="heme-editor-img-wrap"><img src="${esc(src)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px" onerror="retryImageLoad(this)"><span class="heme-img-meta">${esc(hemeImageLabel(entry,i))}</span></div>`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
             <input type="file" accept="image/*" id="cimg-${condition.id}-${i}" style="display:none" onchange="handleConditionImgFile(event,'${condition.id}',${i})">
           </div>
           <div class="heme-slot-meta">
@@ -4305,7 +4306,7 @@ async function handleConditionImgFile(e, conditionId, slot){
   reader.onload=async ev=>{
     const dataUrl=ev.target.result;
     const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
-    const imgs=[...(data?.images||[])];
+    const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
     await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
@@ -4325,7 +4326,7 @@ async function handleConditionImgDrop(e, conditionId, slot){
   reader.onload=async ev=>{
     const dataUrl=ev.target.result;
     const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
-    const imgs=[...(data?.images||[])];
+    const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
     await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
@@ -4361,7 +4362,7 @@ async function handleConditionBulkFiles(files,conditionId,startSlot=0){
   const imageFiles=files.filter(file=>file&&file.type.startsWith('image/')).slice(0,4-startSlot);
   if(!imageFiles.length)return;
   const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
-  const imgs=[...(data?.images||[])];
+  const imgs=[...imageEntryList(data?.images)];
   while(imgs.length<4)imgs.push(null);
   for(let i=0;i<imageFiles.length;i++){
     const slot=startSlot+i;
@@ -4387,7 +4388,7 @@ async function saveHemeConditionDetails(conditionId){
 
 async function updateConditionImageMeta(conditionId,slot,field,value){
   const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
-  const imgs=[...(data?.images||[])];
+  const imgs=[...imageEntryList(data?.images)];
   while(imgs.length<=slot)imgs.push(null);
   const current=imgs[slot];
   const next=typeof current==='object'&&current?{...current}:{url:imageEntrySrc(current),mag:imageEntryMag(current,slot),specimen:imageEntrySpecimen(current,slot)};
@@ -4482,6 +4483,7 @@ function hemeQuizNext(){appState.hemeQuizIdx++;renderTab();}
 // ─── MICROBIOLOGY IMAGES — folder system (mirrors hematology) ─────────────────
 async function renderMicroImages(el){
   if(appState.microImgMode==='quiz'){renderMicroImageQuiz(el);return;}
+  el.innerHTML=imageLoadingHTML();
 
   // Flat view — cache organisms to avoid refetch on tab switch
   if(!window._microOrgsCache||window._microOrgsCache.length===0){
@@ -4583,7 +4585,7 @@ async function generateMicroPDF(){
   try{
     const rawAll=(window._microOrgsCache||[]).filter(o=>ids.includes(o.id));
     // Normalize micro organisms to match shared PDF format
-    const all=rawAll.map(o=>({name:o.name,key_features:o.key_features||[],notes:o.notes||'',images:o.images||[]}));
+    const all=rawAll.map(o=>({name:o.name,key_features:o.key_features||[],notes:o.notes||'',images:imageEntryList(o.images)}));
     // Use shared generator
     await generateImageSectionPDF(all,'Microbiology Organisms','microbiology_organisms.pdf');
     return;
@@ -4652,10 +4654,11 @@ async function generateMicroPDF(){
 function openMicroFolder(key){appState.microImgPage=key;renderTab();}
 
 function buildOrganismThumbs(o){
-  const imgs=o.images||[];
+  const imgs=imageEntryList(o.images);
   const slots=4;let html='';
   for(let i=0;i<slots;i++){
-    if(imgs[i])html+=`<img src="${imgs[i]}" alt="" onerror="this.style.display='none'">`;
+    const src=imageEntrySrc(imgs[i]);
+    if(src)html+=`<img src="${esc(src)}" alt="" onerror="retryImageLoad(this)">`;
     else html+=`<div class="img-ph">${i===0?'🔬':''}</div>`;
   }
   return html;
@@ -4664,7 +4667,7 @@ function buildOrganismThumbs(o){
 function openOrganism(id){
   sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=data.images||[];
+    const imgs=imageEntryList(data.images);
     const features=data.key_features||[];
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
@@ -4676,7 +4679,7 @@ function openOrganism(id){
       </div>
       ${imgs.filter(Boolean).length?`
         <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.filter(Boolean).length,2)},1fr);gap:8px;margin-bottom:16px">
-          ${imgs.filter(Boolean).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+          ${imgs.map(imageEntrySrc).filter(Boolean).map(url=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" onerror="retryImageLoad(this)" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
         </div>`:'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:12px">🔬</div>'}
       ${features.length?`
         <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
@@ -4692,7 +4695,7 @@ function openOrganism(id){
 function openOrganismEditModal(id){
   sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
     if(!data)return;
-    const imgs=data.images||[];
+    const imgs=imageEntryList(data.images);
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
         <div style="font-size:16px;font-weight:600">Edit Organism</div>
@@ -4762,7 +4765,7 @@ async function handleOrganismImgFile(e,orgId,slot){
   reader.onload=async ev=>{
     const dataUrl=ev.target.result;
     const {data}=await sb.from('mlsboc_micro_organisms').select('images').eq('id',orgId).single();
-    const imgs=[...(data?.images||[])];
+    const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=dataUrl;
     await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
@@ -4779,7 +4782,7 @@ async function handleOrganismImgDrop(e,orgId,slot){
   reader.onload=async ev=>{
     const dataUrl=ev.target.result;
     const {data}=await sb.from('mlsboc_micro_organisms').select('images').eq('id',orgId).single();
-    const imgs=[...(data?.images||[])];
+    const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=dataUrl;
     await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
@@ -4953,7 +4956,7 @@ function renderHemeCase(c,idx){
   const qs=c.questions||[];
   const selState=appState.hemeCaseAnswers&&appState.hemeCaseAnswers[c.id]||{};
   // table_data rendered via renderDataTable below
-  const imgs=c.images||[];
+  const imgs=imageEntryList(c.images);
   const collapsed=!appState.hemeCaseCollapsed||appState.hemeCaseCollapsed[c.id]!==false;
   return `
     <div class="case-card" id="hcase-${c.id}" style="margin-bottom:12px">
@@ -4971,12 +4974,13 @@ function renderHemeCase(c,idx){
         <div style="margin-top:16px">
           ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
           ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data):''}  
-          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
+          ${caseImageRowHTML(imgs)}
           ${qs.length?`
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${hcAllChecked(c.id,qs.length)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllHC('${c.id}',${qs.length})">Check All</button>`}
+              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
+              ${caseAnswersAvailable()&&!hcAllChecked(c.id,qs.length)?`<button class="btn btn-primary btn-sm" onclick="checkAllHC('${c.id}',${qs.length})">Check All</button>`:''}
               ${hcAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllHC('${c.id}')">Reset All</button>`:''}
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
@@ -4992,6 +4996,7 @@ function renderHemeCase(c,idx){
 function renderHemeCaseQuestion(caseId,q,qi,selState){
   const checked=selState[qi]?.checked===true;
   const chosen=selState[qi]?.choice;
+  const reveal=caseAnswersAvailable();
   const letters=['a','b','c','d'];
   const correctIdx=letters.indexOf(q.correct);
   return `
@@ -5004,7 +5009,7 @@ function renderHemeCaseQuestion(caseId,q,qi,selState){
           const letter=letters[oi];
           let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
           if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
-          if(checked){
+          if(checked&&reveal){
             if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
             else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
           }
@@ -5015,10 +5020,11 @@ function renderHemeCaseQuestion(caseId,q,qi,selState){
         }).filter(Boolean).join('')}
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
-        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkHemeCaseQ('${caseId}',${qi})">Check Answer</button>`:''}
+        ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkHemeCaseQ('${caseId}',${qi})">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetHemeCaseQ('${caseId}',${qi})">Reset</button>`:''}
+        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
-      ${checked?`
+      ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
         </div>
@@ -5048,6 +5054,7 @@ function selectHemeCaseQ(caseId,qi,letter){
   renderTab();
 }
 function checkAllHC(caseId,count){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
   if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};
   if(!appState.hemeCaseAnswers[caseId])appState.hemeCaseAnswers[caseId]={};
   for(let i=0;i<count;i++){
@@ -5057,7 +5064,10 @@ function checkAllHC(caseId,count){
   renderTab();
 }
 function resetAllHC(caseId){if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};appState.hemeCaseAnswers[caseId]={};renderTab();}
-function checkHemeCaseQ(caseId,qi){if(appState.hemeCaseAnswers?.[caseId]?.[qi])appState.hemeCaseAnswers[caseId][qi].checked=true;renderTab();}
+function checkHemeCaseQ(caseId,qi){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(appState.hemeCaseAnswers?.[caseId]?.[qi])appState.hemeCaseAnswers[caseId][qi].checked=true;renderTab();
+}
 function resetHemeCaseQ(caseId,qi){if(appState.hemeCaseAnswers?.[caseId])delete appState.hemeCaseAnswers[caseId][qi];renderTab();}
 
 function adminHemeCaseControls(){
@@ -5526,11 +5536,12 @@ async function renderMycologyCases(el){
 // ─── SHARED SUBJECT CASE RENDERER ─────────────────────────────────────────────
 async function renderSubjectCases(el, cfg){
   const qmKey=cfg.quizModeKey;
+  if(appState[qmKey]&&!isAdmin)appState[qmKey]=false;
   if(appState[qmKey]){renderSubjectCaseQuiz(el,cfg);return;}
   const {data}=await sb.from(cfg.dbTable).select('*').order('created_at');
   const cases=(data||[]).map(withTableData);
   if(!appState[cfg.collapsedKey])appState[cfg.collapsedKey]={};
-  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
+  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16"><div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: ${cfg.label}</div><button class="btn btn-primary" onclick="${cfg.adminFn}(null)">+ New Case</button></div></div>`:''}
     <div class="flex-center gap-12 mb-16 flex-wrap">
@@ -5540,7 +5551,7 @@ async function renderSubjectCases(el, cfg){
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
         <button class="btn btn-ghost btn-sm" onclick="openSubjectExportModal('${cfg.dbTable}','${cfg.tableField}','${cfg.tableLabel}','${cfg.exportTitle}')">📄 Export</button>
-        ${allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+        ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
     ${!cases.length?`<div class="empty">No ${cfg.label} yet. Use Admin mode to add one.</div>`:''}
@@ -5552,7 +5563,7 @@ function renderSubjectCase(c, idx, cfg){
   const qs=c.questions||[];
   const selState=(appState[cfg.answerKey]||{})[c.id]||{};
   // table_data used via renderDataTable
-  const imgs=c.images||[];
+  const imgs=imageEntryList(c.images);
   const collapsed=!appState[cfg.collapsedKey]||appState[cfg.collapsedKey][c.id]!==false;
   return `
     <div class="case-card" id="sc-${c.id}" style="margin-bottom:12px">
@@ -5574,12 +5585,13 @@ function renderSubjectCase(c, idx, cfg){
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">${cfg.tableLabel}</div>
               ${renderDataTable(c.table_data)}
             </div>`:''}
-          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
+          ${caseImageRowHTML(imgs)}
           ${qs.length?`
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${scAllChecked(c.id,qs.length,cfg.answerKey)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllSC('${c.id}',${qs.length},'${cfg.answerKey}')">Check All</button>`}
+              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
+              ${caseAnswersAvailable()&&!scAllChecked(c.id,qs.length,cfg.answerKey)?`<button class="btn btn-primary btn-sm" onclick="checkAllSC('${c.id}',${qs.length},'${cfg.answerKey}')">Check All</button>`:''}
               ${scAnyAnswered(c.id,cfg.answerKey)?`<button class="btn btn-ghost btn-sm" onclick="resetAllSC('${c.id}','${cfg.answerKey}')">Reset All</button>`:''}
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
@@ -5595,6 +5607,7 @@ function renderSubjectCase(c, idx, cfg){
 function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
   const checked=selState[qi]?.checked===true;
   const chosen=selState[qi]?.choice;
+  const reveal=caseAnswersAvailable();
   const letters=['a','b','c','d'];
   const correctIdx=letters.indexOf(q.correct);
   return `
@@ -5607,7 +5620,7 @@ function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
           const letter=letters[oi];
           let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
           if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
-          if(checked){
+          if(checked&&reveal){
             if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
             else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
           }
@@ -5618,10 +5631,11 @@ function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
         }).filter(Boolean).join('')}
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
-        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Check Answer</button>`:''}
+        ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Reset</button>`:''}
+        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
-      ${checked?`
+      ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
         </div>
@@ -5651,6 +5665,7 @@ function selectSubjectCaseQ(caseId,qi,letter,key){
   renderTab();
 }
 function checkAllSC(caseId,count,key){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
   if(!appState[key])appState[key]={};
   if(!appState[key][caseId])appState[key][caseId]={};
   for(let i=0;i<count;i++){
@@ -5660,14 +5675,18 @@ function checkAllSC(caseId,count,key){
   renderTab();
 }
 function resetAllSC(caseId,key){if(!appState[key])appState[key]={};appState[key][caseId]={};renderTab();}
-function checkSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId]?.[qi])appState[key][caseId][qi].checked=true;renderTab();}
+function checkSubjectCaseQ(caseId,qi,key){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(appState[key]?.[caseId]?.[qi])appState[key][caseId][qi].checked=true;renderTab();
+}
 function resetSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId])delete appState[key][caseId][qi];renderTab();}
 
 // ─── SUBJECT CASE QUIZ MODE ────────────────────────────────────────────────────
 async function startSubjectCaseQuiz(qmKey,dbTable,tableField){
+  if(!isAdmin){alert('Quiz mode is available in Admin mode only for case activities.');return;}
   const {data}=await sb.from(dbTable).select('*').order('created_at');
   const cases=(data||[]).map(withTableData);
-  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
+  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
   if(!allQs.length){alert('No questions found yet.');return;}
   appState[qmKey]=true;
   appState[qmKey+'Items']=shuffle(allQs);
@@ -6100,6 +6119,7 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select cases to include.</div>
+    ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Answers are not available for these activities in regular view. Exports include cases and options only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=false)">Deselect All</button>
@@ -6661,8 +6681,9 @@ async function renderGenericCases(el){
 
 function renderCaseCard(c,idx){
   const steps=parseSteps(c.steps);
-  const fb=appState.caseSelections[c.id]?.feedback;
-  const imgs=c.images||[];
+  const reveal=caseAnswersAvailable();
+  const fb=reveal?appState.caseSelections[c.id]?.feedback:null;
+  const imgs=imageEntryList(c.images);
   return `
     <div class="case-card" id="ccard-${c.id}">
       <div class="flex-center gap-8 mb-8 flex-wrap">
@@ -6672,10 +6693,11 @@ function renderCaseCard(c,idx){
       </div>
       <div class="case-scenario">${escNL(c.scenario)}</div>
       ${c.case_data?`<div class="case-data">${c.case_data}</div>`:''}
-      ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="">`).join('')}</div>`:''}
+      ${caseImageRowHTML(imgs)}
       ${steps.map((step,si)=>renderCaseStep(c.id,step,si,fb)).join('')}
-      ${!fb?`<button class="btn btn-primary btn-sm mt-8" onclick="submitGenericCase('${c.id}','${esc(c.answer)}')">Submit</button>`:''}
-      ${fb?`<div class="case-feedback ${fb.correct?'correct':'wrong'}">${fb.correct?'✓ Correct':'✗ Incorrect'} — ${fb.note||c.answer}</div>`:''}
+      ${!reveal?caseAnswerNoticeHTML():''}
+      ${reveal&&!fb?`<button class="btn btn-primary btn-sm mt-8" onclick="submitGenericCase('${c.id}','${esc(c.answer)}')">Submit</button>`:''}
+      ${reveal&&fb?`<div class="case-feedback ${fb.correct?'correct':'wrong'}">${fb.correct?'✓ Correct':'✗ Incorrect'} — ${fb.note||c.answer}</div>`:''}
       ${isAdmin?`<div class="flex gap-8 mt-8">
         ${c.is_draft?`<button class="btn btn-success btn-xs" onclick="publishCase('${c.id}')">Publish</button>`:''}
         <button class="btn btn-danger btn-xs" onclick="deleteCase('${c.id}')">Delete</button>
@@ -6721,6 +6743,7 @@ function selectCaseOpt(caseId,key,val,type){
 }
 
 function submitGenericCase(caseId,answer){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
   if(!appState.caseSelections[caseId])appState.caseSelections[caseId]={steps:{}};
   const allVals=Object.values(appState.caseSelections[caseId].steps||{}).flat().join(' ').toLowerCase();
   const correct=answer&&allVals.includes(answer.toLowerCase().split(' ')[0]);
@@ -6751,7 +6774,7 @@ function renderMicroCase(c,idx){
   const qs=c.questions||[];
   const selState=(appState.microCaseAnswers||{})[c.id]||{};
   const table=c.test_results||[];
-  const imgs=c.images||[];
+  const imgs=imageEntryList(c.images);
   const collapsed=!appState.microCaseCollapsed||appState.microCaseCollapsed[c.id]!==false;
   const tagCls=c.group_label==='gram_positive'?'tag-gram-pos':c.group_label==='gram_negative'?'tag-gram-neg':'tag-info';
   const tagLabel=c.group_label==='gram_positive'?'Gram (+)':c.group_label==='gram_negative'?'Gram (-)':'';
@@ -6772,12 +6795,13 @@ function renderMicroCase(c,idx){
         <div style="margin-top:16px">
           ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
           ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data):''}  
-          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="cursor:zoom-in">`).join('')}</div>`:''}
+          ${caseImageRowHTML(imgs)}
           ${qs.length?`
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${mcAllChecked(c.id,qs.length)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllMC('${c.id}',${qs.length})">Check All</button>`}
+              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
+              ${caseAnswersAvailable()&&!mcAllChecked(c.id,qs.length)?`<button class="btn btn-primary btn-sm" onclick="checkAllMC('${c.id}',${qs.length})">Check All</button>`:''}
               ${mcAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllMC('${c.id}')">Reset All</button>`:''}
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
@@ -6793,6 +6817,7 @@ function renderMicroCase(c,idx){
 function renderMicroCaseQuestion(caseId,q,qi,selState){
   const checked=selState[qi]?.checked===true;
   const chosen=selState[qi]?.choice;
+  const reveal=caseAnswersAvailable();
   const letters=['a','b','c','d'];
   const correctIdx=letters.indexOf(q.correct);
   return `
@@ -6805,7 +6830,7 @@ function renderMicroCaseQuestion(caseId,q,qi,selState){
           const letter=letters[oi];
           let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
           if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
-          if(checked){
+          if(checked&&reveal){
             if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
             else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
           }
@@ -6816,10 +6841,11 @@ function renderMicroCaseQuestion(caseId,q,qi,selState){
         }).filter(Boolean).join('')}
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
-        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkMCQ('${caseId}',${qi})">Check Answer</button>`:''}
+        ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkMCQ('${caseId}',${qi})">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetMCQ('${caseId}',${qi})">Reset</button>`:''}
+        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
-      ${checked?`
+      ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
         </div>
@@ -6844,6 +6870,7 @@ function selectMCQ(caseId,qi,letter){
   renderTab();
 }
 function checkAllMC(caseId,count){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
   if(!appState.microCaseAnswers)appState.microCaseAnswers={};
   if(!appState.microCaseAnswers[caseId])appState.microCaseAnswers[caseId]={};
   for(let i=0;i<count;i++){
@@ -6853,7 +6880,10 @@ function checkAllMC(caseId,count){
   renderTab();
 }
 function resetAllMC(caseId){if(!appState.microCaseAnswers)appState.microCaseAnswers={};appState.microCaseAnswers[caseId]={};renderTab();}
-function checkMCQ(caseId,qi){if(appState.microCaseAnswers?.[caseId]?.[qi])appState.microCaseAnswers[caseId][qi].checked=true;renderTab();}
+function checkMCQ(caseId,qi){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(appState.microCaseAnswers?.[caseId]?.[qi])appState.microCaseAnswers[caseId][qi].checked=true;renderTab();
+}
 function resetMCQ(caseId,qi){if(appState.microCaseAnswers?.[caseId])delete appState.microCaseAnswers[caseId][qi];renderTab();}
 function toggleMicroCaseCollapse(id){
   if(!appState.microCaseCollapsed)appState.microCaseCollapsed={};
@@ -7001,12 +7031,13 @@ async function deleteMicroCase(id){
 
 // ─── BLOOD BANK CASES (MC question system) ────────────────────────────────────
 async function renderBloodBankCases(el){
+  if(appState.bbQuizMode&&!isAdmin)appState.bbQuizMode=false;
   if(appState.bbQuizMode){renderBBQuiz(el);return;}
   const {data:_bbRaw}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
   const data=(_bbRaw||[]).map(withTableData);
 
   // Flatten all questions across all cases for the quiz button
-  const allQs=data.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
+  const allQs=data.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
 
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminBBCaseControls()}</div>`:''}
@@ -7017,7 +7048,7 @@ async function renderBloodBankCases(el){
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
         <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📄 Export</button>
-        ${allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+        ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
     ${!data||!data.length?'<div class="empty">No Blood Bank cases yet. Use Admin mode to add one.</div>':''}
@@ -7027,9 +7058,10 @@ async function renderBloodBankCases(el){
 
 // ─── BLOOD BANK QUIZ MODE ─────────────────────────────────────────────────────
 async function startBBQuiz(){
+  if(!isAdmin){alert('Quiz mode is available in Admin mode only for case activities.');return;}
   const {data:_bq1}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
   const data=(_bq1||[]).map(withTableData);
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:c.images||[]})));
+  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
   if(!allQs.length){alert('No questions found in any case yet.');return;}
   appState.bbQuizMode=true;
   appState.bbQuizItems=shuffle(allQs);
@@ -7070,9 +7102,10 @@ function renderBBQuiz(el){
       ${renderDataTable(item._tableData,{small:true})}
     </div>`:'' ;
 
-  const imgHtml=item._imgs&&item._imgs.filter(Boolean).length?`
+  const qImgs=imageEntryList(item._imgs).map(imageEntrySrc).filter(Boolean);
+  const imgHtml=qImgs.length?`
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      ${item._imgs.filter(Boolean).map(url=>`<img src="${url}" onclick="openImgViewer('${url}')" style="height:70px;max-width:180px;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;object-fit:contain;background:var(--bg3)">`).join('')}
+      ${qImgs.map(url=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" onerror="retryImageLoad(this)" style="height:70px;max-width:180px;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;object-fit:contain;background:var(--bg3)">`).join('')}
     </div>`:'' ;
 
   const optsHtml=(item.options||[]).map((opt,oi)=>{
@@ -7253,7 +7286,7 @@ function renderBBQuizResults(el){
 function renderBBCase(c,idx){
   const qs=c.questions||[];
   const selState=appState.bbAnswers[c.id]||{};
-  const imgs=c.images||[];
+  const imgs=imageEntryList(c.images);
   // table_data rendered via renderDataTable
   const collapsed=!appState.bbCollapsed||appState.bbCollapsed[c.id]!==false;
   return `
@@ -7272,12 +7305,13 @@ function renderBBCase(c,idx){
         <div style="margin-top:16px">
           ${c.scenario?`<div class="case-scenario" style="margin-bottom:20px;font-size:15px;line-height:1.85">${escNL(c.scenario)}</div>`:''}
           ${c.table_data&&tblHasContent(c.table_data)?renderDataTable(c.table_data,{small:true}):''}  
-          ${imgs.filter(Boolean).length?`<div class="case-img-row">${imgs.filter(Boolean).map(url=>`<img src="${url}" alt="" onclick="openImgViewer('${url}')" style="object-fit:contain;background:var(--bg3);cursor:zoom-in">`).join('')}</div>`:''}
+          ${caseImageRowHTML(imgs,'object-fit:contain;background:var(--bg3);')}
           ${qs.length?`
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${bbAllChecked(c.id,qs.length)?'':`<button class="btn btn-primary btn-sm" onclick="checkAllBB('${c.id}',${qs.length})">Check All</button>`}
+              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
+              ${caseAnswersAvailable()&&!bbAllChecked(c.id,qs.length)?`<button class="btn btn-primary btn-sm" onclick="checkAllBB('${c.id}',${qs.length})">Check All</button>`:''}
               ${bbAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllBB('${c.id}')">Reset All</button>`:''}
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start">
@@ -7293,6 +7327,7 @@ function renderBBCase(c,idx){
 function renderBBQuestion(caseId,q,qi,selState){
   const checked=selState[qi]?.checked===true;
   const chosen=selState[qi]?.choice;
+  const reveal=caseAnswersAvailable();
   const letters=['a','b','c','d'];
   const correctIdx=letters.indexOf(q.correct);
   return `
@@ -7305,7 +7340,7 @@ function renderBBQuestion(caseId,q,qi,selState){
           const letter=letters[oi];
           let bg='var(--bg4)';let bd='var(--border)';let color='var(--text)';let weight='400';
           if(chosen===letter&&!checked){bg='var(--bg4)';bd='var(--accent)';color='var(--accent)';weight='500';}
-          if(checked){
+          if(checked&&reveal){
             if(letter===q.correct){bg='var(--bg4)';bd='var(--success)';color='var(--success)';weight='600';}
             else if(letter===chosen&&chosen!==q.correct){bg='var(--bg4)';bd='var(--danger)';color='var(--danger)';weight='500';}
           }
@@ -7316,10 +7351,11 @@ function renderBBQuestion(caseId,q,qi,selState){
         }).filter(Boolean).join('')}
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
-        ${!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkBBQ('${caseId}',${qi})">Check Answer</button>`:''}
+        ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkBBQ('${caseId}',${qi})">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetBBQ('${caseId}',${qi})">Reset</button>`:''}
+        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
-      ${checked?`
+      ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct
             ?'✓ Correct!'
@@ -7345,6 +7381,7 @@ function selectBBQ(caseId,qi,letter){
   renderTab();
 }
 function checkAllBB(caseId,count){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
   if(!appState.bbAnswers[caseId])appState.bbAnswers[caseId]={};
   for(let i=0;i<count;i++){
     if(appState.bbAnswers[caseId][i]?.choice&&!appState.bbAnswers[caseId][i]?.checked)
@@ -7353,7 +7390,10 @@ function checkAllBB(caseId,count){
   renderTab();
 }
 function resetAllBB(caseId){appState.bbAnswers[caseId]={};renderTab();}
-function checkBBQ(caseId,qi){if(appState.bbAnswers[caseId]?.[qi])appState.bbAnswers[caseId][qi].checked=true;renderTab();}
+function checkBBQ(caseId,qi){
+  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(appState.bbAnswers[caseId]?.[qi])appState.bbAnswers[caseId][qi].checked=true;renderTab();
+}
 function resetBBQ(caseId,qi){if(appState.bbAnswers[caseId])delete appState.bbAnswers[caseId][qi];renderTab();}
 
 function toggleBBCollapse(id){
@@ -8595,6 +8635,7 @@ async function openExportModal(){
       ${closeBtn}
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Select cases to include — all go into one PDF.</div>
+    ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Answers are not available for these activities in regular view. Exports will include cases and options only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(false)">Deselect All</button>
@@ -8741,7 +8782,8 @@ async function generateCasePDF(){
 
     // ── Answer Key — final page ──
     const hasAnyQuestions=selected.some(({c})=>(c.questions||[]).length>0);
-    if(hasAnyQuestions){
+    const includeAnswerKey=hasAnyQuestions&&caseAnswersAvailable();
+    if(includeAnswerKey){
       doc.addPage();y=margin;
       doc.setFillColor(40,40,40);doc.rect(margin,y,contentW,12,'F');
       doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
@@ -8774,7 +8816,7 @@ async function generateCasePDF(){
     for(let p=1;p<=totalPages;p++){
       doc.setPage(p);
       doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-      const label=p===totalPages&&hasAnyQuestions?'Answer Key':`Page ${p} of ${totalPages-1}`;
+      const label=p===totalPages&&includeAnswerKey?'Answer Key':`Page ${p} of ${includeAnswerKey?totalPages-1:totalPages}`;
       doc.text(`MLS BOC Prep — Case Export · ${label}`, margin, pageH-8);
       doc.text(new Date().toLocaleDateString(), pageW-margin, pageH-8, {align:'right'});
     }
@@ -9837,7 +9879,55 @@ function csvField(row,names,idx){
 function imageEntrySrc(entry){
   if(!entry)return '';
   if(typeof entry==='string')return entry;
-  return entry.url||entry.src||entry.dataUrl||entry.image_url||'';
+  return entry.url||entry.src||entry.dataUrl||entry.data_url||entry.image_url||entry.imageUrl||entry.data||'';
+}
+function imageEntryList(images){
+  if(!images)return [];
+  if(Array.isArray(images))return images;
+  if(typeof images==='string'){
+    const trimmed=images.trim();
+    if(!trimmed)return [];
+    if(trimmed.startsWith('[')||trimmed.startsWith('{')){
+      try{
+        const parsed=JSON.parse(trimmed);
+        return Array.isArray(parsed)?parsed:[parsed];
+      }catch(e){}
+    }
+    return [trimmed];
+  }
+  return [images];
+}
+function imageLoadingHTML(){
+  return '<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>Loading images — this may take a moment on first visit...</span><span style="font-size:12px;color:var(--text3)">If images do not load the first try, refresh or try the tab again.</span></div>';
+}
+function retryImageLoad(img){
+  if(!img)return;
+  if(img.dataset.retryDone==='1'){
+    img.style.opacity='.45';
+    img.style.objectFit='contain';
+    img.title='Image did not load. Try refreshing this tab.';
+    return;
+  }
+  const src=img.getAttribute('src')||'';
+  if(!src||src.startsWith('data:')){
+    img.dataset.retryDone='1';
+    img.style.opacity='.45';
+    return;
+  }
+  img.dataset.retryDone='1';
+  const joiner=src.includes('?')?'&':'?';
+  setTimeout(()=>{img.src=src+joiner+'retry='+Date.now();},250);
+}
+function caseAnswersAvailable(){
+  return !!isAdmin;
+}
+function caseAnswerNoticeHTML(){
+  return '<div class="case-answer-notice" style="background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;color:var(--text2);font-size:13px;font-weight:600">Answers are not available for these activities in regular view.</div>';
+}
+function caseImageRowHTML(images, extraStyle=''){
+  const urls=imageEntryList(images).map(imageEntrySrc).filter(Boolean);
+  if(!urls.length)return '';
+  return `<div class="case-img-row">${urls.map(url=>`<img src="${esc(url)}" alt="" onclick="openImgViewer('${jsAttr(url)}')" onerror="retryImageLoad(this)" style="cursor:zoom-in;${extraStyle}">`).join('')}</div>`;
 }
 function hemeSlotDefaultMag(slot){
   return Number(slot)===0?'50x':'100x';
@@ -9859,7 +9949,7 @@ function hemeImageEntry(url, existing, slot){
   return {url, mag:imageEntryMag(existing,slot), specimen:imageEntrySpecimen(existing,slot)};
 }
 function hasUsableImages(item){
-  return !!(item&&Array.isArray(item.images)&&item.images.some(imageEntrySrc));
+  return !!(item&&imageEntryList(item.images).some(imageEntrySrc));
 }
 function normalizeQuizCSVRow(row){
   const payload={
