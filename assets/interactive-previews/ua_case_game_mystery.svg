@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="UA Case Game mystery preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff8d7"/>
+      <stop offset=".55" stop-color="#eef5ff"/>
+      <stop offset="1" stop-color="#f9fbff"/>
+    </linearGradient>
+    <linearGradient id="board" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#172033"/>
+      <stop offset=".62" stop-color="#21314f"/>
+      <stop offset="1" stop-color="#745f08"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="#24345c" flood-opacity=".24"/>
+    </filter>
+  </defs>
+  <rect width="900" height="520" rx="36" fill="url(#bg)"/>
+  <g filter="url(#shadow)">
+    <rect x="58" y="54" width="784" height="392" rx="34" fill="url(#board)"/>
+    <rect x="82" y="83" width="736" height="334" rx="26" fill="#f7faff" opacity=".96"/>
+    <path d="M82 143h736" stroke="#c8a800" stroke-width="10"/>
+  </g>
+  <g transform="translate(96 102)">
+    <text x="0" y="0" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="36" font-weight="900" fill="#141a2b">UA CASE GAME</text>
+    <text x="2" y="36" font-family="IBM Plex Mono, monospace" font-size="17" font-weight="800" letter-spacing="2" fill="#806700">MYSTERY PATTERN MATCH</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="113" y="190" width="250" height="180" rx="24" fill="#ffffff" stroke="#c8cce0" stroke-width="4"/>
+    <text x="137" y="230" font-family="IBM Plex Mono, monospace" font-size="19" font-weight="900" fill="#806700" letter-spacing="2">PATIENT PATTERN</text>
+    <rect x="138" y="257" width="166" height="18" rx="9" fill="#dfe8f7"/>
+    <rect x="138" y="288" width="196" height="18" rx="9" fill="#dfe8f7"/>
+    <rect x="138" y="319" width="138" height="18" rx="9" fill="#dfe8f7"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="419" y="185" width="302" height="118" rx="18" fill="#172033"/>
+    <rect x="445" y="216" width="98" height="58" rx="10" fill="#dfefff" stroke="#8eb4da" stroke-width="4"/>
+    <rect x="596" y="216" width="98" height="58" rx="10" fill="#dfefff" stroke="#8eb4da" stroke-width="4"/>
+    <rect x="422" y="300" width="296" height="15" rx="8" fill="#d5b62b"/>
+    <text x="468" y="171" font-family="IBM Plex Mono, monospace" font-size="18" font-weight="900" fill="#806700" letter-spacing="2">HOSPITAL ROOMS</text>
+  </g>
+  <g filter="url(#shadow)">
+    <circle cx="525" cy="364" r="38" fill="#fff5bc" stroke="#c8a800" stroke-width="6"/>
+    <text x="503" y="376" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="30" font-weight="900" fill="#5f4b00">G2</text>
+    <circle cx="630" cy="364" r="38" fill="#e8f1ff" stroke="#2f6bd8" stroke-width="6"/>
+    <text x="605" y="376" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="29" font-weight="900" fill="#173c86">NS</text>
+    <circle cx="735" cy="364" r="38" fill="#fff5bc" stroke="#c8a800" stroke-width="6"/>
+    <text x="718" y="376" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="30" font-weight="900" fill="#5f4b00">T1</text>
+  </g>
+  <g transform="translate(275 338) rotate(-14)" filter="url(#shadow)">
+    <circle cx="70" cy="70" r="52" fill="none" stroke="#2f6bd8" stroke-width="18"/>
+    <path d="M108 109l72 72" stroke="#2f6bd8" stroke-width="24" stroke-linecap="round"/>
+    <circle cx="70" cy="70" r="26" fill="#f9fbff" opacity=".95"/>
+  </g>
+  <g opacity=".9">
+    <path d="M760 120c0 28-22 50-50 50s-50-22-50-50 22-50 50-50 50 22 50 50Z" fill="#fff" stroke="#c8a800" stroke-width="5"/>
+    <path d="M693 123l13 13 27-36" fill="none" stroke="#1a8a4a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="652" y="196" font-family="IBM Plex Mono, monospace" font-size="17" font-weight="900" fill="#1a8a4a">CASE CLOSED</text>
+  </g>
+</svg>

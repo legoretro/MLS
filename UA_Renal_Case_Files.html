@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>UA Renal Case Files</title>
+<title>UA Case Game</title>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css" />
 <style>
@@ -33,6 +33,29 @@ body.ua-case-files{
   font-family:var(--mls-sans,Inter,system-ui,sans-serif);
 }
 .screen-shell{min-height:100vh}
+.case-header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.case-theme-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--mls-border,#c8cce0);
+  background:var(--mls-bg2,#fff);
+  color:var(--mls-text2,#4a5070);
+  border-radius:8px;
+  padding:7px 12px;
+  font:700 12px/1 var(--mls-sans,Inter,system-ui,sans-serif);
+  cursor:pointer;
+  white-space:nowrap;
+}
+.case-theme-btn:hover{
+  border-color:var(--mls-border2,#aab0cc);
+  background:var(--mls-bg3,#e8eaf2);
+  color:var(--mls-text,#1a1d2e);
+}
 .game-wrap{
   width:min(1120px,calc(100% - 28px));
   margin:0 auto;
@@ -40,7 +63,10 @@ body.ua-case-files{
   max-width:100%;
 }
 .game-hero{
-  background:linear-gradient(135deg,#fffdf5,#ffffff 62%,#eef4ff);
+  position:relative;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(200,168,0,.22),transparent 14rem),
+    linear-gradient(135deg,#fffef7 0 50%,#eaf1ff 100%);
   border:1px solid var(--line);
   border-top:6px solid var(--ua);
   border-radius:22px;
@@ -51,6 +77,11 @@ body.ua-case-files{
   gap:18px;
   align-items:center;
   min-width:0;
+  overflow:hidden;
+}
+.game-hero::before{
+  content:"";
+  display:none;
 }
 .game-hero > *{min-width:0}
 .eyebrow{
@@ -77,8 +108,10 @@ body.ua-case-files{
 .hero-badge{
   min-width:138px;
   aspect-ratio:1;
-  border-radius:26px;
-  background:linear-gradient(145deg,#fff9d7,#dbe8ff);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 36% 22%,rgba(255,255,255,.86),transparent 2.8rem),
+    linear-gradient(145deg,#fff9d7,#dbe8ff);
   border:1px solid #d4dbef;
   display:grid;
   place-items:center;
@@ -119,7 +152,10 @@ body.ua-case-files{
   position:relative;
   border:1px solid var(--line);
   border-radius:20px;
-  background:linear-gradient(180deg,#ffffff,#f9fbff);
+  background:
+    radial-gradient(circle at 94% 12%,rgba(47,107,216,.08),transparent 11rem),
+    linear-gradient(180deg,#ffffff,#f7faff);
+  border-color:var(--line);
   box-shadow:var(--shadow);
   padding:18px;
   text-align:left;
@@ -133,6 +169,10 @@ body.ua-case-files{
   column-gap:16px;
   row-gap:10px;
   align-items:center;
+}
+.unit-card::before{
+  content:"";
+  display:none;
 }
 .unit-card h2{margin:6px 0 6px;font-size:1.22rem}
 .unit-card p{margin:0;color:var(--muted);line-height:1.45}
@@ -522,6 +562,22 @@ body.ua-case-files{
 }
 .room-card h3{margin:76px 0 3px;font-size:1rem}
 .room-card p{margin:0;color:var(--muted);font-size:.85rem}
+.closed-stamp{
+  position:absolute;
+  z-index:4;
+  right:8px;
+  bottom:8px;
+  transform:rotate(-8deg);
+  border:2px solid #c0303f;
+  color:#c0303f;
+  background:rgba(255,255,255,.78);
+  border-radius:9px;
+  padding:4px 7px;
+  font-size:.68rem;
+  font-weight:950;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
 .chart-layout{
   display:grid;
   grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
@@ -679,6 +735,7 @@ body.ua-case-files{
 }
 @media(max-width:560px){
   body.ua-case-files .site-header{flex-wrap:wrap}
+  .case-header-actions{width:100%;justify-content:space-between}
   .game-wrap{width:min(100% - 18px,480px);padding-top:12px}
   .game-hero,.unit-head,.chart-panel,.room-panel{padding:14px;border-radius:17px}
   .unit-card{grid-template-columns:64px 1fr;min-height:148px;padding:14px}
@@ -695,6 +752,14 @@ body.ua-case-files{
   .room-door{top:14px;width:74px;height:96px}
   .room-card h3{margin-top:72px}
   .game-btn{width:100%;justify-content:center}
+}
+html[data-mls-theme="dark"] body.ua-case-files .case-theme-btn{
+  background:#151927;
+  color:#f4f6ff;
+  border-color:#35405e;
+}
+html[data-mls-theme="dark"] body.ua-case-files .case-theme-btn:hover{
+  background:#1f2638;
 }
 html[data-mls-theme="dark"] body.ua-case-files{
   --ink:#f7f9ff;
@@ -851,18 +916,24 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
     position:absolute;
     top:.14in;
     right:.16in;
-    width:.34in;
-    height:.34in;
-    border:2px solid #172554;
-    border-radius:.08in;
-    display:grid;
-    place-items:center;
-    background:#ffffff;
-    color:#c0303f;
-    font-size:18pt;
-    font-weight:950;
-    line-height:1;
-    transform:rotate(5deg);
+    width:.45in;
+    height:.32in;
+    border:2px solid #8a5a10;
+    border-radius:.06in;
+    background:linear-gradient(180deg,#ffe4a3,#edc56d);
+    transform:rotate(4deg);
+  }
+  .print-hospital-icon::before{
+    content:"";
+    position:absolute;
+    left:.02in;
+    top:-.12in;
+    width:.2in;
+    height:.12in;
+    border:2px solid #8a5a10;
+    border-bottom:0;
+    border-radius:.05in .05in 0 0;
+    background:#fff0bd;
   }
   .print-card .meta{
     position:relative;
@@ -929,13 +1000,17 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
     page-break-before:auto;
     page-break-after:always;
   }
+  .print-token-section .print-section-title{
+    font-size:12pt;
+    margin:0 0 .05in;
+  }
   .print-case-section + .print-token-section,
   .print-token-section.back-side{page-break-before:always}
   body.print-tokens .print-case-section + .print-token-section{page-break-before:auto}
   .print-token-grid{
     display:grid;
     grid-template-columns:repeat(5,1.837in);
-    gap:.17in;
+    gap:.13in;
     align-items:start;
     justify-content:center;
   }
@@ -981,22 +1056,25 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
       <div class="logo">MLS/BOC PREP</div>
       <div class="logo-sub">Interactive Learning</div>
     </div>
-    <a class="mls-home-btn" href="index.html">← MLS Home</a>
+    <div class="case-header-actions">
+      <button class="case-theme-btn" id="caseThemeBtn" type="button" onclick="toggleCaseTheme()">Switch theme</button>
+      <a class="mls-home-btn" href="index.html">← MLS Home</a>
+    </div>
   </header>
 
   <main class="game-wrap">
     <section class="game-hero">
       <div>
-        <div class="eyebrow">Urinalysis Renal Case Files</div>
-        <h1>UA Renal Case Files</h1>
-        <p>Solve the renal UA case files by matching patient chart clues to the correct diagnosis token.</p>
+        <div class="eyebrow">Urinalysis Case Game</div>
+        <h1>UA Case Game</h1>
+        <p>Solve the UA pattern rooms by matching short clues to the correct diagnosis token.</p>
         <div class="action-row">
           <button class="game-btn ghost" type="button" onclick="printMode('cases')">Print Case Cards</button>
           <button class="game-btn ghost" type="button" onclick="printMode('tokens')">Print Diagnosis Tokens</button>
           <button class="game-btn ghost" type="button" onclick="printMode('full')">Print Full Game Pack</button>
         </div>
       </div>
-      <div class="hero-badge" aria-hidden="true"><div><span>🏥</span>Case<br>Files</div></div>
+      <div class="hero-badge" aria-hidden="true"><div><span>🔎</span>Case<br>Game</div></div>
     </section>
 
     <section id="gameRoot"></section>
@@ -1006,7 +1084,7 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
 <section class="printable-game" id="printableGame"></section>
 
 <script>
-// Add future hospital units and rooms here. Keep each case in this local array.
+// Add future hospital game departments here. Keep each case in this local array.
 const renalUnits = [
   {
     unitId: 1,
@@ -1024,15 +1102,43 @@ const renalUnits = [
     unitId: 3,
     unitName: "Hospital Unit 3",
     department: "Tubular Disease Department",
-    codePrefix: "T",
-    comingSoon: "Tubular case files coming soon"
+    codePrefix: "T"
   },
   {
     unitId: 4,
     unitName: "Hospital Unit 4",
     department: "Interstitial Disease Department",
-    codePrefix: "I",
-    comingSoon: "Interstitial case files coming soon"
+    codePrefix: "I"
+  },
+  {
+    unitId: 5,
+    unitName: "Hospital Unit 5",
+    department: "Porphyrin Disorders Department",
+    codePrefix: "P"
+  },
+  {
+    unitId: 6,
+    unitName: "Hospital Unit 6",
+    department: "MPS Disorders Department",
+    codePrefix: "MPS"
+  },
+  {
+    unitId: 7,
+    unitName: "Hospital Unit 7",
+    department: "Purine Disorders Department",
+    codePrefix: "PU"
+  },
+  {
+    unitId: 8,
+    unitName: "Hospital Unit 8",
+    department: "Carbohydrate Disorders Department",
+    codePrefix: "C"
+  },
+  {
+    unitId: 9,
+    unitName: "Hospital Unit 9",
+    department: "Amino Acid Disorders Department",
+    codePrefix: "AA"
   }
 ];
 
@@ -1218,6 +1324,331 @@ const renalCaseFiles = [
       "Key clue: common end-stage kidney disease pattern."
     ],
     "diagnosis": "Diabetic Nephropathy"
+  },
+  {
+    "unitId": 3,
+    "department": "Tubular Disease Department",
+    "room": 1,
+    "caseTitle": "Tubular Case 1",
+    "patientResults": [
+      "Pattern: mild proteinuria with RBCs.",
+      "Microscopy: RTE cells and epithelial casts present.",
+      "Cast clue: hyaline, granular, waxy, or broad casts may appear.",
+      "Key clue: tubular cell injury after ischemic or toxic exposure."
+    ],
+    "diagnosis": "Acute Tubular Necrosis"
+  },
+  {
+    "unitId": 3,
+    "department": "Tubular Disease Department",
+    "room": 2,
+    "caseTitle": "Tubular Case 2",
+    "patientResults": [
+      "Pattern: proximal tubule reabsorption failure.",
+      "Urine clue: wasting of glucose, amino acids, phosphorus, sodium, potassium, bicarbonate, and water.",
+      "Key clue: inherited or acquired tubular transport problem.",
+      "System clue: broad reabsorption defect, not one isolated analyte."
+    ],
+    "diagnosis": "Fanconi Syndrome"
+  },
+  {
+    "unitId": 3,
+    "department": "Tubular Disease Department",
+    "room": 3,
+    "caseTitle": "Tubular Case 3",
+    "patientResults": [
+      "Pattern: dilute urine with low specific gravity.",
+      "Clinical clue: frequent urination.",
+      "Hormone clue: tubules cannot respond normally to ADH.",
+      "Key clue: concentration problem from renal tubular response."
+    ],
+    "diagnosis": "Nephrogenic Diabetes Insipidus"
+  },
+  {
+    "unitId": 3,
+    "department": "Tubular Disease Department",
+    "room": 4,
+    "caseTitle": "Tubular Case 4",
+    "patientResults": [
+      "Pattern: urine glucose increased.",
+      "Blood clue: serum glucose is normal.",
+      "Transport clue: glucose transporter number or affinity is decreased.",
+      "Key clue: renal glucose handling problem, not diabetes mellitus pattern."
+    ],
+    "diagnosis": "Renal Glycosuria"
+  },
+  {
+    "unitId": 4,
+    "department": "Interstitial Disease Department",
+    "room": 1,
+    "caseTitle": "Interstitial Case 1",
+    "patientResults": [
+      "Pattern: numerous WBCs and bacteria.",
+      "UA clue: mild proteinuria with RBCs possible.",
+      "Location clue: lower urinary tract/bladder pattern.",
+      "Key clue: inflammation from cystitis-type infection."
+    ],
+    "diagnosis": "Cystitis"
+  },
+  {
+    "unitId": 4,
+    "department": "Interstitial Disease Department",
+    "room": 2,
+    "caseTitle": "Interstitial Case 2",
+    "patientResults": [
+      "Pattern: numerous WBCs and bacteria.",
+      "Microscopy clue: WBC casts present.",
+      "UA clue: mild proteinuria with RBCs possible.",
+      "Location clue: upper UTI/kidney involvement."
+    ],
+    "diagnosis": "Acute Pyelonephritis"
+  },
+  {
+    "unitId": 4,
+    "department": "Interstitial Disease Department",
+    "room": 3,
+    "caseTitle": "Interstitial Case 3",
+    "patientResults": [
+      "Pattern: same infection picture as acute pyelonephritis.",
+      "Cast clue: granular, waxy, or broad casts may also appear.",
+      "History clue: reflux or structural defects may be present.",
+      "Key clue: permanent tubular damage risk."
+    ],
+    "diagnosis": "Chronic Pyelonephritis"
+  },
+  {
+    "unitId": 4,
+    "department": "Interstitial Disease Department",
+    "room": 4,
+    "caseTitle": "Interstitial Case 4",
+    "patientResults": [
+      "Pattern: WBCs with WBC casts, but no bacteria.",
+      "Cell clue: eosinophils may be present.",
+      "UA clue: RBCs and mild-to-marked proteinuria possible.",
+      "Trigger clue: medication or antibiotic allergy pattern."
+    ],
+    "diagnosis": "Acute Interstitial Nephritis"
+  },
+  {
+    "unitId": 5,
+    "department": "Porphyrin Disorders Department",
+    "room": 1,
+    "caseTitle": "Porphyrin Case 1",
+    "patientResults": [
+      "Urine clue: port-wine urine or porphyrinuria pattern.",
+      "Clinical clue: neurologic, psychiatric, or photosensitivity findings.",
+      "Chemistry clue: heme pathway intermediate compounds build up.",
+      "Screen clue: porphyrins may fluoresce under UV."
+    ],
+    "diagnosis": "Porphyrin Disorder"
+  },
+  {
+    "unitId": 6,
+    "department": "MPS Disorders Department",
+    "room": 1,
+    "caseTitle": "MPS Case 1",
+    "patientResults": [
+      "Pattern: mucopolysaccharides accumulate and are excreted in urine.",
+      "Clinical clue: severe childhood pattern with skeletal changes and mental retardation.",
+      "Eye clue: accumulation may involve the cornea.",
+      "Key clue: usually fatal childhood MPS pattern."
+    ],
+    "diagnosis": "Hurler Syndrome"
+  },
+  {
+    "unitId": 6,
+    "department": "MPS Disorders Department",
+    "room": 2,
+    "caseTitle": "MPS Case 2",
+    "patientResults": [
+      "Pattern: mucopolysaccharide breakdown disorder.",
+      "Clinical clue: skeletal changes with mental retardation.",
+      "Course clue: usually fatal in childhood.",
+      "Key clue: MPS pattern without the cornea clue emphasized."
+    ],
+    "diagnosis": "Hunter Syndrome"
+  },
+  {
+    "unitId": 6,
+    "department": "MPS Disorders Department",
+    "room": 3,
+    "caseTitle": "MPS Case 3",
+    "patientResults": [
+      "Pattern: mucopolysaccharide accumulation.",
+      "Clinical clue: mental retardation pattern.",
+      "Course clue: patients may survive into adulthood.",
+      "Key clue: MPS pattern with longer survival."
+    ],
+    "diagnosis": "Sanfilippo Syndrome"
+  },
+  {
+    "unitId": 7,
+    "department": "Purine Disorders Department",
+    "room": 1,
+    "caseTitle": "Purine Case 1",
+    "patientResults": [
+      "Urine clue: massive uric acid crystals.",
+      "Infant clue: orange particles may be seen in diaper.",
+      "Clinical clue: severe motor defects, mental dysfunction, self-injury, gout, and renal calculi.",
+      "Enzyme clue: purine salvage pathway problem."
+    ],
+    "diagnosis": "Lesch-Nyhan Disease"
+  },
+  {
+    "unitId": 8,
+    "department": "Carbohydrate Disorders Department",
+    "room": 1,
+    "caseTitle": "Carbohydrate Case 1",
+    "patientResults": [
+      "Pattern: toxic carbohydrate intermediates build up.",
+      "Infant clue: failure to thrive.",
+      "Clinical clue: liver disorder, cataracts, and severe mental retardation pattern.",
+      "Screen clue: reducing sugar positive while glucose test is negative."
+    ],
+    "diagnosis": "Galactosemia"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 1,
+    "caseTitle": "Phenylalanine-Tyrosine Case 1",
+    "patientResults": [
+      "Pattern: phenylalanine cannot convert normally to tyrosine.",
+      "Urine clue: increased keto acids with mousy odor.",
+      "Pigment clue: decreased melanin may be present.",
+      "Diet clue: avoid phenylalanine/aspartame."
+    ],
+    "diagnosis": "Phenylketonuria"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 2,
+    "caseTitle": "Phenylalanine-Tyrosine Case 2",
+    "patientResults": [
+      "Pattern: tyrosine and related metabolites increased.",
+      "Crystal clue: tyrosine or leucine crystals may be seen.",
+      "Clinical clue: may be inherited, transient in premature infants, or acquired with liver disease.",
+      "Screen clue: nitroso-naphthol may give orange-red reaction."
+    ],
+    "diagnosis": "Tyrosyluria"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 3,
+    "caseTitle": "Phenylalanine-Tyrosine Case 3",
+    "patientResults": [
+      "Urine clue: urine darkens after standing in air.",
+      "Pigment clue: melanin is increased in urine.",
+      "Clinical clue: overgrowth of melanocytes pattern.",
+      "Screen clue: gray/black precipitate or red reactions may be seen."
+    ],
+    "diagnosis": "Melanuria"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 4,
+    "caseTitle": "Phenylalanine-Tyrosine Case 4",
+    "patientResults": [
+      "Urine clue: urine darkens after becoming alkaline and standing.",
+      "Childhood clue: stained diapers may appear.",
+      "Adult clue: brown pigment deposits and arthritis pattern.",
+      "Pathway clue: homogentisic acid oxidation problem."
+    ],
+    "diagnosis": "Alkaptonuria"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 5,
+    "caseTitle": "Branched-Chain Amino Acid Case 1",
+    "patientResults": [
+      "Odor clue: sweet syrup odor.",
+      "Pattern: ketones increased in urine and blood.",
+      "Amino acid clue: leucine, isoleucine, and valine pathway problem.",
+      "Clinical clue: newborn failure-to-thrive pattern."
+    ],
+    "diagnosis": "Maple Syrup Urine Disease"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 6,
+    "caseTitle": "Branched-Chain Amino Acid Case 2",
+    "patientResults": [
+      "Odor clue: sweaty feet odor.",
+      "Pattern: vomiting, metabolic acidosis, hypoglycemia, ketonuria, and ammonia elevation.",
+      "Pathway clue: branched-chain amino acid metabolism issue.",
+      "Key clue: isovaleric acid pattern."
+    ],
+    "diagnosis": "Isovaleric Acidemia"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 7,
+    "caseTitle": "Tryptophan Case 1",
+    "patientResults": [
+      "Color clue: colorless compound oxidizes to blue indigo.",
+      "Diaper clue: blue staining may be seen.",
+      "Pathway clue: tryptophan becomes indole through intestinal bacteria.",
+      "Associated clue: Hartnup or intestinal disorder pattern may be present."
+    ],
+    "diagnosis": "Indicanuria"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 8,
+    "caseTitle": "Tryptophan Case 2",
+    "patientResults": [
+      "Pattern: 5-HIAA excretion increased.",
+      "Pathway clue: tryptophan-related metabolite pattern.",
+      "Clinical clue: malignant tumor association.",
+      "Key clue: less common tryptophan disorder."
+    ],
+    "diagnosis": "5-HIAA Increase"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 9,
+    "caseTitle": "Cystine Case 1",
+    "patientResults": [
+      "Urine clue: cystine elevated with cystine crystals.",
+      "Clinical clue: renal calculi common in children.",
+      "Transport clue: cystine, lysine, arginine, and ornithine reabsorption problem.",
+      "Key clue: renal amino acid transport disorder."
+    ],
+    "diagnosis": "Cystinuria"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 10,
+    "caseTitle": "Cystine Case 2",
+    "patientResults": [
+      "Pattern: cystine crystals deposit in tissues and renal tubular cells.",
+      "Tubular clue: proximal tubule crystals block reabsorption.",
+      "Urine clue: polyuria, aminoaciduria, and decreased concentration pattern.",
+      "Key clue: lysosomal membrane defect with Fanconi-type findings."
+    ],
+    "diagnosis": "Cystinosis"
+  },
+  {
+    "unitId": 9,
+    "department": "Amino Acid Disorders Department",
+    "room": 11,
+    "caseTitle": "Cystine Case 3",
+    "patientResults": [
+      "Pattern: homocystine increased.",
+      "Clinical clue: failure to thrive, cataracts, mental retardation, and thrombosis problems.",
+      "Pathway clue: methionine metabolism defect.",
+      "Key clue: vascular/thrombotic amino acid disorder pattern."
+    ],
+    "diagnosis": "Homocystinuria"
   }
 ];
 
@@ -1235,6 +1666,22 @@ function esc(value){
   }[ch]));
 }
 
+function syncCaseThemeButton(){
+  const button = document.getElementById("caseThemeBtn");
+  if(!button){return;}
+  const theme = document.documentElement.dataset.mlsTheme || "light";
+  button.textContent = theme === "dark" ? "Switch to light" : "Switch to dark";
+  button.title = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
+}
+
+function toggleCaseTheme(){
+  const current = document.documentElement.dataset.mlsTheme || "light";
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.dataset.mlsTheme = next;
+  try{localStorage.setItem("mlsboc_theme", next);}catch(error){}
+  syncCaseThemeButton();
+}
+
 function loadProgress(){
   try{
     const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
@@ -1248,12 +1695,20 @@ function saveProgress(){
   localStorage.setItem(storageKey, JSON.stringify(progress));
 }
 
+function unitFor(item){
+  return renalUnits.find(unit => unit.unitId === item.unitId) || {};
+}
+
+function unitNameFor(item){
+  return unitFor(item).unitName || item.unitName || "Hospital Unit";
+}
+
 function caseKey(item){
   return `${item.unitId}-${item.room}`;
 }
 
 function caseCode(item){
-  const unit = renalUnits.find(unit => unit.unitId === item.unitId);
+  const unit = unitFor(item);
   return `${unit?.codePrefix || "R"}${item.room}`;
 }
 
@@ -1291,7 +1746,7 @@ function renderStart(){
   const totalClosed = Object.keys(progress.closed).length;
   const totalCases = renalCaseFiles.length;
   const completeMessage = totalClosed === totalCases
-    ? '<div class="completion" style="margin-top:18px">UA Renal Case Files Complete - 13/13 medical cases closed.</div>'
+    ? `<div class="completion" style="margin-top:18px">UA Case Game Complete - ${totalCases}/${totalCases} cases closed.</div>`
     : "";
   return `
     <div class="unit-grid">
@@ -1300,8 +1755,8 @@ function renderStart(){
         const closed = closedCases(unit.unitId).length;
         const isEmpty = cases.length === 0;
         const pct = isEmpty ? 0 : Math.round((closed / cases.length) * 100);
-        const countCopy = isEmpty ? (unit.comingSoon || "Case files coming soon") : `${cases.length} rooms / ${cases.length} medical cases`;
-        const progressCopy = isEmpty ? "Ready for future case files" : `Cases Closed ${closed}/${cases.length}`;
+        const countCopy = isEmpty ? (unit.comingSoon || "Cases coming soon") : `${cases.length} rooms / ${cases.length} cases`;
+        const progressCopy = isEmpty ? "Ready for future cases" : `Cases Closed ${closed}/${cases.length}`;
         return `<button class="unit-card ${isEmpty ? "is-empty" : ""}" type="button" ${isEmpty ? "disabled" : `onclick="enterUnit(${unit.unitId})"`}>
           <div class="unit-lobby-icon" aria-hidden="true"></div>
           <div class="unit-summary">
@@ -1330,7 +1785,7 @@ function renderUnit(){
           <div>
             <div class="eyebrow">${esc(unit.unitName)}</div>
             <h2>${esc(unit.department)}</h2>
-            <p>${esc(unit.comingSoon || "Case files coming soon")}</p>
+            <p>${esc(unit.comingSoon || "Cases coming soon")}</p>
           </div>
           <div class="action-row" style="margin-top:0">
             <button class="game-btn ghost" type="button" onclick="backToUnits()">Hospital Lobby</button>
@@ -1349,7 +1804,7 @@ function renderUnit(){
         <div>
           <div class="eyebrow">${esc(unit.unitName)}</div>
           <h2>${esc(unit.department)}</h2>
-          <p>Open a room, review the patient chart, then choose a diagnosis token.</p>
+          <p>Open a hospital room, review the pattern clues, then choose a diagnosis token.</p>
           <div class="progress-track"><div class="progress-fill" style="--progress:${Math.round((closed / unitCases.length) * 100)}%"></div></div>
           <div class="progress-copy">Cases Closed ${closed}/${unitCases.length}</div>
         </div>
@@ -1364,14 +1819,14 @@ function renderUnit(){
         <div class="department-hall-door" aria-hidden="true"></div>
         <div>
           <strong>${esc(unit.department)} Hallway</strong>
-          <span>Choose a patient room door to pull the chart for that case file.</span>
+          <span>Choose a room to pull the short evidence pattern for that case.</span>
         </div>
       </div>
       <div class="room-panel">
         <div class="chart-title-row">
           <div>
-            <h2>Hospital Rooms</h2>
-            <p>Closed rooms stay marked in the room list.</p>
+            <h2>Case Rooms</h2>
+            <p>Closed rooms stay marked in the case list.</p>
           </div>
         </div>
         <div class="room-grid">
@@ -1392,8 +1847,9 @@ function renderRoomCard(item){
       <div class="room-door-handle"></div>
     </div>
     <span class="room-number">${caseCode(item)}</span>
-    <h3>Room ${item.room}</h3>
+    <h3>Case Room ${caseCode(item)}</h3>
     <p>${esc(item.caseTitle)}</p>
+    ${closed ? '<span class="closed-stamp">Case Closed</span>' : ""}
   </button>`;
 }
 
@@ -1405,26 +1861,26 @@ function renderChart(item){
     .filter(diagnosis => !unitUsed.has(diagnosis));
   const message = closed
     ? "Case Closed. This room is sealed."
-    : (chartMessage || "Choose a diagnosis token, then confirm the chart.");
+    : (chartMessage || "Choose a diagnosis token, then confirm the case.");
   const messageState = closed ? "good" : chartMessageState;
   return `<div class="chart-panel" id="patientChart">
     <div class="chart-title-row">
       <div>
-        <h2>Patient Chart - ${caseCode(item)} / Room ${item.room}</h2>
-        <p>${esc(item.unitName)} / ${esc(item.department)} / ${esc(item.caseTitle)}</p>
+        <h2>Patient Chart - ${caseCode(item)}</h2>
+        <p>${esc(unitNameFor(item))} / ${esc(item.department)} / ${esc(item.caseTitle)}</p>
       </div>
       <button class="game-btn ghost" type="button" onclick="closeChart()">Close Chart</button>
     </div>
     <div class="chart-layout">
       <div class="clipboard">
-        <div class="clipboard-head"><span>Patient Results</span><span>UA Evidence</span></div>
+        <div class="clipboard-head"><span>Patient Pattern</span><span>UA Evidence</span></div>
         <ul class="evidence-list">
           ${caseClues(item).map(result => `<li>${esc(result)}</li>`).join("")}
         </ul>
       </div>
       <aside class="diagnosis-bank">
         <h3>Diagnosis Bank</h3>
-        <p>${closed ? "This room no longer needs a token." : "Pick one diagnosis token for this patient chart."}</p>
+        <p>${closed ? "This room no longer needs a token." : "Pick one diagnosis token for this room."}</p>
         <div class="token-grid">
           ${closed ? "" : available.map(diagnosis => `<button type="button" class="diagnosis-token ${selectedDiagnosis === diagnosis ? "selected" : ""}" data-diagnosis="${esc(diagnosis)}">${esc(diagnosis)}</button>`).join("")}
         </div>
@@ -1542,21 +1998,25 @@ function renderPrintable(){
     cardPages.push(`<div class="print-card-page">${renalCaseFiles.slice(i,i+2).map(renderPrintCard).join("")}</div>`);
   }
   const tokenCases = [...renalCaseFiles].sort((a,b) => a.unitId - b.unitId || a.room - b.room);
-  const tokens = `<div class="print-token-section">
-    <h2 class="print-section-title">UA Renal Diagnosis Tokens - Front</h2>
+  const tokenChunks = [];
+  for(let i = 0; i < tokenCases.length; i += 20){
+    tokenChunks.push(tokenCases.slice(i,i+20));
+  }
+  const tokens = tokenChunks.map((chunk,index) => `<div class="print-token-section">
+    <h2 class="print-section-title">UA Diagnosis Tokens - Front Sheet ${index + 1}</h2>
     <div class="print-token-grid">
-      ${tokenCases.map(renderPrintTokenFront).join("")}
+      ${chunk.map(renderPrintTokenFront).join("")}
     </div>
   </div>
   <div class="print-token-section back-side">
-    <h2 class="print-section-title">UA Renal Diagnosis Tokens - Back</h2>
+    <h2 class="print-section-title">UA Diagnosis Tokens - Back Sheet ${index + 1}</h2>
     <div class="print-token-grid">
-      ${tokenCases.map(renderPrintTokenBack).join("")}
+      ${chunk.map(renderPrintTokenBack).join("")}
     </div>
-  </div>`;
+  </div>`).join("");
   document.getElementById("printableGame").innerHTML = `
     <div class="print-case-section">
-      <h1 class="print-section-title">UA Renal Case Files - Case Cards</h1>
+      <h1 class="print-section-title">UA Case Game - Case Cards</h1>
       ${cardPages.join("")}
     </div>
     ${tokens}
@@ -1564,7 +2024,7 @@ function renderPrintable(){
 }
 
 function printTokenClass(item, extra = ""){
-  return `print-token ${item.unitId === 2 ? "ns-token" : ""} ${extra}`.trim();
+  return `print-token unit-token-${item.unitId} ${item.unitId === 2 ? "ns-token" : ""} ${extra}`.trim();
 }
 
 function renderPrintTokenFront(item){
@@ -1578,14 +2038,14 @@ function renderPrintTokenBack(item){
 function renderPrintCard(item){
   const clues = caseClues(item);
   return `<article class="print-card">
-    <div class="print-hospital-icon" aria-hidden="true">+</div>
-    <h2>${caseCode(item)} - ${esc(item.unitName)}</h2>
+    <div class="print-hospital-icon" aria-hidden="true"></div>
+    <h2>${caseCode(item)} - ${esc(unitNameFor(item))}</h2>
     <div class="meta">
       <strong>${esc(item.department)}</strong><br>
-      Room ${item.room} / ${esc(item.caseTitle)}
+      Room ${caseCode(item)} / ${esc(item.caseTitle)}
     </div>
     <div>
-      <div class="clue-title">Patient Results / UA Evidence</div>
+      <div class="clue-title">Pattern Clues / UA Evidence</div>
       <div class="print-clue-list">${clues.map(result => `<div class="print-clue">${esc(result)}</div>`).join("")}</div>
     </div>
     <div class="token-target"><span class="case-code">${caseCode(item)}</span></div>
@@ -1607,6 +2067,7 @@ window.addEventListener("afterprint", () => {
   document.body.classList.remove("print-cases","print-tokens","print-full");
 });
 
+syncCaseThemeButton();
 renderPrintable();
 render();
 </script>
