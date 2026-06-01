@@ -3358,15 +3358,19 @@ async function renderImagesTab(el){
 async function renderGenericImages(el){
   el.innerHTML=imageLoadingHTML();
   let data;
-  if(appState.subject==='para_myco'){
-    const [r1,r2]=await Promise.all([
-      sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),
-      sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at')
-    ]);
-    data=[...(r1.data||[]),...(r2.data||[])];
-  }else{
-    const res=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
-    data=res.data||[];
+  try{
+    if(appState.subject==='para_myco'){
+      const [r1,r2]=await Promise.all([
+        fetchRowsWithRetry(()=>sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),3,true),
+        fetchRowsWithRetry(()=>sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at'),3,true)
+      ]);
+      data=[...r1,...r2];
+    }else{
+      data=await fetchRowsWithRetry(()=>sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at'),3,true);
+    }
+  }catch(e){
+    el.innerHTML=imageLoadRetryHTML('This subject','renderTab()');
+    return;
   }
   const valid=(data||[]).filter(img=>img.image_url);
 
@@ -3447,10 +3451,17 @@ async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
   // Show skeleton immediately
   el.innerHTML=imageLoadingHTML();
-  // Use cache
-  if(!window._uaCache){
-    try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}
-    catch(e){window._uaCache=[];}
+  if(!Array.isArray(window._uaCache)||window._uaCacheLoadFailed||window._uaCache.length===0){
+    try{
+      window._uaCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_ua_images').select('*').order('name'),3,true);
+      window._uaCacheLoadFailed=false;
+    }catch(e){
+      window._uaCacheLoadFailed=true;
+      if(!Array.isArray(window._uaCache)||!window._uaCache.length){
+        el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaCache=null;window._uaCacheLoadFailed=false;renderTab()');
+        return;
+      }
+    }
   }
   const all=window._uaCache||[];
 
@@ -3465,7 +3476,7 @@ async function renderUAImages(el){
       <input type="text" id="ua-search" placeholder="Search findings..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterUAItems(this.value)">
       <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
     </div>
-    ${!all.length?'<div class="empty">No urinalysis images yet. Use Admin mode to add some.</div>':''}
+    ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
     <div class="condition-grid" id="ua-items-body">
       ${all.map(img=>`
         <div class="condition-card ua-item" data-name="${esc(img.name.toLowerCase())}" onclick="openUAImage('${img.id}')">
@@ -4016,10 +4027,18 @@ async function renderHemeImages(el){
   }
   // Show skeleton immediately
   el.innerHTML=imageLoadingHTML();
-  // Use cache
-  if(!window._hemeCondsCache){
-    try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=hemeConditionsOrDefaults(r.data||[]);}
-    catch(e){window._hemeCondsCache=hemeDefaultConditions();}
+  if(!Array.isArray(window._hemeCondsCache)||window._hemeCondsLoadFailed||window._hemeCondsCache.length===0){
+    try{
+      const rows=await fetchRowsWithRetry(()=>sb.from('mlsboc_heme_conditions').select('*').order('name'),3,true);
+      window._hemeCondsCache=hemeConditionsOrDefaults(rows);
+      window._hemeCondsLoadFailed=false;
+    }catch(e){
+      window._hemeCondsLoadFailed=true;
+      if(!Array.isArray(window._hemeCondsCache)||!window._hemeCondsCache.length){
+        el.innerHTML=imageLoadRetryHTML('Hematology','window._hemeCondsCache=null;window._hemeCondsLoadFailed=false;renderTab()');
+        return;
+      }
+    }
   }
   // Flat view — load all conditions, group by folder inline
   const allConditions=window._hemeCondsCache||[];
@@ -4079,7 +4098,7 @@ async function renderHemeImages(el){
             </div>
           </div>`;
       }).join('')}
-      ${conditions.length===0?'<div class="empty">No conditions yet. Use Admin mode to add one.</div>':''}
+      ${conditions.length===0?'<div class="empty">No hematology conditions loaded yet. Try this tab again before adding new images.</div>':''}
     </div>
     ${isAdmin?`<div class="mt-16">${adminHemeImageControls()}</div>`:''}
   `;
@@ -4486,9 +4505,17 @@ async function renderMicroImages(el){
   el.innerHTML=imageLoadingHTML();
 
   // Flat view — cache organisms to avoid refetch on tab switch
-  if(!window._microOrgsCache||window._microOrgsCache.length===0){
-    try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');
-      window._microOrgsCache=r.data||[];}catch(e){window._microOrgsCache=[];}
+  if(!Array.isArray(window._microOrgsCache)||window._microOrgsLoadFailed||window._microOrgsCache.length===0){
+    try{
+      window._microOrgsCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_micro_organisms').select('*').order('name'),3,true);
+      window._microOrgsLoadFailed=false;
+    }catch(e){
+      window._microOrgsLoadFailed=true;
+      if(!Array.isArray(window._microOrgsCache)||!window._microOrgsCache.length){
+        el.innerHTML=imageLoadRetryHTML('Microbiology','window._microOrgsCache=null;window._microOrgsLoadFailed=false;renderTab()');
+        return;
+      }
+    }
   }
   const all=window._microOrgsCache||[];
   const byFolder={};
@@ -4533,7 +4560,7 @@ async function renderMicroImages(el){
             </div>
           </div>`;
       }).join('')}
-      ${all.length===0?'<div class="empty">No organisms yet. Use Admin mode to add some.</div>':''}
+      ${all.length===0?'<div class="empty">No microbiology images loaded yet. Try this tab again before adding new images.</div>':''}
     </div>
     ${isAdmin?`<div class="mt-16">${adminMicroImageControls()}</div>`:''}
   `;
@@ -4947,6 +4974,7 @@ async function renderHematologyCases(el){
       </div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal()">📄 Export</button>
     </div>
+    ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!data||!data.length?'<div class="empty">No Hematology cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderHemeCase(c,i)).join('')}
   `;
@@ -4979,7 +5007,6 @@ function renderHemeCase(c,idx){
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
               ${caseAnswersAvailable()&&!hcAllChecked(c.id,qs.length)?`<button class="btn btn-primary btn-sm" onclick="checkAllHC('${c.id}',${qs.length})">Check All</button>`:''}
               ${hcAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllHC('${c.id}')">Reset All</button>`:''}
             </div>
@@ -5022,7 +5049,6 @@ function renderHemeCaseQuestion(caseId,q,qi,selState){
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
         ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkHemeCaseQ('${caseId}',${qi})">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetHemeCaseQ('${caseId}',${qi})">Reset</button>`:''}
-        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
@@ -5554,6 +5580,7 @@ async function renderSubjectCases(el, cfg){
         ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
+    ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!cases.length?`<div class="empty">No ${cfg.label} yet. Use Admin mode to add one.</div>`:''}
     ${cases.map((c,i)=>renderSubjectCase(c,i,cfg)).join('')}
   `;
@@ -5590,7 +5617,6 @@ function renderSubjectCase(c, idx, cfg){
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
               ${caseAnswersAvailable()&&!scAllChecked(c.id,qs.length,cfg.answerKey)?`<button class="btn btn-primary btn-sm" onclick="checkAllSC('${c.id}',${qs.length},'${cfg.answerKey}')">Check All</button>`:''}
               ${scAnyAnswered(c.id,cfg.answerKey)?`<button class="btn btn-ghost btn-sm" onclick="resetAllSC('${c.id}','${cfg.answerKey}')">Reset All</button>`:''}
             </div>
@@ -5633,7 +5659,6 @@ function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
         ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetSubjectCaseQ('${caseId}',${qi},'${answerKey}')">Reset</button>`:''}
-        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
@@ -6119,7 +6144,7 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select cases to include.</div>
-    ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Answers are not available for these activities in regular view. Exports include cases and options only.</div>`:''}
+      ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answers not available in regular view. Exports include cases and options only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=false)">Deselect All</button>
@@ -6674,6 +6699,7 @@ async function renderGenericCases(el){
   const {data}=await sb.from('mlsboc_cases').select('*').eq('subject',appState.subject).order('created_at');
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminCaseControls()}</div>`:''}
+    ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!data||!data.length?'<div class="empty">No cases yet for this subject.</div>':''}
     ${(data||[]).map((c,i)=>renderCaseCard(c,i)).join('')}
   `;
@@ -6695,7 +6721,6 @@ function renderCaseCard(c,idx){
       ${c.case_data?`<div class="case-data">${c.case_data}</div>`:''}
       ${caseImageRowHTML(imgs)}
       ${steps.map((step,si)=>renderCaseStep(c.id,step,si,fb)).join('')}
-      ${!reveal?caseAnswerNoticeHTML():''}
       ${reveal&&!fb?`<button class="btn btn-primary btn-sm mt-8" onclick="submitGenericCase('${c.id}','${esc(c.answer)}')">Submit</button>`:''}
       ${reveal&&fb?`<div class="case-feedback ${fb.correct?'correct':'wrong'}">${fb.correct?'✓ Correct':'✗ Incorrect'} — ${fb.note||c.answer}</div>`:''}
       ${isAdmin?`<div class="flex gap-8 mt-8">
@@ -6765,6 +6790,7 @@ async function renderMicroCases(el){
       </div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal()">📄 Export</button>
     </div>
+    ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!data||!data.length?'<div class="empty">No Microbiology cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderMicroCase(c,i)).join('')}
   `;
@@ -6800,7 +6826,6 @@ function renderMicroCase(c,idx){
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
               ${caseAnswersAvailable()&&!mcAllChecked(c.id,qs.length)?`<button class="btn btn-primary btn-sm" onclick="checkAllMC('${c.id}',${qs.length})">Check All</button>`:''}
               ${mcAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllMC('${c.id}')">Reset All</button>`:''}
             </div>
@@ -6843,7 +6868,6 @@ function renderMicroCaseQuestion(caseId,q,qi,selState){
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
         ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkMCQ('${caseId}',${qi})">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetMCQ('${caseId}',${qi})">Reset</button>`:''}
-        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
@@ -7051,6 +7075,7 @@ async function renderBloodBankCases(el){
         ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
+    ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!data||!data.length?'<div class="empty">No Blood Bank cases yet. Use Admin mode to add one.</div>':''}
     ${(data||[]).map((c,i)=>renderBBCase(c,i)).join('')}
   `;
@@ -7310,7 +7335,6 @@ function renderBBCase(c,idx){
             <div class="divider"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px">Questions</div>
-              ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
               ${caseAnswersAvailable()&&!bbAllChecked(c.id,qs.length)?`<button class="btn btn-primary btn-sm" onclick="checkAllBB('${c.id}',${qs.length})">Check All</button>`:''}
               ${bbAnyAnswered(c.id)?`<button class="btn btn-ghost btn-sm" onclick="resetAllBB('${c.id}')">Reset All</button>`:''}
             </div>
@@ -7353,7 +7377,6 @@ function renderBBQuestion(caseId,q,qi,selState){
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:32px">
         ${reveal&&!checked&&chosen?`<button class="btn btn-primary btn-sm" onclick="checkBBQ('${caseId}',${qi})">Check Answer</button>`:''}
         ${chosen?`<button class="btn btn-ghost btn-sm" onclick="resetBBQ('${caseId}',${qi})">Reset</button>`:''}
-        ${!reveal?caseAnswerNoticeHTML():''}
       </div>
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
@@ -8635,7 +8658,7 @@ async function openExportModal(){
       ${closeBtn}
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Select cases to include — all go into one PDF.</div>
-    ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Answers are not available for these activities in regular view. Exports will include cases and options only.</div>`:''}
+      ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answers not available in regular view. Exports will include cases and options only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(false)">Deselect All</button>
@@ -9897,8 +9920,33 @@ function imageEntryList(images){
   }
   return [images];
 }
+function wait(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+async function fetchRowsWithRetry(fetcher, attempts=3, retryEmpty=false){
+  let lastError=null;
+  for(let i=0;i<attempts;i++){
+    try{
+      const res=await fetcher();
+      if(res&&res.error)throw res.error;
+      const rows=Array.isArray(res?.data)?res.data:(res?.data?res.data:[]);
+      if(retryEmpty&&!rows.length&&i<attempts-1){
+        await wait(250*(i+1));
+        continue;
+      }
+      return rows;
+    }catch(err){
+      lastError=err;
+      if(i<attempts-1)await wait(300*(i+1));
+    }
+  }
+  throw lastError||new Error('Load failed');
+}
 function imageLoadingHTML(){
   return '<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>Loading images — this may take a moment on first visit...</span><span style="font-size:12px;color:var(--text3)">If images do not load the first try, refresh or try the tab again.</span></div>';
+}
+function imageLoadRetryHTML(label,retryAction){
+  return `<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>${label} images did not load this time. Try this tab again; if it still looks blank, refresh once.</span><button class="btn btn-primary btn-sm" onclick="${retryAction}">Try loading again</button></div>`;
 }
 function retryImageLoad(img){
   if(!img)return;
@@ -9922,7 +9970,7 @@ function caseAnswersAvailable(){
   return !!isAdmin;
 }
 function caseAnswerNoticeHTML(){
-  return '<div class="case-answer-notice" style="background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;color:var(--text2);font-size:13px;font-weight:600">Answers are not available for these activities in regular view.</div>';
+  return '<div class="case-answer-notice" style="background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin:0 0 14px;color:var(--text2);font-size:13px;font-weight:600">Questions and options available. Answers not available in regular view.</div>';
 }
 function caseImageRowHTML(images, extraStyle=''){
   const urls=imageEntryList(images).map(imageEntrySrc).filter(Boolean);
