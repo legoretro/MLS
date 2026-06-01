@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hematology Case Game</title>
+<script src="interactive_theme.js"></script>
+<link rel="stylesheet" href="interactive_learning.css">
+<style>
+:root{
+  --heme:#b22222;
+  --heme-dark:#7e1515;
+  --ink:#171b2e;
+  --muted:#5a6384;
+  --line:#c7d2ea;
+  --paper:#fffdf8;
+  --soft:#f7e7e7;
+  --gold:#f2cf68;
+  --green:#4c9f70;
+}
+body.heme-case-game{
+  background:linear-gradient(180deg,#f3f6fc 0%,#e9eef8 100%);
+  color:var(--ink);
+}
+.heme-wrap{max-width:1180px;margin:0 auto;padding:22px}
+.heme-hero,.department-card,.chart-card,.bank-card{
+  background:rgba(255,255,255,.92);
+  border:2px solid var(--line);
+  border-radius:24px;
+  box-shadow:0 18px 44px rgba(43,59,102,.12);
+}
+.heme-hero{padding:28px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin-bottom:22px;border-top:8px solid var(--heme)}
+.kicker{font:900 12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--heme)}
+.heme-hero h1{font-size:44px;line-height:1;margin:8px 0;color:var(--ink)}
+.heme-hero p{font-size:18px;color:var(--muted);margin:0;max-width:760px}
+.hero-mark{width:82px;height:82px;border-radius:22px;background:linear-gradient(135deg,#fff,#ffe3e3);border:2px solid #e7a8a8;display:grid;place-items:center;color:var(--heme);font-size:40px}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+.tool-btn{border:2px solid #b9c5df;border-radius:999px;padding:10px 16px;background:#fff;color:#343b5c;font-weight:900;cursor:pointer}
+.tool-btn.primary{background:#2d66d7;border-color:#2d66d7;color:#fff}
+.tool-btn.ghost:hover{border-color:#2d66d7}
+.game-grid{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(420px,1.25fr);gap:18px;align-items:start}
+.department-list{display:grid;gap:12px}
+.department-card{padding:18px;text-align:left;cursor:pointer;transition:.18s ease;position:relative;overflow:hidden}
+.department-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--dept-color,var(--heme))}
+.department-card.active{border-color:var(--dept-color,var(--heme));transform:translateY(-1px);box-shadow:0 16px 36px rgba(43,59,102,.18)}
+.dept-top{display:flex;align-items:center;gap:12px}
+.dept-icon{width:52px;height:52px;border-radius:16px;background:color-mix(in srgb,var(--dept-color,var(--heme)) 20%,#fff);border:2px solid color-mix(in srgb,var(--dept-color,var(--heme)) 55%,#fff);display:grid;place-items:center;font-size:25px}
+.department-card h2{font-size:18px;margin:0;color:var(--ink)}
+.department-card p{font-size:13px;margin:5px 0 0;color:var(--muted)}
+.progress{height:8px;border-radius:999px;background:#e8edf8;margin-top:14px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--dept-color,var(--heme));width:0%}
+.room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px;margin-top:12px}
+.room-btn{border:2px solid #d8e0f1;background:#fff;border-radius:16px;padding:12px 10px;text-align:left;cursor:pointer;font-weight:900;color:var(--ink)}
+.room-btn.active{border-color:var(--heme);box-shadow:0 0 0 4px rgba(178,34,34,.12)}
+.room-btn.closed{background:#edf7ef;border-color:#8dc7a2}
+.room-code{font:900 14px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--heme)}
+.room-label{display:block;font-size:11px;color:var(--muted);margin-top:5px}
+.chart-card{padding:18px;border-color:#92a6d2}
+.chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.chart-head h2{font-size:26px;margin:0;color:var(--ink)}
+.chart-head p{margin:3px 0 0;color:var(--muted);font-size:14px}
+.case-code{background:#fff0f0;border:2px solid #e7a8a8;color:var(--heme-dark);border-radius:999px;padding:8px 12px;font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.clue-list{display:grid;gap:10px;margin:14px 0}
+.clue{background:var(--paper);border:2px solid #ead7a4;border-radius:14px;padding:13px 14px;font-size:18px;font-weight:800;color:#27304d}
+.answer-row{display:grid;grid-template-columns:1fr minmax(240px,.55fr);gap:14px;align-items:start}
+.bank-card{padding:16px;border-color:#d9b64a;background:#fffdf3}
+.bank-card h3{font-size:18px;margin:0 0 4px;color:var(--ink)}
+.bank-card p{font-size:13px;color:var(--muted);margin:0 0 10px}
+.token-bank{display:flex;flex-wrap:wrap;gap:8px}
+.diag-token{border:2px solid #9d7410;border-radius:999px;padding:8px 12px;background:linear-gradient(180deg,#ffe891,#e6c733);box-shadow:0 3px 0 #b89a2b;color:#372907;font-size:13px;font-weight:900;cursor:pointer;max-width:100%;line-height:1.1}
+.diag-token.selected{outline:4px solid rgba(45,102,215,.26);background:#2d66d7;color:#fff;border-color:#2d66d7;box-shadow:0 3px 0 #194395}
+.status{margin-top:12px;padding:11px 12px;border:2px solid #c7d2ea;border-radius:14px;font-weight:900;color:#465071;background:#fff}
+.status.good{border-color:#86c99d;color:#1f6f3a;background:#effaf1}
+.status.bad{border-color:#e7a8a8;color:#8a2020;background:#fff0f0}
+html[data-mls-theme="dark"] body.heme-case-game{background:#0d111c;color:#f4f6ff}
+html[data-mls-theme="dark"] .heme-hero,
+html[data-mls-theme="dark"] .department-card,
+html[data-mls-theme="dark"] .chart-card,
+html[data-mls-theme="dark"] .bank-card{background:#161c2c;border-color:#313b5a;color:#f4f6ff}
+html[data-mls-theme="dark"] .heme-hero h1,
+html[data-mls-theme="dark"] .department-card h2,
+html[data-mls-theme="dark"] .chart-head h2,
+html[data-mls-theme="dark"] .bank-card h3{color:#f4f6ff}
+html[data-mls-theme="dark"] .heme-hero p,
+html[data-mls-theme="dark"] .department-card p,
+html[data-mls-theme="dark"] .chart-head p,
+html[data-mls-theme="dark"] .bank-card p{color:#c3cae2}
+html[data-mls-theme="dark"] .room-btn,
+html[data-mls-theme="dark"] .clue,
+html[data-mls-theme="dark"] .status{background:#101625;color:#f4f6ff;border-color:#33405f}
+html[data-mls-theme="dark"] .bank-card{background:#1b1a12;border-color:#8c762d}
+@media(max-width:860px){
+  .heme-wrap{padding:14px}
+  .heme-hero{grid-template-columns:1fr;padding:20px}
+  .heme-hero h1{font-size:34px}
+  .game-grid,.answer-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body class="mls-interactive heme-case-game">
+<div class="site-header">
+  <div>
+    <div class="logo">MLS/BOC PREP</div>
+    <div class="logo-sub">Interactive Learning</div>
+  </div>
+  <a class="mls-home-btn" href="index.html">← MLS Home</a>
+</div>
+<main class="heme-wrap">
+  <section class="heme-hero">
+    <div>
+      <div class="kicker">Hematology Interactive Tool</div>
+      <h1>Hematology Case Game</h1>
+      <p>Open a hematology department, read the morphology pattern, then match the correct diagnosis token.</p>
+    </div>
+    <div class="hero-mark" aria-hidden="true">🩸</div>
+  </section>
+
+  <div class="toolbar">
+    <button class="tool-btn primary" onclick="checkAnswer()">Confirm Diagnosis</button>
+    <button class="tool-btn ghost" onclick="resetGame()">Reset</button>
+    <button class="tool-btn ghost" onclick="toggleTheme()">Switch theme</button>
+  </div>
+
+  <section class="game-grid">
+    <div>
+      <div id="departments" class="department-list"></div>
+    </div>
+    <div id="caseArea"></div>
+  </section>
+</main>
+
+<script>
+const hemeCases=[
+  {name:'Myelodysplastic Syndrome (MDS) - multi-lineage',dept:'Chronic / Mixed Malignancies',folder:'malignancies_chronic',clues:['50% RBC precursors','Myeloblasts are below acute leukemia range','May see auer rods']},
+  {name:'Chronic Lymphocytic Leukemia (CLL)',dept:'Chronic / Mixed Malignancies',folder:'malignancies_chronic',clues:['Small mature lymphs','Cracked mud chromatin','Many smudge cells','High WBC pattern']},
+  {name:'Micro/Hypo Anemia (IDA-Milk Baby)',dept:'Anemias',folder:'anemias',clues:['Poikilocytosis pattern','Target cells and ovalocytes may be seen','May have increased WBC or platelets']},
+  {name:'Megaloblastic Anemia',dept:'Anemias',folder:'anemias',clues:['Macrocytic ovalocytes','Hypersegmented PMNs','Large granulated precursors']},
+  {name:'Hairy Cell Leukemia (HCL)',dept:'Chronic / Mixed Malignancies',folder:'malignancies_chronic',clues:['Pancytopenia pattern','Lymphocytes with hairy projections']},
+  {name:'Pelger-Huet Anomaly',dept:'Non-Malignant / Morphology',folder:'non_malignant',clues:['Hyposegmented PMNs','Less than two nuclear lobes','Pince-nez forms']},
+  {name:'Malaria, parasite (trophozoite)',dept:'Infectious',folder:'infectious',clues:['Trophozoite forms inside RBCs']},
+  {name:'Acanthocytosis (Abetalipoproteinemia)',dept:'Anemias',folder:'anemias',clues:['Numerous acanthocytes']},
+  {name:'Polycythemia',dept:'Chronic / Mixed Malignancies',folder:'malignancies_chronic',clues:['Numerous RBCs','LAP increased pattern']},
+  {name:'Leukemoid Reaction',dept:'Reactive / Physiologic',folder:'reactive',clues:['Shift to left','LAP increased pattern']},
+  {name:'Multiple Myeloma',dept:'Chronic / Mixed Malignancies',folder:'malignancies_other',clues:['Rouleaux in peripheral blood','Possible plasma cells','Bone marrow has many plasma cells']},
+  {name:'Acute Myelomonocytic Leukemia (AMML)',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Blasts are in acute leukemia range','Myelocytic and monocytic features','May see auer rods','Low platelets']},
+  {name:'HGB SC',dept:'Anemias',folder:'anemias',clues:['Hemoglobinopathy pattern','Use RBC morphology clues from image review']},
+  {name:'Acute Myeloid Leukemia (M1, M4, M5A or M5B)',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Acute myeloid pattern','Use blast morphology and lineage clues']},
+  {name:'Acute Leukemia',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Blasts are in acute leukemia range']},
+  {name:'Acute Myeloid Leukemia (M3)',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Promyelocyte-heavy pattern','Auer rods','High WBC pattern','Low platelets']},
+  {name:'Chronic Myelocytic Leukemia (CML)',dept:'Chronic / Mixed Malignancies',folder:'malignancies_chronic',clues:['Shift to left','Blasts remain below acute range','Increased basophils','High platelets']},
+  {name:'Kiddie Lymphs',dept:'Reactive / Physiologic',folder:'reactive',clues:['Reactive pediatric lymphocyte pattern','Use image morphology clues']},
+  {name:'Sickle Cell Anemia',dept:'Anemias',folder:'anemias',clues:['Sickle cells','Target cells','Often neutrophilia with shift to left','May see nRBCs']},
+  {name:'Hemolytic Anemia',dept:'Anemias',folder:'anemias',clues:['Hemolysis pattern','Use RBC morphology clues']},
+  {name:'Acute Promyelocytic Leukemia (APL) M3 with rare pseudo-Chediak-Higashi anomaly',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Promyelocyte-heavy acute pattern','Granule abnormality clue']},
+  {name:'Many Immature nRBCs',dept:'Non-Malignant / Morphology',folder:'non_malignant',clues:['Many immature nucleated RBCs','Erythroid precursor pattern']},
+  {name:'Beta Thalassemia Major',dept:'Anemias',folder:'anemias',clues:['Thalassemia pattern','Use RBC morphology clues']},
+  {name:'Reactive Lymphs',dept:'Reactive / Physiologic',folder:'reactive',clues:['Reactive lymphocyte pattern','Variable lymphocyte shapes']},
+  {name:'Hemolytic Uremia with a shift to the left',dept:'Anemias',folder:'anemias',clues:['Hemolytic pattern','Shift to left clue']},
+  {name:'Sezary Syndrome',dept:'Chronic / Mixed Malignancies',folder:'malignancies_other',clues:['Mature-appearing lymphs','Convoluted cerebriform nuclear folds']},
+  {name:'Acute Lymphoblastic Leukemia (ALL)',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Acute lymphoblast pattern','Use blast morphology clues']},
+  {name:'Platelet satellites',dept:'Non-Malignant / Morphology',folder:'non_malignant',clues:['Platelets attached around neutrophils','Satellite pattern']},
+  {name:'Plasma Cell Leukemia',dept:'Chronic / Mixed Malignancies',folder:'malignancies_other',clues:['Plasma cell pattern in blood','Circulating plasma cells']},
+  {name:'Acute Myelo-Monoblastic Leukemia (AML-M4)',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Acute myeloid-monocytic pattern','Use lineage morphology clues']},
+  {name:'Chronic Myelo-Monocytic Leukemia (CMML)',dept:'Chronic / Mixed Malignancies',folder:'malignancies_chronic',clues:['Chronic myelo-monocytic pattern','Mixed granulocytic and monocytic clues']},
+  {name:'Anemia with a shift to the left',dept:'Anemias',folder:'anemias',clues:['Anemia pattern','Shift to left clue']},
+  {name:'Pernicious Anemia',dept:'Anemias',folder:'anemias',clues:['Megaloblastic-type anemia pattern','Use macrocytic morphology clues']},
+  {name:'Acute Myeloblastic Leukemia (Likely AML-M1)',dept:'Acute Leukemias',folder:'malignancies_acute',clues:['Acute myeloblast pattern','Minimal maturation clue']},
+  {name:'Bacteria Spirochetes',dept:'Infectious',folder:'infectious',clues:['Spirochete organisms seen with blood cells']},
+  {name:'Beta Thalassemia Minor',dept:'Anemias',folder:'anemias',clues:['Milder thalassemia pattern','Use RBC morphology clues']}
+].map((item,index)=>({...item,code:`H${index+1}`}));
+
+const deptStyles={
+  'Anemias':{icon:'🩸',color:'#b22222'},
+  'Acute Leukemias':{icon:'⚡',color:'#7b4bb3'},
+  'Chronic / Mixed Malignancies':{icon:'🔬',color:'#d17b1f'},
+  'Non-Malignant / Morphology':{icon:'🧫',color:'#2f7fb6'},
+  'Reactive / Physiologic':{icon:'✨',color:'#3a9c66'},
+  'Infectious':{icon:'🦠',color:'#24806a'}
+};
+let currentDept='Anemias';
+let currentCase=null;
+let selectedToken='';
+let closed={};
+let tokenOrder={};
+
+function toggleTheme(){
+  const current=document.documentElement.dataset.mlsTheme||'light';
+  const next=current==='dark'?'light':'dark';
+  document.documentElement.dataset.mlsTheme=next;
+  try{localStorage.setItem('mlsboc_theme',next);}catch(e){}
+}
+
+function shuffle(list){
+  const copy=[...list];
+  for(let i=copy.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]]=[copy[j],copy[i]];
+  }
+  return copy;
+}
+function casesForDept(dept){return hemeCases.filter(item=>item.dept===dept);}
+function tokenBank(dept){
+  if(!tokenOrder[dept])tokenOrder[dept]=shuffle(casesForDept(dept).map(item=>item.name));
+  return tokenOrder[dept];
+}
+function setDept(dept){
+  currentDept=dept;
+  const openCase=casesForDept(dept)[0];
+  currentCase=openCase||null;
+  selectedToken='';
+  render();
+}
+function setCase(code){
+  currentCase=hemeCases.find(item=>item.code===code)||currentCase;
+  selectedToken='';
+  render();
+}
+function chooseToken(name){
+  selectedToken=name;
+  renderCaseArea('');
+}
+function checkAnswer(){
+  if(!currentCase||!selectedToken){renderCaseArea('Pick a diagnosis token first.');return;}
+  if(selectedToken===currentCase.name){
+    closed[currentCase.code]=true;
+    render();
+    renderCaseArea('Correct. Case closed.', true);
+  }else{
+    renderCaseArea('Not that pattern. Try another token.', false);
+  }
+}
+function resetGame(){
+  closed={};selectedToken='';tokenOrder={};render();
+}
+function renderDepartments(){
+  const departments=[...new Set(hemeCases.map(item=>item.dept))];
+  document.getElementById('departments').innerHTML=departments.map(dept=>{
+    const style=deptStyles[dept]||deptStyles.Anemias;
+    const items=casesForDept(dept);
+    const done=items.filter(item=>closed[item.code]).length;
+    return `<button class="department-card ${dept===currentDept?'active':''}" style="--dept-color:${style.color}" onclick="setDept('${dept.replace(/'/g,"\\'")}')">
+      <div class="dept-top"><div class="dept-icon">${style.icon}</div><div><h2>${dept}</h2><p>${items.length} morphology cases</p></div></div>
+      <div class="progress"><span style="width:${items.length?done/items.length*100:0}%"></span></div>
+    </button>`;
+  }).join('');
+}
+function renderRoomGrid(){
+  return `<div class="room-grid">${casesForDept(currentDept).map(item=>`
+    <button class="room-btn ${currentCase&&currentCase.code===item.code?'active':''} ${closed[item.code]?'closed':''}" onclick="setCase('${item.code}')">
+      <span class="room-code">${item.code}</span>
+      <span class="room-label">${closed[item.code]?'Closed':'Open case'}</span>
+    </button>`).join('')}</div>`;
+}
+function renderCaseArea(message='', good=null){
+  const area=document.getElementById('caseArea');
+  if(!currentCase){area.innerHTML='<div class="chart-card">Pick a department.</div>';return;}
+  const bank=tokenBank(currentDept);
+  area.innerHTML=`<section class="chart-card">
+    <div class="chart-head">
+      <div><h2>Patient Chart - ${currentCase.code}</h2><p>${currentDept}</p></div>
+      <div class="case-code">${closed[currentCase.code]?'CASE CLOSED':'OPEN CASE'}</div>
+    </div>
+    ${renderRoomGrid()}
+    <div class="answer-row" style="margin-top:16px">
+      <div>
+        <div class="kicker">Morphology Pattern</div>
+        <div class="clue-list">${currentCase.clues.map(clue=>`<div class="clue">${clue}</div>`).join('')}</div>
+      </div>
+      <aside class="bank-card">
+        <h3>Diagnosis Bank</h3>
+        <p>Randomized for this department.</p>
+        <div class="token-bank">${bank.map(name=>`<button class="diag-token ${selectedToken===name?'selected':''}" onclick="chooseToken('${name.replace(/'/g,"\\'")}')">${name}</button>`).join('')}</div>
+        <div class="status ${good===true?'good':good===false?'bad':''}">${message||'Choose a diagnosis token, then confirm.'}</div>
+      </aside>
+    </div>
+  </section>`;
+}
+function render(){
+  renderDepartments();
+  renderCaseArea();
+}
+render();
+</script>
+</body>
+</html>

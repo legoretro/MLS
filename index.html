@@ -1228,11 +1228,9 @@ const PARA_MYCO_KEYS=['parasitology','mycology'];
 const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Blood Structures',url:'ABO_Lewis_Structures.html',description:'Build ABH and Lewis/secretor structures',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/abo_lewis_structures.png'},
   {title:'Lewis & Secretor Genes',url:'Lewis_Secretor_Genes.html',description:'Match Le/Se genotypes, secretor status and Lewis phenotype',topic:'Blood Bank',icon:'Le',color:'#b22222',preview_url:'assets/interactive-previews/lewis_secretor_genes.png'},
-  {title:'Antigen Donor Frequencies',url:'ABO_Population_Ranking.html',description:'Full donor frequency tables by population',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/antigen_donor_frequencies.png'},
   {title:'Antigen Short Version',url:'BloodGroupSystems_Freq_Final.html',description:'Memorize key antigen frequencies and differences',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/antigen_short_version.png'},
   {title:'Rh Haplotype Frequency',url:'Rh_Haplotype_Frequency.html',description:'Rank Rh haplotypes by population pattern',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/rh_haplotype_frequency.png'},
-  {title:'BB Groups: Usual Suspects',url:'BB_Group_Usual.html',description:'Drag-match common blood group systems and antibody rules',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/bb_group_usual.png'},
-  {title:'BB Groups: Unusual Suspects',url:'BB_Group_Unusual.html',description:'Drag-match uncommon systems, codes and serology clues',topic:'Blood Bank',icon:'BB',color:'#b22222',preview_url:'assets/interactive-previews/bb_group_unusual.png'},
+  {title:'Hematology Case Game',url:'Heme_Case_Game.html',description:'Match morphology clue charts to diagnosis tokens',topic:'Hematology',icon:'HE',color:'#b22222'},
   {title:'Reagent Strip Match',url:'UA_Reagent_Strip_Match.html',description:'Match reagent strip chemistry, false results and significance',topic:'Urinalysis',icon:'RS',color:'#c8a800',preview_url:'assets/interactive-previews/ua_reagent_strip_match.png'},
   {title:'UA Case Game',url:'UA_Renal_Case_Files.html',description:'Mystery-style UA pattern game with diagnosis tokens',topic:'Urinalysis',icon:'🔎',color:'#c8a800',image_url:'assets/interactive-previews/ua_case_game_icon.svg',preview_url:'assets/interactive-previews/ua_case_game_mystery.svg'},
   {title:'Urine Color & Clarity',url:'Urine_Color_and_Clarity.html',description:'Match urine appearance to causes and findings',topic:'Urinalysis',icon:'UC',color:'#c8a800',preview_url:'assets/interactive-previews/urine_color_clarity.png'},
@@ -1361,6 +1359,45 @@ const HEME_FOLDER_GROUPS = [
   {label:'Infectious',keys:['infectious']},
   {label:'Reactive / Physiologic',keys:['reactive']},
   {label:'Non-Malignant Disorders / Morphologic',keys:['non_malignant']}
+];
+
+const HEME_DEFAULT_CONDITIONS = [
+  {id:'heme-default-001',name:'Myelodysplastic Syndrome (MDS) - multi-lineage',folder:'malignancies_chronic',key_features:['50% RBC precursors','<20% myeloblasts','May see auer rods']},
+  {id:'heme-default-002',name:'Chronic Lymphocytic Leukemia (CLL)',folder:'malignancies_chronic',key_features:['Small mature lymphs','Cracked mud chromatin','Many smudge cells','High WBCs']},
+  {id:'heme-default-003',name:'Micro/Hypo Anemia (IDA-Milk Baby)',folder:'anemias',key_features:['Poikilocytosis','Target cells','Ovalocytes','May have increased WBC/platelets']},
+  {id:'heme-default-004',name:'Megaloblastic Anemia',folder:'anemias',key_features:['Macrocytic ovalocytes','Hypersegmented PMNs','Large granulated precursors']},
+  {id:'heme-default-005',name:'Hairy Cell Leukemia (HCL)',folder:'malignancies_chronic',key_features:['Pancytopenia pattern','Lymphocytes with hairy projections']},
+  {id:'heme-default-006',name:'Pelger-Huet Anomaly',folder:'non_malignant',key_features:['Hyposegmented PMNs','Less than 2 nuclear lobes','Pince-nez forms','Stodmeister PMNs']},
+  {id:'heme-default-007',name:'Malaria, parasite (trophozoite)',folder:'infectious',key_features:['Trophozoite forms inside RBCs']},
+  {id:'heme-default-008',name:'Acanthocytosis (Abetalipoproteinemia)',folder:'anemias',key_features:['Numerous acanthocytes']},
+  {id:'heme-default-009',name:'Polycythemia',folder:'malignancies_chronic',key_features:['Numerous RBCs','LAP increased']},
+  {id:'heme-default-010',name:'Leukemoid Reaction',folder:'reactive',key_features:['Shift to left','LAP increased']},
+  {id:'heme-default-011',name:'Multiple Myeloma',folder:'malignancies_other',key_features:['Peripheral blood rouleaux','Possible plasma cells','Bone marrow has many plasma cells']},
+  {id:'heme-default-012',name:'Acute Myelomonocytic Leukemia (AMML)',folder:'malignancies_acute',key_features:['>20% blasts','Myelocytic and monocytic features','May see auer rods','Low platelets']},
+  {id:'heme-default-013',name:'HGB SC',folder:'anemias',key_features:[]},
+  {id:'heme-default-014',name:'Acute Myeloid Leukemia (M1, M4, M5A or M5B)',folder:'malignancies_acute',key_features:[]},
+  {id:'heme-default-015',name:'Acute Leukemia',folder:'malignancies_acute',key_features:['>20% blasts']},
+  {id:'heme-default-016',name:'Acute Myeloid Leukemia (M3)',folder:'malignancies_acute',key_features:['>20% blasts and promyelocytes','Auer rods','High WBCs','Low platelets']},
+  {id:'heme-default-017',name:'Chronic Myelocytic Leukemia (CML)',folder:'malignancies_chronic',key_features:['Shift to left','<10% blasts','Increased basophils','High platelets']},
+  {id:'heme-default-018',name:'Kiddie Lymphs',folder:'reactive',key_features:[]},
+  {id:'heme-default-019',name:'Sickle Cell Anemia',folder:'anemias',key_features:['Sickle cells','Target cells','Often neutrophilia shift to left','May see nRBCs']},
+  {id:'heme-default-020',name:'Hemolytic Anemia',folder:'anemias',key_features:[]},
+  {id:'heme-default-021',name:'Acute Promyelocytic Leukemia (APL) M3 with rare pseudo-Chediak-Higashi anomaly',folder:'malignancies_acute',key_features:[]},
+  {id:'heme-default-022',name:'Many Immature nRBCs',folder:'non_malignant',key_features:[]},
+  {id:'heme-default-023',name:'Beta Thalassemia Major',folder:'anemias',key_features:[]},
+  {id:'heme-default-024',name:'Reactive Lymphs',folder:'reactive',key_features:[]},
+  {id:'heme-default-025',name:'Hemolytic Uremia with a shift to the left',folder:'anemias',key_features:[]},
+  {id:'heme-default-026',name:'Sezary Syndrome',folder:'malignancies_other',key_features:['Mature-appearing lymphs','Convoluted cerebriform nuclear folds']},
+  {id:'heme-default-027',name:'Acute Lymphoblastic Leukemia (ALL)',folder:'malignancies_acute',key_features:[]},
+  {id:'heme-default-028',name:'Platelet satellites',folder:'non_malignant',key_features:[]},
+  {id:'heme-default-029',name:'Plasma Cell Leukemia',folder:'malignancies_other',key_features:[]},
+  {id:'heme-default-030',name:'Acute Myelo-Monoblastic Leukemia (AML-M4)',folder:'malignancies_acute',key_features:[]},
+  {id:'heme-default-031',name:'Chronic Myelo-Monocytic Leukemia (CMML)',folder:'malignancies_chronic',key_features:[]},
+  {id:'heme-default-032',name:'Anemia with a shift to the left',folder:'anemias',key_features:[]},
+  {id:'heme-default-033',name:'Pernicious Anemia',folder:'anemias',key_features:[]},
+  {id:'heme-default-034',name:'Acute Myeloblastic Leukemia (Likely AML-M1)',folder:'malignancies_acute',key_features:[]},
+  {id:'heme-default-035',name:'Bacteria Spirochetes',folder:'infectious',key_features:[]},
+  {id:'heme-default-036',name:'Beta Thalassemia Minor',folder:'anemias',key_features:[]}
 ];
 
 const MICRO_FOLDERS = [
@@ -3926,6 +3963,19 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
 }
 
 // Hematology images — folder system
+function hemeDefaultConditions(){
+  return HEME_DEFAULT_CONDITIONS.map(item=>({
+    ...item,
+    images:item.images||[],
+    notes:item.notes||'',
+    key_features:[...(item.key_features||[])]
+  }));
+}
+
+function hemeConditionsOrDefaults(data){
+  return Array.isArray(data)&&data.length?data:hemeDefaultConditions();
+}
+
 function normalizeHemeFolderKey(key){
   const map={
     reactive_physiologic:'reactive',
@@ -3967,8 +4017,8 @@ async function renderHemeImages(el){
   el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>Loading images — this may take a moment on first visit...</div>';
   // Use cache
   if(!window._hemeCondsCache){
-    try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=r.data||[];}
-    catch(e){window._hemeCondsCache=[];}
+    try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=hemeConditionsOrDefaults(r.data||[]);}
+    catch(e){window._hemeCondsCache=hemeDefaultConditions();}
   }
   // Flat view — load all conditions, group by folder inline
   const allConditions=window._hemeCondsCache||[];
@@ -4048,7 +4098,13 @@ function filterHemeConditions(query){
 }
 
 async function openHemeExportModal(){
-  const {data:conditions}=await sb.from('mlsboc_heme_conditions').select('*').order('name');
+  let conditions=[];
+  try{
+    const res=await sb.from('mlsboc_heme_conditions').select('*').order('name');
+    conditions=hemeConditionsOrDefaults(res.data||[]);
+  }catch(error){
+    conditions=hemeDefaultConditions();
+  }
   if(!conditions||!conditions.length){alert('No conditions to export.');return;}
 
   const byFolder={};
@@ -4098,7 +4154,15 @@ async function generateHemeConditionsPDF(){
   const btn=document.querySelector('#condition-modal-body .btn-primary');
   if(btn){btn.textContent='Generating...';btn.disabled=true;}
   try{
-    const {data:all}=await sb.from('mlsboc_heme_conditions').select('*').in('id',selectedIds);
+    let all=window._hemeAllConditions||window._hemeCondsCache||[];
+    if(!all.length){
+      try{
+        const res=await sb.from('mlsboc_heme_conditions').select('*').in('id',selectedIds);
+        all=hemeConditionsOrDefaults(res.data||[]);
+      }catch(error){
+        all=hemeDefaultConditions();
+      }
+    }
     if(!all||!all.length){alert('Could not load conditions.');return;}
     const {jsPDF}=window.jspdf;
     const ordered=selectedIds.map(id=>all.find(item=>item.id===id)).filter(Boolean);
@@ -4131,7 +4195,8 @@ function buildConditionThumbs(c){
 
 function openCondition(id){
   // Show modal
-  sb.from('mlsboc_heme_conditions').select('*').eq('id',id).single().then(({data})=>{
+  const cached=(window._hemeCondsCache||hemeDefaultConditions()).find(item=>String(item.id)===String(id));
+  const openWithData=(data)=>{
     if(!data)return;
     const imgs=(data.images||[]).map((entry,index)=>({entry,index})).filter(x=>imageEntrySrc(x.entry));
     const features=(data.key_features||[]).filter(Boolean);
@@ -4162,7 +4227,11 @@ function openCondition(id){
       `:''}
     `;
     document.getElementById('condition-modal').classList.remove('hidden');
-  });
+  };
+  if(cached&&String(cached.id).startsWith('heme-default-')){openWithData(cached);return;}
+  sb.from('mlsboc_heme_conditions').select('*').eq('id',id).single().then(({data})=>{
+    openWithData(data||cached);
+  }).catch(()=>openWithData(cached));
 }
 
 function buildConditionDetailsEditor(condition){
@@ -4337,7 +4406,9 @@ function openHemeFolder(key){
 
 // Hematology image quiz
 async function startHemeQuiz(){
-  const {data}=await sb.from('mlsboc_heme_conditions').select('*').not('images','is',null);
+  let data=[];
+  try{const res=await sb.from('mlsboc_heme_conditions').select('*').not('images','is',null);data=hemeConditionsOrDefaults(res.data||[]);}
+  catch(error){data=hemeDefaultConditions();}
   const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No conditions with images to quiz on yet.');return;}
   appState.hemeImgMode='quiz';
@@ -4347,7 +4418,7 @@ async function startHemeQuiz(){
 }
 
 async function startHemeFlashcard(){
-  if(!window._hemeCondsCache){try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=r.data||[];}catch(e){}}
+  if(!window._hemeCondsCache){try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=hemeConditionsOrDefaults(r.data||[]);}catch(e){window._hemeCondsCache=hemeDefaultConditions();}}
   if(!window._hemeCondsCache||!window._hemeCondsCache.length){alert('No conditions to study yet.');return;}
   startImageFlashcard(window._hemeCondsCache);
 }
@@ -4366,7 +4437,9 @@ async function startUAFlashcard(){
 }
 
 async function startHemeQuizFolder(folder){
-  const {data}=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',folder);
+  let data=[];
+  try{const res=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',folder);data=hemeConditionsOrDefaults(res.data||[]).filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
+  catch(error){data=hemeDefaultConditions().filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
   const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No conditions with images in this folder yet.');return;}
   appState.hemeImgMode='quiz';
