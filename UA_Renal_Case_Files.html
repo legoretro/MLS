@@ -491,7 +491,32 @@ body.ua-case-files{
   cursor:pointer;
   overflow:hidden;
 }
-.room-card.selected .room-door{transform:translateX(-50%) translateY(-3px) rotate(-1.5deg)}
+.room-card.selected{
+  border-color:#2f6bd8;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(255,243,156,.34),transparent 8rem),
+    linear-gradient(180deg,#fffdf2,#eaf2ff);
+  box-shadow:0 16px 34px rgba(47,107,216,.2);
+}
+.room-card.selected .room-door{
+  transform:translateX(-50%) translateY(-6px) rotateY(-34deg) rotate(-2deg);
+  transform-origin:left center;
+  border-color:#2f6bd8;
+}
+.room-card.selected::after{
+  content:"OPEN";
+  position:absolute;
+  z-index:5;
+  right:10px;
+  top:10px;
+  border-radius:999px;
+  background:#2f6bd8;
+  color:white;
+  font-size:.66rem;
+  font-weight:950;
+  letter-spacing:.08em;
+  padding:5px 8px;
+}
 .room-card.closed .room-door{filter:saturate(.72)}
 .room-door{
   position:absolute;
@@ -582,6 +607,27 @@ body.ua-case-files{
   display:grid;
   grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
   gap:16px;
+}
+.chart-panel{
+  position:relative;
+  border:2px solid #2f6bd8;
+  background:
+    linear-gradient(90deg,rgba(47,107,216,.1),transparent 28%),
+    linear-gradient(180deg,#ffffff,#f6f9ff);
+  box-shadow:0 20px 42px rgba(47,107,216,.18);
+}
+.chart-panel::before{
+  content:"ACTIVE PATIENT CHART";
+  position:absolute;
+  top:-13px;
+  left:18px;
+  border-radius:999px;
+  background:#2f6bd8;
+  color:white;
+  font-size:.68rem;
+  font-weight:950;
+  letter-spacing:.12em;
+  padding:6px 10px;
 }
 .chart-title-row{
   display:flex;
@@ -807,6 +853,24 @@ html[data-mls-theme="dark"] body.ua-case-files .room-card{
   background:linear-gradient(180deg,#222a3f,#141a29);
   border-color:#4d5876;
 }
+html[data-mls-theme="dark"] body.ua-case-files .room-card.selected{
+  background:
+    radial-gradient(circle at 50% 30%,rgba(242,217,106,.16),transparent 8rem),
+    linear-gradient(180deg,#27304a,#151c2c);
+  border-color:#f2d96a;
+  box-shadow:0 16px 34px rgba(242,217,106,.13);
+}
+html[data-mls-theme="dark"] body.ua-case-files .chart-panel{
+  background:
+    linear-gradient(90deg,rgba(242,217,106,.1),transparent 30%),
+    linear-gradient(180deg,#171f31,#111827);
+  border-color:#f2d96a;
+  box-shadow:0 20px 42px rgba(242,217,106,.1);
+}
+html[data-mls-theme="dark"] body.ua-case-files .chart-panel::before{
+  background:#f2d96a;
+  color:#1b1600;
+}
 html[data-mls-theme="dark"] body.ua-case-files .unit-door{
   background:
     linear-gradient(90deg,rgba(255,255,255,.13),rgba(255,255,255,.04) 38%,transparent 70%),
@@ -916,24 +980,44 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
     position:absolute;
     top:.14in;
     right:.16in;
-    width:.45in;
-    height:.32in;
-    border:2px solid #8a5a10;
-    border-radius:.06in;
-    background:linear-gradient(180deg,#ffe4a3,#edc56d);
-    transform:rotate(4deg);
+    width:.42in;
+    height:.46in;
+    border:2px solid #172554;
+    border-radius:.07in .07in .03in .03in;
+    background:
+      linear-gradient(90deg,transparent 42%,#ffffff 42% 58%,transparent 58%),
+      linear-gradient(180deg,#dff2ff,#8cb7dd);
+    transform:rotate(3deg);
+    box-shadow:inset 0 0 0 3px rgba(255,255,255,.55);
   }
   .print-hospital-icon::before{
+    content:"+";
+    position:absolute;
+    left:50%;
+    top:.03in;
+    transform:translateX(-50%);
+    width:.21in;
+    height:.21in;
+    border-radius:.05in;
+    background:#fff4bd;
+    border:1.5px solid #c8a800;
+    color:#8d001b;
+    display:grid;
+    place-items:center;
+    font-size:15pt;
+    font-weight:950;
+    line-height:1;
+  }
+  .print-hospital-icon::after{
     content:"";
     position:absolute;
-    left:.02in;
-    top:-.12in;
-    width:.2in;
-    height:.12in;
-    border:2px solid #8a5a10;
-    border-bottom:0;
-    border-radius:.05in .05in 0 0;
-    background:#fff0bd;
+    left:.05in;
+    right:.05in;
+    bottom:.04in;
+    height:.08in;
+    border-radius:.02in;
+    background:#172554;
+    opacity:.22;
   }
   .print-card .meta{
     position:relative;
@@ -1022,18 +1106,23 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
     display:grid;
     place-items:center;
     text-align:center;
-    font-size:10pt;
-    line-height:1.05;
+    font-family:"Cooper Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
+    font-size:12.5pt;
+    line-height:1.02;
     font-weight:900;
-    padding:.1in;
+    padding:.11in;
     page-break-inside:avoid;
-    overflow-wrap:anywhere;
+    overflow-wrap:normal;
+    word-break:normal;
+    hyphens:none;
     background:
       radial-gradient(circle at 28% 20%,rgba(255,244,189,.8),transparent 34%),
       linear-gradient(180deg,#ffffff,#f8fbff);
     box-shadow:inset 0 0 0 2px #d7e2f4;
   }
   .print-token span{display:block}
+  .print-token.long-token{font-size:10.9pt}
+  .print-token.xlong-token{font-size:9.4pt}
   .print-token.ns-token{
     border-color:#7a4f00;
     background:
@@ -1113,32 +1202,8 @@ const renalUnits = [
   {
     unitId: 5,
     unitName: "Hospital Unit 5",
-    department: "Porphyrin Disorders Department",
-    codePrefix: "P"
-  },
-  {
-    unitId: 6,
-    unitName: "Hospital Unit 6",
-    department: "MPS Disorders Department",
-    codePrefix: "MPS"
-  },
-  {
-    unitId: 7,
-    unitName: "Hospital Unit 7",
-    department: "Purine Disorders Department",
-    codePrefix: "PU"
-  },
-  {
-    unitId: 8,
-    unitName: "Hospital Unit 8",
-    department: "Carbohydrate Disorders Department",
-    codePrefix: "C"
-  },
-  {
-    unitId: 9,
-    unitName: "Hospital Unit 9",
-    department: "Amino Acid Disorders Department",
-    codePrefix: "AA"
+    department: "Other-Metabolic Disorders",
+    codePrefix: "OM"
   }
 ];
 
@@ -1431,165 +1496,165 @@ const renalCaseFiles = [
   },
   {
     "unitId": 5,
-    "department": "Porphyrin Disorders Department",
+    "department": "Other-Metabolic Disorders",
     "room": 1,
-    "caseTitle": "Porphyrin Case 1",
+    "caseTitle": "Metabolic Pattern Case 1",
     "patientResults": [
-      "Urine clue: port-wine urine or porphyrinuria pattern.",
-      "Clinical clue: neurologic, psychiatric, or photosensitivity findings.",
-      "Chemistry clue: heme pathway intermediate compounds build up.",
-      "Screen clue: porphyrins may fluoresce under UV."
+      "Urine clue: port-wine or red-brown urine pattern.",
+      "Screen clue: Ehrlich or Hoesch screening may turn pink/red.",
+      "Light clue: porphyrins may fluoresce under UV.",
+      "Clinical clue: neurologic, psychiatric, abdominal, or photosensitivity pattern."
     ],
     "diagnosis": "Porphyrin Disorder"
   },
   {
-    "unitId": 6,
-    "department": "MPS Disorders Department",
-    "room": 1,
-    "caseTitle": "MPS Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 2,
+    "caseTitle": "Metabolic Pattern Case 2",
     "patientResults": [
-      "Pattern: mucopolysaccharides accumulate and are excreted in urine.",
-      "Clinical clue: severe childhood pattern with skeletal changes and mental retardation.",
-      "Eye clue: accumulation may involve the cornea.",
-      "Key clue: usually fatal childhood MPS pattern."
+      "Urine clue: mucopolysaccharides increased.",
+      "Screen clue: CTAB or acid-albumin turbidity positive.",
+      "Spot clue: metachromatic staining may be positive.",
+      "Pattern clue: severe childhood MPS with skeletal changes and corneal involvement."
     ],
     "diagnosis": "Hurler Syndrome"
   },
   {
-    "unitId": 6,
-    "department": "MPS Disorders Department",
-    "room": 2,
-    "caseTitle": "MPS Case 2",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 3,
+    "caseTitle": "Metabolic Pattern Case 3",
     "patientResults": [
-      "Pattern: mucopolysaccharide breakdown disorder.",
-      "Clinical clue: skeletal changes with mental retardation.",
-      "Course clue: usually fatal in childhood.",
-      "Key clue: MPS pattern without the cornea clue emphasized."
+      "Urine clue: mucopolysaccharides increased.",
+      "Screen clue: CTAB or acid-albumin turbidity positive.",
+      "Spot clue: metachromatic staining may be positive.",
+      "Pattern clue: MPS with skeletal changes and mental retardation; corneal clue not emphasized."
     ],
     "diagnosis": "Hunter Syndrome"
   },
   {
-    "unitId": 6,
-    "department": "MPS Disorders Department",
-    "room": 3,
-    "caseTitle": "MPS Case 3",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 4,
+    "caseTitle": "Metabolic Pattern Case 4",
     "patientResults": [
-      "Pattern: mucopolysaccharide accumulation.",
-      "Clinical clue: mental retardation pattern.",
-      "Course clue: patients may survive into adulthood.",
-      "Key clue: MPS pattern with longer survival."
+      "Urine clue: mucopolysaccharides increased.",
+      "Screen clue: CTAB or acid-albumin turbidity positive.",
+      "Spot clue: metachromatic staining may be positive.",
+      "Pattern clue: MPS with mental retardation and longer survival pattern."
     ],
     "diagnosis": "Sanfilippo Syndrome"
   },
   {
-    "unitId": 7,
-    "department": "Purine Disorders Department",
-    "room": 1,
-    "caseTitle": "Purine Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 5,
+    "caseTitle": "Metabolic Pattern Case 5",
     "patientResults": [
       "Urine clue: massive uric acid crystals.",
       "Infant clue: orange particles may be seen in diaper.",
       "Clinical clue: severe motor defects, mental dysfunction, self-injury, gout, and renal calculi.",
-      "Enzyme clue: purine salvage pathway problem."
+      "Enzyme clue: HGPRT missing or deficient in purine salvage pathway."
     ],
     "diagnosis": "Lesch-Nyhan Disease"
   },
   {
-    "unitId": 8,
-    "department": "Carbohydrate Disorders Department",
-    "room": 1,
-    "caseTitle": "Carbohydrate Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 6,
+    "caseTitle": "Metabolic Pattern Case 6",
     "patientResults": [
-      "Pattern: toxic carbohydrate intermediates build up.",
+      "Urine clue: reducing substance positive while glucose strip is negative.",
       "Infant clue: failure to thrive.",
       "Clinical clue: liver disorder, cataracts, and severe mental retardation pattern.",
-      "Screen clue: reducing sugar positive while glucose test is negative."
+      "Enzyme clue: galactose pathway enzyme deficiency pattern."
     ],
     "diagnosis": "Galactosemia"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 1,
-    "caseTitle": "Phenylalanine-Tyrosine Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 7,
+    "caseTitle": "Metabolic Pattern Case 7",
     "patientResults": [
       "Pattern: phenylalanine cannot convert normally to tyrosine.",
       "Urine clue: increased keto acids with mousy odor.",
-      "Pigment clue: decreased melanin may be present.",
+      "Ferric chloride clue: permanent blue-green color.",
       "Diet clue: avoid phenylalanine/aspartame."
     ],
     "diagnosis": "Phenylketonuria"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 2,
-    "caseTitle": "Phenylalanine-Tyrosine Case 2",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 8,
+    "caseTitle": "Metabolic Pattern Case 8",
     "patientResults": [
       "Pattern: tyrosine and related metabolites increased.",
       "Crystal clue: tyrosine or leucine crystals may be seen.",
-      "Clinical clue: may be inherited, transient in premature infants, or acquired with liver disease.",
-      "Screen clue: nitroso-naphthol may give orange-red reaction."
+      "Ferric chloride clue: green color that fades rapidly.",
+      "Nitroso-naphthol clue: orange-red reaction."
     ],
     "diagnosis": "Tyrosyluria"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 3,
-    "caseTitle": "Phenylalanine-Tyrosine Case 3",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 9,
+    "caseTitle": "Metabolic Pattern Case 9",
     "patientResults": [
       "Urine clue: urine darkens after standing in air.",
       "Pigment clue: melanin is increased in urine.",
-      "Clinical clue: overgrowth of melanocytes pattern.",
-      "Screen clue: gray/black precipitate or red reactions may be seen."
+      "Ferric chloride clue: gray/black precipitate.",
+      "Nitroprusside or Ehrlich clue: red reaction may be seen."
     ],
     "diagnosis": "Melanuria"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 4,
-    "caseTitle": "Phenylalanine-Tyrosine Case 4",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 10,
+    "caseTitle": "Metabolic Pattern Case 10",
     "patientResults": [
       "Urine clue: urine darkens after becoming alkaline and standing.",
       "Childhood clue: stained diapers may appear.",
-      "Adult clue: brown pigment deposits and arthritis pattern.",
-      "Pathway clue: homogentisic acid oxidation problem."
+      "Ferric chloride clue: bright blue color.",
+      "Enzyme clue: homogentisic acid oxidase problem."
     ],
     "diagnosis": "Alkaptonuria"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 5,
-    "caseTitle": "Branched-Chain Amino Acid Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 11,
+    "caseTitle": "Metabolic Pattern Case 11",
     "patientResults": [
       "Odor clue: sweet syrup odor.",
       "Pattern: ketones increased in urine and blood.",
       "Amino acid clue: leucine, isoleucine, and valine pathway problem.",
-      "Clinical clue: newborn failure-to-thrive pattern."
+      "DNPH clue: yellow precipitate."
     ],
     "diagnosis": "Maple Syrup Urine Disease"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 6,
-    "caseTitle": "Branched-Chain Amino Acid Case 2",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 12,
+    "caseTitle": "Metabolic Pattern Case 12",
     "patientResults": [
       "Odor clue: sweaty feet odor.",
-      "Pattern: vomiting, metabolic acidosis, hypoglycemia, ketonuria, and ammonia elevation.",
+      "Pattern clue: ketonuria with acidosis-type illness.",
       "Pathway clue: branched-chain amino acid metabolism issue.",
-      "Key clue: isovaleric acid pattern."
+      "Enzyme clue: isovaleryl-CoA dehydrogenase problem."
     ],
     "diagnosis": "Isovaleric Acidemia"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 7,
-    "caseTitle": "Tryptophan Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 13,
+    "caseTitle": "Metabolic Pattern Case 13",
     "patientResults": [
       "Color clue: colorless compound oxidizes to blue indigo.",
       "Diaper clue: blue staining may be seen.",
@@ -1599,10 +1664,10 @@ const renalCaseFiles = [
     "diagnosis": "Indicanuria"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 8,
-    "caseTitle": "Tryptophan Case 2",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 14,
+    "caseTitle": "Metabolic Pattern Case 14",
     "patientResults": [
       "Pattern: 5-HIAA excretion increased.",
       "Pathway clue: tryptophan-related metabolite pattern.",
@@ -1612,23 +1677,23 @@ const renalCaseFiles = [
     "diagnosis": "5-HIAA Increase"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 9,
-    "caseTitle": "Cystine Case 1",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 15,
+    "caseTitle": "Metabolic Pattern Case 15",
     "patientResults": [
-      "Urine clue: cystine elevated with cystine crystals.",
+      "Urine clue: cystine elevated with hexagonal cystine crystals.",
       "Clinical clue: renal calculi common in children.",
       "Transport clue: cystine, lysine, arginine, and ornithine reabsorption problem.",
-      "Key clue: renal amino acid transport disorder."
+      "Cyanide-nitroprusside clue: red-purple reaction."
     ],
     "diagnosis": "Cystinuria"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 10,
-    "caseTitle": "Cystine Case 2",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 16,
+    "caseTitle": "Metabolic Pattern Case 16",
     "patientResults": [
       "Pattern: cystine crystals deposit in tissues and renal tubular cells.",
       "Tubular clue: proximal tubule crystals block reabsorption.",
@@ -1638,15 +1703,15 @@ const renalCaseFiles = [
     "diagnosis": "Cystinosis"
   },
   {
-    "unitId": 9,
-    "department": "Amino Acid Disorders Department",
-    "room": 11,
-    "caseTitle": "Cystine Case 3",
+    "unitId": 5,
+    "department": "Other-Metabolic Disorders",
+    "room": 17,
+    "caseTitle": "Metabolic Pattern Case 17",
     "patientResults": [
       "Pattern: homocystine increased.",
       "Clinical clue: failure to thrive, cataracts, mental retardation, and thrombosis problems.",
       "Pathway clue: methionine metabolism defect.",
-      "Key clue: vascular/thrombotic amino acid disorder pattern."
+      "Cyanide or silver nitroprusside clue: red reaction."
     ],
     "diagnosis": "Homocystinuria"
   }
@@ -1659,6 +1724,7 @@ let activeRoom = null;
 let selectedDiagnosis = "";
 let chartMessage = "";
 let chartMessageState = "";
+let diagnosisBankOrders = {};
 
 function esc(value){
   return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -1685,7 +1751,12 @@ function toggleCaseTheme(){
 function loadProgress(){
   try{
     const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
-    return saved && typeof saved === "object" ? {closed:saved.closed || {}} : {closed:{}};
+    const validKeys = new Set(renalCaseFiles.map(item => `${item.unitId}-${item.room}`));
+    const closed = {};
+    Object.entries(saved?.closed || {}).forEach(([key,value]) => {
+      if(validKeys.has(key)){closed[key] = value;}
+    });
+    return saved && typeof saved === "object" ? {closed} : {closed:{}};
   }catch(error){
     return {closed:{}};
   }
@@ -1732,6 +1803,23 @@ function closedCases(unitId){
 
 function usedDiagnoses(unitId){
   return new Set(closedCases(unitId).map(item => item.diagnosis));
+}
+
+function shuffleList(list){
+  const items = [...list];
+  for(let i = items.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i],items[j]] = [items[j],items[i]];
+  }
+  return items;
+}
+
+function diagnosisBankFor(item){
+  const key = caseKey(item);
+  if(!diagnosisBankOrders[key]){
+    diagnosisBankOrders[key] = shuffleList(casesForUnit(item.unitId).map(caseFile => caseFile.diagnosis));
+  }
+  return diagnosisBankOrders[key];
 }
 
 function render(){
@@ -1856,8 +1944,7 @@ function renderRoomCard(item){
 function renderChart(item){
   const closed = progress.closed[caseKey(item)];
   const unitUsed = usedDiagnoses(item.unitId);
-  const available = casesForUnit(item.unitId)
-    .map(caseFile => caseFile.diagnosis)
+  const available = diagnosisBankFor(item)
     .filter(diagnosis => !unitUsed.has(diagnosis));
   const message = closed
     ? "Case Closed. This room is sealed."
@@ -1967,6 +2054,9 @@ function resetUnit(unitId){
   selectedDiagnosis = "";
   chartMessage = "";
   chartMessageState = "";
+  Object.keys(diagnosisBankOrders).forEach(key => {
+    if(key.startsWith(`${unitId}-`)){delete diagnosisBankOrders[key];}
+  });
   render();
 }
 
@@ -1977,6 +2067,7 @@ function resetWholeGame(){
   selectedDiagnosis = "";
   chartMessage = "";
   chartMessageState = "";
+  diagnosisBankOrders = {};
   render();
 }
 
@@ -2024,11 +2115,20 @@ function renderPrintable(){
 }
 
 function printTokenClass(item, extra = ""){
-  return `print-token unit-token-${item.unitId} ${item.unitId === 2 ? "ns-token" : ""} ${extra}`.trim();
+  const lengthClass = item.diagnosis.length > 34 ? "xlong-token" : (item.diagnosis.length > 23 ? "long-token" : "");
+  return `print-token unit-token-${item.unitId} ${item.unitId === 2 ? "ns-token" : ""} ${lengthClass} ${extra}`.trim();
+}
+
+function formatTokenName(name){
+  return String(name)
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(word => `<span>${esc(word)}</span>`)
+    .join("");
 }
 
 function renderPrintTokenFront(item){
-  return `<div class="${printTokenClass(item)}"><span>${esc(item.diagnosis)}</span></div>`;
+  return `<div class="${printTokenClass(item)}">${formatTokenName(item.diagnosis)}</div>`;
 }
 
 function renderPrintTokenBack(item){
