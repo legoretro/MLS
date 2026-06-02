@@ -141,7 +141,7 @@ html[data-mls-theme="dark"] .mls-theme-btn{
   display:flex;
   align-items:center;
   gap:8px;
-  color:#454c68;
+  color:var(--muted);
   font-weight:850;
   font-size:.68rem;
 }
@@ -298,7 +298,7 @@ button{
 }
 .guide-row{
   display:grid;
-  grid-template-columns:32px 98px minmax(210px,1fr) 178px;
+  grid-template-columns:32px 98px minmax(230px,1fr) 230px;
   gap:8px;
   align-items:center;
   border:1px solid #dbe4f3;
@@ -349,10 +349,11 @@ button{
   min-height:39px;
 }
 .guide-reaction{
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   align-content:center;
 }
 .reaction-label{
+  display:none;
   width:100%;
   color:#667296;
   font-size:.46rem;
@@ -495,18 +496,193 @@ button{
   font-size:.78rem;
 }
 .acronym-story{
-  min-height:58px;
+  min-height:148px;
   border:2px dashed #b8c5e3;
   border-radius:12px;
-  padding:10px;
-  background:#fbfdff;
+  padding:0;
+  overflow:hidden;
+  background:linear-gradient(180deg,#fbfdff 0%,#f4f1ff 100%);
   color:var(--ink);
   font-weight:800;
   line-height:1.35;
 }
-.acronym-story:focus{
-  outline:3px solid rgba(47,107,216,.2);
-  border-color:var(--blue);
+.mnemonic-stage{
+  position:relative;
+  min-height:148px;
+  padding:12px 16px 42px;
+  overflow:hidden;
+}
+.mnemonic-track{
+  position:absolute;
+  left:16px;
+  right:16px;
+  top:75px;
+  height:6px;
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(139,117,212,.12),rgba(139,117,212,.32),rgba(139,117,212,.12));
+}
+.ghost{
+  position:absolute;
+  top:22px;
+  left:-72px;
+  width:54px;
+  height:58px;
+  border:3px solid #b8c5e3;
+  border-radius:28px 28px 16px 16px;
+  background:#fff;
+  box-shadow:0 8px 18px rgba(75,86,125,.12);
+  animation:ghost-float 8s ease-in-out infinite;
+}
+.ghost::before,
+.ghost::after{
+  content:"";
+  position:absolute;
+  top:22px;
+  width:6px;
+  height:8px;
+  border-radius:50%;
+  background:#3d4260;
+}
+.ghost::before{left:17px}
+.ghost::after{right:17px}
+.ghost .smile{
+  position:absolute;
+  left:20px;
+  top:34px;
+  width:14px;
+  height:7px;
+  border-bottom:3px solid #8c7bd3;
+  border-radius:0 0 12px 12px;
+}
+.ghost .hands{
+  position:absolute;
+  left:38px;
+  top:28px;
+  width:22px;
+  height:10px;
+  border-top:3px solid #b8c5e3;
+  transform:rotate(-14deg);
+}
+.ghost .carry{
+  position:absolute;
+  right:-13px;
+  top:17px;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#bca8f2;
+  border:3px solid #8069d6;
+  box-shadow:0 0 0 4px rgba(188,168,242,.2);
+}
+.ghost-one{animation-delay:0s}
+.ghost-two{animation-delay:1.2s;transform:scale(.94)}
+.ghost-three{animation-delay:2.4s;transform:scale(.9)}
+.circle-piece{
+  position:absolute;
+  top:52px;
+  width:28px;
+  height:28px;
+  border:4px solid #8069d6;
+  border-radius:50%;
+  background:rgba(188,168,242,.18);
+  opacity:0;
+  animation:circle-assemble 8s ease-in-out infinite;
+}
+.circle-piece.one{left:48%;animation-delay:.6s}
+.circle-piece.two{left:54%;animation-delay:1.15s}
+.circle-piece.three{left:60%;animation-delay:1.7s}
+.circle-piece.four{left:66%;animation-delay:2.25s}
+.hook{
+  position:absolute;
+  top:64px;
+  left:51%;
+  width:170px;
+  height:4px;
+  border-radius:999px;
+  background:#8c7bd3;
+  opacity:0;
+  animation:hook-glow 8s ease-in-out infinite;
+}
+.fe-token{
+  position:absolute;
+  right:156px;
+  top:-24px;
+  width:42px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  border:3px solid #b88416;
+  background:#ffe49a;
+  color:#563900;
+  font-weight:950;
+  box-shadow:0 8px 16px rgba(122,76,0,.16);
+  animation:fe-drop 8s ease-in-out infinite;
+}
+.heme-badge{
+  position:absolute;
+  right:28px;
+  top:42px;
+  width:94px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  border:3px solid #9a2435;
+  background:#e94a5d;
+  color:#fff;
+  font-weight:950;
+  letter-spacing:.04em;
+  opacity:0;
+  transform:scale(.86);
+  animation:heme-glow 8s ease-in-out infinite;
+}
+.mnemonic-text{
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:10px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.82);
+  color:#29314d;
+  font-size:.78rem;
+  line-height:1.25;
+  text-align:center;
+  box-shadow:0 6px 18px rgba(66,78,120,.08);
+}
+.mnemonic-text strong{
+  color:#8a42c5;
+  font-weight:950;
+}
+@keyframes ghost-float{
+  0%{left:-72px;transform:translateY(5px) rotate(-2deg)}
+  15%{transform:translateY(-3px) rotate(2deg)}
+  42%{left:38%;transform:translateY(4px) rotate(-1deg)}
+  62%{left:70%;transform:translateY(-3px) rotate(1deg)}
+  82%{left:104%;transform:translateY(4px) rotate(-2deg)}
+  100%{left:104%;transform:translateY(5px) rotate(-2deg)}
+}
+@keyframes circle-assemble{
+  0%,18%{opacity:0;transform:translateX(-120px) scale(.6)}
+  30%,75%{opacity:1;transform:translateX(0) scale(1)}
+  92%,100%{opacity:0;transform:translateX(12px) scale(.96)}
+}
+@keyframes hook-glow{
+  0%,33%{opacity:0;transform:scaleX(.2);transform-origin:left}
+  44%,78%{opacity:.9;transform:scaleX(1);transform-origin:left}
+  95%,100%{opacity:0;transform:scaleX(1)}
+}
+@keyframes fe-drop{
+  0%,55%{opacity:0;transform:translateY(0) scale(.8)}
+  64%{opacity:1;transform:translateY(72px) scale(1)}
+  78%{opacity:1;transform:translateY(72px) scale(1)}
+  95%,100%{opacity:0;transform:translateY(72px) scale(.9)}
+}
+@keyframes heme-glow{
+  0%,66%{opacity:0;transform:scale(.86);box-shadow:none}
+  74%,86%{opacity:1;transform:scale(1);box-shadow:0 0 0 10px rgba(233,74,93,.18),0 0 28px rgba(233,74,93,.38)}
+  100%{opacity:0;transform:scale(.9);box-shadow:none}
 }
 html[data-mls-theme="dark"] .hero,
 html[data-mls-theme="dark"] .controls,
@@ -519,6 +695,48 @@ html[data-mls-theme="dark"] .legend,
 html[data-mls-theme="dark"] .acronym-story{
   background:#101625;
   border-color:#313b5a;
+}
+html[data-mls-theme="dark"] .legend-item,
+html[data-mls-theme="dark"] .cell-title span,
+html[data-mls-theme="dark"] .bank p{
+  color:#c3cae2;
+}
+html[data-mls-theme="dark"] .chip{
+  background:#101625;
+  color:#f4f6ff;
+  border-color:#48557c;
+  box-shadow:0 4px 0 rgba(0,0,0,.24);
+}
+html[data-mls-theme="dark"] .chip:hover,
+html[data-mls-theme="dark"] .chip.selected{
+  border-color:#6aa0ff;
+  box-shadow:0 8px 16px rgba(106,160,255,.14);
+}
+html[data-mls-theme="dark"] .mnemonic-stage{
+  background:linear-gradient(180deg,#111827 0%,#191f34 100%);
+}
+html[data-mls-theme="dark"] .mnemonic-text{
+  background:rgba(16,22,37,.88);
+  color:#f4f6ff;
+}
+html[data-mls-theme="dark"] .ghost{
+  border-color:#7f8db7;
+  background:#f7f9ff;
+}
+@media (prefers-reduced-motion:reduce){
+  .ghost,
+  .circle-piece,
+  .hook,
+  .fe-token,
+  .heme-badge{
+    animation:none!important;
+  }
+  .ghost-one{left:16%;top:24px}
+  .ghost-two{left:30%;top:24px}
+  .ghost-three{left:44%;top:24px}
+  .circle-piece,.hook,.fe-token,.heme-badge{opacity:1}
+  .fe-token{top:48px}
+  .heme-badge{transform:scale(1)}
 }
 @media (max-width:1120px){
   .hero{grid-template-columns:1fr}
@@ -601,8 +819,25 @@ html[data-mls-theme="dark"] .acronym-story{
 
   <section class="acronym-card" aria-label="Acronym story">
     <h2>Acronym Story</h2>
-    <p>Add your memory phrase here later. It saves on this browser.</p>
-    <div class="acronym-story" id="acronymStory" contenteditable="true" role="textbox" aria-label="Acronym story text">Add your heme pathway acronym story here...</div>
+    <p>Ghosts build the pathway, then iron completes the heme ending.</p>
+    <div class="acronym-story" aria-label="Animated mnemonic: Ghosts Assemble Pieces, Hook Up Circles, Perfectly Producing Iron Heme.">
+      <div class="mnemonic-stage">
+        <div class="mnemonic-track" aria-hidden="true"></div>
+        <div class="ghost ghost-one" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
+        <div class="ghost ghost-two" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
+        <div class="ghost ghost-three" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
+        <span class="circle-piece one" aria-hidden="true"></span>
+        <span class="circle-piece two" aria-hidden="true"></span>
+        <span class="circle-piece three" aria-hidden="true"></span>
+        <span class="circle-piece four" aria-hidden="true"></span>
+        <span class="hook" aria-hidden="true"></span>
+        <span class="fe-token" aria-hidden="true">Fe</span>
+        <span class="heme-badge" aria-hidden="true">Heme</span>
+        <div class="mnemonic-text">
+          <strong>(G)</strong>hosts <strong>(A)</strong>ssemble <strong>(P)</strong>ieces, <strong>(H)</strong>ook <strong>(U)</strong>p <strong>(C)</strong>ircles, <strong>(P)</strong>erfectly <strong>(P)</strong>roducing <strong>(Iron)</strong> <strong>(H)</strong>eme.
+        </div>
+      </div>
+    </div>
   </section>
 
 </div>
@@ -717,7 +952,6 @@ function renderSlots(){
     const compartmentClass = row.compartment.toLowerCase().includes("mitochondrion") ? "mito" : "cyto";
     const reactionCell = row.enzyme
       ? `<div class="guide-reaction">
-          <span class="reaction-label">enzyme to next</span>
           ${enzymeFixedHtml(row.enzyme)}
           ${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}
         </div>`
@@ -837,17 +1071,6 @@ function resetBoard(){
   render();
 }
 
-function setupAcronymStory(){
-  const story = document.getElementById("acronymStory");
-  if(!story){return;}
-  const key = "mls_heme_acronym_story";
-  try{
-    const saved = localStorage.getItem(key);
-    if(saved){story.textContent = saved;}
-    story.addEventListener("input", () => localStorage.setItem(key, story.textContent.trim()));
-  }catch(error){}
-}
-
 function setScore(text, state){
   const box = document.getElementById("scoreBox");
   box.textContent = text;
@@ -857,7 +1080,6 @@ function setScore(text, state){
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", resetBoard);
 document.getElementById("answerBtn").addEventListener("click", showAnswers);
-setupAcronymStory();
 render();
 </script>
 </body>
