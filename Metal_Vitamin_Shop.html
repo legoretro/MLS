@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mystery Micronutrient Match</title>
+<title>Mystery Micronutrient Game</title>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css" />
 <style>
@@ -522,7 +522,10 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
 .shelf-bottles{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));align-items:stretch}
 .shop-bottle{
   border:2px dashed color-mix(in srgb,var(--wall-color) 52%,var(--shop-border));
-  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.74)),var(--shop-card);
+  background:
+    radial-gradient(circle at 92% 12%,color-mix(in srgb,var(--wall-color) 18%,transparent),transparent 7rem),
+    linear-gradient(180deg,color-mix(in srgb,var(--wall-color) 16%,#fff),rgba(255,255,255,.82)),
+    var(--shop-card);
   color:var(--shop-ink);
   min-height:232px;
   padding:12px;
@@ -536,17 +539,22 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
   overflow:hidden;
 }
 html[data-mls-theme="dark"] .shop-bottle{
-  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--shop-card);
+  background:
+    radial-gradient(circle at 92% 12%,color-mix(in srgb,var(--wall-color) 25%,transparent),transparent 7rem),
+    linear-gradient(180deg,color-mix(in srgb,var(--wall-color) 12%,#162238),#142033),
+    var(--shop-card);
 }
 .shop-bottle:hover,.shop-bottle.active{transform:translateY(-2px);box-shadow:0 18px 30px rgba(36,47,78,.16)}
 .shop-bottle.drag-ready{outline:3px solid rgba(47,107,216,.32);outline-offset:3px}
 .shop-bottle.sealed{
   border-style:solid;
   border-color:#d94545;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--wall-color) 12%,#fff),#fff);
-  animation:cardFlipSeal .55s ease both;
+  background:linear-gradient(180deg,#ffe8e8,#fff);
+  animation:cardFlipAway .72s ease forwards;
+  pointer-events:none;
+  transform-origin:center;
 }
-html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180deg,color-mix(in srgb,var(--wall-color) 16%,#111827),#151d2e)}
+html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180deg,#5b1f2a,#151d2e)}
 .shop-bottle.sealed::after{
   content:"SEALED";
   position:absolute;
@@ -563,10 +571,11 @@ html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180de
   letter-spacing:.1em;
   opacity:.9;
 }
-@keyframes cardFlipSeal{
-  0%{transform:rotateY(0deg) scale(1)}
-  45%{transform:rotateY(92deg) scale(.97)}
-  100%{transform:rotateY(360deg) scale(1)}
+@keyframes cardFlipAway{
+  0%{opacity:1;transform:rotateY(0deg) translateY(0) scale(1)}
+  42%{opacity:1;transform:rotateY(92deg) translateY(-6px) scale(.96)}
+  72%{opacity:.55;transform:rotateY(160deg) translateY(-14px) scale(.82)}
+  100%{opacity:0;transform:rotateY(180deg) translateY(-20px) scale(.64);filter:blur(2px)}
 }
 .mystery-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .mystery-id{
@@ -587,11 +596,11 @@ html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180de
 }
 .mystery-prompt{font-weight:950;color:var(--shop-ink);font-size:1.05rem;line-height:1.25}
 .mystery-clue{
-  color:var(--shop-muted);
+  color:color-mix(in srgb,var(--shop-ink) 76%,var(--shop-muted));
   font-weight:800;
   font-size:.92rem;
   line-height:1.34;
-  background:color-mix(in srgb,var(--wall-color) 7%,var(--shop-card));
+  background:color-mix(in srgb,var(--wall-color) 9%,#fff);
   border:1px solid color-mix(in srgb,var(--wall-color) 22%,var(--shop-border));
   border-radius:12px;
   padding:10px;
@@ -599,7 +608,7 @@ html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180de
 .mystery-clue ul{margin:0;padding-left:1.05rem}
 .mystery-clue li{margin:.2rem 0}
 .mystery-clue strong{
-  color:var(--shop-ink);
+  color:color-mix(in srgb,var(--wall-color) 56%,var(--shop-ink));
   font-weight:950;
 }
 .answer-orb{
@@ -754,8 +763,8 @@ html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180de
   <section class="shop-hero">
     <div>
       <div class="eyebrow">Clinical Chemistry</div>
-      <h1>Mystery Micronutrient Match</h1>
-      <p class="hero-copy">Choose Metals or Vitamins, read each clue card from your notes, then place the correct circular token to seal the mystery card.</p>
+      <h1>Mystery Micronutrient Game</h1>
+      <p class="hero-copy">Choose Metals or Vitamins, read each clue card from your notes, then drag the correct circular token to seal it.</p>
     </div>
     <div class="shop-sign" aria-hidden="true">
       <div>
@@ -834,26 +843,26 @@ html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180de
 <section class="print-only" id="print-area"></section>
 
 <script>
-const STORAGE_KEY = "mlsboc_metal_vitamin_shop_v2";
+const STORAGE_KEY = "mlsboc_metal_vitamin_game_v3";
 const defaultItems = [
-  {id:"M1",category:"metal",bottle:"Chromium",token:"Chromium",clue:"**Key feature:** chromium three plus helps insulin action. | Toxic pattern: chromium six plus is easier to absorb and more toxic. | Disease/risk: chromium six plus is linked to **lung cancer risk**."},
-  {id:"M2",category:"metal",bottle:"Copper",token:"Copper",clue:"**Key feature:** important cofactor that helps reduce iron. | Transport/excretion: mainly albumin-bound; most leaves in bile. | Disease clues: **Wilson disease** has copper rings in eyes; **Menkes disease** is severe copper metabolism problem."},
-  {id:"M3",category:"metal",bottle:"Manganese",token:"Manganese",clue:"**Key feature:** used in steel production; stored mostly in fat and bone. | Deficiency: clotting issues and dermatitis. | Toxic pattern: nausea, headache, anxiety, confusion; **manganese madness** and Parkinson-like chronic toxicity."},
-  {id:"M4",category:"metal",bottle:"Selenium",token:"Selenium",clue:"**Key feature:** antioxidant needed for thyroid hormone synthesis. | Excretion: leaves mostly in urine. | Deficiency: **cardiomyopathy**. | Toxicity: stomach, heart rate, and nervous system symptoms."},
-  {id:"M5",category:"metal",bottle:"Zinc",token:"Zinc",clue:"**Key feature:** supports many enzymes plus DNA, RNA, proteins, glucose, and insulin function. | Excretion: leaves mostly in feces. | Pattern: too much zinc can lower copper absorption; zinc can be used for **Wilson disease**. | Deficiency affects growth and development."},
-  {id:"V1",category:"vitamin",bottle:"Vitamin A",token:"Vitamin A",clue:"**Key feature:** important for vision. | Also helps growth and immune function. | Deficiency clue: **night blindness**."},
-  {id:"V2",category:"vitamin",bottle:"Vitamin D",token:"Vitamin D",clue:"**Key feature:** calcium and phosphorus metabolism. | Used to assess parathyroid and bone problems. | Deficiency clue: **rickets** or **osteomalacia**; chronic kidney disease can affect vitamin D."},
-  {id:"V3",category:"vitamin",bottle:"Vitamin E",token:"Vitamin E",clue:"**Key feature:** antioxidant that protects cell integrity. | Deficiency pattern: nerves, muscles, eyes, and red cells may be affected."},
-  {id:"V4",category:"vitamin",bottle:"Vitamin K",token:"Vitamin K",clue:"**Key feature:** needed for clotting factors. | Deficiency clue: easy bruising and bleeding; abnormal clotting screen. | Newborn clue: shot prevents serious bleeding."},
-  {id:"V5",category:"vitamin",bottle:"Vitamin C",token:"Vitamin C",clue:"**Key feature:** ascorbic acid needed for collagen. | Deficiency disease: **scurvy**. | Pattern clues: bleeding gums, petechiae, and bruising."},
-  {id:"V6",category:"vitamin",bottle:"Thiamine B1",token:"Thiamine B1",clue:"**Key feature:** affects energy metabolism. | Deficiency disease: **beriberi**."},
-  {id:"V7",category:"vitamin",bottle:"Riboflavin B2",token:"Riboflavin B2",clue:"**Key feature:** B vitamin; water soluble and needs regular resupply. | Pattern clue: removed in urine and feces; toxicity risk is lower unless kidney function is poor."},
-  {id:"V8",category:"vitamin",bottle:"Niacin B3",token:"Niacin B3",clue:"**Key feature:** B vitamin; water soluble and needs regular resupply. | Pattern clue: removed in urine and feces; toxicity risk is lower unless kidney function is poor."},
-  {id:"V9",category:"vitamin",bottle:"Pantothenic Acid B5",token:"Pantothenic Acid B5",clue:"**Key feature:** B vitamin; water soluble and needs regular resupply. | Pattern clue: removed in urine and feces; toxicity risk is lower unless kidney function is poor."},
-  {id:"V10",category:"vitamin",bottle:"Pyridoxine B6",token:"Pyridoxine B6",clue:"**Key feature:** helps amino acid metabolism and heme synthesis."},
-  {id:"V11",category:"vitamin",bottle:"Biotin B7",token:"Biotin B7",clue:"**Key feature:** B vitamin. | Deficiency pattern: hair loss and depression."},
-  {id:"V12",category:"vitamin",bottle:"Folate",token:"Folate",clue:"**Key feature:** most common vitamin deficiency; needed for one-carbon transfer. | Deficiency disease: **megaloblastic anemia**. | Pregnancy clue: low folate increases **neural tube defect** risk. | Must separate from B12 as anemia causes."},
-  {id:"V13",category:"vitamin",bottle:"Cobalamin B12",token:"Cobalamin B12",clue:"**Key feature:** cobalamin; absorption needs intrinsic factor. | Causes: low intake or malabsorption; **pernicious anemia**. | Deficiency disease: **megaloblastic anemia**."}
+  {id:"M1",category:"metal",bottle:"Chromium",token:"Chromium",clue:"**Key clue:** helps insulin work. | **Toxic form:** more easily absorbed. | **Risk:** lung cancer exposure clue."},
+  {id:"M2",category:"metal",bottle:"Copper",token:"Copper",clue:"**Key clue:** helps reduce iron. | **Transport:** albumin-bound; bile exit. | **Disease clue:** Kayser-Fleischer rings or kinky hair syndrome."},
+  {id:"M3",category:"metal",bottle:"Manganese",token:"Manganese",clue:"**Key clue:** steel-work exposure. | **Deficiency:** clotting issues, dermatitis. | **Toxic clue:** Parkinson-like neurologic pattern."},
+  {id:"M4",category:"metal",bottle:"Selenium",token:"Selenium",clue:"**Key clue:** thyroid antioxidant role. | **Exit:** mostly urine. | **Deficiency:** cardiomyopathy pattern."},
+  {id:"M5",category:"metal",bottle:"Zinc",token:"Zinc",clue:"**Key clue:** growth, enzymes, DNA/RNA support. | **Exit:** mostly feces. | **Too much:** lowers trace-mineral absorption."},
+  {id:"V1",category:"vitamin",bottle:"Vitamin A",token:"Vitamin A",clue:"**Key clue:** vision and growth. | **Immune clue:** barrier support. | **Deficiency:** night blindness."},
+  {id:"V2",category:"vitamin",bottle:"Vitamin D",token:"Vitamin D",clue:"**Key clue:** calcium/phosphorus balance. | **Bone clue:** rickets or osteomalacia. | **Kidney clue:** chronic disease can affect activation."},
+  {id:"V3",category:"vitamin",bottle:"Vitamin E",token:"Vitamin E",clue:"**Key clue:** antioxidant cell protection. | **Deficiency:** nerves, muscle, eyes, red cells."},
+  {id:"V4",category:"vitamin",bottle:"Vitamin K",token:"Vitamin K",clue:"**Key clue:** clotting factor support. | **Deficiency:** bruising or bleeding. | **Newborn clue:** preventive shot."},
+  {id:"V5",category:"vitamin",bottle:"Vitamin C",token:"Vitamin C",clue:"**Key clue:** collagen support. | **Disease:** scurvy. | **Pattern:** bleeding gums, petechiae, bruising."},
+  {id:"V6",category:"vitamin",bottle:"Thiamine B1",token:"Thiamine B1",clue:"**Key clue:** energy metabolism. | **Deficiency:** beriberi pattern."},
+  {id:"V7",category:"vitamin",bottle:"Riboflavin B2",token:"Riboflavin B2",clue:"**Key clue:** FAD/FMN helper. | **Deficiency:** mouth cracks, sore tongue, dermatitis."},
+  {id:"V8",category:"vitamin",bottle:"Niacin B3",token:"Niacin B3",clue:"**Key clue:** NAD/NADP helper. | **Deficiency:** pellagra pattern."},
+  {id:"V9",category:"vitamin",bottle:"Pantothenic Acid B5",token:"Pantothenic Acid B5",clue:"**Key clue:** CoA carrier role. | **Pattern:** rare deficiency; fatigue and nerve symptoms."},
+  {id:"V10",category:"vitamin",bottle:"Pyridoxine B6",token:"Pyridoxine B6",clue:"**Key clue:** amino acid metabolism. | **Pathway clue:** heme support."},
+  {id:"V11",category:"vitamin",bottle:"Biotin B7",token:"Biotin B7",clue:"**Key clue:** carboxylation helper. | **Deficiency:** hair loss and depression."},
+  {id:"V12",category:"vitamin",bottle:"Folate",token:"Folate",clue:"**Key clue:** one-carbon transfer. | **Deficiency:** megaloblastic anemia. | **Pregnancy:** neural tube defect risk."},
+  {id:"V13",category:"vitamin",bottle:"Cobalamin B12",token:"Cobalamin B12",clue:"**Key clue:** intrinsic factor needed. | **Cause:** malabsorption or pernicious anemia. | **Deficiency:** megaloblastic anemia."}
 ];
 let items = loadItems();
 let selectedToken = null;
@@ -898,8 +907,8 @@ function render(){
     floor.classList.toggle("vitamin", activeShelf === "vitamin");
     document.getElementById("active-wall-title").textContent = shelfLabel(activeShelf);
     document.getElementById("active-wall-copy").textContent = activeShelf === "metal"
-      ? "Read each metal clue card and drag the matching circular token onto it."
-      : "Read each vitamin clue card and drag the matching circular token onto it.";
+      ? "Read each metal clue card and drag the correct token onto it."
+      : "Read each vitamin clue card and drag the correct token onto it.";
     document.getElementById("active-wall-count").textContent = `${current.length} clue cards`;
     document.getElementById("token-bank-copy").textContent = `${shelfLabel(activeShelf)} tokens only. Drag a token onto a clue card.`;
     document.getElementById("active-wall").innerHTML = renderShelfRows(current);
@@ -1072,7 +1081,7 @@ function deleteShopItem(index){items.splice(index,1);renderAdminRows();}
 function restoreDefaults(){items=defaultItems.map(x=>({...x}));saveItems();placements={};hideShopAnswers();render();setStatus("Starter clue cards restored.");}
 function printShopCards(mode="two"){
   const area=document.getElementById("print-area");
-  area.innerHTML = `<div class="print-page"><h1 class="print-title">Mystery Micronutrient Match - Clue Cards</h1><div class="print-grid">${items.map(item=>`<article class="print-card">
+  area.innerHTML = `<div class="print-page"><h1 class="print-title">Mystery Micronutrient Game - Clue Cards</h1><div class="print-grid">${items.map(item=>`<article class="print-card">
     <div class="print-mystery-mark">?</div>
     <h2>${esc(item.id)}</h2>
     <h3>${item.category==="metal"?"Metals Cards":"Vitamins Cards"}</h3>
@@ -1086,7 +1095,7 @@ function printShopCards(mode="two"){
 }
 function printShopTokens(){
   const area=document.getElementById("print-area");
-  area.innerHTML = `<div class="print-page"><h1 class="print-title">Mystery Micronutrient Match - Label Tokens</h1><div class="print-token-grid">${items.map(item=>`<div class="print-token">${esc(item.token)}</div>`).join("")}</div></div>`;
+  area.innerHTML = `<div class="print-page"><h1 class="print-title">Mystery Micronutrient Game - Label Tokens</h1><div class="print-token-grid">${items.map(item=>`<div class="print-token">${esc(item.token)}</div>`).join("")}</div></div>`;
   document.body.classList.remove("print-single-card","print-two-card");
   window.print();
 }
