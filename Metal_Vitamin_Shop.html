@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Metal & Vitamin Label Shop</title>
+<title>Mystery Micronutrient Match</title>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css" />
 <style>
@@ -14,11 +14,11 @@
   --shop-ink:#1b2135;
   --shop-muted:#606984;
   --shop-border:#c8d2bf;
-  --shop-green:#5f8f6b;
-  --shop-green2:#dbead8;
-  --shop-gold:#d6a531;
-  --shop-gold2:#fff0bb;
-  --shop-blue:#3c87b7;
+  --shop-green:#2980b9;
+  --shop-green2:#dcecff;
+  --shop-gold:#5aa6d6;
+  --shop-gold2:#e7f3ff;
+  --shop-blue:#2980b9;
   --shop-red:#be4f63;
   --shop-shadow:0 18px 40px rgba(70,94,72,.14);
 }
@@ -28,10 +28,10 @@ html[data-mls-theme="dark"]{
   --shop-ink:#f4f7ff;
   --shop-muted:#c0c8de;
   --shop-border:#33405e;
-  --shop-green:#8fc69e;
-  --shop-green2:#1b3229;
-  --shop-gold:#e4b94d;
-  --shop-gold2:#3a3017;
+  --shop-green:#73b8e8;
+  --shop-green2:#14263a;
+  --shop-gold:#73b8e8;
+  --shop-gold2:#14263a;
   --shop-shadow:0 18px 40px rgba(0,0,0,.34);
 }
 body{
@@ -128,7 +128,7 @@ button,.button-link{
 }
 .aisle-card:hover{transform:translateY(-2px);box-shadow:0 24px 46px rgba(36,47,78,.18)}
 .aisle-card.metals{--aisle-color:var(--shop-blue)}
-.aisle-card.vitamins{--aisle-color:var(--shop-gold)}
+.aisle-card.vitamins{--aisle-color:var(--shop-blue)}
 .aisle-kicker{
   color:var(--aisle-color);
   font-family:var(--mls-mono,monospace);
@@ -194,7 +194,7 @@ button,.button-link{
   box-shadow:var(--shop-shadow);
 }
 .shop-floor.active-wall{--wall-color:var(--shop-blue)}
-.shop-floor.active-wall.vitamin{--wall-color:var(--shop-gold)}
+.shop-floor.active-wall.vitamin{--wall-color:var(--shop-blue)}
 .shop-wall-top{
   display:flex;
   flex-wrap:wrap;
@@ -234,7 +234,7 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
     linear-gradient(180deg,#182033 0 16%,#172236 16% 70%,#202033 70% 100%);
 }
 .pharmacy-aisle::before{
-  content:"Medical Labeling Shop";
+  content:"Mystery Micronutrient Cards";
   position:absolute;
   top:16px;
   left:50%;
@@ -501,6 +501,122 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
 }
 .admin-row textarea{min-height:54px;resize:vertical}
 .print-only{display:none}
+
+/* Clue-card mode: the saved answer names stay in admin/tokens, not on the practice cards. */
+.pharmacy-aisle{
+  min-height:500px;
+  background:
+    radial-gradient(circle at 14% 16%,color-mix(in srgb,var(--wall-color) 15%,transparent),transparent 14rem),
+    radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--wall-color) 12%,transparent),transparent 12rem),
+    linear-gradient(180deg,#f7fbff 0 100%);
+}
+html[data-mls-theme="dark"] .pharmacy-aisle{
+  background:
+    radial-gradient(circle at 14% 16%,color-mix(in srgb,var(--wall-color) 18%,transparent),transparent 14rem),
+    radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--wall-color) 14%,transparent),transparent 12rem),
+    linear-gradient(180deg,#111827 0 100%);
+}
+.pharmacy-aisle::before{content:"Mystery Micronutrient Cards"}
+.shelf-row{padding:46px 8px 8px;margin:0}
+.shelf-board{display:none}
+.shelf-bottles{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));align-items:stretch}
+.shop-bottle{
+  border:2px dashed color-mix(in srgb,var(--wall-color) 52%,var(--shop-border));
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.74)),var(--shop-card);
+  color:var(--shop-ink);
+  min-height:232px;
+  padding:12px;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  gap:10px;
+  border-radius:18px;
+  text-align:left;
+  box-shadow:0 12px 22px rgba(36,47,78,.1);
+  position:relative;
+  overflow:hidden;
+}
+html[data-mls-theme="dark"] .shop-bottle{
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--shop-card);
+}
+.shop-bottle:hover,.shop-bottle.active{transform:translateY(-2px);box-shadow:0 18px 30px rgba(36,47,78,.16)}
+.shop-bottle.sealed{border-style:solid;background:linear-gradient(180deg,color-mix(in srgb,var(--wall-color) 12%,#fff),#fff)}
+html[data-mls-theme="dark"] .shop-bottle.sealed{background:linear-gradient(180deg,color-mix(in srgb,var(--wall-color) 16%,#111827),#151d2e)}
+.shop-bottle.sealed::after{
+  content:"SEALED";
+  position:absolute;
+  right:12px;
+  top:12px;
+  transform:rotate(6deg);
+  border:3px solid color-mix(in srgb,var(--wall-color) 78%,#17355c);
+  color:color-mix(in srgb,var(--wall-color) 82%,#17355c);
+  border-radius:10px;
+  padding:4px 8px;
+  font-family:var(--mls-mono,monospace);
+  font-weight:950;
+  letter-spacing:.1em;
+  opacity:.9;
+}
+.mystery-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mystery-id{
+  font-family:var(--mls-mono,monospace);
+  font-weight:950;
+  letter-spacing:.12em;
+  color:var(--wall-color);
+  text-transform:uppercase;
+  font-size:.76rem;
+}
+.mystery-type{
+  border:1px solid color-mix(in srgb,var(--wall-color) 45%,var(--shop-border));
+  background:color-mix(in srgb,var(--wall-color) 12%,var(--shop-card));
+  color:var(--wall-color);
+  border-radius:999px;
+  padding:4px 8px;
+  font:950 .68rem/1 var(--mls-mono,monospace);
+}
+.mystery-prompt{font-weight:950;color:var(--shop-ink);font-size:1.05rem;line-height:1.25}
+.mystery-clue{
+  color:var(--shop-muted);
+  font-weight:800;
+  font-size:.92rem;
+  line-height:1.34;
+  background:color-mix(in srgb,var(--wall-color) 7%,var(--shop-card));
+  border:1px solid color-mix(in srgb,var(--wall-color) 22%,var(--shop-border));
+  border-radius:12px;
+  padding:10px;
+}
+.mystery-clue ul{margin:0;padding-left:1.05rem}
+.mystery-clue li{margin:.2rem 0}
+.mystery-clue strong{
+  color:var(--shop-ink);
+  font-weight:950;
+}
+.answer-orb{
+  width:1.02in;
+  height:1.02in;
+  border:2px dashed color-mix(in srgb,var(--wall-color) 70%,#17355c);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:8px;
+  color:var(--shop-muted);
+  background:#fff;
+  font-weight:950;
+  font-size:.72rem;
+  line-height:1.05;
+  margin:2px auto 0;
+}
+.shop-bottle.sealed .answer-orb{border-style:solid;background:color-mix(in srgb,var(--wall-color) 12%,#fff);color:var(--shop-ink)}
+.shop-bottle .bottle-shape,.shop-bottle .bottle-id,.shop-bottle .bottle-clue{display:none}
+.token{
+  border-radius:50%;
+  width:1.2in;
+  height:1.2in;
+  padding:8px;
+  font-size:.75rem;
+  line-height:1.05;
+  text-align:center;
+}
 @media(max-width:900px){
   .shop-hero,.shop-lobby,.game-grid,.walls{grid-template-columns:1fr}
   .token-bank{position:static}
@@ -509,9 +625,11 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
   .aisle-scene{min-height:170px}
   .pharmacy-aisle{min-height:0;padding:54px 10px 20px}
   .shelf-row{padding-left:6px;padding-right:6px}
-  .shelf-bottles{grid-template-columns:repeat(3,minmax(82px,1fr));gap:12px 8px}
+  .shelf-bottles{grid-template-columns:1fr;gap:12px}
   .bottle-shape{width:80px;min-height:118px}
   .bottle-label{font-size:.68rem}
+  .shop-bottle{min-height:210px}
+  .token{width:1.05in;height:1.05in}
 }
 @media print{
   body{background:#fff;color:#111}
@@ -533,7 +651,45 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
   .print-card h2{font-size:18pt;margin:0 0 .08in}
   .print-card h3{font-size:13pt;margin:.1in 0 .06in}
   .print-card p,.print-card li{font-size:12pt;line-height:1.25}
-  .print-bottle{position:absolute;right:.22in;top:.22in;font-size:24pt}
+  .print-clue ul{margin:.04in 0 0;padding-left:.2in}
+  .print-clue strong{font-weight:900}
+  .print-mystery-mark{
+    position:absolute;
+    right:.22in;
+    top:.22in;
+    width:.58in;
+    height:.58in;
+    border:2px solid #2f6bd8;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font:900 18pt/1 Arial,sans-serif;
+    color:#2f6bd8;
+  }
+  .print-card-footer{
+    position:absolute;
+    left:.22in;
+    right:.22in;
+    bottom:.18in;
+    border-top:1px solid #999;
+    padding-top:.08in;
+    font-weight:900;
+  }
+  .print-answer-circle{
+    position:absolute;
+    left:50%;
+    bottom:.58in;
+    transform:translateX(-50%);
+    width:1.837in;
+    height:1.837in;
+    border:2px dashed #1c2c55;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:.12in;
+    font:900 13pt/1.05 Arial,sans-serif;
+  }
   .print-token-grid{display:grid;grid-template-columns:repeat(4,1.837in);gap:.16in}
   .print-token{
     width:1.837in;
@@ -563,13 +719,13 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
   <section class="shop-hero">
     <div>
       <div class="eyebrow">Clinical Chemistry</div>
-      <h1>Metal & Vitamin Label Shop</h1>
-      <p class="hero-copy">Choose a shop shelf, then match each bottle to the correct metal or vitamin token. Use the admin editor to rename bottles, tokens, and clue cards when you add your real notes.</p>
+      <h1>Mystery Micronutrient Match</h1>
+      <p class="hero-copy">Choose Metals or Vitamins, read each clue card from your notes, then place the correct circular token to seal the mystery card.</p>
     </div>
     <div class="shop-sign" aria-hidden="true">
       <div>
-        <strong>Medical Labeling Shop</strong>
-        <span>Pick a shelf, label the bottles</span>
+        <strong>Mystery Micronutrient</strong>
+        <span>Read the clue, seal the card</span>
       </div>
     </div>
   </section>
@@ -578,18 +734,17 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
     <button class="primary" onclick="checkShop()">Check</button>
     <button class="ghost" onclick="resetShop()">Reset</button>
     <button class="good" onclick="showShopAnswers()">Show answers</button>
-    <button class="warn" onclick="printShopCards()">Print Bottle Cards</button>
+    <button class="warn" onclick="printShopCards()">Print Mystery Cards</button>
     <button class="warn" onclick="printShopTokens()">Print Label Tokens</button>
-    <button class="ghost" onclick="toggleAdmin()">Admin Edit</button>
-    <span class="status" id="shop-status">Pick a token, then click a bottle label.</span>
+    <span class="status" id="shop-status">Pick a token, then click a mystery card.</span>
   </section>
 
-  <section class="shop-lobby" id="shop-lobby" aria-label="Choose a shop shelf">
+  <section class="shop-lobby" id="shop-lobby" aria-label="Choose a clue card set">
     <button class="aisle-card metals" onclick="openShelf('metal')">
       <div>
         <div class="aisle-kicker">Shelf 1</div>
-        <h2>Metals Shelf</h2>
-        <p>Enter the metals aisle and label each bottle with the correct metal token.</p>
+        <h2>Metals Cards</h2>
+        <p>Enter the metals set and match each information card to the correct metal token.</p>
         <span class="aisle-pill" id="metal-count"></span>
       </div>
       <div class="aisle-scene" aria-hidden="true"><span class="aisle-counter">Open Metals</span></div>
@@ -597,8 +752,8 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
     <button class="aisle-card vitamins" onclick="openShelf('vitamin')">
       <div>
         <div class="aisle-kicker">Shelf 2</div>
-        <h2>Vitamins Shelf</h2>
-        <p>Enter the vitamins aisle and label each bottle with the correct vitamin token.</p>
+        <h2>Vitamins Cards</h2>
+        <p>Enter the vitamins set and match each information card to the correct vitamin token.</p>
         <span class="aisle-pill" id="vitamin-count"></span>
       </div>
       <div class="aisle-scene" aria-hidden="true"><span class="aisle-counter">Open Vitamins</span></div>
@@ -609,9 +764,9 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
     <div class="shop-floor active-wall" id="shop-floor">
       <div class="shop-wall-top">
         <div>
-          <button class="ghost" onclick="backToLobby()">← Shop Entrance</button>
-          <h2 id="active-wall-title">Metals Shelf</h2>
-          <p id="active-wall-copy">Pick labels from the bank and place them on the bottles.</p>
+          <button class="ghost" onclick="backToLobby()">← Card Sets</button>
+          <h2 id="active-wall-title">Metals Cards</h2>
+          <p id="active-wall-copy">Pick labels from the bank and place them on the clue cards.</p>
         </div>
         <span class="wall-count" id="active-wall-count"></span>
       </div>
@@ -620,14 +775,14 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
 
     <aside class="token-bank">
       <h2>Label Token Bank</h2>
-      <p id="token-bank-copy">Tokens shuffle each time. Click a token, then click a bottle.</p>
+      <p id="token-bank-copy">Tokens shuffle each time. Click a token, then click a card.</p>
       <div class="token-list" id="token-bank"></div>
     </aside>
   </section>
 
   <section class="admin-panel" id="admin-panel">
-    <h2>Admin: edit shop labels</h2>
-    <p style="color:var(--shop-muted);margin-top:0">Saved on this browser. Edit category, bottle label, token name, and short clue text.</p>
+    <h2>Admin: edit clue cards</h2>
+    <p style="color:var(--shop-muted);margin-top:0">Saved on this browser. Edit category, internal answer note, token name, and short clue text.</p>
     <div id="admin-rows"></div>
     <div class="toolbar" style="box-shadow:none;margin-bottom:0">
       <button class="primary" onclick="saveAdminData()">Save changes</button>
@@ -641,26 +796,26 @@ html[data-mls-theme="dark"] .pharmacy-aisle{
 <section class="print-only" id="print-area"></section>
 
 <script>
-const STORAGE_KEY = "mlsboc_metal_vitamin_shop_v1";
+const STORAGE_KEY = "mlsboc_metal_vitamin_shop_v2";
 const defaultItems = [
-  {id:"M1",category:"metal",bottle:"Iron",token:"Iron",clue:"Edit with your iron pattern notes."},
-  {id:"M2",category:"metal",bottle:"Copper",token:"Copper",clue:"Edit with your copper pattern notes."},
-  {id:"M3",category:"metal",bottle:"Zinc",token:"Zinc",clue:"Edit with your zinc pattern notes."},
-  {id:"M4",category:"metal",bottle:"Magnesium",token:"Magnesium",clue:"Edit with your magnesium pattern notes."},
-  {id:"M5",category:"metal",bottle:"Calcium",token:"Calcium",clue:"Edit with your calcium pattern notes."},
-  {id:"V1",category:"vitamin",bottle:"Vitamin A",token:"Vitamin A",clue:"Edit with your vitamin A notes."},
-  {id:"V2",category:"vitamin",bottle:"Vitamin D",token:"Vitamin D",clue:"Edit with your vitamin D notes."},
-  {id:"V3",category:"vitamin",bottle:"Vitamin E",token:"Vitamin E",clue:"Edit with your vitamin E notes."},
-  {id:"V4",category:"vitamin",bottle:"Vitamin K",token:"Vitamin K",clue:"Edit with your vitamin K notes."},
-  {id:"V5",category:"vitamin",bottle:"Thiamine B1",token:"Thiamine B1",clue:"Edit with your B1 notes."},
-  {id:"V6",category:"vitamin",bottle:"Riboflavin B2",token:"Riboflavin B2",clue:"Edit with your B2 notes."},
-  {id:"V7",category:"vitamin",bottle:"Niacin B3",token:"Niacin B3",clue:"Edit with your B3 notes."},
-  {id:"V8",category:"vitamin",bottle:"Pyridoxine B6",token:"Pyridoxine B6",clue:"Edit with your B6 notes."},
-  {id:"V9",category:"vitamin",bottle:"Cobalamin B12",token:"Cobalamin B12",clue:"Edit with your B12 notes."},
-  {id:"V10",category:"vitamin",bottle:"Vitamin C",token:"Vitamin C",clue:"Edit with your vitamin C notes."},
-  {id:"V11",category:"vitamin",bottle:"Folate",token:"Folate",clue:"Edit with your folate notes."},
-  {id:"V12",category:"vitamin",bottle:"Biotin",token:"Biotin",clue:"Edit with your biotin notes."},
-  {id:"V13",category:"vitamin",bottle:"Pantothenic Acid",token:"Pantothenic Acid",clue:"Edit with your pantothenic acid notes."}
+  {id:"M1",category:"metal",bottle:"Chromium",token:"Chromium",clue:"**Key feature:** chromium three plus helps insulin action. | Toxic pattern: chromium six plus is easier to absorb and more toxic. | Disease/risk: chromium six plus is linked to **lung cancer risk**."},
+  {id:"M2",category:"metal",bottle:"Copper",token:"Copper",clue:"**Key feature:** important cofactor that helps reduce iron. | Transport/excretion: mainly albumin-bound; most leaves in bile. | Disease clues: **Wilson disease** has copper rings in eyes; **Menkes disease** is severe copper metabolism problem."},
+  {id:"M3",category:"metal",bottle:"Manganese",token:"Manganese",clue:"**Key feature:** used in steel production; stored mostly in fat and bone. | Deficiency: clotting issues and dermatitis. | Toxic pattern: nausea, headache, anxiety, confusion; **manganese madness** and Parkinson-like chronic toxicity."},
+  {id:"M4",category:"metal",bottle:"Selenium",token:"Selenium",clue:"**Key feature:** antioxidant needed for thyroid hormone synthesis. | Excretion: leaves mostly in urine. | Deficiency: **cardiomyopathy**. | Toxicity: stomach, heart rate, and nervous system symptoms."},
+  {id:"M5",category:"metal",bottle:"Zinc",token:"Zinc",clue:"**Key feature:** supports many enzymes plus DNA, RNA, proteins, glucose, and insulin function. | Excretion: leaves mostly in feces. | Pattern: too much zinc can lower copper absorption; zinc can be used for **Wilson disease**. | Deficiency affects growth and development."},
+  {id:"V1",category:"vitamin",bottle:"Vitamin A",token:"Vitamin A",clue:"**Key feature:** important for vision. | Also helps growth and immune function. | Deficiency clue: **night blindness**."},
+  {id:"V2",category:"vitamin",bottle:"Vitamin D",token:"Vitamin D",clue:"**Key feature:** calcium and phosphorus metabolism. | Used to assess parathyroid and bone problems. | Deficiency clue: **rickets** or **osteomalacia**; chronic kidney disease can affect vitamin D."},
+  {id:"V3",category:"vitamin",bottle:"Vitamin E",token:"Vitamin E",clue:"**Key feature:** antioxidant that protects cell integrity. | Deficiency pattern: nerves, muscles, eyes, and red cells may be affected."},
+  {id:"V4",category:"vitamin",bottle:"Vitamin K",token:"Vitamin K",clue:"**Key feature:** needed for clotting factors. | Deficiency clue: easy bruising and bleeding; abnormal clotting screen. | Newborn clue: shot prevents serious bleeding."},
+  {id:"V5",category:"vitamin",bottle:"Vitamin C",token:"Vitamin C",clue:"**Key feature:** ascorbic acid needed for collagen. | Deficiency disease: **scurvy**. | Pattern clues: bleeding gums, petechiae, and bruising."},
+  {id:"V6",category:"vitamin",bottle:"Thiamine B1",token:"Thiamine B1",clue:"**Key feature:** affects energy metabolism. | Deficiency disease: **beriberi**."},
+  {id:"V7",category:"vitamin",bottle:"Riboflavin B2",token:"Riboflavin B2",clue:"**Key feature:** B vitamin; water soluble and needs regular resupply. | Pattern clue: removed in urine and feces; toxicity risk is lower unless kidney function is poor."},
+  {id:"V8",category:"vitamin",bottle:"Niacin B3",token:"Niacin B3",clue:"**Key feature:** B vitamin; water soluble and needs regular resupply. | Pattern clue: removed in urine and feces; toxicity risk is lower unless kidney function is poor."},
+  {id:"V9",category:"vitamin",bottle:"Pantothenic Acid B5",token:"Pantothenic Acid B5",clue:"**Key feature:** B vitamin; water soluble and needs regular resupply. | Pattern clue: removed in urine and feces; toxicity risk is lower unless kidney function is poor."},
+  {id:"V10",category:"vitamin",bottle:"Pyridoxine B6",token:"Pyridoxine B6",clue:"**Key feature:** helps amino acid metabolism and heme synthesis."},
+  {id:"V11",category:"vitamin",bottle:"Biotin B7",token:"Biotin B7",clue:"**Key feature:** B vitamin. | Deficiency pattern: hair loss and depression."},
+  {id:"V12",category:"vitamin",bottle:"Folate",token:"Folate",clue:"**Key feature:** most common vitamin deficiency; needed for one-carbon transfer. | Deficiency disease: **megaloblastic anemia**. | Pregnancy clue: low folate increases **neural tube defect** risk. | Must separate from B12 as anemia causes."},
+  {id:"V13",category:"vitamin",bottle:"Cobalamin B12",token:"Cobalamin B12",clue:"**Key feature:** cobalamin; absorption needs intrinsic factor. | Causes: low intake or malabsorption; **pernicious anemia**. | Deficiency disease: **megaloblastic anemia**."}
 ];
 let items = loadItems();
 let selectedToken = null;
@@ -677,6 +832,12 @@ function loadItems(){
 }
 function saveItems(){localStorage.setItem(STORAGE_KEY,JSON.stringify(items));}
 function esc(text){return String(text||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));}
+function formatStrong(text){return esc(text).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");}
+function formatClue(text){
+  const raw = String(text || "Add clue information in admin mode.");
+  const parts = raw.split(/\s*\|\s*/).map(part=>part.trim()).filter(Boolean);
+  return `<ul>${parts.map(part=>`<li>${formatStrong(part)}</li>`).join("")}</ul>`;
+}
 function shuffle(list){
   const copy=[...list];
   for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}
@@ -684,12 +845,12 @@ function shuffle(list){
 }
 function colorFor(item){return item.category === "metal" ? "var(--shop-blue)" : "var(--shop-gold)";}
 function shelfItems(){return activeShelf ? items.filter(x=>x.category===activeShelf) : items;}
-function shelfLabel(category){return category === "metal" ? "Metals Shelf" : "Vitamins Shelf";}
+function shelfLabel(category){return category === "metal" ? "Metals Cards" : "Vitamins Cards";}
 function render(){
   const metals = items.filter(x=>x.category==="metal");
   const vitamins = items.filter(x=>x.category==="vitamin");
-  document.getElementById("metal-count").textContent = `${metals.length} bottle labels`;
-  document.getElementById("vitamin-count").textContent = `${vitamins.length} bottle labels`;
+  document.getElementById("metal-count").textContent = `${metals.length} clue cards`;
+  document.getElementById("vitamin-count").textContent = `${vitamins.length} clue cards`;
   document.getElementById("shop-lobby").classList.toggle("hidden", Boolean(activeShelf));
   document.getElementById("shop-game").classList.toggle("hidden", !activeShelf);
   if(activeShelf){
@@ -698,10 +859,10 @@ function render(){
     floor.classList.toggle("vitamin", activeShelf === "vitamin");
     document.getElementById("active-wall-title").textContent = shelfLabel(activeShelf);
     document.getElementById("active-wall-copy").textContent = activeShelf === "metal"
-      ? "Choose each metal token and place it on the matching shelf bottle."
-      : "Choose each vitamin token and place it on the matching shelf bottle.";
-    document.getElementById("active-wall-count").textContent = `${current.length} bottles`;
-    document.getElementById("token-bank-copy").textContent = `${shelfLabel(activeShelf)} tokens only. Click a token, then click a bottle.`;
+      ? "Read each metal clue card and place the matching circular token."
+      : "Read each vitamin clue card and place the matching circular token.";
+    document.getElementById("active-wall-count").textContent = `${current.length} clue cards`;
+    document.getElementById("token-bank-copy").textContent = `${shelfLabel(activeShelf)} tokens only. Click a token, then click a card.`;
     document.getElementById("active-wall").innerHTML = renderShelfRows(current);
     document.getElementById("token-bank").innerHTML = shuffle(current).map(renderToken).join("");
   }
@@ -712,14 +873,14 @@ function openShelf(category){
   history.replaceState(null,"",`#${category}`);
   selectedToken = null;
   render();
-  setStatus(`Entered ${shelfLabel(category)}. Pick a token, then click a bottle.`);
+  setStatus(`Entered ${shelfLabel(category)}. Pick a token, then click a clue card.`);
 }
 function backToLobby(){
   activeShelf = null;
   history.replaceState(null,"",location.pathname);
   selectedToken = null;
   render();
-  setStatus("Choose a shop shelf to start labeling.");
+  setStatus("Choose a clue card set to start matching.");
 }
 function renderShelfRows(list){
   const rows = [];
@@ -731,17 +892,17 @@ function renderShelfRows(list){
 }
 function renderBottle(item){
   const placed = placements[item.id];
-  const label = placed ? placed : "label me";
+  const label = placed ? placed : "place token";
   const active = selectedToken ? " active" : "";
-  return `<button class="shop-bottle${active}" style="--wall-color:${colorFor(item)}" onclick="placeToken('${item.id}')">
-    <span class="bottle-shape">
-      <span class="bottle-liquid"></span>
-      <span class="bottle-label">${esc(label)}</span>
+  const sealed = placed === item.token ? " sealed" : "";
+  return `<button class="shop-bottle${active}${sealed}" style="--wall-color:${colorFor(item)}" onclick="placeToken('${item.id}')">
+    <span class="mystery-head">
+      <span class="mystery-id">${esc(item.id)}</span>
+      <span class="mystery-type">${item.category === "metal" ? "Metal" : "Vitamin"}</span>
     </span>
-    <span>
-      <span class="bottle-id">${esc(item.id)} · ${item.category === "metal" ? "Metal" : "Vitamin"}</span>
-      <span class="bottle-clue">${esc(item.clue)}</span>
-    </span>
+    <span class="mystery-prompt">Mystery micronutrient clue</span>
+    <span class="mystery-clue">${formatClue(item.clue)}</span>
+    <span class="answer-orb">${esc(label)}</span>
   </button>`;
 }
 function renderToken(item){
@@ -754,15 +915,17 @@ function selectTokenById(id){
 }
 function selectToken(token){
   selectedToken = token;
-  setStatus(`Selected: ${token}. Now click the matching bottle.`);
+  setStatus(`Selected: ${token}. Now click the matching clue card.`);
 }
 function placeToken(id){
-  if(!selectedToken){setStatus("Pick a token first, then click a bottle.", false);return;}
-  Object.keys(placements).forEach(key=>{if(placements[key]===selectedToken)delete placements[key];});
-  placements[id]=selectedToken;
+  if(!selectedToken){setStatus("Pick a token first, then click a clue card.", false);return;}
+  const token = selectedToken;
+  Object.keys(placements).forEach(key=>{if(placements[key]===token)delete placements[key];});
+  placements[id]=token;
   selectedToken=null;
   render();
-  setStatus("Placed. Keep labeling the shop.");
+  const item = items.find(entry=>entry.id===id);
+  setStatus(item && token === item.token ? "Correct match. Card sealed." : "Placed. Keep matching the clue cards.");
 }
 function setStatus(message, good=true){
   const el=document.getElementById("shop-status");
@@ -773,9 +936,9 @@ function checkShop(){
   let filled=0, correct=0;
   const current = shelfItems();
   current.forEach(item=>{if(placements[item.id]){filled++; if(placements[item.id]===item.token)correct++;}});
-  setStatus(`${correct}/${current.length} correct on ${activeShelf ? shelfLabel(activeShelf) : "the shop"}. ${current.length-filled} bottles still need labels.`, correct===current.length);
+  setStatus(`${correct}/${current.length} correct on ${activeShelf ? shelfLabel(activeShelf) : "the set"}. ${current.length-filled} clue cards still need tokens.`, correct===current.length);
 }
-function resetShop(){placements={};selectedToken=null;render();setStatus("Reset. Pick a token, then click a bottle label.");}
+function resetShop(){placements={};selectedToken=null;render();setStatus("Reset. Pick a token, then click a clue card.");}
 function showShopAnswers(){
   const current = shelfItems();
   current.forEach(item=>{placements[item.id]=item.token;});
@@ -791,7 +954,7 @@ function renderAdminRows(){
       <option value="metal" ${item.category==="metal"?"selected":""}>Metal</option>
       <option value="vitamin" ${item.category==="vitamin"?"selected":""}>Vitamin</option>
     </select>
-    <input data-field="bottle" data-index="${index}" value="${esc(item.bottle)}" placeholder="Bottle label">
+    <input data-field="bottle" data-index="${index}" value="${esc(item.bottle)}" placeholder="Internal answer note">
     <input data-field="token" data-index="${index}" value="${esc(item.token)}" placeholder="Token name">
     <textarea data-field="clue" data-index="${index}" placeholder="Short pattern clue">${esc(item.clue)}</textarea>
     <button class="ghost" onclick="deleteShopItem(${index})">×</button>
@@ -811,30 +974,31 @@ function saveAdminData(){
   saveItems();
   placements={};
   render();
-  setStatus("Shop labels saved.");
+  setStatus("Mystery clue cards saved.");
 }
 function addShopItem(category){
   const next = items.filter(x=>x.category===category).length + 1;
-  items.push({id:`${category==="metal"?"M":"V"}${next}`,category,bottle:category==="metal"?"New Metal":"New Vitamin",token:category==="metal"?"New Metal":"New Vitamin",clue:"Add clue notes here."});
+  items.push({id:`${category==="metal"?"M":"V"}${next}`,category,bottle:"Internal answer note",token:category==="metal"?"New Metal":"New Vitamin",clue:"Add clue notes here."});
   renderAdminRows();
 }
 function deleteShopItem(index){items.splice(index,1);renderAdminRows();}
-function restoreDefaults(){items=defaultItems.map(x=>({...x}));saveItems();placements={};render();setStatus("Starter shop restored.");}
+function restoreDefaults(){items=defaultItems.map(x=>({...x}));saveItems();placements={};render();setStatus("Starter clue cards restored.");}
 function printShopCards(){
   const area=document.getElementById("print-area");
-  area.innerHTML = `<div class="print-page"><h1 class="print-title">Metal & Vitamin Label Shop - Bottle Cards</h1><div class="print-grid">${items.map(item=>`<article class="print-card">
-    <div class="print-bottle">${item.category==="metal"?"⚙":"✦"}</div>
-    <h2>${esc(item.id)} · ${esc(item.bottle)}</h2>
-    <h3>${item.category==="metal"?"Metals Wall":"Vitamins Wall"}</h3>
-    <p><strong>Pattern clue:</strong></p>
-    <ul><li>${esc(item.clue)}</li></ul>
-    <p style="position:absolute;left:.22in;right:.22in;bottom:.22in;border-top:1px solid #999;padding-top:.1in"><strong>Place the matching label token on this bottle.</strong></p>
+  area.innerHTML = `<div class="print-page"><h1 class="print-title">Mystery Micronutrient Match - Clue Cards</h1><div class="print-grid">${items.map(item=>`<article class="print-card">
+    <div class="print-mystery-mark">?</div>
+    <h2>${esc(item.id)}</h2>
+    <h3>${item.category==="metal"?"Metals Cards":"Vitamins Cards"}</h3>
+    <p><strong>Clue information:</strong></p>
+    <div class="print-clue">${formatClue(item.clue)}</div>
+    <div class="print-answer-circle">${esc(item.id)}<br>token spot</div>
+    <p class="print-card-footer">Place the matching circular token here.</p>
   </article>`).join("")}</div></div>`;
   window.print();
 }
 function printShopTokens(){
   const area=document.getElementById("print-area");
-  area.innerHTML = `<div class="print-page"><h1 class="print-title">Metal & Vitamin Label Shop - Label Tokens</h1><div class="print-token-grid">${items.map(item=>`<div class="print-token">${esc(item.token)}</div>`).join("")}</div></div>`;
+  area.innerHTML = `<div class="print-page"><h1 class="print-title">Mystery Micronutrient Match - Label Tokens</h1><div class="print-token-grid">${items.map(item=>`<div class="print-token">${esc(item.token)}</div>`).join("")}</div></div>`;
   window.print();
 }
 render();
