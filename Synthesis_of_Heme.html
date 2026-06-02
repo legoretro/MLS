@@ -250,9 +250,9 @@ button{
 .enzyme-fixed{
   display:inline-grid;
   place-items:center;
-  min-width:138px;
-  min-height:31px;
-  padding:5px 14px;
+  min-width:150px;
+  min-height:30px;
+  padding:5px 16px;
   clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);
   background:var(--enzyme);
   border:2px solid var(--enzyme-line);
@@ -270,7 +270,7 @@ button{
   border-radius:18px;
   padding:8px;
   box-shadow:var(--shadow);
-  max-width:660px;
+  max-width:720px;
 }
 .cell-title{
   display:flex;
@@ -298,7 +298,7 @@ button{
 }
 .guide-row{
   display:grid;
-  grid-template-columns:32px 98px minmax(230px,1fr) 230px;
+  grid-template-columns:32px 110px minmax(300px,1fr);
   gap:8px;
   align-items:center;
   border:1px solid #dbe4f3;
@@ -306,7 +306,7 @@ button{
   border-radius:12px;
   padding:7px 8px;
   background:#fff;
-  min-height:66px;
+  min-height:58px;
 }
 .guide-row.mito{
   border-left-color:var(--mito-line);
@@ -336,7 +336,8 @@ button{
   line-height:1.15;
 }
 .guide-product,
-.guide-reaction{
+.guide-reaction,
+.guide-enzyme-flow{
   display:flex;
   align-items:center;
   justify-content:center;
@@ -345,12 +346,45 @@ button{
 }
 .guide-product .slot.step{
   width:100%;
-  max-width:300px;
-  min-height:39px;
+  max-width:430px;
+  min-height:42px;
 }
 .guide-reaction{
   flex-wrap:nowrap;
   align-content:center;
+}
+.guide-enzyme-row{
+  display:grid;
+  grid-template-columns:32px 110px minmax(300px,1fr);
+  gap:8px;
+  align-items:center;
+  min-height:42px;
+  padding:0 8px;
+  margin:-1px 0;
+}
+.guide-enzyme-flow{
+  grid-column:3;
+  position:relative;
+}
+.guide-enzyme-flow::before,
+.guide-enzyme-flow::after{
+  content:"";
+  width:2px;
+  height:11px;
+  border-radius:999px;
+  background:#bec8df;
+}
+.guide-enzyme-flow::after{
+  width:0;
+  height:0;
+  border-left:5px solid transparent;
+  border-right:5px solid transparent;
+  border-top:8px solid #30415f;
+  background:transparent;
+  border-radius:0;
+}
+.guide-enzyme-flow .slot.cofactor{
+  margin-left:2px;
 }
 .reaction-label{
   display:none;
@@ -406,8 +440,8 @@ button{
   transform:none;
 }
 .step-guide .slot.step{
-  width:min(100%,260px);
-  min-height:38px;
+  width:min(100%,430px);
+  min-height:42px;
 }
 .step-guide .slot.cofactor{
   width:56px;
@@ -565,47 +599,56 @@ button{
 }
 .ghost .carry{
   position:absolute;
-  right:-13px;
-  top:17px;
-  width:16px;
-  height:16px;
-  border-radius:50%;
+  right:-17px;
+  top:18px;
+  width:23px;
+  height:14px;
+  border-radius:999px;
   background:#bca8f2;
   border:3px solid #8069d6;
+  transform:rotate(-18deg);
   box-shadow:0 0 0 4px rgba(188,168,242,.2);
 }
 .ghost-one{animation-delay:0s}
 .ghost-two{animation-delay:1.2s;transform:scale(.94)}
 .ghost-three{animation-delay:2.4s;transform:scale(.9)}
-.circle-piece{
+.chain-link{
   position:absolute;
   top:52px;
-  width:28px;
-  height:28px;
+  --rot:0deg;
+  width:46px;
+  height:25px;
   border:4px solid #8069d6;
-  border-radius:50%;
+  border-radius:999px;
   background:rgba(188,168,242,.18);
   opacity:0;
-  animation:circle-assemble 8s ease-in-out infinite;
+  transform:translateX(-120px) scale(.6) rotate(var(--rot));
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.72),0 6px 16px rgba(107,89,185,.12);
+  animation:chain-assemble 8s ease-in-out infinite;
 }
-.circle-piece.one{left:48%;animation-delay:.6s}
-.circle-piece.two{left:54%;animation-delay:1.15s}
-.circle-piece.three{left:60%;animation-delay:1.7s}
-.circle-piece.four{left:66%;animation-delay:2.25s}
-.hook{
+.chain-link.one{left:46%;animation-delay:.6s}
+.chain-link.two{left:50%;top:48px;animation-delay:1.15s;--rot:90deg}
+.chain-link.three{left:54%;animation-delay:1.7s}
+.chain-link.four{left:58%;top:48px;animation-delay:2.25s;--rot:90deg}
+.chain-bridge{
   position:absolute;
   top:64px;
-  left:51%;
-  width:170px;
-  height:4px;
+  left:46.5%;
+  width:185px;
+  height:8px;
   border-radius:999px;
-  background:#8c7bd3;
+  background:
+    radial-gradient(circle at 20% 50%,#f6f0ff 0 6px,transparent 7px),
+    radial-gradient(circle at 40% 50%,#f6f0ff 0 6px,transparent 7px),
+    radial-gradient(circle at 60% 50%,#f6f0ff 0 6px,transparent 7px),
+    radial-gradient(circle at 80% 50%,#f6f0ff 0 6px,transparent 7px),
+    linear-gradient(90deg,#8069d6,#bca8f2,#8069d6);
   opacity:0;
-  animation:hook-glow 8s ease-in-out infinite;
+  animation:chain-hook 8s ease-in-out infinite;
 }
 .fe-token{
   position:absolute;
-  right:156px;
+  right:150px;
   top:-24px;
   width:42px;
   height:30px;
@@ -621,9 +664,9 @@ button{
 }
 .heme-badge{
   position:absolute;
-  right:28px;
+  right:22px;
   top:42px;
-  width:94px;
+  width:110px;
   height:42px;
   display:grid;
   place-items:center;
@@ -663,12 +706,12 @@ button{
   82%{left:104%;transform:translateY(4px) rotate(-2deg)}
   100%{left:104%;transform:translateY(5px) rotate(-2deg)}
 }
-@keyframes circle-assemble{
-  0%,18%{opacity:0;transform:translateX(-120px) scale(.6)}
-  30%,75%{opacity:1;transform:translateX(0) scale(1)}
-  92%,100%{opacity:0;transform:translateX(12px) scale(.96)}
+@keyframes chain-assemble{
+  0%,18%{opacity:0;transform:translateX(-120px) scale(.6) rotate(var(--rot))}
+  30%,75%{opacity:1;transform:translateX(0) scale(1) rotate(var(--rot))}
+  92%,100%{opacity:0;transform:translateX(12px) scale(.96) rotate(var(--rot))}
 }
-@keyframes hook-glow{
+@keyframes chain-hook{
   0%,33%{opacity:0;transform:scaleX(.2);transform-origin:left}
   44%,78%{opacity:.9;transform:scaleX(1);transform-origin:left}
   95%,100%{opacity:0;transform:scaleX(1)}
@@ -725,8 +768,8 @@ html[data-mls-theme="dark"] .ghost{
 }
 @media (prefers-reduced-motion:reduce){
   .ghost,
-  .circle-piece,
-  .hook,
+  .chain-link,
+  .chain-bridge,
   .fe-token,
   .heme-badge{
     animation:none!important;
@@ -734,7 +777,8 @@ html[data-mls-theme="dark"] .ghost{
   .ghost-one{left:16%;top:24px}
   .ghost-two{left:30%;top:24px}
   .ghost-three{left:44%;top:24px}
-  .circle-piece,.hook,.fe-token,.heme-badge{opacity:1}
+  .chain-link,.chain-bridge,.fe-token,.heme-badge{opacity:1}
+  .chain-link{transform:translateX(0) scale(1) rotate(var(--rot))}
   .fe-token{top:48px}
   .heme-badge{transform:scale(1)}
 }
@@ -761,6 +805,12 @@ html[data-mls-theme="dark"] .ghost{
   }
   .guide-compartment{grid-column:2}
   .guide-product,.guide-reaction{grid-column:1 / -1}
+  .guide-enzyme-row{
+    grid-template-columns:30px minmax(0,1fr);
+    gap:5px;
+    min-height:38px;
+  }
+  .guide-enzyme-flow{grid-column:1 / -1}
   .slot{
     width:58px;
   }
@@ -782,7 +832,7 @@ html[data-mls-theme="dark"] .ghost{
     <div>
       <div class="kicker">Drag + Label Pathway</div>
       <h1>Simple heme step guide.</h1>
-      <p>Drag the 10 pathway labels into the dashed boxes. Enzymes are fixed gold markers so the practice stays focused on products and sequence.</p>
+      <p>Drag the 10 pathway labels into the dashed boxes. Enzymes are fixed between steps so the practice stays focused on products and sequence.</p>
     </div>
     <aside class="legend" aria-label="Legend">
       <div class="legend-item"><span class="legend-swatch"></span>Pathway labels</div>
@@ -819,22 +869,22 @@ html[data-mls-theme="dark"] .ghost{
 
   <section class="acronym-card" aria-label="Acronym story">
     <h2>Acronym Story</h2>
-    <p>Ghosts build the pathway, then iron completes the heme ending.</p>
-    <div class="acronym-story" aria-label="Animated mnemonic: Ghosts Assemble Pieces, Hook Up Circles, Perfectly Producing Iron Heme.">
+    <p>Ghosts hook four chain pieces together, then iron completes the heme ending.</p>
+    <div class="acronym-story" aria-label="Animated mnemonic: Ghosts Assemble Pieces Hooking Up Chains Perfectly Producing Iron Heme.">
       <div class="mnemonic-stage">
         <div class="mnemonic-track" aria-hidden="true"></div>
         <div class="ghost ghost-one" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
         <div class="ghost ghost-two" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
         <div class="ghost ghost-three" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
-        <span class="circle-piece one" aria-hidden="true"></span>
-        <span class="circle-piece two" aria-hidden="true"></span>
-        <span class="circle-piece three" aria-hidden="true"></span>
-        <span class="circle-piece four" aria-hidden="true"></span>
-        <span class="hook" aria-hidden="true"></span>
+        <span class="chain-link one" aria-hidden="true"></span>
+        <span class="chain-link two" aria-hidden="true"></span>
+        <span class="chain-link three" aria-hidden="true"></span>
+        <span class="chain-link four" aria-hidden="true"></span>
+        <span class="chain-bridge" aria-hidden="true"></span>
         <span class="fe-token" aria-hidden="true">Fe</span>
         <span class="heme-badge" aria-hidden="true">Heme</span>
         <div class="mnemonic-text">
-          <strong>(G)</strong>hosts <strong>(A)</strong>ssemble <strong>(P)</strong>ieces, <strong>(H)</strong>ook <strong>(U)</strong>p <strong>(C)</strong>ircles, <strong>(P)</strong>erfectly <strong>(P)</strong>roducing <strong>(Iron)</strong> <strong>(H)</strong>eme.
+          <strong>G</strong>hosts <strong>A</strong>ssemble <strong>P</strong>ieces <strong>H</strong>ooking <strong>U</strong>p <strong>C</strong>hains <strong>P</strong>erfectly <strong>P</strong>roducing <strong>Iron</strong> <strong>H</strong>eme.
         </div>
       </div>
     </div>
@@ -950,18 +1000,19 @@ function renderSlots(){
   const layer = document.getElementById("slotLayer");
   layer.innerHTML = GUIDE_ROWS.map(row => {
     const compartmentClass = row.compartment.toLowerCase().includes("mitochondrion") ? "mito" : "cyto";
-    const reactionCell = row.enzyme
-      ? `<div class="guide-reaction">
+    const enzymeBetween = row.enzyme
+      ? `<div class="guide-enzyme-row" aria-label="Enzyme between step ${row.number} and the next step">
+        <div class="guide-enzyme-flow">
           ${enzymeFixedHtml(row.enzyme)}
           ${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}
-        </div>`
-      : `<div class="guide-reaction"><span class="final-badge">Final product</span></div>`;
+        </div>
+      </div>`
+      : "";
     return `<div class="guide-row ${compartmentClass}">
       <div class="guide-number">${row.number}</div>
       <div class="guide-compartment">${row.compartment}</div>
       <div class="guide-product">${slotHtml(row.step)}</div>
-      ${reactionCell}
-    </div>`;
+    </div>${enzymeBetween}`;
   }).join("");
   layer.querySelectorAll(".slot").forEach(slotEl => {
     slotEl.addEventListener("click", () => handleSlotClick(slotEl.dataset.slot));
