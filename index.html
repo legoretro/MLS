@@ -2029,7 +2029,7 @@ async function generateImageSectionPDF(items, title, filename, options={}){
   document.getElementById('condition-modal').classList.add('hidden');
 }
 
-async function generateUASingleImagePDF(items, title, filename){
+async function generateUASingleImagePDF(items, title, filename, options={}){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const pageW=doc.internal.pageSize.getWidth();
@@ -2037,11 +2037,11 @@ async function generateUASingleImagePDF(items, title, filename){
   const margin=12;
   const gap=5;
   const cols=2;
-  const rows=4;
+  const rows=options.includeFeatures?3:4;
   const itemsPerPage=cols*rows;
   const cardW=(pageW-margin*2-gap*(cols-1))/cols;
   const cardH=(pageH-margin*2-10-gap*(rows-1))/rows;
-  const imgH=cardH-16;
+  const imgH=options.includeFeatures?Math.max(34,cardH-36):cardH-16;
   const makePDFImage=(src)=>new Promise(res=>{
     let done=false;
     const fmt=(src&&src.startsWith('data:image/png'))?'PNG':'JPEG';
@@ -2093,9 +2093,28 @@ async function generateUASingleImagePDF(items, title, filename){
         doc.addImage(pdfImg.src,pdfImg.fmt,ox,oy,dw,dh,'','FAST');
       }catch(e){}
     }
-    doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
+    let textY=y+imgH+8;
+    if(options.showCategory){
+      doc.setFontSize(7);doc.setFont('helvetica','bold');doc.setTextColor(38,92,165);
+      doc.text(uaCategoryLabel(item),x+3,textY);
+      textY+=4.5;
+    }
+    doc.setFontSize(9.2);doc.setFont('helvetica','bold');doc.setTextColor(15,15,15);
     const nameLines=doc.splitTextToSize(item.name||'',cardW-6);
-    doc.text(nameLines.slice(0,2),x+3,y+cardH-10);
+    doc.text(nameLines.slice(0,2),x+3,textY);
+    textY+=Math.min(nameLines.length,2)*4.2+1;
+    if(options.includeFeatures){
+      const feats=(item.key_features||[]).filter(Boolean);
+      doc.setFontSize(7.4);doc.setFont('helvetica','normal');
+      if(feats.length){
+        doc.setTextColor(55,55,70);
+        const lines=doc.splitTextToSize(feats.join('  |  '),cardW-6).slice(0,4);
+        lines.forEach(line=>{doc.text(line,x+3,textY);textY+=3.6;});
+      }else{
+        doc.setFont('helvetica','bold');doc.setTextColor(190,45,65);
+        doc.text('No key features added yet',x+3,textY);
+      }
+    }
   }
   const tot=doc.internal.getNumberOfPages();
   for(let p=1;p<=tot;p++){
@@ -3450,7 +3469,94 @@ async function startGenericFlashcard(){
   startImageFlashcard(valid);
 }
 
-// ─── URINALYSIS IMAGES — flat list with bulk upload + quiz (no folders) ───────
+// ─── URINALYSIS IMAGES — categorized list with bulk upload + quiz ─────────────
+const UA_CATEGORY_TYPES=['Normal','Abnormal'];
+const UA_PH_GROUPS=['Acidic','Alkaline','Unspecified'];
+const UA_CAT_META_RE=/^\s*\[\[UA_CATEGORY:([^|\]]+)\|([^\]]+)\]\]\s*\n?/i;
+function normalizeUACatType(v){
+  const val=String(v||'').trim().toLowerCase();
+  if(val==='normal')return 'Normal';
+  if(val==='abnormal')return 'Abnormal';
+  return '';
+}
+function normalizeUAPh(v){
+  const val=String(v||'').trim().toLowerCase();
+  if(val==='acidic'||val==='acid')return 'Acidic';
+  if(val==='alkaline'||val==='basic')return 'Alkaline';
+  return 'Unspecified';
+}
+function stripUACategoryNote(notes){
+  return String(notes||'').replace(UA_CAT_META_RE,'').trim();
+}
+function uaTextForGuess(item){
+  return [
+    item?.name,
+    ...(Array.isArray(item?.key_features)?item.key_features:[]),
+    stripUACategoryNote(item?.notes)
+  ].join(' ').toLowerCase();
+}
+function inferUACategory(item){
+  const notes=String(item?.notes||'');
+  const match=notes.match(UA_CAT_META_RE);
+  if(match){
+    return {type:normalizeUACatType(match[1])||'Abnormal',ph:normalizeUAPh(match[2])};
+  }
+  const text=uaTextForGuess(item);
+  const ph=/alkaline|basic|ammonium biurate|triple phosphate|struvite|calcium carbonate|phosphate/.test(text)
+    ?'Alkaline'
+    :(/acidic|acid urine|uric acid|cystine|calcium oxalate/.test(text)?'Acidic':'Unspecified');
+  const type=/\bnormal\b|normal finding|normal sediment|hyaline cast/.test(text)?'Normal':'Abnormal';
+  return {type,ph};
+}
+function composeUANotesWithCategory(notes,type,ph){
+  const clean=stripUACategoryNote(notes);
+  return `[[UA_CATEGORY:${normalizeUACatType(type)||'Abnormal'}|${normalizeUAPh(ph)}]]${clean?`\n${clean}`:''}`;
+}
+function uaCategoryKey(item){
+  const cat=inferUACategory(item);
+  return `${cat.type}|${cat.ph}`;
+}
+function uaCategoryLabel(item){
+  const cat=inferUACategory(item);
+  return cat.ph==='Unspecified'?cat.type:`${cat.type} / ${cat.ph}`;
+}
+function uaCategoryControls(prefix,item={}){
+  const cat=inferUACategory(item);
+  return `
+    <div class="form-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+      <div class="form-group">
+        <label>Normal / Abnormal</label>
+        <select id="${prefix}-type">
+          ${UA_CATEGORY_TYPES.map(v=>`<option value="${v}" ${cat.type===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Acidic / Alkaline</label>
+        <select id="${prefix}-ph">
+          ${UA_PH_GROUPS.map(v=>`<option value="${v}" ${cat.ph===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+}
+function uaSortItems(items){
+  const typeRank={Normal:0,Abnormal:1};
+  const phRank={Acidic:0,Alkaline:1,Unspecified:2};
+  return [...(items||[])].sort((a,b)=>{
+    const ca=inferUACategory(a),cb=inferUACategory(b);
+    return (typeRank[ca.type]??9)-(typeRank[cb.type]??9)
+      ||(phRank[ca.ph]??9)-(phRank[cb.ph]??9)
+      ||String(a.name||'').localeCompare(String(b.name||''));
+  });
+}
+function groupedUAImages(items){
+  const groups={};
+  uaSortItems(items).forEach(item=>{
+    const key=uaCategoryKey(item);
+    if(!groups[key])groups[key]=[];
+    groups[key].push(item);
+  });
+  return groups;
+}
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
   // Show skeleton immediately
@@ -3467,7 +3573,10 @@ async function renderUAImages(el){
       }
     }
   }
-  const all=window._uaCache||[];
+  const all=uaSortItems(window._uaCache||[]);
+  const groups=groupedUAImages(all);
+  const groupOrder=[];
+  UA_CATEGORY_TYPES.forEach(type=>UA_PH_GROUPS.forEach(ph=>groupOrder.push(`${type}|${ph}`)));
 
   el.innerHTML=`
     <div class="flex-center gap-8 mb-16 flex-wrap">
@@ -3481,19 +3590,34 @@ async function renderUAImages(el){
       <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
     </div>
     ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
-    <div class="condition-grid" id="ua-items-body">
-      ${all.map(img=>`
-        <div class="condition-card ua-item" data-name="${esc(img.name.toLowerCase())}" onclick="openUAImage('${img.id}')">
-          <div class="ua-single-img">${buildUAThumbs(img)}</div>
-          <div class="condition-body">
-            <div class="condition-name">${img.name}</div>
-            ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
-            ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
-              <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
-              <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
-            </div>`:''}
+    <div id="ua-items-body">
+      ${groupOrder.filter(key=>groups[key]?.length).map(key=>{
+        const [type,ph]=key.split('|');
+        return `<section class="ua-image-group" data-group="${esc(key)}" style="margin-bottom:26px">
+          <div class="section-subtitle" style="display:flex;align-items:center;gap:10px;margin:6px 0 12px">
+            <span>${esc(type)}</span>
+            <span style="font-size:11px;color:var(--text3);letter-spacing:.08em">${esc(ph)}</span>
+            <span style="height:1px;background:var(--border);flex:1"></span>
           </div>
-        </div>`).join('')}
+          <div class="condition-grid">
+            ${groups[key].map(img=>`
+              <div class="condition-card ua-item" data-name="${esc([img.name,...(img.key_features||[])].join(' ').toLowerCase())}" onclick="openUAImage('${img.id}')">
+                <div class="ua-single-img">${buildUAThumbs(img)}</div>
+                <div class="condition-body">
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                    <span class="tag tag-info" style="font-size:10px">${esc(uaCategoryLabel(img))}</span>
+                  </div>
+                  <div class="condition-name">${esc(img.name||'')}</div>
+                  ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).map(esc).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
+                  ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                    <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
+                    <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
+                  </div>`:''}
+                </div>
+              </div>`).join('')}
+          </div>
+        </section>`;
+      }).join('')}
     </div>
     ${isAdmin?`<div class="mt-16">${adminUAImageControls()}</div>`:''}
   `;
@@ -3504,24 +3628,52 @@ function filterUAItems(query){
   document.querySelectorAll('.ua-item').forEach(card=>{
     card.style.display=(!q||card.dataset.name.includes(q))?'':'none';
   });
+  document.querySelectorAll('.ua-image-group').forEach(group=>{
+    const any=[...group.querySelectorAll('.ua-item')].some(card=>card.style.display!=='none');
+    group.style.display=any?'':'none';
+  });
 }
 
 async function openUAExportModal(){
   const {data:items}=await sb.from('mlsboc_ua_images').select('*').order('name');
   if(!items||!items.length){alert('No images to export.');return;}
+  window._uaExportItems=uaSortItems(items);
+  const groups=groupedUAImages(window._uaExportItems);
+  const groupOrder=[];
+  UA_CATEGORY_TYPES.forEach(type=>UA_PH_GROUPS.forEach(ph=>groupOrder.push(`${type}|${ph}`)));
   let html=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">Export UA Findings to PDF</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;cursor:pointer;font-size:13px">
+      <input type="checkbox" id="ua-exp-features" checked style="width:16px;height:16px;flex-shrink:0">
+      <span><strong>Include key features</strong> in the PDF</span>
+    </label>
+    <div style="font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Export whole categories</div>
     <div class="flex gap-8 mb-12 flex-wrap">
-      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=true)">Select All</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=false)">Deselect All</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-group').forEach(c=>c.checked=true)">Select Categories</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-group').forEach(c=>c.checked=false)">Clear Categories</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:16px">
+      ${groupOrder.filter(key=>groups[key]?.length).map(key=>{
+        const [type,ph]=key.split('|');
+        return `<label style="display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:12px">
+          <input type="checkbox" class="ua-exp-group" data-group="${esc(key)}" checked style="width:16px;height:16px;flex-shrink:0">
+          <span><strong>${esc(type)}</strong> / ${esc(ph)} <span style="color:var(--text3)">(${groups[key].length})</span></span>
+        </label>`;
+      }).join('')}
+    </div>
+    <div style="font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Or choose independently</div>
+    <div class="flex gap-8 mb-12 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=true)">Select All Items</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=false)">Deselect Items</button>
     </div>`;
-  items.forEach(img=>{
+  window._uaExportItems.forEach(img=>{
     html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
-      <input type="checkbox" class="ua-exp-cb" data-id="${img.id}" checked style="width:16px;height:16px;flex-shrink:0">
-      <span style="font-weight:600">${img.name}</span>
+      <input type="checkbox" class="ua-exp-cb" data-id="${img.id}" style="width:16px;height:16px;flex-shrink:0">
+      <span style="font-weight:600">${esc(img.name||'')}</span>
+      <span class="tag tag-info" style="font-size:10px;margin-left:auto">${esc(uaCategoryLabel(img))}</span>
     </label>`;
   });
   html+=`<div class="flex gap-8 mt-20"><button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" onclick="generateUAPDF()">📄 Generate PDF</button></div>`;
@@ -3532,17 +3684,21 @@ async function openUAExportModal(){
 async function generateUAPDF(){
   if(window._uaExportBusy)return;
   const ids=[...document.querySelectorAll('.ua-exp-cb:checked')].map(cb=>cb.dataset.id);
-  if(!ids.length){alert('Select at least one.');return;}
+  const selectedGroups=[...document.querySelectorAll('.ua-exp-group:checked')].map(cb=>cb.dataset.group);
+  const includeFeatures=!!document.getElementById('ua-exp-features')?.checked;
+  const source=Array.isArray(window._uaExportItems)?window._uaExportItems:[];
+  const selectedMap=new Map();
+  source.forEach(item=>{
+    if(ids.includes(String(item.id))||selectedGroups.includes(uaCategoryKey(item)))selectedMap.set(String(item.id),item);
+  });
+  const ordered=uaSortItems([...selectedMap.values()]);
+  if(!ordered.length){alert('Select at least one category or image.');return;}
   window._uaExportBusy=true;
   const btn=document.querySelector('#condition-modal-body .btn-primary');
   if(btn){btn.textContent='Generating...';btn.disabled=true;}
   try{
     await new Promise(r=>setTimeout(r,30));
-    const {data:all,error}=await sb.from('mlsboc_ua_images').select('*').in('id',ids);
-    if(error)throw error;
-    if(!all||!all.length){alert('No selected images found.');return;}
-    const ordered=ids.map(id=>all.find(item=>item.id===id)).filter(Boolean);
-    await generateUASingleImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf');
+    await generateUASingleImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf',{includeFeatures,showCategory:true});
   }catch(err){
     alert('PDF failed: '+err.message);
     if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
@@ -3565,19 +3721,20 @@ function openUAImage(id){
     const features=data.key_features||[];
     document.getElementById('condition-modal-body').innerHTML=`
       <div class="flex-center gap-8 mb-16">
-        <div class="section-title" style="font-size:16px">${data.name}</div>
+        <div class="section-title" style="font-size:16px">${esc(data.name||'')}</div>
         <div class="flex gap-6 ml-auto">
           ${isAdmin?`<button class="btn btn-ghost btn-xs" onclick="document.getElementById('condition-modal').classList.add('hidden');openUAEditModal('${data.id}')">Edit</button>`:''}
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
         </div>
       </div>
       ${firstSrc?`<img src="${esc(firstSrc)}" onclick="openImgViewer('${jsAttr(firstSrc)}')" onerror="retryImageLoad(this)" style="width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3);margin-bottom:16px" alt="">`:'<div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px">🧪</div>'}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span class="tag tag-info">${esc(uaCategoryLabel(data))}</span></div>
       ${features.length?`
         <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-          ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
+          ${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}
         </div>`:'<div style="color:var(--text3);font-size:13px;margin-bottom:12px">No key features added yet.</div>'}
-      ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
+      ${stripUACategoryNote(data.notes)?`<div class="explanation">${esc(stripUACategoryNote(data.notes))}</div>`:''}
     `;
     document.getElementById('condition-modal').classList.remove('hidden');
   });
@@ -3598,16 +3755,17 @@ function openUAEditModal(id){
       </div>
       <div class="form-group">
         <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
-        <textarea id="uaedit-features" style="min-height:90px" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome">${(data.key_features||[]).join('\n')}</textarea>
+        <textarea id="uaedit-features" style="min-height:90px" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome">${esc((data.key_features||[]).join('\n'))}</textarea>
       </div>
+      ${uaCategoryControls('uaedit',data)}
       <div class="form-group">
         <label>Notes (optional)</label>
-        <textarea id="uaedit-notes" style="min-height:60px">${data.notes||''}</textarea>
+        <textarea id="uaedit-notes" style="min-height:60px">${esc(stripUACategoryNote(data.notes))}</textarea>
       </div>
       <div class="form-group">
         <label>Image <span style="font-size:11px;color:var(--text3)">(one image per finding)</span></label>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          ${imgs[0]?`<img src="${imgs[0]}" style="height:100px;max-width:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3)">`:
+          ${imgs[0]?`<img src="${esc(imageEntrySrc(imgs[0]))}" onerror="retryImageLoad(this)" style="height:100px;max-width:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3)">`:
             `<div style="height:100px;width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div>`}
           <label class="btn btn-ghost btn-sm" style="cursor:pointer">
             ${imgs[0]?'Replace Image':'Upload Image'}
@@ -3630,8 +3788,10 @@ async function saveUAEdit(id){
   if(!name){alert('Name is required.');return;}
   const featText=document.getElementById('uaedit-features')?.value||'';
   const notes=document.getElementById('uaedit-notes')?.value.trim()||'';
+  const type=document.getElementById('uaedit-type')?.value||'Abnormal';
+  const ph=document.getElementById('uaedit-ph')?.value||'Unspecified';
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes}).eq('id',id);window._uaCache=null;
+  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes:composeUANotesWithCategory(notes,type,ph)}).eq('id',id);window._uaCache=null;
   if(error){alert('Save failed: '+error.message);return;}
   document.getElementById('condition-modal').classList.add('hidden');
   renderTab();
@@ -3641,7 +3801,7 @@ async function handleUASingleImgUpload(e,id){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async ev=>{
-    await sb.from('mlsboc_ua_images').update({images:[ev.target.result]}).eq('id',id);
+    await sb.from('mlsboc_ua_images').update({images:[ev.target.result]}).eq('id',id);window._uaCache=null;
     openUAEditModal(id);
   };
   reader.readAsDataURL(file);
@@ -3649,7 +3809,7 @@ async function handleUASingleImgUpload(e,id){
 
 async function clearUAImage(id){
   if(!confirm('Remove the image?'))return;
-  await sb.from('mlsboc_ua_images').update({images:[]}).eq('id',id);
+  await sb.from('mlsboc_ua_images').update({images:[]}).eq('id',id);window._uaCache=null;
   openUAEditModal(id);
 }
 
@@ -3680,7 +3840,7 @@ async function handleUAImgFile(e,itemId,slot){
     const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=ev.target.result;
-    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);window._uaCache=null;
     openUAImage(itemId);
   };
   reader.readAsDataURL(file);
@@ -3695,7 +3855,7 @@ async function handleUAImgDrop(e,itemId,slot){
     const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=ev.target.result;
-    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);window._uaCache=null;
     openUAImage(itemId);
   };
   reader.readAsDataURL(file);
@@ -3707,6 +3867,7 @@ function adminUAImageControls(){
       <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Add UA Image Entry</div>
       <div class="form-group"><label>Name</label><input type="text" id="ua-name" placeholder="e.g. RBC Cast"></div>
       <div class="form-group"><label>Key Features (one per line)</label><textarea id="ua-features" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome"></textarea></div>
+      ${uaCategoryControls('uaadd',{notes:'[[UA_CATEGORY:Abnormal|Unspecified]]'})}
       <div class="form-group"><label>Notes (optional)</label><textarea id="ua-notes" style="min-height:60px"></textarea></div>
       <div class="form-group">
         <label>Bulk Image Drop — drag multiple images at once</label>
@@ -3738,9 +3899,11 @@ async function adminAddUAImage(){
   const name=document.getElementById('ua-name')?.value.trim();
   const featText=document.getElementById('ua-features')?.value||'';
   const notes=document.getElementById('ua-notes')?.value.trim();
+  const type=document.getElementById('uaadd-type')?.value||'Abnormal';
+  const ph=document.getElementById('uaadd-ph')?.value||'Unspecified';
   if(!name){alert('Name required.');return;}
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:notes||'',images:[]});window._uaCache=null;
+  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:composeUANotesWithCategory(notes||'',type,ph),images:[]});window._uaCache=null;
   if(error){alert('Error: '+error.message);return;}
   document.getElementById('ua-name').value='';
   document.getElementById('ua-features').value='';
@@ -3767,7 +3930,8 @@ async function processUABulkFiles(files){
   for(const file of files){
     const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
     const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
-    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:'',images:[dataUrl]});
+    const guess=inferUACategory({name,key_features:[],notes:''});
+    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:composeUANotesWithCategory('',guess.type,guess.ph),images:[dataUrl]});
     if(!error)done++;
   }
   if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--success)">✓ Added ${done} of ${files.length} images. You can edit names/features by clicking each card.</div>`;
