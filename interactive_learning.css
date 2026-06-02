@@ -96,9 +96,28 @@ body.mls-interactive .mls-home-btn{
   cursor:pointer;
   white-space:nowrap;
 }
+body.mls-interactive .mls-theme-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border:1px solid var(--mls-border);
+  background:var(--mls-bg3);
+  color:var(--mls-text2);
+  border-radius:var(--mls-r);
+  padding:7px 12px;
+  font:600 12px/1 var(--mls-sans);
+  cursor:pointer;
+  white-space:nowrap;
+}
 body.mls-interactive .mls-home-btn:hover{
   border-color:var(--mls-border2);
   background:var(--mls-bg3);
+  color:var(--mls-text);
+}
+body.mls-interactive .mls-theme-btn:hover{
+  border-color:var(--mls-border2);
+  background:var(--mls-bg4);
   color:var(--mls-text);
 }
 
@@ -316,6 +335,17 @@ html[data-mls-theme="dark"] body.mls-interactive .key-panel{
   border-color:var(--mls-border) !important;
   color:var(--mls-text) !important;
   box-shadow:0 12px 28px rgba(0,0,0,.28) !important;
+}
+html[data-mls-theme="dark"] body.mls-interactive .mls-home-btn,
+html[data-mls-theme="dark"] body.mls-interactive .mls-theme-btn{
+  background:var(--mls-bg3);
+  border-color:var(--mls-border);
+  color:var(--mls-text);
+}
+html[data-mls-theme="dark"] body.mls-interactive .mls-home-btn:hover,
+html[data-mls-theme="dark"] body.mls-interactive .mls-theme-btn:hover{
+  background:var(--mls-bg4);
+  border-color:var(--mls-border2);
 }
 html[data-mls-theme="dark"] body.mls-interactive .main-body,
 html[data-mls-theme="dark"] body.mls-interactive .structure,

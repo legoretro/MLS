@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Synthesis of Heme - Drag and Label</title>
+<script src="interactive_theme.js"></script>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -24,6 +25,19 @@
   --bad:#d71f3c;
   --shadow:0 18px 42px rgba(40,60,110,.12);
 }
+html[data-mls-theme="dark"]{
+  --bg:#0d111c;
+  --panel:#161c2c;
+  --ink:#f4f6ff;
+  --muted:#c3cae2;
+  --line:#313b5a;
+  --cytosol:#173844;
+  --cytosol-line:#41b5c7;
+  --mito:#3a2b15;
+  --mito-line:#d9a13f;
+  --drop:#101625;
+  --shadow:0 18px 42px rgba(0,0,0,.32);
+}
 body{
   margin:0;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -34,9 +48,9 @@ body{
     var(--bg);
 }
 .wrap{
-  width:min(860px,calc(100% - 24px));
+  width:min(1000px,calc(100% - 24px));
   margin:0 auto;
-  padding:14px 0 28px;
+  padding:10px 0 24px;
 }
 .topbar{
   display:flex;
@@ -57,6 +71,27 @@ body{
   font-weight:800;
   font-size:.85rem;
 }
+.mls-theme-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  color:#4a5270;
+  border:2px solid var(--line);
+  background:rgba(255,255,255,.84);
+  text-decoration:none;
+  border-radius:10px;
+  padding:8px 11px;
+  font-weight:800;
+  font-size:.85rem;
+  cursor:pointer;
+}
+html[data-mls-theme="dark"] .home,
+html[data-mls-theme="dark"] .mls-theme-btn{
+  background:#161c2c;
+  color:#f4f6ff;
+  border-color:#313b5a;
+}
 .kicker{
   color:var(--chem);
   font-size:.74rem;
@@ -66,37 +101,37 @@ body{
 }
 h1{
   margin:0;
-  font-size:clamp(1.6rem,3.2vw,2.7rem);
+  font-size:clamp(1.35rem,2.6vw,2.05rem);
   line-height:1.02;
 }
 .hero{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 205px;
-  gap:12px;
+  grid-template-columns:minmax(0,1fr) 178px;
+  gap:10px;
   align-items:stretch;
   background:rgba(255,255,255,.9);
   border:2px solid var(--line);
-  border-radius:18px;
-  padding:14px;
+  border-radius:16px;
+  padding:10px 12px;
   box-shadow:var(--shadow);
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
-.hero h1{font-size:clamp(1.25rem,2.5vw,2rem)}
+.hero h1{font-size:clamp(1.08rem,1.7vw,1.35rem)}
 .hero p{
-  margin:7px 0 0;
+  margin:5px 0 0;
   max-width:720px;
   color:var(--muted);
-  font-size:.9rem;
-  line-height:1.38;
+  font-size:.78rem;
+  line-height:1.32;
 }
 .legend{
   display:grid;
-  gap:7px;
+  gap:5px;
   align-content:center;
   background:#f6f9fe;
   border:2px solid #dce5f5;
-  border-radius:14px;
-  padding:10px;
+  border-radius:12px;
+  padding:8px;
 }
 .legend-item{
   display:flex;
@@ -104,11 +139,11 @@ h1{
   gap:8px;
   color:#454c68;
   font-weight:850;
-  font-size:.78rem;
+  font-size:.68rem;
 }
 .legend-swatch{
-  width:32px;
-  height:21px;
+  width:28px;
+  height:18px;
   border-radius:8px;
   border:2px dashed #95a4ca;
   background:#fff;
@@ -128,7 +163,7 @@ h1{
   border-radius:14px;
   padding:9px;
   box-shadow:0 10px 24px rgba(40,60,110,.08);
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 button{
   border:0;
@@ -156,7 +191,7 @@ button{
 .score.bad{background:#fff0f0;color:var(--bad)}
 .workspace{
   display:grid;
-  grid-template-columns:132px minmax(0,520px) 132px;
+  grid-template-columns:165px minmax(0,660px);
   justify-content:center;
   gap:8px;
   align-items:start;
@@ -208,6 +243,22 @@ button{
   border-radius:999px;
   box-shadow:0 5px 0 rgba(122,76,0,.18);
 }
+.enzyme-fixed{
+  display:inline-grid;
+  place-items:center;
+  min-width:118px;
+  min-height:25px;
+  padding:4px 11px;
+  clip-path:polygon(11px 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,11px 100%,0 50%);
+  background:var(--enzyme);
+  border:2px solid var(--enzyme-line);
+  color:#4b3100;
+  font-weight:950;
+  font-size:.64rem;
+  line-height:1.05;
+  text-align:center;
+  box-shadow:0 3px 0 rgba(122,76,0,.2);
+}
 .chip.dragging{opacity:.42}
 .cell-card{
   background:rgba(255,255,255,.92);
@@ -215,7 +266,7 @@ button{
   border-radius:18px;
   padding:8px;
   box-shadow:var(--shadow);
-  max-width:520px;
+  max-width:660px;
 }
 .cell-title{
   display:flex;
@@ -226,7 +277,7 @@ button{
 }
 .cell-title h2{
   margin:0;
-  font-size:.9rem;
+  font-size:.86rem;
 }
 .cell-title span{
   color:var(--muted);
@@ -237,14 +288,14 @@ button{
   border:2px solid #d0dbf0;
   border-radius:16px;
   background:linear-gradient(180deg,#fbfdff,#f4f8ff);
-  padding:7px;
+  padding:6px;
   display:grid;
-  gap:5px;
+  gap:4px;
 }
 .guide-row{
   display:grid;
-  grid-template-columns:30px 74px minmax(0,1fr);
-  gap:5px;
+  grid-template-columns:28px 82px minmax(0,1fr);
+  gap:4px;
   align-items:center;
   border:1px solid #dbe4f3;
   border-left:5px solid var(--cytosol-line);
@@ -257,8 +308,8 @@ button{
   background:#fffaf0;
 }
 .guide-number{
-  width:23px;
-  height:23px;
+  width:22px;
+  height:22px;
   border-radius:9px;
   display:grid;
   place-items:center;
@@ -273,7 +324,7 @@ button{
 }
 .guide-compartment{
   color:#59627f;
-  font-size:.5rem;
+  font-size:.46rem;
   font-weight:950;
   letter-spacing:.08em;
   text-transform:uppercase;
@@ -282,14 +333,14 @@ button{
 .guide-body{
   display:grid;
   grid-template-columns:minmax(0,1fr);
-  gap:3px;
+  gap:2px;
 }
 .guide-enzyme-line,
 .guide-main-line{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:5px;
+  gap:4px;
   min-width:0;
 }
 .guide-arrow{
@@ -324,7 +375,7 @@ button{
 }
 .step-guide .slot.step{
   width:min(100%,182px);
-  min-height:23px;
+  min-height:24px;
 }
 .step-guide .slot.enzyme{
   width:min(100%,128px);
@@ -389,14 +440,6 @@ button{
   background:#ffe1e8!important;
   color:#4e0b17!important;
 }
-.slot.enzyme.correct{
-  background:#34c878!important;
-  color:#062c17!important;
-}
-.slot.enzyme.wrong{
-  background:#ff8a9a!important;
-  color:#4b1019!important;
-}
 .slot.reject{animation:reject .22s ease}
 .step-guide .slot.reject{animation:reject-static .22s ease}
 @keyframes reject{
@@ -410,6 +453,50 @@ button{
   75%{transform:translateX(5px)}
 }
 .empty{color:#8a92ad;font-weight:800}
+.acronym-card{
+  width:min(833px,100%);
+  margin:12px auto 0;
+  background:rgba(255,255,255,.92);
+  border:2px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:var(--shadow);
+}
+.acronym-card h2{
+  margin:0 0 4px;
+  font-size:.94rem;
+}
+.acronym-card p{
+  margin:0 0 8px;
+  color:var(--muted);
+  font-size:.78rem;
+}
+.acronym-story{
+  min-height:58px;
+  border:2px dashed #b8c5e3;
+  border-radius:12px;
+  padding:10px;
+  background:#fbfdff;
+  color:var(--ink);
+  font-weight:800;
+  line-height:1.35;
+}
+.acronym-story:focus{
+  outline:3px solid rgba(47,107,216,.2);
+  border-color:var(--blue);
+}
+html[data-mls-theme="dark"] .hero,
+html[data-mls-theme="dark"] .controls,
+html[data-mls-theme="dark"] .bank,
+html[data-mls-theme="dark"] .cell-card,
+html[data-mls-theme="dark"] .acronym-card{
+  background:rgba(22,28,44,.95);
+}
+html[data-mls-theme="dark"] .legend,
+html[data-mls-theme="dark"] .acronym-story{
+  background:#101625;
+  border-color:#313b5a;
+}
 @media (max-width:1120px){
   .hero{grid-template-columns:1fr}
   .workspace{grid-template-columns:1fr}
@@ -441,7 +528,7 @@ button{
 <body>
 <div class="wrap">
   <div class="topbar">
-    <a class="home" href="index.html">&larr; MLS Home</a>
+    <a class="home" href="index.html#interactive">&larr; Interactive Tools</a>
     <div>
       <div class="kicker">Clinical Chemistry</div>
       <h1>Synthesis of Heme</h1>
@@ -452,11 +539,11 @@ button{
     <div>
       <div class="kicker">Drag + Label Pathway</div>
       <h1>Simple heme step guide.</h1>
-      <p>Drag the 10 pathway labels into the dashed boxes. Drag the 8 enzyme labels into the solid gold enzyme spots above each step.</p>
+      <p>Drag the 10 pathway labels into the dashed boxes. Enzymes are fixed gold markers so the practice stays focused on products and sequence.</p>
     </div>
     <aside class="legend" aria-label="Legend">
       <div class="legend-item"><span class="legend-swatch"></span>Pathway labels</div>
-      <div class="legend-item"><span class="legend-swatch enzyme"></span>Enzyme labels</div>
+      <div class="legend-item"><span class="legend-swatch enzyme"></span>Fixed enzymes</div>
       <div class="legend-item"><span class="legend-swatch" style="background:var(--cytosol);border-style:solid"></span>Cytosol</div>
       <div class="legend-item"><span class="legend-swatch" style="background:var(--mito);border-style:solid"></span>Mitochondrion</div>
     </aside>
@@ -479,19 +566,19 @@ button{
     <section class="cell-card">
       <div class="cell-title">
         <h2>Step Guide Chart</h2>
-        <span>8 enzymes + 10 pathway labels</span>
+        <span>10 pathway labels</span>
       </div>
       <div class="step-guide" id="cellBoard">
         <div id="slotLayer"></div>
       </div>
     </section>
-
-    <aside class="bank">
-      <h2>8 Enzyme Labels</h2>
-      <p>These go only into the solid gold enzyme spots.</p>
-      <div class="bank-grid" id="enzymeBank"></div>
-    </aside>
   </main>
+
+  <section class="acronym-card" aria-label="Acronym story">
+    <h2>Acronym Story</h2>
+    <p>Add your memory phrase here later. It saves on this browser.</p>
+    <div class="acronym-story" id="acronymStory" contenteditable="true" role="textbox" aria-label="Acronym story text">Add your heme pathway acronym story here...</div>
+  </section>
 
 </div>
 
@@ -522,45 +609,37 @@ const ENZYME_LABELS = [
 
 const SLOTS = [
   {id:"slot-s1", kind:"step", answer:"s1", label:"Start", compartment:"Mitochondrion"},
-  {id:"slot-e1", kind:"enzyme", answer:"e1", label:"Enzyme", compartment:"Mitochondrion"},
   {id:"slot-s2", kind:"step", answer:"s2", label:"Product", compartment:"Cytosol"},
-  {id:"slot-e2", kind:"enzyme", answer:"e2", label:"Enzyme", compartment:"Cytosol"},
   {id:"slot-s3", kind:"step", answer:"s3", label:"Product", compartment:"Cytosol"},
-  {id:"slot-e3", kind:"enzyme", answer:"e3", label:"Enzyme", compartment:"Cytosol"},
   {id:"slot-s4", kind:"step", answer:"s4", label:"Product", compartment:"Cytosol"},
-  {id:"slot-e4", kind:"enzyme", answer:"e4", label:"Enzyme", compartment:"Cytosol"},
   {id:"slot-s5", kind:"step", answer:"s5", label:"Product", compartment:"Cytosol"},
-  {id:"slot-e5", kind:"enzyme", answer:"e5", label:"Enzyme", compartment:"Cytosol"},
   {id:"slot-s6", kind:"step", answer:"s6", label:"Product", compartment:"Cytosol to mitochondrion"},
-  {id:"slot-e6", kind:"enzyme", answer:"e6", label:"Enzyme", compartment:"Mitochondrion"},
   {id:"slot-s7", kind:"step", answer:"s7", label:"Product", compartment:"Mitochondrion"},
-  {id:"slot-e7", kind:"enzyme", answer:"e7", label:"Enzyme", compartment:"Mitochondrion"},
   {id:"slot-s8", kind:"step", answer:"s8", label:"Product", compartment:"Mitochondrion"},
-  {id:"slot-e8", kind:"enzyme", answer:"e8", label:"Enzyme", compartment:"Mitochondrion"},
   {id:"slot-s10", kind:"step", answer:"s10", label:"Fe", compartment:"Mitochondrion", extraClass:"cofactor"},
   {id:"slot-s9", kind:"step", answer:"s9", label:"Final", compartment:"Mitochondrion"}
 ];
 
 const GUIDE_ROWS = [
-  {number:1, compartment:"Mitochondrion", step:"slot-s1", enzyme:"slot-e1"},
-  {number:2, compartment:"Cytosol", step:"slot-s2", enzyme:"slot-e2"},
-  {number:3, compartment:"Cytosol", step:"slot-s3", enzyme:"slot-e3"},
-  {number:4, compartment:"Cytosol", step:"slot-s4", enzyme:"slot-e4"},
-  {number:5, compartment:"Cytosol", step:"slot-s5", enzyme:"slot-e5"},
-  {number:6, compartment:"Cytosol -> mitochondrion", step:"slot-s6", enzyme:"slot-e6"},
-  {number:7, compartment:"Mitochondrion", step:"slot-s7", enzyme:"slot-e7"},
-  {number:8, compartment:"Mitochondrion", step:"slot-s8", enzyme:"slot-e8", cofactor:"slot-s10"},
+  {number:1, compartment:"Mitochondrion", step:"slot-s1", enzyme:"e1"},
+  {number:2, compartment:"Cytosol", step:"slot-s2", enzyme:"e2"},
+  {number:3, compartment:"Cytosol", step:"slot-s3", enzyme:"e3"},
+  {number:4, compartment:"Cytosol", step:"slot-s4", enzyme:"e4"},
+  {number:5, compartment:"Cytosol", step:"slot-s5", enzyme:"e5"},
+  {number:6, compartment:"Cytosol -> mitochondrion", step:"slot-s6", enzyme:"e6"},
+  {number:7, compartment:"Mitochondrion", step:"slot-s7", enzyme:"e7"},
+  {number:8, compartment:"Mitochondrion", step:"slot-s8", enzyme:"e8", cofactor:"slot-s10"},
   {number:9, compartment:"Mitochondrion", step:"slot-s9"}
 ];
 
-const allLabels = [...STEP_LABELS.map(item => ({...item, kind:"step"})), ...ENZYME_LABELS.map(item => ({...item, kind:"enzyme"}))];
+const allLabels = STEP_LABELS.map(item => ({...item, kind:"step"}));
 const labelById = new Map(allLabels.map(item => [item.id, item]));
+const enzymeById = new Map(ENZYME_LABELS.map(item => [item.id, item]));
 const slotById = new Map(SLOTS.map(slot => [slot.id, slot]));
 let placements = {};
 let feedback = {};
 let selectedChipId = null;
 let stepOrder = shuffle(STEP_LABELS.map(item => item.id));
-let enzymeOrder = shuffle(ENZYME_LABELS.map(item => item.id));
 
 function shuffle(items){
   const copy = [...items];
@@ -578,7 +657,6 @@ function render(){
 
 function renderBanks(){
   renderBank("stepBank", stepOrder, "step");
-  renderBank("enzymeBank", enzymeOrder, "enzyme");
 }
 
 function renderBank(targetId, order, kind){
@@ -613,7 +691,7 @@ function renderSlots(){
   layer.innerHTML = GUIDE_ROWS.map(row => {
     const compartmentClass = row.compartment.toLowerCase().includes("mitochondrion") ? "mito" : "cyto";
     const enzymeLine = row.enzyme
-      ? `<div class="guide-enzyme-line">${slotHtml(row.enzyme)}${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}</div>`
+      ? `<div class="guide-enzyme-line">${enzymeFixedHtml(row.enzyme)}${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}</div>`
       : "";
     return `<div class="guide-row ${compartmentClass}">
       <div class="guide-number">${row.number}</div>
@@ -640,6 +718,11 @@ function renderSlots(){
   });
 }
 
+function enzymeFixedHtml(enzymeId){
+  const enzyme = enzymeById.get(enzymeId);
+  return `<span class="enzyme-fixed" aria-label="Fixed enzyme: ${enzyme.label}">${enzyme.label}</span>`;
+}
+
 function slotHtml(slotId){
   const slot = slotById.get(slotId);
   const placedId = placements[slot.id];
@@ -649,7 +732,7 @@ function slotHtml(slotId){
   const extraClass = slot.extraClass || "";
   return `<div class="slot ${slot.kind} ${extraClass}${filled} ${state}" data-slot="${slot.id}" data-kind="${slot.kind}" role="button" tabindex="0">
     <span class="slot-label">${slot.label}</span>
-    <span class="value">${placed || "drop " + (slot.kind === "enzyme" ? "enzyme" : "label")}</span>
+    <span class="value">${placed || "drop label"}</span>
   </div>`;
 }
 
@@ -676,11 +759,6 @@ function placeChip(slotId, chipId){
   const slot = slotById.get(slotId);
   const chip = labelById.get(chipId);
   if(!slot || !chip){return;}
-  if(slot.kind !== chip.kind){
-    flashReject(slotId);
-    setScore("That label type goes in the other shape.", "bad");
-    return;
-  }
   Object.keys(placements).forEach(key => {
     if(placements[key] === chipId){delete placements[key];}
   });
@@ -728,9 +806,19 @@ function resetBoard(){
   feedback = {};
   selectedChipId = null;
   stepOrder = shuffle(STEP_LABELS.map(item => item.id));
-  enzymeOrder = shuffle(ENZYME_LABELS.map(item => item.id));
   setScore("Reset. Click or drag labels into the pathway.", "");
   render();
+}
+
+function setupAcronymStory(){
+  const story = document.getElementById("acronymStory");
+  if(!story){return;}
+  const key = "mls_heme_acronym_story";
+  try{
+    const saved = localStorage.getItem(key);
+    if(saved){story.textContent = saved;}
+    story.addEventListener("input", () => localStorage.setItem(key, story.textContent.trim()));
+  }catch(error){}
 }
 
 function setScore(text, state){
@@ -742,6 +830,7 @@ function setScore(text, state){
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", resetBoard);
 document.getElementById("answerBtn").addEventListener("click", showAnswers);
+setupAcronymStory();
 render();
 </script>
 </body>

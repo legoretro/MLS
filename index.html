@@ -1880,6 +1880,9 @@ window.__appInit = async function(){
         // 'all' exam and quiz mid-session intentionally not restored
       }
     }catch(e){}
+    if(location.hash==='#interactive'){
+      appState.view='interactive';
+    }
   }catch(e){console.warn('Init error',e);}
   // Hide splash and show app
   const splash=document.getElementById('pwa-splash');
@@ -2819,8 +2822,8 @@ function goSubject(key){
 }
 function goAll(){appState.view='all';appState.allStarted=false;appState.allDone=false;appState.allSeconds=0;renderView();}
 function goFormulas(){appState.view='formulas';renderView();}
-function goHome(){appState.view='home';clearInterval(appState.allTimer);renderView();}
-function goInteractive(){appState.view='interactive';renderView();}
+function goHome(){appState.view='home';clearInterval(appState.allTimer);if(location.hash)history.replaceState(null,'',location.pathname+location.search);renderView();}
+function goInteractive(){appState.view='interactive';history.replaceState(null,'',location.pathname+location.search+'#interactive');renderView();}
 function goResources(){appState.view='resources';renderView();}
 function goClass(){appState.view='class';appState.classView=null;appState.classSubject=null;appState.classSet=null;renderView();}
 

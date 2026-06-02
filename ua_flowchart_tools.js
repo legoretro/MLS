@@ -49,7 +49,7 @@
         <div class="logo">MLS Interactive</div>
         <div class="logo-sub">Urinalysis renal flowchart</div>
       </div>
-      <a class="mls-home-btn" href="index.html">Back to MLS Home</a>
+      <a class="mls-home-btn" href="index.html#interactive">← Interactive Tools</a>
     </header>
     <main class="ua-flow-wrap">
       <section class="ua-flow-hero">

@@ -127,7 +127,7 @@ html[data-mls-theme="dark"] .morph-preview-text span{color:#c3cae2}
     <div class="logo">MLS/BOC PREP</div>
     <div class="logo-sub">Interactive Learning</div>
   </div>
-  <a class="mls-home-btn" href="index.html">← MLS Home</a>
+  <a class="mls-home-btn" href="index.html#interactive">← Interactive Tools</a>
 </div>
 <main class="heme-wrap">
   <section class="heme-hero">
@@ -211,10 +211,15 @@ const SB_URL='https://rbdvjwipedbxfbedjgoa.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
 
 function toggleTheme(){
+  if(typeof window.toggleInteractiveTheme === 'function'){
+    window.toggleInteractiveTheme();
+    return;
+  }
   const current=document.documentElement.dataset.mlsTheme||'light';
   const next=current==='dark'?'light':'dark';
   document.documentElement.dataset.mlsTheme=next;
   try{localStorage.setItem('mlsboc_theme',next);}catch(e){}
+  if(typeof window.updateInteractiveThemeButton === 'function')window.updateInteractiveThemeButton();
 }
 
 function shuffle(list){
