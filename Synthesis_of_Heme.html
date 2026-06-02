@@ -40,23 +40,95 @@ html[data-mls-theme="dark"]{
 }
 body{
   margin:0;
+  position:relative;
+  min-height:100vh;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   color:var(--ink);
   background:
     radial-gradient(circle at 10% 8%,rgba(47,107,216,.12),transparent 28rem),
     radial-gradient(circle at 94% 8%,rgba(242,185,77,.16),transparent 26rem),
     var(--bg);
+  overflow-x:hidden;
+}
+.heme-float-layer{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.float-heme{
+  position:absolute;
+  left:calc(var(--x) * 1%);
+  top:calc(var(--y) * 1%);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:3px solid #8f2131;
+  background:
+    radial-gradient(circle at 32% 28%,rgba(255,255,255,.62) 0 4px,transparent 5px),
+    #df4e60;
+  box-shadow:0 8px 18px rgba(87,26,40,.18);
+  opacity:0;
+  transform:translate(-18px,18px) scale(.35) rotate(-8deg);
+  animation:float-heme-rest 24s ease-in-out infinite;
+  animation-delay:var(--delay);
+}
+.float-heme::before{
+  content:"Fe";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:13px;
+  height:13px;
+  display:grid;
+  place-items:center;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:#ffe49a;
+  color:#654103;
+  border:1px solid #a56f11;
+  font-size:.42rem;
+  font-weight:950;
+  line-height:1;
+}
+.heme-bye{
+  position:fixed;
+  right:8%;
+  bottom:9%;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+  color:#8a42c5;
+  border:2px solid rgba(188,168,242,.55);
+  font-size:.72rem;
+  font-weight:950;
+  opacity:0;
+  animation:bye-pop 24s ease-in-out infinite;
+}
+@keyframes float-heme-rest{
+  0%,20%{opacity:0;transform:translate(-18px,18px) scale(.35) rotate(-8deg)}
+  30%{opacity:.82;transform:translate(0,0) scale(1) rotate(4deg)}
+  52%{opacity:.72;transform:translate(var(--dx),calc(var(--dy) - 8px)) scale(.9) rotate(var(--rot))}
+  68%,100%{opacity:.62;transform:translate(var(--dx),var(--dy)) scale(.78) rotate(var(--rot))}
+}
+@keyframes bye-pop{
+  0%,66%{opacity:0;transform:translateY(8px) scale(.92)}
+  74%,90%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(4px) scale(.96)}
 }
 .wrap{
-  width:min(1040px,calc(100% - 24px));
+  position:relative;
+  z-index:2;
+  width:min(1160px,calc(100% - 20px));
   margin:0 auto;
-  padding:10px 0 24px;
+  padding:6px 0 18px;
 }
 .topbar{
   display:flex;
   align-items:center;
   gap:10px;
-  margin-bottom:10px;
+  margin-bottom:6px;
 }
 .home{
   display:inline-flex;
@@ -101,61 +173,8 @@ html[data-mls-theme="dark"] .mls-theme-btn{
 }
 .topbar h1{
   margin:0;
-  font-size:clamp(1.15rem,2vw,1.45rem);
+  font-size:clamp(1.05rem,1.75vw,1.28rem);
   line-height:1.05;
-}
-.hero{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 160px;
-  gap:10px;
-  align-items:stretch;
-  background:rgba(255,255,255,.9);
-  border:2px solid var(--line);
-  border-radius:16px;
-  padding:10px 12px;
-  box-shadow:var(--shadow);
-  margin-bottom:8px;
-}
-.hero h1{
-  margin:0;
-  font-size:clamp(1rem,1.45vw,1.18rem);
-  line-height:1.12;
-}
-.hero p{
-  margin:5px 0 0;
-  max-width:720px;
-  color:var(--muted);
-  font-size:.78rem;
-  line-height:1.32;
-}
-.legend{
-  display:grid;
-  gap:5px;
-  align-content:center;
-  background:#f6f9fe;
-  border:2px solid #dce5f5;
-  border-radius:12px;
-  padding:8px;
-}
-.legend-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:var(--muted);
-  font-weight:850;
-  font-size:.68rem;
-}
-.legend-swatch{
-  width:28px;
-  height:18px;
-  border-radius:8px;
-  border:2px dashed #95a4ca;
-  background:#fff;
-}
-.legend-swatch.enzyme{
-  border:2px solid var(--enzyme-line);
-  background:var(--enzyme);
-  border-radius:999px;
 }
 .controls{
   display:flex;
@@ -165,16 +184,16 @@ html[data-mls-theme="dark"] .mls-theme-btn{
   background:rgba(255,255,255,.88);
   border:2px solid var(--line);
   border-radius:14px;
-  padding:9px;
+  padding:7px;
   box-shadow:0 10px 24px rgba(40,60,110,.08);
-  margin-bottom:8px;
+  margin-bottom:7px;
 }
 button{
   border:0;
   border-radius:10px;
-  padding:8px 13px;
+  padding:7px 12px;
   font:inherit;
-  font-size:.86rem;
+  font-size:.82rem;
   font-weight:900;
   cursor:pointer;
 }
@@ -195,7 +214,7 @@ button{
 .score.bad{background:#fff0f0;color:var(--bad)}
 .workspace{
   display:grid;
-  grid-template-columns:182px minmax(0,760px);
+  grid-template-columns:178px minmax(0,780px);
   justify-content:center;
   gap:8px;
   align-items:start;
@@ -211,13 +230,13 @@ button{
 }
 .bank h2{
   margin:0;
-  font-size:.78rem;
+  font-size:.82rem;
 }
 .bank p{
   margin:4px 0 8px;
   color:var(--muted);
   line-height:1.35;
-  font-size:.67rem;
+  font-size:.7rem;
 }
 .chip{
   width:100%;
@@ -225,10 +244,10 @@ button{
   background:#fff;
   color:var(--ink);
   border-radius:9px;
-  padding:6px 7px;
+  padding:5px 7px;
   margin:4px 0;
   font-weight:850;
-  font-size:.7rem;
+  font-size:.8rem;
   text-align:center;
   cursor:grab;
   box-shadow:0 4px 0 rgba(38,59,105,.10);
@@ -258,7 +277,7 @@ button{
   border:2px solid var(--enzyme-line);
   color:#4b3100;
   font-weight:950;
-  font-size:.74rem;
+  font-size:.8rem;
   line-height:1.05;
   text-align:center;
   box-shadow:0 3px 0 rgba(122,76,0,.2);
@@ -270,7 +289,7 @@ button{
   border-radius:18px;
   padding:8px;
   box-shadow:var(--shadow);
-  max-width:720px;
+  max-width:780px;
 }
 .cell-title{
   display:flex;
@@ -298,29 +317,29 @@ button{
 }
 .guide-row{
   display:grid;
-  grid-template-columns:32px 110px minmax(300px,1fr);
+  grid-template-columns:30px 122px minmax(300px,1fr);
   gap:8px;
   align-items:center;
   border:1px solid #dbe4f3;
   border-left:5px solid var(--cytosol-line);
   border-radius:12px;
-  padding:7px 8px;
+  padding:5px 8px;
   background:#fff;
-  min-height:58px;
+  min-height:45px;
 }
 .guide-row.mito{
   border-left-color:var(--mito-line);
   background:#fffaf0;
 }
 .guide-number{
-  width:25px;
-  height:25px;
+  width:24px;
+  height:24px;
   border-radius:9px;
   display:grid;
   place-items:center;
   background:#eaf2ff;
   color:#284d87;
-  font-size:.75rem;
+  font-size:.78rem;
   font-weight:950;
 }
 .guide-row.mito .guide-number{
@@ -329,7 +348,7 @@ button{
 }
 .guide-compartment{
   color:#59627f;
-  font-size:.58rem;
+  font-size:.66rem;
   font-weight:950;
   letter-spacing:.08em;
   text-transform:uppercase;
@@ -346,8 +365,8 @@ button{
 }
 .guide-product .slot.step{
   width:100%;
-  max-width:430px;
-  min-height:42px;
+  max-width:470px;
+  min-height:36px;
 }
 .guide-reaction{
   flex-wrap:nowrap;
@@ -355,10 +374,10 @@ button{
 }
 .guide-enzyme-row{
   display:grid;
-  grid-template-columns:32px 110px minmax(300px,1fr);
+  grid-template-columns:30px 122px minmax(300px,1fr);
   gap:8px;
   align-items:center;
-  min-height:42px;
+  min-height:27px;
   padding:0 8px;
   margin:-1px 0;
 }
@@ -370,7 +389,7 @@ button{
 .guide-enzyme-flow::after{
   content:"";
   width:2px;
-  height:11px;
+  height:5px;
   border-radius:999px;
   background:#bec8df;
 }
@@ -379,7 +398,7 @@ button{
   height:0;
   border-left:5px solid transparent;
   border-right:5px solid transparent;
-  border-top:8px solid #30415f;
+  border-top:6px solid #30415f;
   background:transparent;
   border-radius:0;
 }
@@ -440,8 +459,8 @@ button{
   transform:none;
 }
 .step-guide .slot.step{
-  width:min(100%,430px);
-  min-height:42px;
+  width:min(100%,470px);
+  min-height:36px;
 }
 .step-guide .slot.cofactor{
   width:56px;
@@ -463,15 +482,15 @@ button{
   left:6px;
   top:4px;
   color:#667296;
-  font-size:.42rem;
+  font-size:.45rem;
   font-weight:950;
   letter-spacing:.08em;
   text-transform:uppercase;
 }
 .slot .value{
   display:block;
-  padding-top:8px;
-  font-size:.73rem;
+  padding-top:7px;
+  font-size:.93rem;
   line-height:1.08;
 }
 .slot.filled.step{
@@ -512,25 +531,26 @@ button{
 }
 .empty{color:#8a92ad;font-weight:800}
 .acronym-card{
-  width:min(833px,100%);
-  margin:12px auto 0;
+  width:min(100%,980px);
+  margin:0 auto 6px;
   background:rgba(255,255,255,.92);
   border:2px solid var(--line);
   border-radius:16px;
-  padding:12px;
+  padding:8px;
   box-shadow:var(--shadow);
 }
 .acronym-card h2{
-  margin:0 0 4px;
-  font-size:.94rem;
+  margin:0 0 2px;
+  font-size:.82rem;
 }
 .acronym-card p{
-  margin:0 0 8px;
+  display:none;
+  margin:0;
   color:var(--muted);
-  font-size:.78rem;
+  font-size:.68rem;
 }
 .acronym-story{
-  min-height:148px;
+  min-height:108px;
   border:2px dashed #b8c5e3;
   border-radius:12px;
   padding:0;
@@ -542,22 +562,22 @@ button{
 }
 .mnemonic-stage{
   position:relative;
-  min-height:148px;
-  padding:12px 16px 42px;
+  min-height:108px;
+  padding:8px 14px 36px;
   overflow:hidden;
 }
 .mnemonic-track{
   position:absolute;
   left:16px;
   right:16px;
-  top:75px;
+  top:54px;
   height:6px;
   border-radius:999px;
   background:linear-gradient(90deg,rgba(139,117,212,.12),rgba(139,117,212,.32),rgba(139,117,212,.12));
 }
 .ghost{
   position:absolute;
-  top:22px;
+  top:14px;
   left:-72px;
   width:54px;
   height:58px;
@@ -614,7 +634,7 @@ button{
 .ghost-three{animation-delay:2.4s;transform:scale(.9)}
 .chain-link{
   position:absolute;
-  top:52px;
+  top:36px;
   --rot:0deg;
   width:46px;
   height:25px;
@@ -627,12 +647,12 @@ button{
   animation:chain-assemble 8s ease-in-out infinite;
 }
 .chain-link.one{left:46%;animation-delay:.6s}
-.chain-link.two{left:50%;top:48px;animation-delay:1.15s;--rot:90deg}
+.chain-link.two{left:50%;top:32px;animation-delay:1.15s;--rot:90deg}
 .chain-link.three{left:54%;animation-delay:1.7s}
-.chain-link.four{left:58%;top:48px;animation-delay:2.25s;--rot:90deg}
+.chain-link.four{left:58%;top:32px;animation-delay:2.25s;--rot:90deg}
 .chain-bridge{
   position:absolute;
-  top:64px;
+  top:48px;
   left:46.5%;
   width:185px;
   height:8px;
@@ -649,7 +669,7 @@ button{
 .fe-token{
   position:absolute;
   right:150px;
-  top:-24px;
+  top:-18px;
   width:42px;
   height:30px;
   display:grid;
@@ -665,7 +685,7 @@ button{
 .heme-badge{
   position:absolute;
   right:22px;
-  top:42px;
+  top:29px;
   width:110px;
   height:42px;
   display:grid;
@@ -684,8 +704,8 @@ button{
   position:absolute;
   left:14px;
   right:14px;
-  bottom:10px;
-  padding:8px 10px;
+  bottom:7px;
+  padding:6px 10px;
   border-radius:10px;
   background:rgba(255,255,255,.82);
   color:#29314d;
@@ -727,25 +747,22 @@ button{
   74%,86%{opacity:1;transform:scale(1);box-shadow:0 0 0 10px rgba(233,74,93,.18),0 0 28px rgba(233,74,93,.38)}
   100%{opacity:0;transform:scale(.9);box-shadow:none}
 }
-html[data-mls-theme="dark"] .hero,
 html[data-mls-theme="dark"] .controls,
 html[data-mls-theme="dark"] .bank,
 html[data-mls-theme="dark"] .cell-card,
 html[data-mls-theme="dark"] .acronym-card{
   background:rgba(22,28,44,.95);
 }
-html[data-mls-theme="dark"] .legend,
 html[data-mls-theme="dark"] .acronym-story{
   background:#101625;
   border-color:#313b5a;
 }
-html[data-mls-theme="dark"] .legend-item,
 html[data-mls-theme="dark"] .cell-title span,
 html[data-mls-theme="dark"] .bank p{
   color:#c3cae2;
 }
 html[data-mls-theme="dark"] .chip{
-  background:#101625;
+  background:#182236;
   color:#f4f6ff;
   border-color:#48557c;
   box-shadow:0 4px 0 rgba(0,0,0,.24);
@@ -761,6 +778,11 @@ html[data-mls-theme="dark"] .mnemonic-stage{
 html[data-mls-theme="dark"] .mnemonic-text{
   background:rgba(16,22,37,.88);
   color:#f4f6ff;
+}
+html[data-mls-theme="dark"] .heme-bye{
+  background:rgba(16,22,37,.86);
+  color:#d9c7ff;
+  border-color:#59618b;
 }
 html[data-mls-theme="dark"] .ghost{
   border-color:#7f8db7;
@@ -783,7 +805,6 @@ html[data-mls-theme="dark"] .ghost{
   .heme-badge{transform:scale(1)}
 }
 @media (max-width:1120px){
-  .hero{grid-template-columns:1fr}
   .workspace{grid-template-columns:1fr}
   .bank{position:static}
   .bank-grid{
@@ -796,7 +817,7 @@ html[data-mls-theme="dark"] .ghost{
 @media (max-width:760px){
   .wrap{width:min(100% - 18px,680px);padding-top:12px}
   .topbar{align-items:flex-start;flex-direction:column}
-  .hero{padding:12px;border-radius:16px}
+  .heme-float-layer{display:none}
   .cell-card{overflow-x:visible}
   .guide-row{
     grid-template-columns:30px minmax(0,1fr);
@@ -819,6 +840,29 @@ html[data-mls-theme="dark"] .ghost{
 </style>
 </head>
 <body>
+<div class="heme-float-layer" aria-hidden="true">
+  <span class="float-heme" style="--x:72;--y:16;--dx:14px;--dy:18px;--rot:8deg;--delay:0s"></span>
+  <span class="float-heme" style="--x:82;--y:23;--dx:-18px;--dy:10px;--rot:-9deg;--delay:.45s"></span>
+  <span class="float-heme" style="--x:91;--y:34;--dx:8px;--dy:-12px;--rot:13deg;--delay:.9s"></span>
+  <span class="float-heme" style="--x:79;--y:49;--dx:20px;--dy:15px;--rot:-14deg;--delay:1.35s"></span>
+  <span class="float-heme" style="--x:93;--y:62;--dx:-14px;--dy:20px;--rot:7deg;--delay:1.8s"></span>
+  <span class="float-heme" style="--x:68;--y:72;--dx:12px;--dy:-16px;--rot:-10deg;--delay:2.25s"></span>
+  <span class="float-heme" style="--x:88;--y:82;--dx:-8px;--dy:12px;--rot:11deg;--delay:2.7s"></span>
+  <span class="float-heme" style="--x:7;--y:22;--dx:18px;--dy:14px;--rot:-8deg;--delay:3.15s"></span>
+  <span class="float-heme" style="--x:12;--y:38;--dx:-8px;--dy:-12px;--rot:9deg;--delay:3.6s"></span>
+  <span class="float-heme" style="--x:8;--y:56;--dx:16px;--dy:18px;--rot:-12deg;--delay:4.05s"></span>
+  <span class="float-heme" style="--x:17;--y:76;--dx:-12px;--dy:8px;--rot:10deg;--delay:4.5s"></span>
+  <span class="float-heme" style="--x:96;--y:18;--dx:-16px;--dy:14px;--rot:-6deg;--delay:4.95s"></span>
+  <span class="float-heme" style="--x:74;--y:88;--dx:10px;--dy:-10px;--rot:12deg;--delay:5.4s"></span>
+  <span class="float-heme" style="--x:3;--y:83;--dx:14px;--dy:-8px;--rot:-9deg;--delay:5.85s"></span>
+  <span class="float-heme" style="--x:99;--y:76;--dx:-20px;--dy:6px;--rot:8deg;--delay:6.3s"></span>
+  <span class="float-heme" style="--x:63;--y:32;--dx:12px;--dy:16px;--rot:-11deg;--delay:6.75s"></span>
+  <span class="float-heme" style="--x:24;--y:91;--dx:-10px;--dy:-12px;--rot:7deg;--delay:7.2s"></span>
+  <span class="float-heme" style="--x:57;--y:12;--dx:8px;--dy:14px;--rot:-8deg;--delay:7.65s"></span>
+  <span class="float-heme" style="--x:38;--y:86;--dx:16px;--dy:-8px;--rot:11deg;--delay:8.1s"></span>
+  <span class="float-heme" style="--x:4;--y:8;--dx:10px;--dy:12px;--rot:-6deg;--delay:8.55s"></span>
+  <span class="heme-bye">bye bye</span>
+</div>
 <div class="wrap">
   <div class="topbar">
     <a class="home" href="index.html#interactive">&larr; Interactive Tools</a>
@@ -828,18 +872,27 @@ html[data-mls-theme="dark"] .ghost{
     </div>
   </div>
 
-  <section class="hero">
-    <div>
-      <div class="kicker">Drag + Label Pathway</div>
-      <h1>Simple heme step guide.</h1>
-      <p>Drag the 10 pathway labels into the dashed boxes. Enzymes are fixed between steps so the practice stays focused on products and sequence.</p>
+  <section class="acronym-card" aria-label="Acronym story">
+    <h2>Acronym Story</h2>
+    <p>Ghosts hook four chain pieces together, then iron completes the heme ending.</p>
+    <div class="acronym-story" aria-label="Animated mnemonic: Ghosts Assemble Pieces Hooking Up Chains Perfectly Producing Iron Heme.">
+      <div class="mnemonic-stage">
+        <div class="mnemonic-track" aria-hidden="true"></div>
+        <div class="ghost ghost-one" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
+        <div class="ghost ghost-two" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
+        <div class="ghost ghost-three" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
+        <span class="chain-link one" aria-hidden="true"></span>
+        <span class="chain-link two" aria-hidden="true"></span>
+        <span class="chain-link three" aria-hidden="true"></span>
+        <span class="chain-link four" aria-hidden="true"></span>
+        <span class="chain-bridge" aria-hidden="true"></span>
+        <span class="fe-token" aria-hidden="true">Fe</span>
+        <span class="heme-badge" aria-hidden="true">Heme</span>
+        <div class="mnemonic-text">
+          <strong>G</strong>hosts <strong>A</strong>ssemble <strong>P</strong>ieces <strong>H</strong>ooking <strong>U</strong>p <strong>C</strong>hains <strong>P</strong>erfectly <strong>P</strong>roducing <strong>Iron</strong> <strong>H</strong>eme.
+        </div>
+      </div>
     </div>
-    <aside class="legend" aria-label="Legend">
-      <div class="legend-item"><span class="legend-swatch"></span>Pathway labels</div>
-      <div class="legend-item"><span class="legend-swatch enzyme"></span>Fixed enzymes</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:var(--cytosol);border-style:solid"></span>Cytosol</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:var(--mito);border-style:solid"></span>Mitochondrion</div>
-    </aside>
   </section>
 
   <section class="controls" aria-label="Controls">
@@ -866,29 +919,6 @@ html[data-mls-theme="dark"] .ghost{
       </div>
     </section>
   </main>
-
-  <section class="acronym-card" aria-label="Acronym story">
-    <h2>Acronym Story</h2>
-    <p>Ghosts hook four chain pieces together, then iron completes the heme ending.</p>
-    <div class="acronym-story" aria-label="Animated mnemonic: Ghosts Assemble Pieces Hooking Up Chains Perfectly Producing Iron Heme.">
-      <div class="mnemonic-stage">
-        <div class="mnemonic-track" aria-hidden="true"></div>
-        <div class="ghost ghost-one" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
-        <div class="ghost ghost-two" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
-        <div class="ghost ghost-three" aria-hidden="true"><span class="smile"></span><span class="hands"></span><span class="carry"></span></div>
-        <span class="chain-link one" aria-hidden="true"></span>
-        <span class="chain-link two" aria-hidden="true"></span>
-        <span class="chain-link three" aria-hidden="true"></span>
-        <span class="chain-link four" aria-hidden="true"></span>
-        <span class="chain-bridge" aria-hidden="true"></span>
-        <span class="fe-token" aria-hidden="true">Fe</span>
-        <span class="heme-badge" aria-hidden="true">Heme</span>
-        <div class="mnemonic-text">
-          <strong>G</strong>hosts <strong>A</strong>ssemble <strong>P</strong>ieces <strong>H</strong>ooking <strong>U</strong>p <strong>C</strong>hains <strong>P</strong>erfectly <strong>P</strong>roducing <strong>Iron</strong> <strong>H</strong>eme.
-        </div>
-      </div>
-    </div>
-  </section>
 
 </div>
 
