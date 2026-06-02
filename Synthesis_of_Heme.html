@@ -48,7 +48,7 @@ body{
     var(--bg);
 }
 .wrap{
-  width:min(1000px,calc(100% - 24px));
+  width:min(1040px,calc(100% - 24px));
   margin:0 auto;
   padding:10px 0 24px;
 }
@@ -99,14 +99,14 @@ html[data-mls-theme="dark"] .mls-theme-btn{
   letter-spacing:.16em;
   text-transform:uppercase;
 }
-h1{
+.topbar h1{
   margin:0;
-  font-size:clamp(1.35rem,2.6vw,2.05rem);
-  line-height:1.02;
+  font-size:clamp(1.15rem,2vw,1.45rem);
+  line-height:1.05;
 }
 .hero{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 178px;
+  grid-template-columns:minmax(0,1fr) 160px;
   gap:10px;
   align-items:stretch;
   background:rgba(255,255,255,.9);
@@ -116,7 +116,11 @@ h1{
   box-shadow:var(--shadow);
   margin-bottom:8px;
 }
-.hero h1{font-size:clamp(1.08rem,1.7vw,1.35rem)}
+.hero h1{
+  margin:0;
+  font-size:clamp(1rem,1.45vw,1.18rem);
+  line-height:1.12;
+}
 .hero p{
   margin:5px 0 0;
   max-width:720px;
@@ -191,7 +195,7 @@ button{
 .score.bad{background:#fff0f0;color:var(--bad)}
 .workspace{
   display:grid;
-  grid-template-columns:165px minmax(0,660px);
+  grid-template-columns:182px minmax(0,760px);
   justify-content:center;
   gap:8px;
   align-items:start;
@@ -207,13 +211,13 @@ button{
 }
 .bank h2{
   margin:0;
-  font-size:.72rem;
+  font-size:.78rem;
 }
 .bank p{
   margin:4px 0 8px;
   color:var(--muted);
   line-height:1.35;
-  font-size:.62rem;
+  font-size:.67rem;
 }
 .chip{
   width:100%;
@@ -221,10 +225,10 @@ button{
   background:#fff;
   color:var(--ink);
   border-radius:9px;
-  padding:5px 6px;
+  padding:6px 7px;
   margin:4px 0;
   font-weight:850;
-  font-size:.6rem;
+  font-size:.7rem;
   text-align:center;
   cursor:grab;
   box-shadow:0 4px 0 rgba(38,59,105,.10);
@@ -246,15 +250,15 @@ button{
 .enzyme-fixed{
   display:inline-grid;
   place-items:center;
-  min-width:118px;
-  min-height:25px;
-  padding:4px 11px;
-  clip-path:polygon(11px 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,11px 100%,0 50%);
+  min-width:138px;
+  min-height:31px;
+  padding:5px 14px;
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);
   background:var(--enzyme);
   border:2px solid var(--enzyme-line);
   color:#4b3100;
   font-weight:950;
-  font-size:.64rem;
+  font-size:.74rem;
   line-height:1.05;
   text-align:center;
   box-shadow:0 3px 0 rgba(122,76,0,.2);
@@ -288,34 +292,35 @@ button{
   border:2px solid #d0dbf0;
   border-radius:16px;
   background:linear-gradient(180deg,#fbfdff,#f4f8ff);
-  padding:6px;
+  padding:7px;
   display:grid;
-  gap:4px;
+  gap:5px;
 }
 .guide-row{
   display:grid;
-  grid-template-columns:28px 82px minmax(0,1fr);
-  gap:4px;
+  grid-template-columns:32px 98px minmax(210px,1fr) 178px;
+  gap:8px;
   align-items:center;
   border:1px solid #dbe4f3;
   border-left:5px solid var(--cytosol-line);
   border-radius:12px;
-  padding:4px 5px;
+  padding:7px 8px;
   background:#fff;
+  min-height:66px;
 }
 .guide-row.mito{
   border-left-color:var(--mito-line);
   background:#fffaf0;
 }
 .guide-number{
-  width:22px;
-  height:22px;
+  width:25px;
+  height:25px;
   border-radius:9px;
   display:grid;
   place-items:center;
   background:#eaf2ff;
   color:#284d87;
-  font-size:.64rem;
+  font-size:.75rem;
   font-weight:950;
 }
 .guide-row.mito .guide-number{
@@ -324,29 +329,55 @@ button{
 }
 .guide-compartment{
   color:#59627f;
-  font-size:.46rem;
+  font-size:.58rem;
   font-weight:950;
   letter-spacing:.08em;
   text-transform:uppercase;
   line-height:1.15;
 }
-.guide-body{
-  display:grid;
-  grid-template-columns:minmax(0,1fr);
-  gap:2px;
-}
-.guide-enzyme-line,
-.guide-main-line{
+.guide-product,
+.guide-reaction{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:4px;
+  gap:6px;
   min-width:0;
+}
+.guide-product .slot.step{
+  width:100%;
+  max-width:300px;
+  min-height:39px;
+}
+.guide-reaction{
+  flex-wrap:wrap;
+  align-content:center;
+}
+.reaction-label{
+  width:100%;
+  color:#667296;
+  font-size:.46rem;
+  font-weight:950;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  text-align:center;
+  line-height:1;
+}
+.final-badge{
+  display:inline-grid;
+  place-items:center;
+  min-width:138px;
+  min-height:31px;
+  border-radius:999px;
+  border:2px solid #9ecfb4;
+  background:#e7f7ee;
+  color:#147947;
+  font-size:.72rem;
+  font-weight:950;
 }
 .guide-arrow{
   color:#7c869f;
   font-weight:950;
-  font-size:.7rem;
+  font-size:.9rem;
 }
 .slot{
   position:absolute;
@@ -374,15 +405,12 @@ button{
   transform:none;
 }
 .step-guide .slot.step{
-  width:min(100%,182px);
-  min-height:24px;
-}
-.step-guide .slot.enzyme{
-  width:min(100%,128px);
-  min-height:21px;
+  width:min(100%,260px);
+  min-height:38px;
 }
 .step-guide .slot.cofactor{
-  width:42px;
+  width:56px;
+  min-height:34px;
 }
 .slot.step{
   border:2px dashed #224f8f;
@@ -390,31 +418,26 @@ button{
   background:rgba(255,255,255,.88);
   color:#2a3a5c;
 }
-.slot.enzyme{
-  width:clamp(52px,5.4vw,66px);
-  min-height:21px;
-  border:2px solid var(--enzyme-line);
-  border-radius:999px;
-  background:rgba(242,185,77,.7);
-  color:#5d3c00;
-}
 .slot.cofactor{
-  width:38px;
-  min-height:21px;
+  width:56px;
+  min-height:34px;
   border-radius:8px;
 }
 .slot-label{
   position:absolute;
-  left:4px;
-  top:2px;
+  left:6px;
+  top:4px;
   color:#667296;
-  font-size:.31rem;
+  font-size:.42rem;
+  font-weight:950;
   letter-spacing:.08em;
   text-transform:uppercase;
 }
 .slot .value{
   display:block;
-  padding-top:4px;
+  padding-top:8px;
+  font-size:.73rem;
+  line-height:1.08;
 }
 .slot.filled.step{
   border-style:solid;
@@ -514,14 +537,16 @@ html[data-mls-theme="dark"] .acronym-story{
   .hero{padding:12px;border-radius:16px}
   .cell-card{overflow-x:visible}
   .guide-row{
-    grid-template-columns:30px 76px minmax(0,1fr);
+    grid-template-columns:30px minmax(0,1fr);
     gap:5px;
+    min-height:auto;
   }
+  .guide-compartment{grid-column:2}
+  .guide-product,.guide-reaction{grid-column:1 / -1}
   .slot{
     width:58px;
-    font-size:.43rem;
   }
-  .slot.enzyme{width:60px}
+  .slot .value{font-size:.68rem}
 }
 </style>
 </head>
@@ -690,16 +715,18 @@ function renderSlots(){
   const layer = document.getElementById("slotLayer");
   layer.innerHTML = GUIDE_ROWS.map(row => {
     const compartmentClass = row.compartment.toLowerCase().includes("mitochondrion") ? "mito" : "cyto";
-    const enzymeLine = row.enzyme
-      ? `<div class="guide-enzyme-line">${enzymeFixedHtml(row.enzyme)}${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}</div>`
-      : "";
+    const reactionCell = row.enzyme
+      ? `<div class="guide-reaction">
+          <span class="reaction-label">enzyme to next</span>
+          ${enzymeFixedHtml(row.enzyme)}
+          ${row.cofactor ? `<span class="guide-arrow">+</span>${slotHtml(row.cofactor)}` : ""}
+        </div>`
+      : `<div class="guide-reaction"><span class="final-badge">Final product</span></div>`;
     return `<div class="guide-row ${compartmentClass}">
       <div class="guide-number">${row.number}</div>
       <div class="guide-compartment">${row.compartment}</div>
-      <div class="guide-body">
-        ${enzymeLine}
-        <div class="guide-main-line">${slotHtml(row.step)}</div>
-      </div>
+      <div class="guide-product">${slotHtml(row.step)}</div>
+      ${reactionCell}
     </div>`;
   }).join("");
   layer.querySelectorAll(".slot").forEach(slotEl => {
