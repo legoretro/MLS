@@ -7331,8 +7331,110 @@ function toggleMicroCaseCollapse(id){
 function adminMicroCaseControls(){
   return `<div class="card">
     <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Microbiology Cases</div>
-    <button class="btn btn-primary" onclick="openMicroCaseEditor(null)">+ New Case</button>
+    <div class="flex gap-8 flex-wrap">
+      <button class="btn btn-primary" onclick="openMicroCaseEditor(null)">+ New Case</button>
+      <label class="btn btn-ghost" style="cursor:pointer">Import CSV
+        <input type="file" accept=".csv,text/csv" style="display:none" onchange="importMicroCasesCSV(event)">
+      </label>
+      <button class="btn btn-ghost" onclick="downloadMicroCaseTemplate()">Download Template</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">Use the same case_key on repeated rows to add multiple questions to one case.</div>
   </div>`;
+}
+
+function downloadMicroCaseTemplate(){
+  dlCSV([[
+    'case_key','title','group_label','scenario','test_results',
+    'question','option_a','option_b','option_c','option_d','correct','explanation','is_draft'
+  ]],'microbiology_cases_template.csv');
+}
+
+function microImportText(v){
+  return String(v||'').replace(/\\n/g,'\n').trim();
+}
+
+function normalizeMicroCaseGroup(v){
+  const raw=String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+  if(raw.includes('negative')||raw.includes('gram_neg')||raw==='gn'||raw==='gnr')return 'gram_negative';
+  if(raw.includes('positive')||raw.includes('gram_pos')||raw==='gp'||raw==='gpc')return 'gram_positive';
+  return raw&&raw!=='none'?raw:'';
+}
+
+function microImportTableFromText(text){
+  text=microImportText(text);
+  if(!text)return null;
+  const chunks=text.split(/\n|;/).map(x=>x.trim()).filter(Boolean);
+  const pairs=chunks.map(chunk=>{
+    const m=chunk.match(/^([^:=]+?)\s*(?::|=)\s*(.+)$/);
+    return m?[m[1].trim(),m[2].trim()]:null;
+  }).filter(Boolean);
+  if(pairs.length){
+    return {
+      headers:pairs.map(p=>p[0]),
+      rows:[pairs.map(p=>p[1])],
+      meta:[pairs.map(()=>({}))]
+    };
+  }
+  return {headers:['Test Results'],rows:[[text]],meta:[[{}]]};
+}
+
+function microCorrectLetter(raw,options){
+  const val=String(raw||'').trim().toLowerCase();
+  const letters=['a','b','c','d'];
+  if(letters.includes(val))return val;
+  if(['1','2','3','4'].includes(val))return letters[Number(val)-1];
+  const optIdx=(options||[]).findIndex(o=>String(o||'').trim().toLowerCase()===val);
+  return optIdx>=0?letters[optIdx]:'a';
+}
+
+async function importMicroCasesCSV(event){
+  const file=event.target.files&&event.target.files[0];
+  event.target.value='';
+  if(!file)return;
+  if(!isAdmin){alert('Import is available in Admin mode only.');return;}
+  const text=await file.text();
+  const rows=parseCSVRecords(text);
+  if(!rows.length){alert('No rows found. Download the template and keep the header row.');return;}
+  const grouped=new Map();
+  rows.forEach((row,idx)=>{
+    const title=microImportText(csvField(row,['title','case_title','name'],1));
+    const scenario=microImportText(csvField(row,['scenario','case_scenario','patient_info'],3));
+    const question=microImportText(csvField(row,['question','prompt','stem'],5));
+    const key=microImportText(csvField(row,['case_key','case_id','id'],0))||title||`case-${idx+1}`;
+    if(!title&&!scenario&&!question)return;
+    if(!grouped.has(key)){
+      const tableText=csvField(row,['test_results','results','table','case_data','lab_data'],4);
+      grouped.set(key,{
+        title:title||key,
+        scenario,
+        group_label:normalizeMicroCaseGroup(csvField(row,['group_label','gram_group','group'],2)),
+        table_data:microImportTableFromText(tableText),
+        questions:[],
+        is_draft:String(csvField(row,['is_draft','draft','status'],12)||'').toLowerCase().includes('true'),
+        images:[]
+      });
+    }
+    const item=grouped.get(key);
+    if(!item.title&&title)item.title=title;
+    if(!item.scenario&&scenario)item.scenario=scenario;
+    if(!item.group_label)item.group_label=normalizeMicroCaseGroup(csvField(row,['group_label','gram_group','group'],2));
+    if(!item.table_data)item.table_data=microImportTableFromText(csvField(row,['test_results','results','table','case_data','lab_data'],4));
+    if(question){
+      const options=['option_a','option_b','option_c','option_d'].map((name,oi)=>microImportText(csvField(row,[name,String.fromCharCode(97+oi),'choice_'+String.fromCharCode(97+oi)],6+oi)));
+      item.questions.push({
+        question,
+        options,
+        correct:microCorrectLetter(csvField(row,['correct','correct_answer','answer','key'],10),options),
+        explanation:microImportText(csvField(row,['explanation','rationale','notes'],11))
+      });
+    }
+  });
+  const payloads=[...grouped.values()].filter(c=>c.title);
+  if(!payloads.length){alert('No valid cases found.');return;}
+  const {error}=await sb.from('mlsboc_micro_cases').insert(payloads);
+  if(error){alert('Import failed: '+error.message);return;}
+  alert(`Imported ${payloads.length} microbiology case${payloads.length===1?'':'s'}.`);
+  renderTab();
 }
 
 async function openMicroCaseEditor(caseId){
