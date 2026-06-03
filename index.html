@@ -3471,13 +3471,12 @@ async function startGenericFlashcard(){
 
 // ─── URINALYSIS IMAGES — categorized list with bulk upload + quiz ─────────────
 const UA_IMAGE_SECTIONS=[
-  'Normal Findings',
   'Macroscopic Color / Clarity',
   'Reagent Strip',
-  'Microscopic Cells',
-  'Microscopic Casts',
-  'Microscopic Crystals - Acidic',
-  'Microscopic Crystals - Alkaline',
+  'Cells',
+  'Casts',
+  'Acidic Crystals',
+  'Alkaline Crystals',
   'Microscopic Miscellaneous',
   'Needs Review'
 ];
@@ -3488,14 +3487,14 @@ function normalizeUASection(v){
   const val=String(v||'').trim().toLowerCase();
   const found=UA_IMAGE_SECTIONS.find(section=>section.toLowerCase()===val);
   if(found)return found;
-  if(val==='cells'||val==='cell')return 'Microscopic Cells';
-  if(val==='casts'||val==='cast')return 'Microscopic Casts';
-  if(val==='acid crystals'||val==='acidic crystals')return 'Microscopic Crystals - Acidic';
-  if(val==='alkaline crystals'||val==='basic crystals')return 'Microscopic Crystals - Alkaline';
+  if(val==='cells'||val==='cell'||val==='microscopic cells')return 'Cells';
+  if(val==='casts'||val==='cast'||val==='microscopic casts')return 'Casts';
+  if(val==='acid crystals'||val==='acidic crystals'||val==='microscopic crystals - acidic')return 'Acidic Crystals';
+  if(val==='alkaline crystals'||val==='basic crystals'||val==='microscopic crystals - alkaline')return 'Alkaline Crystals';
   if(val==='misc'||val==='miscellaneous'||val==='microscopic miscellaneous')return 'Microscopic Miscellaneous';
   if(val==='macroscopic'||val==='color'||val==='clarity')return 'Macroscopic Color / Clarity';
   if(val==='strip'||val==='dipstick'||val==='reagent')return 'Reagent Strip';
-  if(val==='normal')return 'Normal Findings';
+  if(val==='normal'||val==='normal findings')return 'Microscopic Miscellaneous';
   return '';
 }
 function normalizeUACatType(v){
@@ -3536,7 +3535,6 @@ function parseUACategoryNote(notes){
 function uaTextForGuess(item){
   return [
     item?.name,
-    ...(Array.isArray(item?.key_features)?item.key_features:[]),
     stripUACategoryNote(item?.notes)
   ].join(' ').toLowerCase();
 }
@@ -3551,20 +3549,18 @@ function inferUACategory(item){
   const type=/\bnormal\b|normal finding|normal sediment|hyaline cast/.test(text)?'Normal':'Abnormal';
   let section='';
   if(stored?.section)section=stored.section;
-  else if(/\bnormal sediment\b|\bnormal finding\b|\bnormal\b/.test(compact)&&!/(cast|crystal|bacteria|yeast|rbc|wbc|epithelial|bilirubin|glucose|ketone|protein|nitrite|leukocyte)/.test(compact)){
-    section='Normal Findings';
+  else if(/cast|cylindr|hyaline/.test(compact)){
+    section='Casts';
+  }else if(/crystal|amorphous|uric acid|cystine|calcium oxalate|tyrosine|leucine|cholesterol|sulfonamide|triple phosphate|struvite|ammonium biurate|calcium carbonate|phosphate/.test(compact)){
+    section=ph==='Alkaline'?'Alkaline Crystals':'Acidic Crystals';
+  }else if(/\brbc\b|red blood|wbc|white blood|epithelial|squamous|transitional|renal tubular|rte|oval fat|fat body|clue cell/.test(compact)){
+    section='Cells';
+  }else if(/bacteria|bacterial|yeast|fung|mucus|sperm|trichomonas|parasite|artifact|contaminant|fecal|pollen|fiber|starch|oil droplet|bubble|hemosiderin|schisto|nematode|larva/.test(compact)){
+    section='Microscopic Miscellaneous';
   }else if(/color|clarity|clear|cloudy|turbid|foam|odor|yellow|orange|red|brown|black|green|blue|amber|port wine|appearance/.test(compact)){
     section='Macroscopic Color / Clarity';
   }else if(/reagent|dipstick|bilirubin|urobilinogen|glucose|ketone|protein|nitrite|leukocyte|leu|specific gravity|sg\b|ph\b|blood pad|strip/.test(compact)){
     section='Reagent Strip';
-  }else if(/cast|cylindr|hyaline/.test(compact)){
-    section='Microscopic Casts';
-  }else if(/crystal|amorphous|uric acid|cystine|calcium oxalate|tyrosine|leucine|cholesterol|sulfonamide|triple phosphate|struvite|ammonium biurate|calcium carbonate|phosphate/.test(compact)){
-    section=ph==='Alkaline'?'Microscopic Crystals - Alkaline':'Microscopic Crystals - Acidic';
-  }else if(/\brbc\b|red blood|wbc|white blood|epithelial|squamous|transitional|renal tubular|rte|oval fat|fat body|clue cell/.test(compact)){
-    section='Microscopic Cells';
-  }else if(/bacteria|bacterial|yeast|fung|mucus|sperm|trichomonas|parasite|artifact|contaminant|fecal|pollen|fiber|starch|oil droplet|hemosiderin|schisto|nematode|larva/.test(compact)){
-    section='Microscopic Miscellaneous';
   }else{
     section='Needs Review';
   }
@@ -3584,8 +3580,7 @@ function uaSectionKey(item){
 }
 function uaCategoryLabel(item){
   const cat=inferUACategory(item);
-  const suffix=cat.ph==='Unspecified'?cat.type:`${cat.type} / ${cat.ph}`;
-  return `${cat.section} • ${suffix}`;
+  return cat.section;
 }
 function uaCategoryControls(prefix,item={}){
   const cat=inferUACategory(item);
@@ -3613,13 +3608,9 @@ function uaCategoryControls(prefix,item={}){
 }
 function uaSortItems(items){
   const sectionRank=Object.fromEntries(UA_IMAGE_SECTIONS.map((name,i)=>[name,i]));
-  const typeRank={Normal:0,Abnormal:1};
-  const phRank={Acidic:0,Alkaline:1,Unspecified:2};
   return [...(items||[])].sort((a,b)=>{
     const ca=inferUACategory(a),cb=inferUACategory(b);
     return (sectionRank[ca.section]??99)-(sectionRank[cb.section]??99)
-      ||(typeRank[ca.type]??9)-(typeRank[cb.type]??9)
-      ||(phRank[ca.ph]??9)-(phRank[cb.ph]??9)
       ||String(a.name||'').localeCompare(String(b.name||''));
   });
 }
