@@ -2127,6 +2127,134 @@ async function generateUASingleImagePDF(items, title, filename, options={}){
   document.getElementById('condition-modal').classList.add('hidden');
 }
 
+async function generateUAGroupedImagePDF(items, title, filename, options={}){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const margin=10;
+  const gap=4;
+  const cols=3;
+  const rows=options.includeFeatures?3:4;
+  const headerH=16;
+  const cardW=(pageW-margin*2-gap*(cols-1))/cols;
+  const cardH=(pageH-margin*2-headerH-8-gap*(rows-1))/rows;
+  const imgH=options.includeFeatures?Math.max(30,cardH-33):Math.max(32,cardH-15);
+  const makePDFImage=(src)=>new Promise(res=>{
+    let done=false;
+    const finish=(val)=>{if(done)return;done=true;res(val);};
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        const maxW=640,maxH=430;
+        const nw=img.naturalWidth||4,nh=img.naturalHeight||3;
+        const scale=Math.min(maxW/nw,maxH/nh,1);
+        const w=Math.max(1,Math.round(nw*scale));
+        const h=Math.max(1,Math.round(nh*scale));
+        const cv=document.createElement('canvas');
+        cv.width=w;cv.height=h;
+        const ctx=cv.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+        ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
+        ctx.drawImage(img,0,0,w,h);
+        finish({src:cv.toDataURL('image/jpeg',0.74),fmt:'JPEG',w,h});
+      }catch(e){
+        finish({src,fmt:(src&&src.startsWith('data:image/png'))?'PNG':'JPEG',w:img.naturalWidth||4,h:img.naturalHeight||3});
+      }
+    };
+    img.onerror=()=>finish({src:null,fmt:'JPEG',w:4,h:3});
+    setTimeout(()=>finish({src:null,fmt:'JPEG',w:4,h:3}),5000);
+    if(src&&!src.startsWith('data:'))img.crossOrigin='anonymous';
+    img.src=src;
+  });
+  const drawHeader=(section,count,continued=false)=>{
+    doc.setFillColor(255,255,255);
+    doc.rect(0,0,pageW,pageH,'F');
+    doc.setTextColor(15,15,20);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(15);
+    doc.text(section.toUpperCase()+(continued?' - CONTINUED':''),margin,margin+7);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100,100,115);
+    doc.text(`${count} finding${count===1?'':'s'} selected`,pageW-margin,margin+7,{align:'right'});
+    doc.setDrawColor(205,205,205);
+    doc.setLineWidth(0.35);
+    doc.line(margin,margin+11,pageW-margin,margin+11);
+  };
+  const grouped=groupedUASections(items);
+  const orderedSections=UA_IMAGE_SECTIONS.filter(section=>grouped[section]?.length);
+  let firstSection=true;
+  for(const section of orderedSections){
+    const sectionItems=uaSortItems(grouped[section]||[]);
+    if(!firstSection)doc.addPage();
+    firstSection=false;
+    drawHeader(section,sectionItems.length,false);
+    for(let idx=0;idx<sectionItems.length;idx++){
+      if(idx>0&&idx%(cols*rows)===0){
+        doc.addPage();
+        drawHeader(section,sectionItems.length,true);
+      }
+      const item=sectionItems[idx];
+      const pos=idx%(cols*rows);
+      const col=pos%cols,row=Math.floor(pos/cols);
+      const x=margin+col*(cardW+gap);
+      const y=margin+headerH+row*(cardH+gap);
+      const imgX=x+2.4,imgY=y+2.4,imgW=cardW-4.8;
+      const img=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean)[0];
+      doc.setFillColor(248,248,248);
+      doc.rect(x,y,cardW,cardH,'F');
+      doc.setDrawColor(218,218,218);
+      doc.setLineWidth(0.28);
+      doc.rect(x,y,cardW,cardH,'S');
+      doc.setFillColor(245,245,245);
+      doc.rect(imgX,imgY,imgW,imgH,'F');
+      if(img){
+        try{
+          const pdfImg=await makePDFImage(img);
+          if(pdfImg.src){
+            const ar=pdfImg.w/pdfImg.h,car=imgW/imgH;
+            let dw,dh;
+            if(ar>car){dw=imgW;dh=imgW/ar;}else{dh=imgH;dw=imgH*ar;}
+            const ox=imgX+(imgW-dw)/2,oy=imgY+(imgH-dh)/2;
+            doc.addImage(pdfImg.src,pdfImg.fmt,ox,oy,dw,dh,'','FAST');
+          }
+        }catch(e){}
+      }
+      let textY=y+imgH+7;
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(7.8);
+      doc.setTextColor(15,15,15);
+      const nameLines=doc.splitTextToSize(item.name||'',cardW-5).slice(0,2);
+      doc.text(nameLines,x+2.4,textY);
+      textY+=nameLines.length*3.7+1.5;
+      if(options.includeFeatures){
+        const feats=(item.key_features||[]).filter(Boolean);
+        doc.setFontSize(6.5);
+        if(feats.length){
+          doc.setFont('helvetica','normal');
+          doc.setTextColor(55,55,65);
+          const lines=doc.splitTextToSize(feats.join('  |  '),cardW-5).slice(0,4);
+          lines.forEach(line=>{doc.text(line,x+2.4,textY);textY+=3.2;});
+        }else{
+          doc.setFont('helvetica','bold');
+          doc.setTextColor(190,45,65);
+          doc.text('No key features added yet',x+2.4,textY);
+        }
+      }
+    }
+  }
+  const tot=doc.internal.getNumberOfPages();
+  for(let p=1;p<=tot;p++){
+    doc.setPage(p);
+    doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+    doc.text('MLS BOC Prep - '+title+' | Page '+p+' of '+tot,margin,pageH-5);
+    doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-5,{align:'right'});
+  }
+  doc.save(filename);
+  document.getElementById('condition-modal').classList.add('hidden');
+}
+
 async function seedIfEmpty(){
   return;
 }
@@ -3480,8 +3608,6 @@ const UA_IMAGE_SECTIONS=[
   'Microscopic Miscellaneous',
   'Needs Review'
 ];
-const UA_CATEGORY_TYPES=['Normal','Abnormal'];
-const UA_PH_GROUPS=['Acidic','Alkaline','Unspecified'];
 const UA_CAT_META_RE=/^\s*\[\[UA_CATEGORY:([^\]]+)\]\]\s*\n?/i;
 function normalizeUASection(v){
   const val=String(v||'').trim().toLowerCase();
@@ -3516,6 +3642,13 @@ function parseUACategoryNote(notes){
   const match=String(notes||'').match(UA_CAT_META_RE);
   if(!match)return null;
   const parts=match[1].split('|').map(p=>p.trim()).filter(Boolean);
+  if(parts.length===1){
+    return {
+      section:normalizeUASection(parts[0]),
+      type:'Abnormal',
+      ph:'Unspecified'
+    };
+  }
   if(parts.length>=3){
     return {
       section:normalizeUASection(parts[0]),
@@ -3569,7 +3702,7 @@ function inferUACategory(item){
 function composeUANotesWithCategory(notes,section,type,ph){
   const clean=stripUACategoryNote(notes);
   const safeSection=normalizeUASection(section)||'Needs Review';
-  return `[[UA_CATEGORY:${safeSection}|${normalizeUACatType(type)||'Abnormal'}|${normalizeUAPh(ph)}]]${clean?`\n${clean}`:''}`;
+  return `[[UA_CATEGORY:${safeSection}]]${clean?`\n${clean}`:''}`;
 }
 function uaTypePhKey(item){
   const cat=inferUACategory(item);
@@ -3585,23 +3718,11 @@ function uaCategoryLabel(item){
 function uaCategoryControls(prefix,item={}){
   const cat=inferUACategory(item);
   return `
-    <div class="form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+    <div class="form-grid" style="grid-template-columns:1fr;gap:10px">
       <div class="form-group">
         <label>Chart Category</label>
         <select id="${prefix}-section">
           ${UA_IMAGE_SECTIONS.map(v=>`<option value="${v}" ${cat.section===v?'selected':''}>${v}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Normal / Abnormal</label>
-        <select id="${prefix}-type">
-          ${UA_CATEGORY_TYPES.map(v=>`<option value="${v}" ${cat.type===v?'selected':''}>${v}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Acidic / Alkaline</label>
-        <select id="${prefix}-ph">
-          ${UA_PH_GROUPS.map(v=>`<option value="${v}" ${cat.ph===v?'selected':''}>${v}</option>`).join('')}
         </select>
       </div>
     </div>`;
@@ -3617,7 +3738,7 @@ function uaSortItems(items){
 function groupedUAImages(items){
   const groups={};
   uaSortItems(items).forEach(item=>{
-    const key=uaTypePhKey(item);
+    const key=uaSectionKey(item);
     if(!groups[key])groups[key]=[];
     groups[key].push(item);
   });
@@ -3692,9 +3813,6 @@ async function renderUAImages(el){
     el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaImageCacheById={};renderTab()');
     return;
   }
-  const groups=groupedUAImages(activeItems);
-  const groupOrder=[];
-  UA_CATEGORY_TYPES.forEach(type=>UA_PH_GROUPS.forEach(ph=>groupOrder.push(`${type}|${ph}`)));
 
   el.innerHTML=`
     <div class="flex-center gap-8 mb-16 flex-wrap">
@@ -3715,33 +3833,23 @@ async function renderUAImages(el){
     </div>
     ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
     <div id="ua-items-body">
-      ${groupOrder.filter(key=>groups[key]?.length).map(key=>{
-        const [type,ph]=key.split('|');
-        return `<section class="ua-image-group" data-group="${esc(key)}" style="margin-bottom:26px">
-          <div class="section-subtitle" style="display:flex;align-items:center;gap:10px;margin:6px 0 12px">
-            <span>${esc(type)}</span>
-            <span style="font-size:11px;color:var(--text3);letter-spacing:.08em">${esc(ph)}</span>
-            <span style="height:1px;background:var(--border);flex:1"></span>
-          </div>
-          <div class="condition-grid">
-            ${groups[key].map(img=>`
-              <div class="condition-card ua-item" data-name="${esc([img.name,...(img.key_features||[])].join(' ').toLowerCase())}" onclick="openUAImage('${img.id}')">
-                <div class="ua-single-img">${buildUAThumbs(img)}</div>
-                <div class="condition-body">
-                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-                    <span class="tag tag-info" style="font-size:10px">${esc(uaCategoryLabel(img))}</span>
-                  </div>
-                  <div class="condition-name">${esc(img.name||'')}</div>
-                  ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).map(esc).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
-                  ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
-                    <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
-                    <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
-                  </div>`:''}
-                </div>
-              </div>`).join('')}
-          </div>
-        </section>`;
-      }).join('')}
+      <div class="condition-grid">
+        ${activeItems.map(img=>`
+          <div class="condition-card ua-item" data-name="${esc([img.name,...(img.key_features||[])].join(' ').toLowerCase())}" onclick="openUAImage('${img.id}')">
+            <div class="ua-single-img">${buildUAThumbs(img)}</div>
+            <div class="condition-body">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                <span class="tag tag-info" style="font-size:10px">${esc(uaCategoryLabel(img))}</span>
+              </div>
+              <div class="condition-name">${esc(img.name||'')}</div>
+              ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).map(esc).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
+              ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
+                <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
+              </div>`:''}
+            </div>
+          </div>`).join('')}
+      </div>
     </div>
     ${isAdmin?`<div class="mt-16">${adminUAImageControls()}</div>`:''}
   `;
@@ -3821,7 +3929,7 @@ async function generateUAPDF(){
   try{
     await new Promise(r=>setTimeout(r,30));
     const ordered=await getUAItemsWithImages(orderedMeta);
-    await generateUASingleImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf',{includeFeatures,showCategory:true});
+    await generateUAGroupedImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf',{includeFeatures});
   }catch(err){
     alert('PDF failed: '+err.message);
     if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
