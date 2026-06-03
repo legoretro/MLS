@@ -3470,9 +3470,34 @@ async function startGenericFlashcard(){
 }
 
 // ─── URINALYSIS IMAGES — categorized list with bulk upload + quiz ─────────────
+const UA_IMAGE_SECTIONS=[
+  'Normal Findings',
+  'Macroscopic Color / Clarity',
+  'Reagent Strip',
+  'Microscopic Cells',
+  'Microscopic Casts',
+  'Microscopic Crystals - Acidic',
+  'Microscopic Crystals - Alkaline',
+  'Microscopic Miscellaneous',
+  'Needs Review'
+];
 const UA_CATEGORY_TYPES=['Normal','Abnormal'];
 const UA_PH_GROUPS=['Acidic','Alkaline','Unspecified'];
-const UA_CAT_META_RE=/^\s*\[\[UA_CATEGORY:([^|\]]+)\|([^\]]+)\]\]\s*\n?/i;
+const UA_CAT_META_RE=/^\s*\[\[UA_CATEGORY:([^\]]+)\]\]\s*\n?/i;
+function normalizeUASection(v){
+  const val=String(v||'').trim().toLowerCase();
+  const found=UA_IMAGE_SECTIONS.find(section=>section.toLowerCase()===val);
+  if(found)return found;
+  if(val==='cells'||val==='cell')return 'Microscopic Cells';
+  if(val==='casts'||val==='cast')return 'Microscopic Casts';
+  if(val==='acid crystals'||val==='acidic crystals')return 'Microscopic Crystals - Acidic';
+  if(val==='alkaline crystals'||val==='basic crystals')return 'Microscopic Crystals - Alkaline';
+  if(val==='misc'||val==='miscellaneous'||val==='microscopic miscellaneous')return 'Microscopic Miscellaneous';
+  if(val==='macroscopic'||val==='color'||val==='clarity')return 'Macroscopic Color / Clarity';
+  if(val==='strip'||val==='dipstick'||val==='reagent')return 'Reagent Strip';
+  if(val==='normal')return 'Normal Findings';
+  return '';
+}
 function normalizeUACatType(v){
   const val=String(v||'').trim().toLowerCase();
   if(val==='normal')return 'Normal';
@@ -3488,6 +3513,26 @@ function normalizeUAPh(v){
 function stripUACategoryNote(notes){
   return String(notes||'').replace(UA_CAT_META_RE,'').trim();
 }
+function parseUACategoryNote(notes){
+  const match=String(notes||'').match(UA_CAT_META_RE);
+  if(!match)return null;
+  const parts=match[1].split('|').map(p=>p.trim()).filter(Boolean);
+  if(parts.length>=3){
+    return {
+      section:normalizeUASection(parts[0]),
+      type:normalizeUACatType(parts[1])||'Abnormal',
+      ph:normalizeUAPh(parts[2])
+    };
+  }
+  if(parts.length===2){
+    return {
+      section:'',
+      type:normalizeUACatType(parts[0])||'Abnormal',
+      ph:normalizeUAPh(parts[1])
+    };
+  }
+  return null;
+}
 function uaTextForGuess(item){
   return [
     item?.name,
@@ -3497,33 +3542,61 @@ function uaTextForGuess(item){
 }
 function inferUACategory(item){
   const notes=String(item?.notes||'');
-  const match=notes.match(UA_CAT_META_RE);
-  if(match){
-    return {type:normalizeUACatType(match[1])||'Abnormal',ph:normalizeUAPh(match[2])};
-  }
+  const stored=parseUACategoryNote(notes);
   const text=uaTextForGuess(item);
+  const compact=text.replace(/[^a-z0-9]+/g,' ');
   const ph=/alkaline|basic|ammonium biurate|triple phosphate|struvite|calcium carbonate|phosphate/.test(text)
     ?'Alkaline'
     :(/acidic|acid urine|uric acid|cystine|calcium oxalate/.test(text)?'Acidic':'Unspecified');
   const type=/\bnormal\b|normal finding|normal sediment|hyaline cast/.test(text)?'Normal':'Abnormal';
-  return {type,ph};
+  let section='';
+  if(stored?.section)section=stored.section;
+  else if(/\bnormal sediment\b|\bnormal finding\b|\bnormal\b/.test(compact)&&!/(cast|crystal|bacteria|yeast|rbc|wbc|epithelial|bilirubin|glucose|ketone|protein|nitrite|leukocyte)/.test(compact)){
+    section='Normal Findings';
+  }else if(/color|clarity|clear|cloudy|turbid|foam|odor|yellow|orange|red|brown|black|green|blue|amber|port wine|appearance/.test(compact)){
+    section='Macroscopic Color / Clarity';
+  }else if(/reagent|dipstick|bilirubin|urobilinogen|glucose|ketone|protein|nitrite|leukocyte|leu|specific gravity|sg\b|ph\b|blood pad|strip/.test(compact)){
+    section='Reagent Strip';
+  }else if(/cast|cylindr|hyaline/.test(compact)){
+    section='Microscopic Casts';
+  }else if(/crystal|amorphous|uric acid|cystine|calcium oxalate|tyrosine|leucine|cholesterol|sulfonamide|triple phosphate|struvite|ammonium biurate|calcium carbonate|phosphate/.test(compact)){
+    section=ph==='Alkaline'?'Microscopic Crystals - Alkaline':'Microscopic Crystals - Acidic';
+  }else if(/\brbc\b|red blood|wbc|white blood|epithelial|squamous|transitional|renal tubular|rte|oval fat|fat body|clue cell/.test(compact)){
+    section='Microscopic Cells';
+  }else if(/bacteria|bacterial|yeast|fung|mucus|sperm|trichomonas|parasite|artifact|contaminant|fecal|pollen|fiber|starch|oil droplet|hemosiderin|schisto|nematode|larva/.test(compact)){
+    section='Microscopic Miscellaneous';
+  }else{
+    section='Needs Review';
+  }
+  return {section,type:stored?.type||type,ph:stored?.ph||ph};
 }
-function composeUANotesWithCategory(notes,type,ph){
+function composeUANotesWithCategory(notes,section,type,ph){
   const clean=stripUACategoryNote(notes);
-  return `[[UA_CATEGORY:${normalizeUACatType(type)||'Abnormal'}|${normalizeUAPh(ph)}]]${clean?`\n${clean}`:''}`;
+  const safeSection=normalizeUASection(section)||'Needs Review';
+  return `[[UA_CATEGORY:${safeSection}|${normalizeUACatType(type)||'Abnormal'}|${normalizeUAPh(ph)}]]${clean?`\n${clean}`:''}`;
 }
-function uaCategoryKey(item){
+function uaTypePhKey(item){
   const cat=inferUACategory(item);
   return `${cat.type}|${cat.ph}`;
 }
+function uaSectionKey(item){
+  return inferUACategory(item).section||'Needs Review';
+}
 function uaCategoryLabel(item){
   const cat=inferUACategory(item);
-  return cat.ph==='Unspecified'?cat.type:`${cat.type} / ${cat.ph}`;
+  const suffix=cat.ph==='Unspecified'?cat.type:`${cat.type} / ${cat.ph}`;
+  return `${cat.section} • ${suffix}`;
 }
 function uaCategoryControls(prefix,item={}){
   const cat=inferUACategory(item);
   return `
-    <div class="form-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+    <div class="form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+      <div class="form-group">
+        <label>Chart Category</label>
+        <select id="${prefix}-section">
+          ${UA_IMAGE_SECTIONS.map(v=>`<option value="${v}" ${cat.section===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
       <div class="form-group">
         <label>Normal / Abnormal</label>
         <select id="${prefix}-type">
@@ -3539,11 +3612,13 @@ function uaCategoryControls(prefix,item={}){
     </div>`;
 }
 function uaSortItems(items){
+  const sectionRank=Object.fromEntries(UA_IMAGE_SECTIONS.map((name,i)=>[name,i]));
   const typeRank={Normal:0,Abnormal:1};
   const phRank={Acidic:0,Alkaline:1,Unspecified:2};
   return [...(items||[])].sort((a,b)=>{
     const ca=inferUACategory(a),cb=inferUACategory(b);
-    return (typeRank[ca.type]??9)-(typeRank[cb.type]??9)
+    return (sectionRank[ca.section]??99)-(sectionRank[cb.section]??99)
+      ||(typeRank[ca.type]??9)-(typeRank[cb.type]??9)
       ||(phRank[ca.ph]??9)-(phRank[cb.ph]??9)
       ||String(a.name||'').localeCompare(String(b.name||''));
   });
@@ -3551,30 +3626,82 @@ function uaSortItems(items){
 function groupedUAImages(items){
   const groups={};
   uaSortItems(items).forEach(item=>{
-    const key=uaCategoryKey(item);
+    const key=uaTypePhKey(item);
     if(!groups[key])groups[key]=[];
     groups[key].push(item);
   });
   return groups;
 }
+function groupedUASections(items){
+  const groups={};
+  uaSortItems(items).forEach(item=>{
+    const key=uaSectionKey(item);
+    if(!groups[key])groups[key]=[];
+    groups[key].push(item);
+  });
+  return groups;
+}
+function invalidateUACaches(id=null){
+  window._uaCache=null;
+  window._uaMetaCache=null;
+  window._uaCacheLoadFailed=false;
+  window._uaMetaCacheLoadFailed=false;
+  if(id&&window._uaImageCacheById)delete window._uaImageCacheById[String(id)];
+  if(!id)window._uaImageCacheById={};
+}
+async function getUAMetaItems(force=false){
+  if(!force&&Array.isArray(window._uaMetaCache)&&!window._uaMetaCacheLoadFailed)return window._uaMetaCache;
+  try{
+    window._uaMetaCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_ua_images').select('id,name,key_features,notes').order('name'),3,true);
+    window._uaMetaCacheLoadFailed=false;
+  }catch(e){
+    window._uaMetaCacheLoadFailed=true;
+    if(!Array.isArray(window._uaMetaCache))throw e;
+  }
+  return window._uaMetaCache||[];
+}
+async function getUAItemsWithImages(items){
+  window._uaImageCacheById=window._uaImageCacheById||{};
+  const ids=[...(items||[])].map(item=>String(item.id)).filter(Boolean);
+  const missing=ids.filter(id=>!Object.prototype.hasOwnProperty.call(window._uaImageCacheById,id));
+  for(let i=0;i<missing.length;i+=20){
+    const chunk=missing.slice(i,i+20);
+    if(!chunk.length)continue;
+    const rows=await fetchRowsWithRetry(()=>sb.from('mlsboc_ua_images').select('id,images').in('id',chunk),2,false);
+    rows.forEach(row=>{window._uaImageCacheById[String(row.id)]=row.images||[];});
+    chunk.forEach(id=>{
+      if(!Object.prototype.hasOwnProperty.call(window._uaImageCacheById,id))window._uaImageCacheById[id]=[];
+    });
+  }
+  return (items||[]).map(item=>({...item,images:window._uaImageCacheById[String(item.id)]||[]}));
+}
+function setUAImageSection(section){
+  window._uaImageSection=normalizeUASection(section)||section;
+  renderTab();
+}
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
   // Show skeleton immediately
   el.innerHTML=imageLoadingHTML();
-  if(!Array.isArray(window._uaCache)||window._uaCacheLoadFailed||window._uaCache.length===0){
-    try{
-      window._uaCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_ua_images').select('*').order('name'),3,true);
-      window._uaCacheLoadFailed=false;
-    }catch(e){
-      window._uaCacheLoadFailed=true;
-      if(!Array.isArray(window._uaCache)||!window._uaCache.length){
-        el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaCache=null;window._uaCacheLoadFailed=false;renderTab()');
-        return;
-      }
-    }
+  let all=[];
+  try{
+    all=uaSortItems(await getUAMetaItems());
+  }catch(e){
+    el.innerHTML=imageLoadRetryHTML('Urinalysis','invalidateUACaches();renderTab()');
+    return;
   }
-  const all=uaSortItems(window._uaCache||[]);
-  const groups=groupedUAImages(all);
+  const sectionGroups=groupedUASections(all);
+  const sectionOrder=UA_IMAGE_SECTIONS.filter(section=>sectionGroups[section]?.length);
+  const activeSection=sectionOrder.includes(window._uaImageSection)?window._uaImageSection:(sectionOrder[0]||UA_IMAGE_SECTIONS[0]);
+  window._uaImageSection=activeSection;
+  let activeItems=[];
+  try{
+    activeItems=await getUAItemsWithImages(sectionGroups[activeSection]||[]);
+  }catch(e){
+    el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaImageCacheById={};renderTab()');
+    return;
+  }
+  const groups=groupedUAImages(activeItems);
   const groupOrder=[];
   UA_CATEGORY_TYPES.forEach(type=>UA_PH_GROUPS.forEach(ph=>groupOrder.push(`${type}|${ph}`)));
 
@@ -3588,6 +3715,12 @@ async function renderUAImages(el){
     <div style="position:relative;margin-bottom:20px">
       <input type="text" id="ua-search" placeholder="Search findings..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterUAItems(this.value)">
       <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+    </div>
+    <div class="ua-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      ${UA_IMAGE_SECTIONS.filter(section=>sectionGroups[section]?.length).map(section=>`
+        <button class="btn ${activeSection===section?'btn-primary':'btn-ghost'} btn-sm" onclick="setUAImageSection('${jsAttr(section)}')" style="font-size:12px">
+          ${esc(section)} <span style="opacity:.75">(${sectionGroups[section].length})</span>
+        </button>`).join('')}
     </div>
     ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
     <div id="ua-items-body">
@@ -3635,12 +3768,11 @@ function filterUAItems(query){
 }
 
 async function openUAExportModal(){
-  const {data:items}=await sb.from('mlsboc_ua_images').select('*').order('name');
+  const items=await getUAMetaItems();
   if(!items||!items.length){alert('No images to export.');return;}
   window._uaExportItems=uaSortItems(items);
-  const groups=groupedUAImages(window._uaExportItems);
-  const groupOrder=[];
-  UA_CATEGORY_TYPES.forEach(type=>UA_PH_GROUPS.forEach(ph=>groupOrder.push(`${type}|${ph}`)));
+  const groups=groupedUASections(window._uaExportItems);
+  const groupOrder=UA_IMAGE_SECTIONS.filter(section=>groups[section]?.length);
   let html=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">Export UA Findings to PDF</div>
@@ -3656,11 +3788,10 @@ async function openUAExportModal(){
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-group').forEach(c=>c.checked=false)">Clear Categories</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:16px">
-      ${groupOrder.filter(key=>groups[key]?.length).map(key=>{
-        const [type,ph]=key.split('|');
+      ${groupOrder.map(key=>{
         return `<label style="display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:12px">
           <input type="checkbox" class="ua-exp-group" data-group="${esc(key)}" checked style="width:16px;height:16px;flex-shrink:0">
-          <span><strong>${esc(type)}</strong> / ${esc(ph)} <span style="color:var(--text3)">(${groups[key].length})</span></span>
+          <span><strong>${esc(key)}</strong> <span style="color:var(--text3)">(${groups[key].length})</span></span>
         </label>`;
       }).join('')}
     </div>
@@ -3689,15 +3820,16 @@ async function generateUAPDF(){
   const source=Array.isArray(window._uaExportItems)?window._uaExportItems:[];
   const selectedMap=new Map();
   source.forEach(item=>{
-    if(ids.includes(String(item.id))||selectedGroups.includes(uaCategoryKey(item)))selectedMap.set(String(item.id),item);
+    if(ids.includes(String(item.id))||selectedGroups.includes(uaSectionKey(item)))selectedMap.set(String(item.id),item);
   });
-  const ordered=uaSortItems([...selectedMap.values()]);
-  if(!ordered.length){alert('Select at least one category or image.');return;}
+  const orderedMeta=uaSortItems([...selectedMap.values()]);
+  if(!orderedMeta.length){alert('Select at least one category or image.');return;}
   window._uaExportBusy=true;
   const btn=document.querySelector('#condition-modal-body .btn-primary');
   if(btn){btn.textContent='Generating...';btn.disabled=true;}
   try{
     await new Promise(r=>setTimeout(r,30));
+    const ordered=await getUAItemsWithImages(orderedMeta);
     await generateUASingleImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf',{includeFeatures,showCategory:true});
   }catch(err){
     alert('PDF failed: '+err.message);
@@ -3788,10 +3920,11 @@ async function saveUAEdit(id){
   if(!name){alert('Name is required.');return;}
   const featText=document.getElementById('uaedit-features')?.value||'';
   const notes=document.getElementById('uaedit-notes')?.value.trim()||'';
+  const section=document.getElementById('uaedit-section')?.value||'Needs Review';
   const type=document.getElementById('uaedit-type')?.value||'Abnormal';
   const ph=document.getElementById('uaedit-ph')?.value||'Unspecified';
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes:composeUANotesWithCategory(notes,type,ph)}).eq('id',id);window._uaCache=null;
+  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes:composeUANotesWithCategory(notes,section,type,ph)}).eq('id',id);invalidateUACaches(id);
   if(error){alert('Save failed: '+error.message);return;}
   document.getElementById('condition-modal').classList.add('hidden');
   renderTab();
@@ -3801,7 +3934,7 @@ async function handleUASingleImgUpload(e,id){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async ev=>{
-    await sb.from('mlsboc_ua_images').update({images:[ev.target.result]}).eq('id',id);window._uaCache=null;
+    await sb.from('mlsboc_ua_images').update({images:[ev.target.result]}).eq('id',id);invalidateUACaches(id);
     openUAEditModal(id);
   };
   reader.readAsDataURL(file);
@@ -3809,7 +3942,7 @@ async function handleUASingleImgUpload(e,id){
 
 async function clearUAImage(id){
   if(!confirm('Remove the image?'))return;
-  await sb.from('mlsboc_ua_images').update({images:[]}).eq('id',id);window._uaCache=null;
+  await sb.from('mlsboc_ua_images').update({images:[]}).eq('id',id);invalidateUACaches(id);
   openUAEditModal(id);
 }
 
@@ -3840,7 +3973,7 @@ async function handleUAImgFile(e,itemId,slot){
     const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=ev.target.result;
-    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);window._uaCache=null;
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);invalidateUACaches(itemId);
     openUAImage(itemId);
   };
   reader.readAsDataURL(file);
@@ -3855,7 +3988,7 @@ async function handleUAImgDrop(e,itemId,slot){
     const imgs=[...imageEntryList(data?.images)];
     while(imgs.length<=slot)imgs.push(null);
     imgs[slot]=ev.target.result;
-    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);window._uaCache=null;
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);invalidateUACaches(itemId);
     openUAImage(itemId);
   };
   reader.readAsDataURL(file);
@@ -3867,7 +4000,7 @@ function adminUAImageControls(){
       <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Add UA Image Entry</div>
       <div class="form-group"><label>Name</label><input type="text" id="ua-name" placeholder="e.g. RBC Cast"></div>
       <div class="form-group"><label>Key Features (one per line)</label><textarea id="ua-features" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome"></textarea></div>
-      ${uaCategoryControls('uaadd',{notes:'[[UA_CATEGORY:Abnormal|Unspecified]]'})}
+      ${uaCategoryControls('uaadd',{notes:'[[UA_CATEGORY:Needs Review|Abnormal|Unspecified]]'})}
       <div class="form-group"><label>Notes (optional)</label><textarea id="ua-notes" style="min-height:60px"></textarea></div>
       <div class="form-group">
         <label>Bulk Image Drop — drag multiple images at once</label>
@@ -3899,11 +4032,12 @@ async function adminAddUAImage(){
   const name=document.getElementById('ua-name')?.value.trim();
   const featText=document.getElementById('ua-features')?.value||'';
   const notes=document.getElementById('ua-notes')?.value.trim();
+  const section=document.getElementById('uaadd-section')?.value||'Needs Review';
   const type=document.getElementById('uaadd-type')?.value||'Abnormal';
   const ph=document.getElementById('uaadd-ph')?.value||'Unspecified';
   if(!name){alert('Name required.');return;}
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
-  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:composeUANotesWithCategory(notes||'',type,ph),images:[]});window._uaCache=null;
+  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:composeUANotesWithCategory(notes||'',section,type,ph),images:[]});invalidateUACaches();
   if(error){alert('Error: '+error.message);return;}
   document.getElementById('ua-name').value='';
   document.getElementById('ua-features').value='';
@@ -3931,16 +4065,17 @@ async function processUABulkFiles(files){
     const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
     const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
     const guess=inferUACategory({name,key_features:[],notes:''});
-    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:composeUANotesWithCategory('',guess.type,guess.ph),images:[dataUrl]});
+    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:composeUANotesWithCategory('',guess.section,guess.type,guess.ph),images:[dataUrl]});
     if(!error)done++;
   }
   if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--success)">✓ Added ${done} of ${files.length} images. You can edit names/features by clicking each card.</div>`;
+  invalidateUACaches();
   renderTab();
 }
 
 async function deleteUAImage(id){
   if(!confirm('Delete this image entry?'))return;
-  await sb.from('mlsboc_ua_images').delete().eq('id',id);window._uaCache=null;
+  await sb.from('mlsboc_ua_images').delete().eq('id',id);invalidateUACaches(id);
   renderTab();
 }
 
@@ -3954,8 +4089,13 @@ async function startUAQuiz(forceNew=false){
     window._uaShowResume=true;
     renderTab();return;
   }
-  if(!window._uaCache){try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}catch(e){}}
-  const valid=(window._uaCache||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!window._uaCache){
+    try{
+      const meta=await getUAMetaItems();
+      window._uaCache=await getUAItemsWithImages(meta);
+    }catch(e){}
+  }
+  const valid=(window._uaCache||[]).filter(o=>imageEntryList(o.images).some(entry=>imageEntrySrc(entry)));
   if(!valid.length){alert('No images to quiz on yet.');return;}
   appState.uaImgMode='quiz';
   window._uaShowResume=false;
@@ -4619,9 +4759,15 @@ async function startMicroFlashcard(){
 }
 
 async function startUAFlashcard(){
-  if(!window._uaCache){try{const r=await sb.from('mlsboc_ua_images').select('*').order('name');window._uaCache=r.data||[];}catch(e){}}
-  if(!window._uaCache||!window._uaCache.length){alert('No images to study yet.');return;}
-  startImageFlashcard(window._uaCache);
+  if(!window._uaCache){
+    try{
+      const meta=await getUAMetaItems();
+      window._uaCache=await getUAItemsWithImages(meta);
+    }catch(e){}
+  }
+  const valid=(window._uaCache||[]).filter(o=>imageEntryList(o.images).some(entry=>imageEntrySrc(entry)));
+  if(!valid.length){alert('No images to study yet.');return;}
+  startImageFlashcard(valid);
 }
 
 async function startHemeQuizFolder(folder){
