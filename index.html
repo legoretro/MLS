@@ -1206,23 +1206,34 @@ const HUB_URL = 'https://legoretro.github.io/Hubs/';
 // Real ASCP BOC weights from guideline (% of 100)
 const BOC_WEIGHTS = {
   blood_bank: 19.5,       // 17-22%
-  urinalysis: 7.5,        // 5-10%
   clinical_chemistry: 19.5, // 17-22%
   hematology: 19.5,       // 17-22%
-  immunology: 7.5,        // 5-10%
   microbiology: 19.5,     // 17-22%
+  urinalysis: 7.5,        // 5-10%
+  immunology: 7.5,        // 5-10%
   lab_operations: 7.5     // 5-10%
+};
+
+const BOC_WEIGHT_LABELS = {
+  blood_bank: '17-22%',
+  clinical_chemistry: '17-22%',
+  hematology: '17-22%',
+  microbiology: '17-22%',
+  para_myco: '17-22%',
+  urinalysis: '5-10%',
+  immunology: '5-10%',
+  lab_operations: '5-10%'
 };
 
 const SUBJECTS = [
   {key:'blood_bank',name:'Blood Bank',icon:'🏥'},
   {key:'clinical_chemistry',name:'Clinical Chemistry',icon:'⚗️'},
   {key:'hematology',name:'Hematology',icon:'🩸'},
-  {key:'immunology',name:'Immunology',icon:'🔬'},
-  {key:'lab_operations',name:'Lab Operations',icon:'📊'},
   {key:'microbiology',name:'Microbiology',icon:'🦠'},
   {key:'para_myco',name:'Parasitology / Mycology',icon:'🍄🪱',_combined:['parasitology','mycology']},
-  {key:'urinalysis',name:'Urinalysis',icon:'🧪'}
+  {key:'urinalysis',name:'Urinalysis',icon:'🧪'},
+  {key:'immunology',name:'Immunology',icon:'🔬'},
+  {key:'lab_operations',name:'Lab Operations',icon:'📊'}
 ];
 const PARA_MYCO_KEYS=['parasitology','mycology'];
 const BUILT_IN_INTERACTIVE_LINKS=[
@@ -2505,6 +2516,10 @@ function homeSubjectCode(key,fallback){
   return short[key]||String(fallback||'?').slice(0,4).toUpperCase();
 }
 
+function bocWeightLabel(key){
+  return BOC_WEIGHT_LABELS[key]||'';
+}
+
 function homeMascotScene(){
   // Mascot asset source/license: self-made SVG in assets/mascots; no external assets used.
   return '<div class="home-hero-mark" role="img" aria-label="Animated cute centrifuge mascot with spinning rotor, blinking face, and status lights">'
@@ -2531,10 +2546,11 @@ function homeAdminIconUpload(key){
 }
 
 function homeSubjectCardHtml(cfg){
+  const title=cfg.weightLabel?cfg.name+' ('+cfg.weightLabel+')':cfg.name;
   return '<div style="position:relative">'
     + '<button class="home-subject-card" style="--subject-color:'+homeSubjectColor(cfg.key)+'" onclick="'+cfg.onclick+'">'
     + '<div class="home-subject-top">'+homeSubjectMark(cfg.key,cfg.code||cfg.name)+'<div class="home-subject-arrow">›</div></div>'
-    + '<div class="home-subject-name">'+cfg.name+'</div>'
+    + '<div class="home-subject-name">'+title+'</div>'
     + '<div class="home-subject-desc">'+cfg.desc+'</div>'
     + '<div class="home-subject-count" id="'+cfg.countId+'">'+cfg.countText+'</div>'
     + '</button>'
@@ -2556,12 +2572,14 @@ async function renderHome(v){
     if(isCombined){
       return homeSubjectCardHtml({
         key:'para_myco',name:s.name,desc:HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice',
-        countId:'cnt-para_myco',countText:'0 questions',onclick:"goSubject('para_myco')",uploadKey:'para_myco'
+        countId:'cnt-para_myco',countText:'0 questions',onclick:"goSubject('para_myco')",uploadKey:'para_myco',
+        weightLabel:bocWeightLabel(s.key)
       });
     }
     return homeSubjectCardHtml({
       key:s.key,name:s.name,desc:HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice',
-      countId:'cnt-'+s.key,countText:'0 questions',onclick:"goSubject('"+s.key+"')",uploadKey:s.key
+      countId:'cnt-'+s.key,countText:'0 questions',onclick:"goSubject('"+s.key+"')",uploadKey:s.key,
+      weightLabel:bocWeightLabel(s.key)
     });
   }).join('');
 
@@ -8654,7 +8672,7 @@ async function renderAllStart(v){
         ${Object.entries(BOC_WEIGHTS).map(([s,w])=>`
           <div class="flex-center gap-8">
             <span style="font-size:12px;color:var(--text2)">${s==='microbiology'?'microbiology (incl. parasitology & mycology)':s.replace(/_/g,' ')}</span>
-            <span class="text-mono ml-auto" style="font-size:11px;color:var(--text3)">${w}%</span>
+            <span class="text-mono ml-auto" style="font-size:11px;color:var(--text3)">(${bocWeightLabel(s)})</span>
           </div>`).join('')}
       </div>
       <button class="btn btn-primary" onclick="startAllExam()">Start Exam</button>
