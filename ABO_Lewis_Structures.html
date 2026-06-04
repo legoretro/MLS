@@ -32,11 +32,11 @@
     font-family:'Nunito', sans-serif;
     background:var(--bg);
     color:var(--text);
-    padding:12px;
+    padding:8px;
   }
 
   .wrap{
-    max-width:1100px;
+    max-width:920px;
     margin:0 auto;
   }
 
@@ -84,7 +84,7 @@
     margin-bottom:10px;
     background:var(--panel);
     border-radius:12px;
-    padding:10px 12px;
+    padding:8px 10px;
     box-shadow:var(--shadow);
     align-items:center;
   }
@@ -125,8 +125,8 @@
 
   .layout{
     display:grid;
-    grid-template-columns:220px 1fr 220px;
-    gap:12px;
+    grid-template-columns:180px minmax(0,1fr) 180px;
+    gap:10px;
     align-items:start;
   }
 
@@ -191,40 +191,40 @@
   }
 
   .main-body{
-    padding:16px 12px 14px;
+    padding:10px;
   }
 
   .structure{
     position:relative;
-    height:420px;
+    height:380px;
     background:#fff;
     border:2px solid #ebe5d8;
     border-radius:12px;
     overflow:hidden;
   }
 
-  .type2-structure{
-    height:500px;
-    min-height:500px;
+  .blood-chain-structure{
+    height:380px;
+    min-height:380px;
   }
 
-  .type2-note{
+  .chain-note{
     position:absolute;
-    left:18px;
-    top:18px;
-    max-width:158px;
+    left:14px;
+    top:14px;
+    max-width:132px;
     color:#6c1732;
     font-weight:900;
-    font-size:.72rem;
+    font-size:.62rem;
     line-height:1.2;
   }
 
   .rbc-anchor{
     position:absolute;
-    left:244px;
-    bottom:18px;
-    width:92px;
-    height:54px;
+    left:calc(50% - 34px);
+    bottom:10px;
+    width:68px;
+    height:40px;
     border-radius:50%;
     background:radial-gradient(circle at 36% 35%, #ff6d62 0 22%, #cc1b24 58%, #94131a 100%);
     color:#fff;
@@ -236,79 +236,84 @@
     box-shadow:0 8px 16px rgba(160,20,35,.18);
   }
 
-  .type2-structure .line{
+  .blood-chain-structure .line{
     background:#c91946;
   }
 
-  .type2-structure .line-base-1{ left:288px; top:356px; height:52px; }
-  .type2-structure .line-base-2{ left:288px; top:266px; height:52px; }
-  .type2-structure .line-base-3{ left:288px; top:176px; height:52px; }
-  .type2-structure .line-top{ left:288px; top:84px; height:52px; }
-  .type2-structure .line-side{ left:196px; top:214px; width:78px; }
+  .blood-chain-structure .line-base-1{ left:calc(50% - 2px); top:306px; height:18px; }
+  .blood-chain-structure .line-base-2{ left:calc(50% - 2px); top:228px; height:18px; }
+  .blood-chain-structure .line-base-3{ left:calc(50% - 2px); top:154px; height:12px; }
+  .blood-chain-structure .line-top{ left:calc(50% - 2px); top:78px; height:16px; }
+  .type2-structure .line-side{ left:calc(50% - 116px); top:123px; width:72px; }
+  .type1-structure .line-side-secretor{ left:calc(50% - 116px); top:123px; width:72px; }
+  .type1-structure .line-side-lewis{ left:calc(50% - 116px); top:203px; width:72px; }
 
-  .type2-structure .sugar-shape{
+  .blood-chain-structure .sugar-shape{
     box-shadow:none;
     border:3px solid rgba(139,107,40,.55);
     color:#151515;
-    font-size:.84rem;
-  }
-
-  .type2-structure .sugar-glc{
-    left:238px;
-    top:404px;
-    width:108px;
-    height:88px;
-    background:#87c58c;
-    clip-path:polygon(50% 2%, 98% 96%, 2% 96%);
-    align-items:flex-end;
-    padding-bottom:18px;
-  }
-
-  .type2-structure .sugar-gal-low{
-    left:238px;
-    top:316px;
-    width:108px;
-    height:86px;
-    background:#41c7d5;
-    border-radius:50%;
-    clip-path:none;
-  }
-
-  .type2-structure .sugar-glcnac{
-    left:246px;
-    top:226px;
-    width:92px;
-    height:92px;
-    background:#ffe15d;
-    border-radius:14px;
-    clip-path:none;
-  }
-
-  .type2-structure .sugar-gal-terminal{
-    left:238px;
-    top:136px;
-    width:108px;
-    height:86px;
-    background:#41c7d5;
-    border-radius:50%;
-    clip-path:none;
-  }
-
-  .type2-structure .fut-drop{
-    left:92px;
-    top:184px;
-    width:122px;
-    height:74px;
-    border-radius:18px;
-    clip-path:none;
     font-size:.72rem;
   }
 
-  .type2-structure .antigen-drop{
-    left:238px;
-    top:36px;
-    width:108px;
-    height:86px;
+  .blood-chain-structure .chain-glc{
+    left:calc(50% - 44px);
+    top:320px;
+    width:88px;
+    height:68px;
+    background:#87c58c;
+    clip-path:polygon(50% 2%, 98% 96%, 2% 96%);
+    align-items:flex-end;
+    padding-bottom:14px;
+  }
+
+  .blood-chain-structure .chain-gal-low{
+    left:calc(50% - 42px);
+    top:246px;
+    width:84px;
+    height:62px;
+    background:#41c7d5;
+    border-radius:50%;
+    clip-path:none;
+  }
+
+  .blood-chain-structure .chain-glcnac{
+    left:calc(50% - 37px);
+    top:166px;
+    width:74px;
+    height:74px;
+    background:#ffe15d;
+    border-radius:12px;
+    clip-path:none;
+  }
+
+  .blood-chain-structure .chain-gal-terminal{
+    left:calc(50% - 42px);
+    top:94px;
+    width:84px;
+    height:62px;
+    background:#41c7d5;
+    border-radius:50%;
+    clip-path:none;
+  }
+
+  .blood-chain-structure .gene-drop{
+    left:calc(50% - 226px);
+    width:112px;
+    height:54px;
+    border-radius:16px;
+    clip-path:none;
+    font-size:.62rem;
+  }
+
+  .type2-structure .fut-drop{ top:96px; }
+  .type1-structure .secretor-drop{ top:96px; }
+  .type1-structure .lewis-drop{ top:176px; }
+
+  .blood-chain-structure .antigen-drop{
+    left:calc(50% - 42px);
+    top:18px;
+    width:84px;
+    height:62px;
     font-size:.72rem;
   }
 
@@ -692,61 +697,43 @@
       padding:12px;
     }
 
-    .type2-structure{
-      height:500px !important;
-      min-height:500px !important;
+    .blood-chain-structure{
+      height:380px !important;
+      min-height:380px !important;
       border-radius:18px;
     }
 
-    .type2-note{
-      left:14px;
-      top:14px;
-      max-width:122px;
-      font-size:.66rem;
+    .chain-note{
+      max-width:108px;
+      font-size:.56rem;
     }
-
-    .rbc-anchor{
-      left:calc(50% - 46px);
-      bottom:16px;
-    }
-
-    .type2-structure .line-base-1{ left:calc(50% - 2px); top:356px; height:50px; }
-    .type2-structure .line-base-2{ left:calc(50% - 2px); top:266px; height:50px; }
-    .type2-structure .line-base-3{ left:calc(50% - 2px); top:176px; height:50px; }
-    .type2-structure .line-top{ left:calc(50% - 2px); top:84px; height:50px; }
-    .type2-structure .line-side{ left:calc(50% - 108px); top:214px; width:76px; }
-
-    .type2-structure .sugar-glc{ left:calc(50% - 54px); top:404px; }
-    .type2-structure .sugar-gal-low{ left:calc(50% - 54px); top:316px; }
-    .type2-structure .sugar-glcnac{ left:calc(50% - 46px); top:226px; }
-    .type2-structure .sugar-gal-terminal{ left:calc(50% - 54px); top:136px; }
-    .type2-structure .fut-drop{ left:calc(50% - 210px); top:184px; }
-    .type2-structure .antigen-drop{ left:calc(50% - 54px); top:36px; }
   }
 
   @media (max-width: 460px){
-    .type2-note{
-      max-width:104px;
-      font-size:.58rem;
+    .chain-note{
+      max-width:96px;
+      font-size:.52rem;
     }
 
-    .type2-structure .line-side{
+    .type2-structure .line-side,
+    .type1-structure .line-side-secretor,
+    .type1-structure .line-side-lewis{
       left:14px;
-      width:calc(50% - 68px);
+      width:calc(50% - 58px);
     }
 
-    .type2-structure .fut-drop{
+    .blood-chain-structure .gene-drop{
       left:10px;
-      width:104px;
-      font-size:.62rem;
+      width:96px;
+      font-size:.56rem;
     }
   }
 </style>
 <script src="interactive_theme.js"></script>
-<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-8">
-<script src="interactive_music.js?v=bb-theme-8" defer></script>
+<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-9">
+<script src="interactive_music.js?v=bb-theme-9" defer></script>
 </head>
-<body class="mls-interactive bb-theme">
+<body class="mls-interactive bb-theme blood-structures-game">
 <header class="site-header">
   <div>
     <div class="logo">MLS<span style="color:var(--mls-text3)">/</span>BOC<span style="color:var(--mls-text3);font-size:12px;margin-left:8px">PREP</span></div>
@@ -790,8 +777,8 @@
     <div class="main-card">
       <div class="main-title">Type 2 Chain</div>
       <div class="main-body">
-        <div class="structure type2-structure" aria-label="Type 2 chain base structure">
-          <div class="type2-note">Type 2 precursor stays the same. Build upward from the RBC.</div>
+        <div class="structure blood-chain-structure type2-structure" aria-label="Type 2 chain base structure">
+          <div class="chain-note">Type 2 precursor. FUT1 attaches to the top Gal side.</div>
           <div class="rbc-anchor">RBC</div>
           <div class="line v line-base-1"></div>
           <div class="line v line-base-2"></div>
@@ -799,12 +786,12 @@
           <div class="line v line-top"></div>
           <div class="line h line-side"></div>
 
-          <div class="hex fixed sugar-shape sugar-glc">Glc</div>
-          <div class="hex fixed sugar-shape sugar-gal-low">Gal</div>
-          <div class="hex fixed sugar-shape sugar-glcnac">GlcNAc</div>
-          <div class="hex fixed sugar-shape sugar-gal-terminal">Gal</div>
+          <div class="hex fixed sugar-shape sugar-glc chain-glc">Glc</div>
+          <div class="hex fixed sugar-shape sugar-gal chain-gal-low">Gal</div>
+          <div class="hex fixed sugar-shape sugar-glcnac chain-glcnac">GlcNAc</div>
+          <div class="hex fixed sugar-shape sugar-gal chain-gal-terminal">Gal</div>
 
-          <div class="hex dropzone fut-drop" id="drop-side"></div>
+          <div class="hex dropzone gene-drop fut-drop" id="drop-side"></div>
           <div class="hex dropzone antigen-drop" id="drop-top"></div>
         </div>
 
@@ -828,7 +815,7 @@
   <header>
     <div>
       <h1>Lewis / Secretor Type 1 Structures</h1>
-      <p>Build the Type 1 chain with FUT3, FUT2, and ABH sugars, then match the Lewis, secretor, and agglutination labels.</p>
+      <p>Build the Type 1 chain with the top Gal included. FUT2 attaches to the top Gal, FUT3 attaches to GlcNAc, then ABH sugars go above.</p>
     </div>
     <div class="badge">Type 1</div>
   </header>
@@ -843,27 +830,31 @@
   <div class="layout">
     <div class="bank">
       <h2>Type 1 Sugar Bank</h2>
-      <div class="hint">Drag FUT3, FUT2 and and ABH to structure.</div>
+      <div class="hint">Tap or drag. FUT2 goes to top Gal; FUT3 goes to GlcNAc.</div>
       <div id="sugarWrapType1"></div>
     </div>
 
     <div class="main-card">
-      <div class="main-title">Type 1 Chain Base Structure</div>
+      <div class="main-title">Type 1 Chain</div>
       <div class="main-body">
-        <div class="structure">
-          <div class="line v" style="left:267px; top:246px; height:70px;"></div>
-          <div class="line v" style="left:267px; top:158px; height:70px;"></div>
-          <div class="line h" style="left:184px; top:196px; width:78px;"></div>
-          <div class="line h" style="left:184px; top:284px; width:78px;"></div>
-          <div class="line v" style="left:267px; top:74px; height:64px;"></div>
+        <div class="structure blood-chain-structure type1-structure" aria-label="Type 1 chain base structure">
+          <div class="chain-note">Type 1 precursor. FUT2 = top Gal. FUT3 = GlcNAc.</div>
+          <div class="rbc-anchor">RBC</div>
+          <div class="line v line-base-1"></div>
+          <div class="line v line-base-2"></div>
+          <div class="line v line-base-3"></div>
+          <div class="line v line-top"></div>
+          <div class="line h line-side-secretor"></div>
+          <div class="line h line-side-lewis"></div>
 
-          <div class="hex fixed" style="left:218px; top:302px;">Glucose</div>
-          <div class="hex fixed" style="left:218px; top:214px;">Galactose</div>
-          <div class="hex fixed" style="left:218px; top:126px;">N-acetyl-<br>glucosamine</div>
+          <div class="hex fixed sugar-shape sugar-glc chain-glc">Glc</div>
+          <div class="hex fixed sugar-shape sugar-gal chain-gal-low">Gal</div>
+          <div class="hex fixed sugar-shape sugar-glcnac chain-glcnac">GlcNAc</div>
+          <div class="hex fixed sugar-shape sugar-gal chain-gal-terminal">Gal</div>
 
-          <div class="hex dropzone" id="drop-side-lewis-type1" style="left:92px; top:152px;"></div>
-          <div class="hex dropzone" id="drop-side-secretor-type1" style="left:92px; top:240px;"></div>
-          <div class="hex dropzone" id="drop-top-type1" style="left:218px; top:36px;"></div>
+          <div class="hex dropzone gene-drop secretor-drop" id="drop-side-secretor-type1"></div>
+          <div class="hex dropzone gene-drop lewis-drop" id="drop-side-lewis-type1"></div>
+          <div class="hex dropzone antigen-drop" id="drop-top-type1"></div>
         </div>
 
         <div class="label-wrap">
@@ -949,8 +940,8 @@
     <div class="answers-grid">
       <div class="answer-card">
         <h3>No FUT2 and no FUT3</h3>
-        <div><strong>Le Gene:</strong> blank</div>
-        <div><strong>Se Gene:</strong> blank</div>
+        <div><strong>Le Gene / GlcNAc:</strong> blank</div>
+        <div><strong>Se Gene / top Gal:</strong> blank</div>
         <div><strong>ABH top:</strong> blank</div>
         <div><strong>ABH Label:</strong> blank</div>
         <div><strong>Lewis Label:</strong> blank</div>
@@ -959,8 +950,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT3 only</h3>
-        <div><strong>Le Gene:</strong> FUT3</div>
-        <div><strong>Se Gene:</strong> blank</div>
+        <div><strong>Le Gene / GlcNAc:</strong> FUT3</div>
+        <div><strong>Se Gene / top Gal:</strong> blank</div>
         <div><strong>ABH top:</strong> blank</div>
         <div><strong>ABH Label:</strong> blank</div>
         <div><strong>Lewis Label:</strong> Le(a+,b-)</div>
@@ -969,8 +960,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT2 only</h3>
-        <div><strong>Le Gene:</strong> blank</div>
-        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>Le Gene / GlcNAc:</strong> blank</div>
+        <div><strong>Se Gene / top Gal:</strong> FUT2</div>
         <div><strong>ABH top:</strong> blank = H antigen</div>
         <div><strong>Lewis Label:</strong> blank</div>
         <div><strong>Secretor:</strong> Yes</div>
@@ -978,8 +969,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT2 + N-acetylgalactosamine</h3>
-        <div><strong>Le Gene:</strong> blank or FUT3</div>
-        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>Le Gene / GlcNAc:</strong> blank or FUT3</div>
+        <div><strong>Se Gene / top Gal:</strong> FUT2</div>
         <div><strong>ABH top:</strong> N-acetylgalactosamine</div>
         <div><strong>ABH Label:</strong> A antigen</div>
         <div><strong>Lewis Label:</strong> blank or Le(a-,b+)</div>
@@ -988,8 +979,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT2 + Galactose</h3>
-        <div><strong>Le Gene:</strong> blank or FUT3</div>
-        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>Le Gene / GlcNAc:</strong> blank or FUT3</div>
+        <div><strong>Se Gene / top Gal:</strong> FUT2</div>
         <div><strong>ABH top:</strong> Galactose</div>
         <div><strong>ABH Label:</strong> B antigen</div>
         <div><strong>Lewis Label:</strong> blank or Le(a-,b+)</div>
@@ -998,8 +989,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT2 + FUT3</h3>
-        <div><strong>Le Gene:</strong> FUT3</div>
-        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>Le Gene / GlcNAc:</strong> FUT3</div>
+        <div><strong>Se Gene / top Gal:</strong> FUT2</div>
         <div><strong>ABH top:</strong> blank = H antigen</div>
         <div><strong>ABH Label:</strong> H antigen</div>
         <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
@@ -1008,8 +999,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT2 + FUT3 + N-acetylgalactosamine</h3>
-        <div><strong>Le Gene:</strong> FUT3</div>
-        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>Le Gene / GlcNAc:</strong> FUT3</div>
+        <div><strong>Se Gene / top Gal:</strong> FUT2</div>
         <div><strong>ABH top:</strong> N-acetylgalactosamine</div>
         <div><strong>ABH Label:</strong> A antigen</div>
         <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
@@ -1018,8 +1009,8 @@
       </div>
       <div class="answer-card">
         <h3>FUT2 + FUT3 + Galactose</h3>
-        <div><strong>Le Gene:</strong> FUT3</div>
-        <div><strong>Se Gene:</strong> FUT2</div>
+        <div><strong>Le Gene / GlcNAc:</strong> FUT3</div>
+        <div><strong>Se Gene / top Gal:</strong> FUT2</div>
         <div><strong>ABH top:</strong> Galactose</div>
         <div><strong>ABH Label:</strong> B antigen</div>
         <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
@@ -1464,6 +1455,9 @@ const type1State = {
   agglutinationLabel: null
 };
 
+let selectedType1Sugar = null;
+let selectedType1Label = { group: null, value: null };
+
 function clearType1Marks(){
   [
     document.getElementById("drop-side-lewis-type1"),
@@ -1486,6 +1480,50 @@ function countType1SugarUses(value){
   if(type1State.secretorSide === value) count++;
   if(type1State.top === value) count++;
   return count;
+}
+
+function isValidType1SugarForSlot(stateKey, value, allowedValue){
+  if(allowedValue !== null) return value === allowedValue;
+  if(stateKey === "top") return value === "N-acetylgalactosamine" || value === "Galactose";
+  return false;
+}
+
+function clearType1TapSelections(){
+  selectedType1Sugar = null;
+  selectedType1Label = { group: null, value: null };
+  renderType1SugarBankUsage();
+  ["abh","lewis","secretor","agglutination"].forEach(renderType1LabelBankUsage);
+}
+
+function placeType1SugarValue(stateKey, value, allowedValue, fromKey = null){
+  if(!isValidType1SugarForSlot(stateKey, value, allowedValue)) return false;
+
+  const usedElsewhere = Object.entries(type1State)
+    .some(([key, val]) => ["lewisSide","secretorSide","top"].includes(key) && key !== stateKey && val === value);
+
+  if(usedElsewhere && fromKey !== `type1-${stateKey}`) return false;
+
+  if(fromKey && fromKey.startsWith("type1-") && fromKey !== `type1-${stateKey}`){
+    const oldKey = fromKey.replace("type1-", "");
+    if(["lewisSide","secretorSide","top"].includes(oldKey)){
+      type1State[oldKey] = null;
+      renderType1SugarDrop(oldKey);
+    }
+  }
+
+  type1State[stateKey] = value;
+  renderType1SugarDrop(stateKey);
+  clearType1Marks();
+  renderType1SugarBankUsage();
+  return true;
+}
+
+function placeType1LabelValue(group, stateKey, value){
+  type1State[stateKey] = value;
+  renderType1LabelDrop(stateKey);
+  clearType1Marks();
+  renderType1LabelBankUsage(group);
+  return true;
 }
 
 function buildType1SugarBank(){
@@ -1513,6 +1551,15 @@ function buildType1SugarBank(){
       chip.classList.remove("dragging");
     });
 
+    chip.addEventListener("click", () => {
+      if(countType1SugarUses(value) >= 1) return;
+      selectedType1Sugar = selectedType1Sugar === value ? null : value;
+      selectedType1Label = { group: null, value: null };
+      renderType1SugarBankUsage();
+      ["abh","lewis","secretor","agglutination"].forEach(renderType1LabelBankUsage);
+      clearType1Marks();
+    });
+
     wrap.appendChild(chip);
   });
 
@@ -1522,6 +1569,7 @@ function buildType1SugarBank(){
 function renderType1SugarBankUsage(){
   document.querySelectorAll("#sugarWrapType1 .chip").forEach(chip => {
     chip.classList.toggle("used", countType1SugarUses(chip.textContent) >= 1);
+    chip.classList.toggle("selected", selectedType1Sugar === chip.textContent);
   });
 }
 
@@ -1557,6 +1605,17 @@ function buildType1LabelBank(wrapId, values, group){
       chip.classList.remove("dragging");
     });
 
+    chip.addEventListener("click", () => {
+      if(countType1LabelUses(group, value) >= 1) return;
+      selectedType1Label = selectedType1Label.group === group && selectedType1Label.value === value
+        ? { group: null, value: null }
+        : { group, value };
+      selectedType1Sugar = null;
+      renderType1SugarBankUsage();
+      ["abh","lewis","secretor","agglutination"].forEach(renderType1LabelBankUsage);
+      clearType1Marks();
+    });
+
     wrap.appendChild(chip);
   });
 
@@ -1572,6 +1631,7 @@ function renderType1LabelBankUsage(group){
   };
   document.querySelectorAll(map[group]).forEach(chip => {
     chip.classList.toggle("used", countType1LabelUses(group, chip.textContent) >= 1);
+    chip.classList.toggle("selected", selectedType1Label.group === group && selectedType1Label.value === chip.textContent);
   });
 }
 
@@ -1580,7 +1640,7 @@ function setupType1SugarDrop(slotId, stateKey, allowedValue){
   el.draggable = true;
 
   el.addEventListener("dragover", e => {
-    if(dragItem && dragItem.type === "type1-sugar"){
+    if(dragItem && dragItem.type === "type1-sugar" && isValidType1SugarForSlot(stateKey, dragItem.value, allowedValue)){
       e.preventDefault();
       el.classList.add("drag-over");
     }
@@ -1594,40 +1654,20 @@ function setupType1SugarDrop(slotId, stateKey, allowedValue){
     e.preventDefault();
     el.classList.remove("drag-over");
     if(!dragItem || dragItem.type !== "type1-sugar") return;
-    if(allowedValue !== null && dragItem.value !== allowedValue) {
-      dragItem = null;
-      dragFrom = null;
-      clearType1Marks();
-      return;
-    }
 
-    const usedElsewhere = Object.entries(type1State)
-      .some(([key, val]) => ["lewisSide","secretorSide","top"].includes(key) && key !== stateKey && val === dragItem.value);
-
-    if(usedElsewhere && dragFrom !== `type1-${stateKey}`){
-      dragItem = null;
-      dragFrom = null;
-      return;
-    }
-
-    if(dragFrom && dragFrom.startsWith("type1-") && dragFrom !== `type1-${stateKey}`){
-      const oldKey = dragFrom.replace("type1-", "");
-      if(["lewisSide","secretorSide","top"].includes(oldKey)){
-        type1State[oldKey] = null;
-        renderType1SugarDrop(oldKey);
-      }
-    }
-
-    type1State[stateKey] = dragItem.value;
-    renderType1SugarDrop(stateKey);
-
+    placeType1SugarValue(stateKey, dragItem.value, allowedValue, dragFrom);
     dragItem = null;
     dragFrom = null;
-    clearType1Marks();
-    renderType1SugarBankUsage();
+    clearType1TapSelections();
   });
 
   el.addEventListener("click", () => {
+    if(selectedType1Sugar){
+      if(placeType1SugarValue(stateKey, selectedType1Sugar, allowedValue)){
+        clearType1TapSelections();
+      }
+      return;
+    }
     if(!type1State[stateKey]) return;
     type1State[stateKey] = null;
     renderType1SugarDrop(stateKey);
@@ -1652,9 +1692,9 @@ function renderType1SugarDrop(stateKey){
     top: "drop-top-type1"
   };
   const placeholderMap = {
-    lewisSide: "— drop Le Gene here —",
-    secretorSide: "— drop Se Gene here —",
-    top: "— drop ABH sugar here —"
+    lewisSide: "— tap FUT3 at GlcNAc —",
+    secretorSide: "— tap FUT2 at top Gal —",
+    top: "— tap ABH sugar here —"
   };
   const el = document.getElementById(idMap[stateKey]);
   el.classList.remove("correct","wrong","filled");
@@ -1687,16 +1727,19 @@ function setupType1LabelDrop(elId, stateKey, dragType, group){
     el.classList.remove("drag-over");
     if(!dragItem || dragItem.type !== dragType) return;
 
-    type1State[stateKey] = dragItem.value;
-    renderType1LabelDrop(stateKey);
-
+    placeType1LabelValue(group, stateKey, dragItem.value);
     dragItem = null;
     dragFrom = null;
-    clearType1Marks();
-    renderType1LabelBankUsage(group);
+    clearType1TapSelections();
   });
 
   el.addEventListener("click", () => {
+    if(selectedType1Label.group === group && selectedType1Label.value){
+      if(placeType1LabelValue(group, stateKey, selectedType1Label.value)){
+        clearType1TapSelections();
+      }
+      return;
+    }
     if(!type1State[stateKey]) return;
     type1State[stateKey] = null;
     renderType1LabelDrop(stateKey);
@@ -1812,6 +1855,8 @@ function resetType1(){
   type1State.lewisLabel = null;
   type1State.secretorLabel = null;
   type1State.agglutinationLabel = null;
+  selectedType1Sugar = null;
+  selectedType1Label = { group: null, value: null };
 
   renderType1SugarDrop("lewisSide");
   renderType1SugarDrop("secretorSide");
@@ -1845,6 +1890,8 @@ function showCurrentAnswer(){
 }
 
 function showType1Answer(){
+  selectedType1Sugar = null;
+  selectedType1Label = { group: null, value: null };
   if(!type1State.lewisSide) type1State.lewisSide = "FUT3";
   if(!type1State.secretorSide) type1State.secretorSide = "FUT2";
   if(!type1State.top) type1State.top = "N-acetylgalactosamine";
