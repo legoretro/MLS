@@ -351,28 +351,36 @@ body.room-intense .scene-top p{color:#d0f4e8}
 }
 .big-case-card{
   min-height:330px;
-  border:2px solid #9bcfc0;
+  border:3px solid #0d4d3f;
   border-radius:22px;
   padding:16px;
   background:
-    linear-gradient(135deg,transparent 0 48%,rgba(35,133,107,.16) 49% 52%,transparent 53%),
-    linear-gradient(180deg,#fff,#effaf5);
-  color:var(--ink);
+    linear-gradient(135deg,transparent 0 48%,rgba(13,77,63,.16) 49% 52%,transparent 53%),
+    radial-gradient(circle at 82% 16%,rgba(255,230,120,.3),transparent 24%),
+    linear-gradient(180deg,#fff,#e5f8ef);
+  color:#123d34;
   text-align:left;
-  font-family:inherit;
+  font-family:"Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
   cursor:pointer;
-  box-shadow:0 16px 28px rgba(18,61,52,.1);
+  box-shadow:6px 8px 0 #0d4d3f,0 16px 28px rgba(18,61,52,.16);
   transition:.18s ease;
   display:grid;
   grid-template-rows:auto 1fr auto;
   overflow:hidden;
 }
-.big-case-card:hover{transform:translateY(-4px) rotate(-.5deg);border-color:#0e4c3e}
+.big-case-card:hover{transform:translateY(-4px) rotate(-.5deg);border-color:#062d26;box-shadow:8px 11px 0 #062d26,0 20px 34px rgba(18,61,52,.2)}
 .big-case-card.solved{border-color:#64bb84;background:#effaf3}
-.case-number{font-size:13px;font-weight:1000;letter-spacing:.14em;text-transform:uppercase;color:var(--micro-dark)}
-.big-case-card h2{font-size:34px;margin:10px 0 8px;line-height:.95}
-.case-card-copy{color:#596b63;font-size:14px;font-weight:800;line-height:1.35}
-.case-card-footer{border-top:1px dashed #91c7b8;padding-top:12px;font-size:12px;font-weight:1000;text-transform:uppercase;color:var(--micro-dark)}
+.case-number{font-size:14px;font-weight:1000;letter-spacing:.14em;text-transform:uppercase;color:#0d4d3f}
+.big-case-card h2{
+  font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
+  font-size:clamp(36px,4vw,54px);
+  margin:10px 0 10px;
+  line-height:.9;
+  color:#10382f;
+  text-shadow:2px 2px 0 #bdf0dc;
+}
+.case-card-copy{color:#314b43;font-size:16px;font-weight:1000;line-height:1.28}
+.case-card-footer{border-top:2px dashed #83bcae;padding-top:12px;font-size:13px;font-weight:1000;text-transform:uppercase;color:#0d4d3f}
 .deck-panel{padding:16px;margin-bottom:16px}
 .deck-title{font-size:13px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:var(--micro-dark);margin-bottom:10px}
 .deck-tabs{display:flex;flex-wrap:wrap;gap:9px}
@@ -662,30 +670,29 @@ body.room-intense .room-card{border-color:#b8ffe4;box-shadow:0 0 0 5px rgba(202,
   }
   body.print-single .print-title{display:none!important}
   body.print-single .print-sheet{display:block;page-break-after:auto}
+  body.print-single .print-test-guide,
+  body.print-single .print-token-section{display:none!important}
   .print-card{
     box-sizing:border-box;
     width:4in;
     height:6in;
     border:2px solid #000;
     border-radius:.14in;
-    padding:.17in;
+    padding:.13in;
     page-break-inside:avoid;
     background:#fff!important;
     color:#000!important;
     display:grid;
     grid-template-rows:auto auto 1fr auto;
-    gap:.08in;
+    gap:.06in;
   }
   body.print-single .print-card{
     page:microSingle;
     margin:0 auto;
     page-break-after:always;
   }
-  .print-card h2{font-size:17pt;line-height:1.05;margin:0;color:#000!important}
-  .print-card h3{font-size:12pt;margin:0;color:#000!important;border-top:1px solid #000;padding-top:.07in}
-  .print-card .meta{font-size:9.5pt;line-height:1.25;border:1px solid #000;padding:.06in;color:#000!important}
-  .print-card ul{margin:.02in 0 0;padding-left:.2in}
-  .print-card li{font-size:10.3pt;line-height:1.2;margin:.035in 0;color:#000!important}
+  .print-card h2{font-size:18pt;line-height:.98;margin:0;color:#000!important}
+  .print-card .meta{font-size:8.5pt;line-height:1.15;border:1px solid #000;padding:.045in;color:#000!important}
   .print-card-type{
     justify-self:start;
     border:1px solid #000;
@@ -697,7 +704,85 @@ body.room-intense .room-card{border-color:#b8ffe4;box-shadow:0 0 0 5px rgba(202,
     text-transform:uppercase;
     color:#000!important;
   }
-  .print-cut{border-top:1px dashed #000;padding-top:.06in;font-size:9pt;font-weight:800;color:#000!important}
+  .print-clue-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:repeat(3,1fr);
+    gap:.055in;
+    min-height:0;
+  }
+  .print-clue-box{
+    border:1px solid #000;
+    border-radius:.07in;
+    padding:.055in;
+    min-height:.78in;
+    overflow:hidden;
+  }
+  .print-clue-box strong{
+    display:block;
+    font-size:7.8pt;
+    line-height:1;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin-bottom:.035in;
+  }
+  .print-clue-box span{
+    display:block;
+    font-size:8.4pt;
+    line-height:1.12;
+    font-weight:700;
+    color:#000!important;
+  }
+  .print-cut{border-top:1px dashed #000;padding-top:.05in;font-size:8pt;font-weight:800;color:#000!important}
+  .print-test-guide,
+  .print-token-section{
+    page-break-after:always;
+    color:#000!important;
+  }
+  .print-test-guide h2,
+  .print-token-section h2{
+    font-size:16pt;
+    margin:0 0 .1in;
+    color:#000!important;
+  }
+  .print-test-guide table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:8pt;
+    line-height:1.15;
+  }
+  .print-test-guide th,
+  .print-test-guide td{
+    border:1px solid #000;
+    vertical-align:top;
+    padding:.045in;
+    color:#000!important;
+  }
+  .print-test-guide th{font-size:8.5pt;text-align:left;background:#fff!important}
+  .print-test-note{font-size:8.5pt;font-weight:700;margin:.08in 0 .12in;color:#000!important}
+  .print-token-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1.55in);
+    gap:.12in;
+    justify-content:center;
+  }
+  .print-org-token{
+    width:1.55in;
+    height:1.55in;
+    border:2px solid #000;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:.08in;
+    font-size:10pt;
+    line-height:1.05;
+    font-weight:900;
+    page-break-inside:avoid;
+    color:#000!important;
+    background:#fff!important;
+  }
+  .print-org-token small{display:block;font-size:7pt;font-weight:700;margin-top:.04in}
 }
 </style>
 </head>
@@ -1349,45 +1434,63 @@ function render(){
   updateMicroMusicButton();
 }
 
-function printableCard(type, item, deck){
-  const body = {
-    patient: [
-      `Age: ${item.age}`,
-      `Specimen source: ${item.specimenSource}`,
-      `Symptoms/history: ${item.symptoms}`,
-      `Collection note: ${item.collectionNote}`
-    ],
-    lab: [
-      `Gram stain: ${item.gramStain}`,
-      `Colony morphology: ${item.colonyMorphology}`,
-      `Media growth: ${item.mediaGrowth}`,
-      `Extra clue: ${item.extraClue}`
-    ],
-    result: item.tests.filter(test => item.requiredTestIds.includes(test.id)).map(test => `${test.label}: ${test.result}`),
-    organism: item.organisms.map(org => org.label),
-    solved: [
-      `Organism: ${item.solved.organism}`,
-      `Key clues: ${item.solved.keyClues.join(" / ")}`,
-      `Best confirmatory tests: ${item.solved.confirmatoryTests.join(", ")}`
-    ]
-  };
-  const title = {
-    patient:"Patient Envelope Card",
-    lab:"Lab Clue Card",
-    result:"Test Result Card",
-    organism:"Organism Choice Card",
-    solved:"Solved Card"
-  }[type];
+function renderPrintCaseCard(item, deck){
+  const clues = [
+    ["Age", item.age],
+    ["Specimen", item.specimenSource],
+    ["History", item.symptoms],
+    ["Collection", item.collectionNote],
+    ["Gram Stain", item.gramStain],
+    ["Growth Clues", `${item.colonyMorphology} ${item.mediaGrowth} ${item.extraClue}`]
+  ];
   return `<article class="print-card">
-    <div class="print-card-type">${esc(title)}</div>
+    <div class="print-card-type">Case Clue Card</div>
     <h2>${esc(caseCode(item))} - ${esc(deck.name)}</h2>
-    <div class="meta">Placeholder printable card / 4x6 format / cut line friendly</div>
-    <div>
-      <h3>${esc(title)}</h3>
-      <ul>${body[type].map(line => `<li>${esc(line)}</li>`).join("")}</ul>
+    <div class="meta">15-minute case / wrong test or organism = -1 minute / placeholder content only</div>
+    <div class="print-clue-grid">
+      ${clues.map(([label, value]) => `<div class="print-clue-box"><strong>${esc(label)}</strong><span>${esc(value)}</span></div>`).join("")}
     </div>
-    <div class="print-cut">Cut card. Placeholder content only.</div>
+    <div class="print-cut">Cut card. Use organism tokens and the test guide sheet to run this case.</div>
   </article>`;
+}
+
+function testStatusForCase(item, test){
+  if(!item.requiredTestIds.includes(test.id))return "Not correct for this case.";
+  const needsBoth = item.requiredTestIds.length === 2;
+  return needsBoth
+    ? "Positive required. Complete both required tests before organism token selection."
+    : "Positive required. Proceed to organism token selection.";
+}
+
+function renderPrintTestGuide(entries, title){
+  const allTests = testLabels.map((label, index) => ({id:`test-${index}`, label}));
+  return `<section class="print-test-guide">
+    <h2>${esc(title)} - Test Choice Guide</h2>
+    <p class="print-test-note">Use this full-page guide after each case clue card. Every row lists the same five placeholder test options and whether that test is correct for each case.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Test Option</th>
+          ${entries.map(({item}) => `<th>${esc(caseCode(item))}</th>`).join("")}
+        </tr>
+      </thead>
+      <tbody>
+        ${allTests.map(test => `<tr>
+          <th>${esc(test.label)}</th>
+          ${entries.map(({item}) => `<td>${esc(testStatusForCase(item, test))}</td>`).join("")}
+        </tr>`).join("")}
+      </tbody>
+    </table>
+  </section>`;
+}
+
+function renderPrintTokens(entries, title){
+  return `<section class="print-token-section">
+    <h2>${esc(title)} - Organism Tokens</h2>
+    <div class="print-token-grid">
+      ${entries.map(({item}) => `<div class="print-org-token">${esc(item.solved.organism)}<small>${esc(caseCode(item))}</small></div>`).join("")}
+    </div>
+  </section>`;
 }
 
 function renderPrintable(mode){
@@ -1397,13 +1500,24 @@ function renderPrintable(mode){
     : mode === "single"
       ? [{deck, item:currentCase()}]
       : deck.cases.map(item => ({deck, item}));
-  const cards = targetCases.flatMap(({deck:caseDeck, item}) => ["patient","lab","result","organism","solved"].map(type => printableCard(type, item, caseDeck)));
+  const guideGroups = mode === "all"
+    ? decks.map(entry => ({
+        title:`Micro Case Room - ${entry.name}`,
+        entries:entry.cases.map(item => ({deck:entry, item}))
+      }))
+    : [{title:mode === "single" ? `Micro Case Room - ${deck.name} / ${caseCode(currentCase())}` : `Micro Case Room - ${deck.name}`, entries:targetCases}];
+  const cards = targetCases.map(({deck:caseDeck, item}) => renderPrintCaseCard(item, caseDeck));
   const sheets = [];
   for(let i = 0; i < cards.length; i += 2){
     sheets.push(`<div class="print-sheet">${cards.slice(i, i + 2).join("")}</div>`);
   }
   const title = mode === "all" ? "Micro Case Room - All Placeholder Decks" : `Micro Case Room - ${deck.name}`;
-  document.getElementById("printableGame").innerHTML = `<h1 class="print-title">${esc(title)}</h1>${sheets.join("")}`;
+  document.getElementById("printableGame").innerHTML = `
+    <h1 class="print-title">${esc(title)} - Case Cards</h1>
+    ${sheets.join("")}
+    ${guideGroups.map(group => renderPrintTestGuide(group.entries, group.title)).join("")}
+    ${guideGroups.map(group => renderPrintTokens(group.entries, group.title)).join("")}
+  `;
 }
 
 function printMode(mode){
