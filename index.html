@@ -5403,7 +5403,7 @@ async function renderHematologyCases(el){
         <div style="font-size:15px;font-weight:600;margin-bottom:2px">Hematology Cases</div>
         <p class="text-muted" style="font-size:13px">Read the patient scenario and CBC/smear results, then answer each question.</p>
       </div>
-      <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal()">📄 Export</button>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal('hc')">📄 Export</button>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!data||!data.length?'<div class="empty">No Hematology cases yet. Use Admin mode to add one.</div>':''}
@@ -7210,7 +7210,7 @@ function submitGenericCase(caseId,answer){
 // ─── MICROBIOLOGY CASES ───────────────────────────────────────────────────────
 async function renderMicroCases(el){
   const {data:_mcRaw}=await sb.from('mlsboc_micro_cases').select('*').order('created_at');
-  const data=(_mcRaw||[]).map(withTableData);
+  const data=sortCaseRows((_mcRaw||[]).map(withTableData));
   if(!appState.microCaseCollapsed)appState.microCaseCollapsed={};
   el.innerHTML=`
     ${isAdmin?`<div class="mb-16">${adminMicroCaseControls()}</div>`:''}
@@ -7219,7 +7219,7 @@ async function renderMicroCases(el){
         <div style="font-size:15px;font-weight:600;margin-bottom:2px">Microbiology Cases</div>
         <p class="text-muted" style="font-size:13px">Read the scenario and test results, then answer each question.</p>
       </div>
-      <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal()">📄 Export</button>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal('mc')">📄 Export</button>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
     ${!data||!data.length?'<div class="empty">No Microbiology cases yet. Use Admin mode to add one.</div>':''}
@@ -7604,7 +7604,7 @@ async function renderBloodBankCases(el){
         <div class="text-muted" style="font-size:13px">Read the case and typing results, then answer each question.</div>
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
-        <button class="btn btn-ghost btn-sm" onclick="openExportModal()">📄 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="openExportModal('bb')">📄 Export</button>
         ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
@@ -9140,46 +9140,75 @@ async function deleteCondition(id){
 // ─── CASE PDF EXPORT ─────────────────────────────────────────────────────────
 let _exportCases = []; // {source, cases} loaded when modal opens
 
-async function openExportModal(){
+function caseTitleNumber(c){
+  const m=String(c?.title||'').match(/^Case\s+(\d+)$/i);
+  return m?Number(m[1]):null;
+}
+
+function sortCaseRows(rows){
+  return [...(rows||[])].sort((a,b)=>{
+    const an=caseTitleNumber(a),bn=caseTitleNumber(b);
+    if(an!==null&&bn!==null)return an-bn;
+    if(an!==null)return -1;
+    if(bn!==null)return 1;
+    return String(a.created_at||'').localeCompare(String(b.created_at||''));
+  });
+}
+
+function caseExportSourceMeta(key){
+  const map={
+    bb:{label:'Blood Bank',table:'mlsboc_bb_cases',tableLabel:'Typing Results'},
+    hc:{label:'Hematology',table:'mlsboc_heme_cases',tableLabel:'Lab Results'},
+    mc:{label:'Microbiology',table:'mlsboc_micro_cases',tableLabel:'Test Results'},
+    imm:{label:'Immunology',table:'mlsboc_immuno_cases',tableLabel:'Immunology Results'},
+    chem:{label:'Clinical Chemistry',table:'mlsboc_chem_cases',tableLabel:'Chemistry Results'},
+    para:{label:'Parasitology',table:'mlsboc_para_cases',tableLabel:'Parasitology Results'},
+    myco:{label:'Mycology',table:'mlsboc_myco_cases',tableLabel:'Mycology Results'}
+  };
+  const src=map[key];
+  return src?{...src,key}:null;
+}
+
+function currentCaseExportKeys(){
+  const map={
+    blood_bank:['bb'],
+    hematology:['hc'],
+    microbiology:['mc'],
+    immunology:['imm'],
+    clinical_chemistry:['chem'],
+    para_myco:['para','myco']
+  };
+  return map[appState.subject]||[];
+}
+
+async function openExportModal(sourceKeys){
   // Show loading state
   const modal=document.getElementById('condition-modal');
   const modalBody=document.getElementById('condition-modal-body');
   if(!modal||!modalBody){console.error('Export modal not found');return;}
 
   const closeBtn=`<button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>`;
-  modalBody.innerHTML=`<div class="flex-center gap-8 mb-16"><div style="font-size:16px;font-weight:600">Export Cases to PDF</div>${closeBtn}</div><div style="color:var(--text2);font-size:13px">Loading cases...</div>`;
+  const requestedKeys=Array.isArray(sourceKeys)?sourceKeys:(sourceKeys?[sourceKeys]:currentCaseExportKeys());
+  const requestedSources=requestedKeys.map(caseExportSourceMeta).filter(Boolean);
+  const exportTitle=requestedSources.length===1?`Export ${requestedSources[0].label} Cases to PDF`:'Export Cases to PDF';
+  modalBody.innerHTML=`<div class="flex-center gap-8 mb-16"><div style="font-size:16px;font-weight:600">${exportTitle}</div>${closeBtn}</div><div style="color:var(--text2);font-size:13px">Loading cases...</div>`;
   modal.classList.remove('hidden');
 
   // Safe fetch helper — always returns array
   const safeFetch=async(table)=>{
     try{
       const res=await sb.from(table).select('*').order('created_at');
-      return Array.isArray(res.data)?res.data.map(withTableData):[];
+      return Array.isArray(res.data)?sortCaseRows(res.data.map(withTableData)):[];
     }catch(e){return [];}
   };
 
-  const [bbD,hcD,mcD,immD,chemD,paraD,mycoD]=await Promise.all([
-    safeFetch('mlsboc_bb_cases'),
-    safeFetch('mlsboc_heme_cases'),
-    safeFetch('mlsboc_micro_cases'),
-    safeFetch('mlsboc_immuno_cases'),
-    safeFetch('mlsboc_chem_cases'),
-    safeFetch('mlsboc_para_cases'),
-    safeFetch('mlsboc_myco_cases'),
-  ]);
-
-  const sources=[
-    {label:'Blood Bank',        key:'bb',   data:bbD,   tableLabel:'Typing Results'},
-    {label:'Hematology',        key:'hc',   data:hcD,   tableLabel:'Lab Results'},
-    {label:'Microbiology',      key:'mc',   data:mcD,   tableLabel:'Test Results'},
-    {label:'Immunology',        key:'imm',  data:immD,  tableLabel:'Immunology Results'},
-    {label:'Clinical Chemistry',key:'chem', data:chemD, tableLabel:'Chemistry Results'},
-    {label:'Parasitology',      key:'para', data:paraD, tableLabel:'Parasitology Results'},
-    {label:'Mycology',          key:'myco', data:mycoD, tableLabel:'Mycology Results'},
-  ].filter(s=>s.data.length>0);
+  const sources=(await Promise.all(requestedSources.map(async src=>({
+    ...src,
+    data:await safeFetch(src.table)
+  })))).filter(s=>s.data.length>0);
 
   if(!sources.length){
-    modalBody.innerHTML=`<div class="flex-center gap-8 mb-16"><div style="font-size:16px;font-weight:600">Export Cases to PDF</div>${closeBtn}</div><div class="empty">No cases to export yet.</div>`;
+    modalBody.innerHTML=`<div class="flex-center gap-8 mb-16"><div style="font-size:16px;font-weight:600">${exportTitle}</div>${closeBtn}</div><div class="empty">No cases to export yet.</div>`;
     return;
   }
 
@@ -9187,7 +9216,7 @@ async function openExportModal(){
 
   let html=`
     <div class="flex-center gap-8 mb-16">
-      <div style="font-size:16px;font-weight:600">Export Cases to PDF</div>
+      <div style="font-size:16px;font-weight:600">${exportTitle}</div>
       ${closeBtn}
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Select cases to include — all go into one PDF.</div>
