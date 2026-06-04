@@ -771,3 +771,529 @@ body.bb-theme.blood-group-game .mls-audio-btn{
     overflow-wrap:anywhere;
   }
 }
+
+/* Blood Bank universal game skin: keep each tool's layout/gameplay, but make the
+   whole playable surface feel like one red Blood Bank game family. */
+body.bb-theme{
+  --bg:#fff5f7 !important;
+  --paper:#fffafb !important;
+  --panel:#fffafb !important;
+  --panel2:#ffe8ee !important;
+  --header:var(--bb-red) !important;
+  --accent:var(--bb-red) !important;
+  --accent2:var(--bb-red2) !important;
+  --line:#d94f6d !important;
+  --border:#f3b6c5 !important;
+  --border2:#d94f6d !important;
+  --ink:var(--bb-deep) !important;
+  --text:var(--bb-deep) !important;
+  --text2:#7a3145 !important;
+  --text3:#9f6473 !important;
+  --muted:#7a4c58 !important;
+  --cell:#fff0f4 !important;
+  --cell2:#ffe1e9 !important;
+  --stripe:#ffe8ee !important;
+  --drop:#fff9fb !important;
+  --drop-border:var(--bb-red) !important;
+  --fixed:#ffe7ee !important;
+  --fixed-border:#e98aa0 !important;
+  --top-dark:var(--bb-deep) !important;
+  --top-yellow:#fff2f5 !important;
+  --gold-line:#bb3150 !important;
+  --shadow:0 16px 34px rgba(103,19,37,.12) !important;
+}
+
+body.bb-theme,
+body.bb-theme *,
+body.bb-theme button,
+body.bb-theme input,
+body.bb-theme select,
+body.bb-theme textarea{
+  font-family:"Arial Rounded MT Bold","Trebuchet MS",Arial,Helvetica,sans-serif !important;
+}
+
+body.bb-theme h1,
+body.bb-theme h2,
+body.bb-theme h3,
+body.bb-theme .funky-title,
+body.bb-theme .main-title,
+body.bb-theme .section-title,
+body.bb-theme .system-title,
+body.bb-theme .table-title,
+body.bb-theme .deck-title,
+body.bb-theme .panel-title,
+body.bb-theme .answers-title,
+body.bb-theme .answers-subtitle,
+body.bb-theme .subbank-title,
+body.bb-theme .bank-title,
+body.bb-theme .label-title{
+  font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif !important;
+  letter-spacing:.02em !important;
+}
+
+body.bb-theme header:not(.site-header),
+body.bb-theme .hero,
+body.bb-theme .controls,
+body.bb-theme .section-controls,
+body.bb-theme .panel,
+body.bb-theme .deck-panel,
+body.bb-theme .main-card,
+body.bb-theme .bank,
+body.bb-theme .donor-bank,
+body.bb-theme .table-card,
+body.bb-theme .table-wrap,
+body.bb-theme .system-card,
+body.bb-theme .section,
+body.bb-theme .answers-panel,
+body.bb-theme #answersSection,
+body.bb-theme .answer-key,
+body.bb-theme .answer-panel,
+body.bb-theme .key-panel{
+  background:linear-gradient(180deg,#fffdfd,#fff3f6) !important;
+  border:2px solid #f0a9ba !important;
+  box-shadow:0 16px 34px rgba(103,19,37,.12) !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme .main-body,
+body.bb-theme .structure,
+body.bb-theme .board,
+body.bb-theme .banks,
+body.bb-theme .donor-banks,
+body.bb-theme .activity-layout,
+body.bb-theme .mystery-stage,
+body.bb-theme .clue-area,
+body.bb-theme .deck-grid,
+body.bb-theme .clue-grid,
+body.bb-theme .system-grid,
+body.bb-theme .table-scroll{
+  background:#fffafb !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme header:not(.site-header){
+  background:
+    linear-gradient(135deg,rgba(201,22,67,.14),rgba(255,255,255,.95) 42%),
+    #fffafb !important;
+  border-top:0 !important;
+  border-left:7px solid var(--bb-red) !important;
+}
+
+body.bb-theme header:not(.site-header) h1{
+  color:var(--bb-red) !important;
+  text-shadow:2px 2px 0 #ffd4df !important;
+}
+
+body.bb-theme .main-title,
+body.bb-theme .section-title,
+body.bb-theme .system-title,
+body.bb-theme .table-title,
+body.bb-theme th,
+body.bb-theme .activity-table th,
+body.bb-theme .structure-tab.active,
+body.bb-theme .system-tab.active,
+body.bb-theme .tab.active,
+body.bb-theme .pill.active,
+body.bb-theme .badge,
+body.bb-theme .round-badge,
+body.bb-theme .deck-card.active,
+body.bb-theme .primary,
+body.bb-theme .checkBtn,
+body.bb-theme #btn-check,
+body.bb-theme .btn.primary{
+  background:linear-gradient(135deg,var(--bb-red),var(--bb-red2)) !important;
+  border-color:var(--bb-red) !important;
+  color:#fff !important;
+  text-shadow:none !important;
+}
+
+body.bb-theme .structure-tab,
+body.bb-theme .system-tab,
+body.bb-theme .tab,
+body.bb-theme .pill,
+body.bb-theme .print-btn,
+body.bb-theme .back,
+body.bb-theme .ghost,
+body.bb-theme .deck-card,
+body.bb-theme .system-token,
+body.bb-theme .button,
+body.bb-theme .btn,
+body.bb-theme .resetBtn,
+body.bb-theme #btn-reset{
+  background:#fff !important;
+  border:2px solid #eca1b4 !important;
+  color:var(--bb-deep) !important;
+  box-shadow:0 5px 0 #ffd2dd !important;
+}
+
+body.bb-theme .answersBtn,
+body.bb-theme .answerBtn,
+body.bb-theme .seeBtn,
+body.bb-theme .seeAnswersBtn,
+body.bb-theme .keyBtn,
+body.bb-theme .btn.good{
+  background:#fff8df !important;
+  border-color:#dfb33f !important;
+  color:#71490a !important;
+  box-shadow:0 5px 0 #f8df94 !important;
+}
+
+body.bb-theme .chip,
+body.bb-theme .mechanism-card,
+body.bb-theme .deck-card,
+body.bb-theme .system-token,
+body.bb-theme .answer-card{
+  background:linear-gradient(180deg,#ffffff,#fff0f4) !important;
+  border:2px solid #ed9bae !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme .chip:hover,
+body.bb-theme .chip.selected,
+body.bb-theme .mechanism-card.selected,
+body.bb-theme .deck-card:hover,
+body.bb-theme .system-token:hover,
+body.bb-theme .system-token.selected,
+body.bb-theme .structure-tab:hover,
+body.bb-theme .system-tab:hover,
+body.bb-theme .tab:hover,
+body.bb-theme .pill:hover{
+  background:#ffe2ea !important;
+  border-color:var(--bb-red) !important;
+  color:var(--bb-deep) !important;
+  box-shadow:0 0 0 4px rgba(201,22,67,.12),0 8px 0 #ffd2dd !important;
+}
+
+body.bb-theme .dropzone,
+body.bb-theme .label-drop,
+body.bb-theme .mechanism-slot,
+body.bb-theme .slot,
+body.bb-theme input,
+body.bb-theme select,
+body.bb-theme textarea{
+  background:#fff9fb !important;
+  border:2px dashed #e98aa0 !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme .dropzone.filled,
+body.bb-theme .label-drop.filled,
+body.bb-theme .mechanism-slot.filled,
+body.bb-theme .slot .chip{
+  background:#fff !important;
+  border-style:solid !important;
+}
+
+body.bb-theme .dropzone.drag-over,
+body.bb-theme .dropzone.over,
+body.bb-theme .label-drop.drag-over,
+body.bb-theme .mechanism-slot.drag-over,
+body.bb-theme .mechanism-slot.over,
+body.bb-theme .slot.over{
+  background:#ffe2ea !important;
+  border-color:var(--bb-red) !important;
+}
+
+body.bb-theme .fixed,
+body.bb-theme .hex.fixed,
+body.bb-theme .donor-static,
+body.bb-theme .system,
+body.bb-theme .mechanism-system{
+  background:#ffe8ee !important;
+  border:2px solid #e98aa0 !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme .line{
+  background:var(--bb-red) !important;
+}
+
+body.bb-theme .dot,
+body.bb-theme .mechanism-dot{
+  background:linear-gradient(135deg,var(--bb-red),var(--bb-red2)) !important;
+  color:#fff !important;
+  font-family:"Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif !important;
+}
+
+body.bb-theme .placeholder,
+body.bb-theme .mechanism-slot.empty::before,
+body.bb-theme .slot.empty::before,
+body.bb-theme .deck-status,
+body.bb-theme .panel-note,
+body.bb-theme .deck-note,
+body.bb-theme .hint,
+body.bb-theme .note,
+body.bb-theme .answer-note{
+  color:#8c5664 !important;
+}
+
+body.bb-theme table,
+body.bb-theme .activity-table,
+body.bb-theme .donor-table{
+  background:#fffafb !important;
+  border-color:#eda6b7 !important;
+}
+
+body.bb-theme td,
+body.bb-theme tbody tr:nth-child(even) td,
+body.bb-theme tr:nth-child(even) td{
+  background:#fff0f4 !important;
+  border-color:#eda6b7 !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme tbody tr:nth-child(odd) td,
+body.bb-theme tr:nth-child(odd) td{
+  background:#fffafb !important;
+}
+
+body.bb-theme td.antigen,
+body.bb-theme .gene-td,
+body.bb-theme .antigen{
+  color:#8e1634 !important;
+}
+
+body.bb-theme .legend .high,
+body.bb-theme .antigen.high{
+  color:#a80f34 !important;
+}
+
+body.bb-theme .legend .low,
+body.bb-theme .antigen.low{
+  color:#6f2f4a !important;
+}
+
+body.bb-theme .score,
+body.bb-theme .msg,
+body.bb-theme .feedback{
+  background:#fffafb !important;
+  border:2px solid #f0b3c2 !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme .score.good,
+body.bb-theme .msg.good,
+body.bb-theme .feedback.good,
+body.bb-theme .dropzone.correct,
+body.bb-theme .label-drop.correct,
+body.bb-theme .mechanism-slot.correct,
+body.bb-theme .slot.correct,
+body.bb-theme input.correct,
+body.bb-theme select.correct,
+body.bb-theme .system-token.correct{
+  background:#effaf2 !important;
+  border-color:#2f9f62 !important;
+  color:#17653a !important;
+}
+
+body.bb-theme .score.bad,
+body.bb-theme .msg.bad,
+body.bb-theme .feedback.bad,
+body.bb-theme .dropzone.wrong,
+body.bb-theme .label-drop.wrong,
+body.bb-theme .mechanism-slot.wrong,
+body.bb-theme .slot.wrong,
+body.bb-theme input.wrong,
+body.bb-theme select.wrong,
+body.bb-theme .system-token.wrong{
+  background:#fff0f4 !important;
+  border-color:var(--bb-red) !important;
+  color:var(--bb-red) !important;
+}
+
+body.bb-theme .face{
+  background:
+    radial-gradient(circle at 27% 43%,rgba(255,255,255,.96) 0 7%,rgba(255,214,224,.92) 8% 16%,transparent 17%),
+    repeating-conic-gradient(from -18deg at 28% 44%,rgba(255,255,255,.86) 0deg 5deg,rgba(255,186,203,.7) 5deg 9deg,rgba(255,255,255,.18) 9deg 12deg),
+    linear-gradient(132deg,#fff2f5 0 43%,#cf1644 44% 100%) !important;
+  border:2px solid #eca1b4 !important;
+}
+
+body.bb-theme .face.back{
+  background:
+    radial-gradient(circle at 50% 38%,rgba(255,255,255,.92) 0 10%,transparent 11%),
+    repeating-conic-gradient(from 0deg at 50% 40%,rgba(255,255,255,.65) 0deg 4deg,rgba(255,205,218,.32) 4deg 8deg),
+    linear-gradient(135deg,#fff2f5,#8e1634) !important;
+}
+
+body.bb-theme .mystery-question{
+  color:#fff2a8 !important;
+  text-shadow:4px 4px 0 var(--bb-red),0 0 10px rgba(255,255,255,.35) !important;
+}
+
+body.bb-theme .mystery-label,
+body.bb-theme .screen-title,
+body.bb-theme .solved-stamp,
+body.bb-theme .reveal-token{
+  color:#fff !important;
+}
+
+body.bb-theme .answer-name,
+body.bb-theme .answer-sub,
+body.bb-theme .token-caption{
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme .clue-card,
+body.bb-theme .locked-note{
+  background:#fff9fb !important;
+  border:2px dashed #eca1b4 !important;
+  color:var(--bb-deep) !important;
+}
+
+body.bb-theme a:not(.mls-home-btn):not(.back){
+  color:var(--bb-red) !important;
+  font-weight:900;
+}
+
+html[data-mls-theme="dark"] body.bb-theme,
+html[data-mls-theme="dark"] body.bb-theme.mls-interactive{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(239,79,109,.22),transparent 32%),
+    radial-gradient(circle at 92% 10%,rgba(255,190,205,.36),transparent 28%),
+    linear-gradient(180deg,#fff8fa 0%,#fff0f4 56%,#f8d9e1 100%) !important;
+  color:var(--bb-deep) !important;
+}
+
+html[data-mls-theme="dark"] body.bb-theme .site-header,
+html[data-mls-theme="dark"] body.bb-theme header:not(.site-header),
+html[data-mls-theme="dark"] body.bb-theme .hero,
+html[data-mls-theme="dark"] body.bb-theme .controls,
+html[data-mls-theme="dark"] body.bb-theme .section-controls,
+html[data-mls-theme="dark"] body.bb-theme .panel,
+html[data-mls-theme="dark"] body.bb-theme .deck-panel,
+html[data-mls-theme="dark"] body.bb-theme .main-card,
+html[data-mls-theme="dark"] body.bb-theme .bank,
+html[data-mls-theme="dark"] body.bb-theme .donor-bank,
+html[data-mls-theme="dark"] body.bb-theme .table-card,
+html[data-mls-theme="dark"] body.bb-theme .table-wrap,
+html[data-mls-theme="dark"] body.bb-theme .system-card,
+html[data-mls-theme="dark"] body.bb-theme .section,
+html[data-mls-theme="dark"] body.bb-theme .answers-panel,
+html[data-mls-theme="dark"] body.bb-theme #answersSection,
+html[data-mls-theme="dark"] body.bb-theme .answer-key,
+html[data-mls-theme="dark"] body.bb-theme .answer-panel,
+html[data-mls-theme="dark"] body.bb-theme .key-panel,
+html[data-mls-theme="dark"] body.bb-theme .main-body,
+html[data-mls-theme="dark"] body.bb-theme .structure,
+html[data-mls-theme="dark"] body.bb-theme .board,
+html[data-mls-theme="dark"] body.bb-theme .table-scroll,
+html[data-mls-theme="dark"] body.bb-theme .chip,
+html[data-mls-theme="dark"] body.bb-theme .dropzone,
+html[data-mls-theme="dark"] body.bb-theme .label-drop,
+html[data-mls-theme="dark"] body.bb-theme .fixed,
+html[data-mls-theme="dark"] body.bb-theme .hex.fixed,
+html[data-mls-theme="dark"] body.bb-theme .donor-static,
+html[data-mls-theme="dark"] body.bb-theme .system,
+html[data-mls-theme="dark"] body.bb-theme .mechanism-system,
+html[data-mls-theme="dark"] body.bb-theme input,
+html[data-mls-theme="dark"] body.bb-theme select,
+html[data-mls-theme="dark"] body.bb-theme textarea{
+  color:var(--bb-deep) !important;
+}
+
+@media(max-width:640px){
+  body.bb-theme{
+    overflow-x:hidden !important;
+  }
+  body.bb-theme .wrap,
+  body.bb-theme header:not(.site-header),
+  body.bb-theme .topbar,
+  body.bb-theme .top,
+  body.bb-theme .hero,
+  body.bb-theme .controls,
+  body.bb-theme .section-controls,
+  body.bb-theme .deck-panel,
+  body.bb-theme .panel,
+  body.bb-theme .main-card,
+  body.bb-theme .bank,
+  body.bb-theme .table-card{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  body.bb-theme header:not(.site-header) > *,
+  body.bb-theme .topbar > *,
+  body.bb-theme .top > *,
+  body.bb-theme .deck-head > *,
+  body.bb-theme .panel-head > *{
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+  body.bb-theme header:not(.site-header) p,
+  body.bb-theme .subtitle,
+  body.bb-theme .deck-note,
+  body.bb-theme .panel-note,
+  body.bb-theme .hint,
+  body.bb-theme .note{
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+  }
+  body.bb-theme header:not(.site-header) p{
+    max-width:320px !important;
+  }
+  body.bb-theme .subtitle,
+  body.bb-theme.blood-group-game .subtitle{
+    max-width:340px !important;
+  }
+  body.bb-theme .deck-note,
+  body.bb-theme .panel-note{
+    max-width:320px !important;
+  }
+  body.bb-theme .main-title,
+  body.bb-theme .section-title,
+  body.bb-theme .system-title,
+  body.bb-theme .table-title{
+    font-size:clamp(16px,5vw,20px) !important;
+    line-height:1.12 !important;
+  }
+  body.bb-theme .structure-tabs,
+  body.bb-theme .system-tabs{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+  body.bb-theme .deck-grid{
+    grid-template-columns:1fr !important;
+  }
+  body.bb-theme.blood-group-game .deck-head,
+  body.bb-theme.blood-group-game .panel-head{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+  }
+  body.bb-theme.blood-group-game .round-badge{
+    width:100% !important;
+    text-align:center !important;
+  }
+  body.bb-theme.blood-group-game .game{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media(max-width:480px){
+  body.bb-theme .wrap{
+    max-width:100vw !important;
+    overflow:hidden !important;
+  }
+  body.bb-theme header:not(.site-header) p{
+    display:block !important;
+    width:calc(100vw - 72px) !important;
+    max-width:calc(100vw - 72px) !important;
+  }
+  body.bb-theme .subtitle,
+  body.bb-theme.blood-group-game .subtitle{
+    display:block !important;
+    width:calc(100vw - 24px) !important;
+    max-width:calc(100vw - 24px) !important;
+  }
+  body.bb-theme .deck-note,
+  body.bb-theme .panel-note{
+    display:block !important;
+    width:calc(100vw - 48px) !important;
+    max-width:calc(100vw - 48px) !important;
+  }
+  body.bb-theme .deck-grid,
+  body.bb-theme.blood-group-game .deck-grid{
+    grid-template-columns:1fr !important;
+  }
+}
