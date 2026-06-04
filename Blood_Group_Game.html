@@ -15,8 +15,6 @@
     --soft:#f7edf0;
     --accent:#c91643;
     --accent2:#e45577;
-    --blue:#1267ff;
-    --gold:#e29400;
     --good:#3ddc84;
     --bad:#f06474;
     --shadow:0 18px 38px rgba(0,0,0,.24);
@@ -29,12 +27,12 @@
     background:radial-gradient(circle at 12% 0%, #241928 0, transparent 32%), var(--bg);
     color:var(--text);
   }
-  .wrap{max-width:1180px;margin:0 auto;padding:18px}
+  .wrap{max-width:1240px;margin:0 auto;padding:18px}
   .topbar{
     display:flex;
     align-items:center;
     gap:12px;
-    margin-bottom:18px;
+    margin-bottom:14px;
   }
   .back{
     color:var(--muted);
@@ -60,9 +58,57 @@
     font-weight:800;
     white-space:nowrap;
   }
+  .deck-panel{
+    background:rgba(21,24,35,.78);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:12px;
+    margin-bottom:16px;
+  }
+  .deck-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .deck-title{
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .deck-note{font-size:12px;color:var(--muted);font-weight:700}
+  .deck-grid{
+    display:grid;
+    grid-template-columns:repeat(9,minmax(0,1fr));
+    gap:8px;
+  }
+  .deck-card{
+    min-height:64px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--panel2);
+    color:var(--text);
+    padding:9px 10px;
+    text-align:left;
+    transition:.15s ease;
+  }
+  .deck-card:hover{border-color:var(--accent2);transform:translateY(-1px)}
+  .deck-card.active{
+    background:rgba(201,22,67,.16);
+    border-color:var(--accent);
+    box-shadow:inset 0 3px 0 var(--accent);
+  }
+  .deck-card.done{border-color:rgba(61,220,132,.42)}
+  .deck-label{font-size:14px;font-weight:900;line-height:1.1}
+  .deck-status{font-size:10px;color:var(--muted);font-weight:800;margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+  .deck-card.done .deck-status{color:#bdf4d4}
   .game{
     display:grid;
-    grid-template-columns:minmax(320px,1.05fr) minmax(320px,.95fr);
+    grid-template-columns:minmax(300px,.72fr) minmax(460px,1.28fr);
     gap:16px;
     align-items:start;
   }
@@ -84,11 +130,11 @@
   }
   .panel-title{font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
   .panel-note{color:var(--muted);font-size:12px;font-weight:700}
-  .mystery-stage{padding:16px}
+  .mystery-stage{padding:14px}
   .flip-card{
     position:relative;
     width:100%;
-    min-height:430px;
+    min-height:330px;
     perspective:1200px;
   }
   .flip-inner{
@@ -109,23 +155,40 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:20px;
   }
   .face.back{transform:rotateY(180deg)}
   .mystery-img{
-    width:100%;
-    height:100%;
+    width:88%;
+    height:88%;
+    max-width:360px;
     object-fit:contain;
     background:#fff8f8;
   }
   .face.front .mystery-img{
-    filter:brightness(0) contrast(1.5);
-    opacity:.92;
+    filter:blur(15px) saturate(.86) contrast(.94) brightness(.98);
+    opacity:.9;
+    transform:scale(.94);
+  }
+  .mystery-placeholder{
+    width:100%;
+    height:100%;
+    border:2px dashed #eec4cf;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:#9b5b6c;
+    font-weight:900;
+    line-height:1.4;
+    padding:20px;
   }
   .mystery-label{
     position:absolute;
     left:16px;
     top:16px;
-    font-size:13px;
+    font-size:12px;
     font-weight:900;
     letter-spacing:.12em;
     text-transform:uppercase;
@@ -134,6 +197,23 @@
     border:1px solid rgba(255,255,255,.2);
     border-radius:999px;
     padding:7px 10px;
+  }
+  .solved-stamp{
+    position:absolute;
+    right:18px;
+    top:18px;
+    z-index:3;
+    color:#fff;
+    background:rgba(61,220,132,.92);
+    border:2px solid rgba(255,255,255,.75);
+    border-radius:12px;
+    padding:8px 12px;
+    font-size:18px;
+    font-weight:1000;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    transform:rotate(-7deg);
+    box-shadow:0 10px 24px rgba(0,0,0,.22);
   }
   .answer-ribbon{
     position:absolute;
@@ -150,17 +230,23 @@
     border-radius:12px;
     color:#fff;
   }
-  .answer-name{font-size:19px;font-weight:900}
+  .answer-name{font-size:18px;font-weight:900}
+  .answer-secret{
+    display:inline-block;
+    filter:blur(8px);
+    opacity:.62;
+    user-select:none;
+  }
   .answer-sub{font-size:12px;color:#d4d8ec}
-  .clue-area{padding:16px;display:grid;gap:12px}
-  .clue-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .clue-area{padding:16px;display:grid;gap:14px}
+  .clue-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .clue-card{
-    min-height:240px;
+    min-height:292px;
     border-radius:13px;
     background:var(--soft);
     color:#211419;
     border:2px solid #f1b6c8;
-    padding:14px;
+    padding:18px;
     position:relative;
     overflow:hidden;
   }
@@ -173,13 +259,19 @@
     border-color:var(--line);
   }
   .clue-card h2{
-    margin:0 0 9px;
+    margin:0 0 12px;
     color:var(--accent);
-    font-size:17px;
+    font-size:20px;
     letter-spacing:.02em;
   }
-  .clue-card ul{margin:0;padding-left:18px;display:grid;gap:7px}
-  .clue-card li{font-size:13px;line-height:1.32;font-weight:700}
+  .clue-card ul{margin:0;padding-left:20px;display:grid;gap:9px}
+  .clue-card li{font-size:15px;line-height:1.36;font-weight:800}
+  .locked-note{
+    max-width:260px;
+    font-size:14px;
+    line-height:1.4;
+    font-weight:800;
+  }
   .clue-button-row{display:flex;gap:8px;flex-wrap:wrap}
   button{
     border:0;
@@ -189,25 +281,38 @@
     cursor:pointer;
     font-family:Arial, Helvetica, sans-serif;
   }
+  button:disabled{cursor:not-allowed;opacity:.56}
   .primary{background:var(--accent);color:#fff}
   .ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
   .system-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .system-token{
+    position:relative;
     background:var(--panel2);
     color:var(--text);
     border:1px solid var(--line);
-    min-height:46px;
+    min-height:48px;
     transition:.15s ease;
+    overflow:hidden;
   }
   .system-token:hover{border-color:var(--accent2);transform:translateY(-1px)}
   .system-token.selected{background:rgba(201,22,67,.18);border-color:var(--accent);color:#ffd2dd}
   .system-token.correct{background:rgba(61,220,132,.18);border-color:var(--good);color:#c9f7dd}
   .system-token.wrong{background:rgba(240,100,116,.16);border-color:var(--bad);color:#ffd5da}
+  .token-secret{display:inline-block;filter:blur(7px);opacity:.55}
+  .token-solved{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    color:#c9f7dd;
+    font-size:12px;
+    letter-spacing:.12em;
+  }
   .feedback{
-    min-height:42px;
+    min-height:46px;
     border-radius:10px;
-    padding:10px 12px;
-    font-size:13px;
+    padding:11px 12px;
+    font-size:14px;
     font-weight:800;
     color:var(--muted);
     background:rgba(255,255,255,.035);
@@ -215,48 +320,18 @@
   }
   .feedback.good{color:#c9f7dd;border-color:rgba(61,220,132,.4);background:rgba(61,220,132,.11)}
   .feedback.bad{color:#ffd5da;border-color:rgba(240,100,116,.42);background:rgba(240,100,116,.12)}
-  .reference{
-    display:none;
-    grid-column:1 / -1;
-    margin-top:16px;
-    border:1px solid #f2bfd0;
-    border-top:3px solid var(--accent);
-    border-radius:12px;
-    background:#fff8f8;
-    color:#211419;
-    overflow:hidden;
-  }
-  .reference.show{display:block}
-  .ref-title{
-    padding:13px 16px;
-    font-size:13px;
-    font-weight:900;
-    letter-spacing:.16em;
-    color:#7a6670;
-    text-transform:uppercase;
-    border-bottom:1px solid #f2bfd0;
-  }
-  .ref-row{
-    display:grid;
-    grid-template-columns:220px 1fr;
-    border-bottom:1px solid #f2bfd0;
-  }
-  .ref-row:last-child{border-bottom:0}
-  .ref-key{
-    padding:9px 12px;
-    font-weight:900;
-    color:#7a6670;
-    letter-spacing:.04em;
-    text-transform:uppercase;
-    background:rgba(255,210,221,.22);
-  }
-  .ref-val{padding:9px 12px;font-weight:700;line-height:1.35}
-  @media(max-width:850px){
+  @media(max-width:980px){
+    .deck-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
     .game{grid-template-columns:1fr}
-    .flip-card{min-height:360px}
+    .flip-card{min-height:320px}
+  }
+  @media(max-width:650px){
+    .wrap{padding:14px}
+    .topbar{align-items:flex-start;flex-wrap:wrap}
+    .round-badge{margin-left:0}
+    .deck-grid{grid-template-columns:1fr 1fr}
     .clue-grid{grid-template-columns:1fr}
     .system-grid{grid-template-columns:1fr 1fr}
-    .ref-row{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -268,8 +343,16 @@
       <h1>Blood Group</h1>
       <div class="subtitle">Open both clue cards, choose the system, then reveal the antigen image.</div>
     </div>
-    <div class="round-badge">Card 1 of 9</div>
+    <div class="round-badge" id="card-badge">Card 1 of 9</div>
   </div>
+
+  <section class="deck-panel">
+    <div class="deck-head">
+      <div class="deck-title">Blood group deck</div>
+      <div class="deck-note">First card is ready. Add the next clue sets when you send them.</div>
+    </div>
+    <div class="deck-grid" id="deck-grid"></div>
+  </section>
 
   <main class="game">
     <section class="panel">
@@ -280,18 +363,21 @@
       <div class="mystery-stage">
         <div class="flip-card" id="mystery-card">
           <div class="flip-inner">
-            <div class="face front">
-              <img class="mystery-img" src="assets/interactive-previews/blood_group_type2_substance.png" alt="Hidden blood group antigen structure">
+            <div class="face front" id="front-face">
+              <img class="mystery-img" id="front-img" src="" alt="">
+              <div class="mystery-placeholder" id="front-placeholder">Image and clues will be added later.</div>
               <div class="mystery-label">Who is this blood group?</div>
             </div>
-            <div class="face back">
-              <img class="mystery-img" src="assets/interactive-previews/blood_group_type2_substance.png" alt="Type 2 substance antigen structure">
+            <div class="face back" id="back-face">
+              <img class="mystery-img" id="back-img" src="" alt="">
+              <div class="mystery-placeholder" id="back-placeholder">Image and clues will be added later.</div>
+              <div class="solved-stamp">Solved</div>
               <div class="answer-ribbon">
                 <div>
-                  <div class="answer-name">ABO Blood Group System</div>
-                  <div class="answer-sub">Antigen image: Type 2 Substance</div>
+                  <div class="answer-name"><span class="answer-secret" id="answer-secret">Hidden answer</span></div>
+                  <div class="answer-sub" id="answer-sub">Antigen image revealed</div>
                 </div>
-                <div class="answer-sub">Chromosome 9</div>
+                <div class="answer-sub" id="answer-extra">Solved</div>
               </div>
             </div>
           </div>
@@ -302,16 +388,12 @@
     <section class="panel">
       <div class="panel-head">
         <div class="panel-title">Clue cards</div>
-        <div class="panel-note">2 required</div>
+        <div class="panel-note" id="clue-note">2 required</div>
       </div>
       <div class="clue-area">
         <div class="clue-grid">
-          <article class="clue-card locked" id="clue-1">
-            <button class="primary" onclick="openClue(1)">Open Clue 1</button>
-          </article>
-          <article class="clue-card locked" id="clue-2">
-            <button class="primary" onclick="openClue(2)">Open Clue 2</button>
-          </article>
+          <article class="clue-card locked" id="clue-1"></article>
+          <article class="clue-card locked" id="clue-2"></article>
         </div>
 
         <div>
@@ -321,110 +403,147 @@
 
         <div class="feedback" id="feedback">Open both clue cards before matching.</div>
         <div class="clue-button-row">
-          <button class="ghost" onclick="resetGame()">Reset</button>
-          <button class="ghost" onclick="showReference()">Study Reference</button>
+          <button class="ghost" onclick="resetCurrentCard()">Reset card</button>
         </div>
       </div>
-    </section>
-
-    <section class="reference" id="reference">
-      <div class="ref-title">Study Reference</div>
-      <div id="reference-rows"></div>
     </section>
   </main>
 </div>
 
 <script>
-const answer = 'ABO';
-const systems = ['ABO','Rh','Lewis','Kell','Duffy','Kidd','MNS','P1PK','Lutheran'];
-const clues = {
-  1: [
-    'Gene location: chromosome 9.',
-    'Null pattern: Bombay has no H antigen through FUT1 and FUT2.',
-    'Parabombay lacks H antigen through FUT1, but has secretor FUT2 activity.',
-    'Transferase attaches oligosaccharide to glycoproteins and glycosphingolipids.',
-    'Antigen structure is extrinsic.',
-    'Related substance: Type 2 chains through FUT1.',
-    'Expressed on baby cells.'
-  ],
-  2: [
-    'Antibodies are naturally occurring.',
-    'Mostly IgM and typically cold reacting.',
-    'Can fix complement.',
-    'Not destroyed by routine treatment; enzyme enhancement can occur.',
-    'No dosage.',
-    'Can cause mild HDN and severe HTRXN.',
-    'Immunogenic and clinically important if transfusion is incompatible.'
-  ]
-};
-const referenceRows = [
-  ['Antigen names','A, B, O, AB'],
-  ['Null','Bombay (No H antigen by FUT1 and FUT2), Parabombay (No H antigen by FUT1 but yes by FUT2 secretor)'],
-  ['Antithetical pairs','None'],
-  ['Gene location','Chromosome 9'],
-  ['Disease association','HTRXN, HDN Mild'],
-  ['Antigen structure','Transferase attaches oligosaccharide to glycoprotein and glycosphingolipid. It is extrinsic.'],
-  ['Related substance','Type 2 Chains (FUT1)'],
-  ['Expressed on baby cells','Yes'],
-  ['Destroyed by','N/Ap'],
-  ['Enhanced by','Enzymes'],
-  ['Dosage','No'],
-  ['IgG or IgM','IgM'],
-  ['Warm or cold','Cold Antibodies'],
-  ['Naturally occurring','Yes'],
-  ['Fixes complement','Yes'],
-  ['Causes HDN','Yes Mild'],
-  ['Causes HTRXN','Yes Extreme'],
-  ['Immunogenic','Yes'],
-  ['Transfusion notes','Expected naturally occurring ABO antibodies in plasma; clinically severe if incompatible transfusion.']
+const imagePath = 'assets/interactive-previews/blood_group_type2_substance.png';
+const cards = [
+  {
+    id:'abo',
+    label:'ABO',
+    answer:'ABO',
+    status:'ready',
+    image:imagePath,
+    imageAlt:'Type 2 substance antigen structure',
+    imageNote:'Antigen image: Type 2 Substance',
+    extra:'Chromosome 9',
+    clues:[
+      [
+        'Gene location: chromosome 9.',
+        'Null pattern: Bombay has no H antigen through FUT1 and FUT2.',
+        'Parabombay lacks H antigen through FUT1, but has secretor FUT2 activity.',
+        'Transferase attaches oligosaccharide to glycoproteins and glycosphingolipids.',
+        'Antigen structure is extrinsic.',
+        'Related substance: Type 2 chains through FUT1.',
+        'Expressed on baby cells.'
+      ],
+      [
+        'Antibodies are naturally occurring.',
+        'Mostly IgM and typically cold reacting.',
+        'Can fix complement.',
+        'Not destroyed by routine treatment; enzyme enhancement can occur.',
+        'No dosage.',
+        'Can cause mild HDN and severe HTRXN.',
+        'Immunogenic and clinically important if transfusion is incompatible.'
+      ]
+    ]
+  },
+  {id:'rh',label:'Rh',answer:'Rh',status:'needs_clues'},
+  {id:'kell',label:'Kell',answer:'Kell',status:'needs_clues'},
+  {id:'duffy',label:'Duffy',answer:'Duffy',status:'needs_clues'},
+  {id:'kidd',label:'Kidd',answer:'Kidd',status:'needs_clues'},
+  {id:'mns',label:'MNS',answer:'MNS',status:'needs_clues'},
+  {id:'p1pk',label:'P1PK / Globoside',answer:'P1PK / Globoside',status:'needs_clues'},
+  {id:'lewis',label:'Lewis',answer:'Lewis',status:'needs_clues'},
+  {id:'lutheran',label:'Lutheran',answer:'Lutheran',status:'needs_clues'}
 ];
-const opened = new Set();
+
+let currentIndex = 0;
+let opened = new Set();
 let selected = '';
-let solved = false;
+let solvedCards = new Set();
 
 function esc(text){
   return String(text).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
-function openClue(num){
-  opened.add(num);
-  const el = document.getElementById('clue-'+num);
-  el.classList.remove('locked');
-  el.innerHTML = '<h2>Clue Card '+num+'</h2><ul>'+clues[num].map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>';
-  updateFeedback();
+function currentCard(){
+  return cards[currentIndex];
 }
 
-function renderSystems(){
-  const grid = document.getElementById('system-grid');
-  grid.innerHTML = systems.map(system => {
-    const cls = [
-      'system-token',
-      selected === system ? 'selected' : '',
-      solved && system === answer ? 'correct' : '',
-      selected === system && selected !== answer && opened.size === 2 ? 'wrong' : ''
+function renderDeck(){
+  const grid = document.getElementById('deck-grid');
+  grid.innerHTML = cards.map((card, index) => {
+    const classes = [
+      'deck-card',
+      index === currentIndex ? 'active' : '',
+      solvedCards.has(card.id) ? 'done' : ''
     ].filter(Boolean).join(' ');
-    return '<button class="'+cls+'" onclick="selectSystem(\''+system+'\')">'+system+'</button>';
+    const status = solvedCards.has(card.id) ? 'Solved' : (card.status === 'ready' ? 'Ready' : 'Needs clues');
+    return '<button class="'+classes+'" onclick="selectCard('+index+')">'
+      + '<div class="deck-label">'+esc(card.label)+'</div>'
+      + '<div class="deck-status">'+esc(status)+'</div>'
+      + '</button>';
   }).join('');
 }
 
-function selectSystem(system){
-  if(opened.size < 2){
-    selected = system;
-    updateFeedback('Open both clue cards first, then match the system.', 'bad');
-    renderSystems();
-    return;
+function renderMystery(){
+  const card = currentCard();
+  const hasImage = Boolean(card.image);
+  const solved = solvedCards.has(card.id);
+  const frontImg = document.getElementById('front-img');
+  const backImg = document.getElementById('back-img');
+  const frontPlaceholder = document.getElementById('front-placeholder');
+  const backPlaceholder = document.getElementById('back-placeholder');
+  frontImg.style.display = hasImage ? 'block' : 'none';
+  backImg.style.display = hasImage ? 'block' : 'none';
+  frontPlaceholder.style.display = hasImage ? 'none' : 'flex';
+  backPlaceholder.style.display = hasImage ? 'none' : 'flex';
+  if(hasImage){
+    frontImg.src = card.image;
+    backImg.src = card.image;
+    frontImg.alt = 'Blurred mystery antigen structure';
+    backImg.alt = card.imageAlt || 'Revealed antigen structure';
   }
-  selected = system;
-  if(system === answer){
-    solved = true;
-    document.getElementById('mystery-card').classList.add('revealed');
-    document.getElementById('reveal-note').textContent = 'Revealed';
-    updateFeedback('Correct match. The antigen image is revealed.', 'good');
-    showReference(true);
-  }else{
-    updateFeedback('Not this one. Compare both clue cards and try another system.', 'bad');
+  document.getElementById('answer-secret').textContent = solved ? card.answer + ' Blood Group System' : 'Hidden answer';
+  document.getElementById('answer-sub').textContent = solved ? (card.imageNote || 'Antigen image revealed') : 'Answer hidden until this card is completed';
+  document.getElementById('answer-extra').textContent = solved ? (card.extra || 'Solved') : 'Hidden';
+  document.getElementById('mystery-card').classList.toggle('revealed', solved);
+  document.getElementById('reveal-note').textContent = solved ? 'Solved' : (card.status === 'ready' ? 'Blurred' : 'Waiting');
+}
+
+function renderClues(){
+  const card = currentCard();
+  for(let i = 1; i <= 2; i++){
+    const el = document.getElementById('clue-'+i);
+    const clueSet = card.clues && card.clues[i - 1];
+    if(card.status !== 'ready'){
+      el.className = 'clue-card locked';
+      el.innerHTML = '<div class="locked-note">Clue Card '+i+' will be added when you send the '+esc(card.label)+' clues.</div>';
+    }else if(opened.has(i)){
+      el.className = 'clue-card';
+      el.innerHTML = '<h2>Clue Card '+i+'</h2><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>';
+    }else{
+      el.className = 'clue-card locked';
+      el.innerHTML = '<button class="primary" onclick="openClue('+i+')">Open Clue '+i+'</button>';
+    }
   }
-  renderSystems();
+  document.getElementById('clue-note').textContent = card.status === 'ready' ? '2 required' : 'Waiting for clues';
+}
+
+function renderSystems(){
+  const card = currentCard();
+  const solved = solvedCards.has(card.id);
+  const grid = document.getElementById('system-grid');
+  grid.innerHTML = cards.map(systemCard => {
+    const label = systemCard.answer;
+    const isCorrect = solved && label === card.answer;
+    const cls = [
+      'system-token',
+      selected === label ? 'selected' : '',
+      isCorrect ? 'correct' : '',
+      selected === label && selected !== card.answer && opened.size === 2 ? 'wrong' : ''
+    ].filter(Boolean).join(' ');
+    const tokenText = isCorrect
+      ? '<span class="token-secret">'+esc(label)+'</span><span class="token-solved">Solved</span>'
+      : esc(label);
+    return '<button class="'+cls+'" onclick="selectSystem(\''+esc(label).replace(/&#39;/g,"\\'")+'\')" '+(card.status !== 'ready' ? 'disabled' : '')+'>'+tokenText+'</button>';
+  }).join('');
 }
 
 function updateFeedback(text, type){
@@ -432,6 +551,13 @@ function updateFeedback(text, type){
   fb.className = 'feedback' + (type ? ' '+type : '');
   if(text){
     fb.textContent = text;
+    return;
+  }
+  const card = currentCard();
+  if(card.status !== 'ready'){
+    fb.textContent = 'This card is set up and waiting for the clues you will provide later.';
+  }else if(solvedCards.has(card.id)){
+    fb.textContent = 'Solved. The antigen is revealed, and the answer label is blurred.';
   }else if(opened.size < 2){
     fb.textContent = 'Open both clue cards before matching.';
   }else{
@@ -439,39 +565,69 @@ function updateFeedback(text, type){
   }
 }
 
-function showReference(force){
-  if(!solved && !force){
-    updateFeedback('Match the system first, then open the study reference.', 'bad');
-    return;
-  }
-  const ref = document.getElementById('reference');
-  const rows = document.getElementById('reference-rows');
-  rows.innerHTML = referenceRows.map(([key,val]) =>
-    '<div class="ref-row"><div class="ref-key">'+esc(key)+'</div><div class="ref-val">'+esc(val)+'</div></div>'
-  ).join('');
-  ref.classList.add('show');
+function openClue(num){
+  const card = currentCard();
+  if(card.status !== 'ready')return;
+  opened.add(num);
+  renderClues();
+  updateFeedback();
 }
 
-function resetGame(){
-  opened.clear();
-  selected = '';
-  solved = false;
-  document.getElementById('mystery-card').classList.remove('revealed');
-  document.getElementById('reveal-note').textContent = 'Hidden';
-  document.getElementById('clue-1').className = 'clue-card locked';
-  document.getElementById('clue-1').innerHTML = '<button class="primary" onclick="openClue(1)">Open Clue 1</button>';
-  document.getElementById('clue-2').className = 'clue-card locked';
-  document.getElementById('clue-2').innerHTML = '<button class="primary" onclick="openClue(2)">Open Clue 2</button>';
-  document.getElementById('reference').classList.remove('show');
-  updateFeedback();
+function selectSystem(system){
+  const card = currentCard();
+  if(card.status !== 'ready'){
+    updateFeedback('This card is waiting for its clue set.', 'bad');
+    return;
+  }
+  if(opened.size < 2){
+    selected = system;
+    renderSystems();
+    updateFeedback('Open both clue cards first, then match the system.', 'bad');
+    return;
+  }
+  selected = system;
+  if(system === card.answer){
+    solvedCards.add(card.id);
+    document.getElementById('mystery-card').classList.add('revealed');
+    updateFeedback('Correct. Solved stamp added and the answer label is blurred.', 'good');
+  }else{
+    updateFeedback('Not this one. Compare both clue cards and try another system.', 'bad');
+  }
+  renderDeck();
+  renderMystery();
   renderSystems();
+}
+
+function selectCard(index){
+  currentIndex = index;
+  opened = new Set();
+  selected = '';
+  renderAll();
+}
+
+function resetCurrentCard(){
+  const card = currentCard();
+  opened = new Set();
+  selected = '';
+  solvedCards.delete(card.id);
+  renderAll();
+}
+
+function renderAll(){
+  const card = currentCard();
+  document.getElementById('card-badge').textContent = 'Card '+(currentIndex + 1)+' of '+cards.length;
+  renderDeck();
+  renderMystery();
+  renderClues();
+  renderSystems();
+  updateFeedback();
 }
 
 window.openClue = openClue;
 window.selectSystem = selectSystem;
-window.resetGame = resetGame;
-window.showReference = showReference;
-renderSystems();
+window.selectCard = selectCard;
+window.resetCurrentCard = resetCurrentCard;
+renderAll();
 </script>
 </body>
 </html>
