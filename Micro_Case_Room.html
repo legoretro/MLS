@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Micro Case Room</title>
+<script src="interactive_theme.js"></script>
+<link rel="stylesheet" href="interactive_learning.css">
+<style>
+:root{
+  --micro:#23856b;
+  --micro-dark:#0e4c3e;
+  --micro-soft:#e8f7f1;
+  --ink:#172033;
+  --muted:#66728d;
+  --panel:#ffffff;
+  --line:#bed9d0;
+  --cream:#fffdf7;
+  --amber:#f2c85b;
+  --rose:#d85263;
+  --blue:#3b74d8;
+  --shadow:0 18px 42px rgba(22,48,72,.13);
+}
+*{box-sizing:border-box}
+body.micro-case-room{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 9% 0%,rgba(35,133,107,.14),transparent 34%),
+    linear-gradient(180deg,#f4faf7 0%,#e9f1f6 100%);
+  color:var(--ink);
+  font-family:"Trebuchet MS",Arial,Helvetica,sans-serif;
+}
+.micro-wrap{max-width:1240px;margin:0 auto;padding:22px}
+.hero,.deck-panel,.room-card,.side-card{
+  background:rgba(255,255,255,.94);
+  border:2px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+}
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:center;
+  padding:24px;
+  border-top:8px solid var(--micro);
+  margin-bottom:16px;
+}
+.eyebrow{
+  color:var(--micro-dark);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.hero h1{margin:6px 0 7px;font-size:42px;line-height:1;color:var(--ink)}
+.hero p{margin:0;color:var(--muted);font-size:17px;max-width:780px;line-height:1.4}
+.hero-mark{
+  width:96px;
+  height:96px;
+  border-radius:24px;
+  border:2px solid #9bcfc0;
+  background:
+    linear-gradient(90deg,transparent 45%,rgba(255,255,255,.75) 45% 55%,transparent 55%),
+    linear-gradient(180deg,#e8fff7,#9cdccc);
+  position:relative;
+  box-shadow:inset 0 0 0 7px rgba(255,255,255,.55);
+}
+.hero-mark::before{
+  content:"CASE";
+  position:absolute;
+  left:50%;
+  top:17px;
+  transform:translateX(-50%);
+  color:var(--micro-dark);
+  font-weight:1000;
+  font-size:15px;
+  letter-spacing:.12em;
+}
+.hero-mark::after{
+  content:"ROOM";
+  position:absolute;
+  left:50%;
+  bottom:16px;
+  transform:translateX(-50%);
+  color:#fff;
+  background:var(--micro-dark);
+  border-radius:999px;
+  padding:6px 9px;
+  font-weight:1000;
+  font-size:13px;
+}
+.action-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.game-btn{
+  border:2px solid #9fc9bd;
+  background:#fff;
+  color:var(--micro-dark);
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:900;
+  cursor:pointer;
+  font-family:inherit;
+}
+.game-btn.primary{background:var(--micro);border-color:var(--micro);color:#fff}
+.game-btn.warn{background:#fff5d9;border-color:#deb34a;color:#725000}
+.game-btn:disabled{opacity:.5;cursor:not-allowed}
+.deck-panel{padding:16px;margin-bottom:16px}
+.deck-title{font-size:13px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:var(--micro-dark);margin-bottom:10px}
+.deck-tabs{display:flex;flex-wrap:wrap;gap:9px}
+.deck-tab{
+  border:2px solid #bcd8cf;
+  background:#fff;
+  color:#21493d;
+  border-radius:999px;
+  padding:10px 14px;
+  font-size:14px;
+  font-weight:1000;
+  cursor:pointer;
+  font-family:inherit;
+  box-shadow:0 3px 0 rgba(35,133,107,.08);
+}
+.deck-tab.active{background:var(--micro);border-color:var(--micro);color:#fff}
+.deck-tab.complete{border-color:#5dbb8d;background:#effaf3}
+.deck-tab.active.complete{background:#17664f;color:#fff}
+.game-grid{
+  display:grid;
+  grid-template-columns:minmax(520px,1.25fr) minmax(300px,.75fr);
+  gap:16px;
+  align-items:start;
+}
+.room-card{min-height:640px;perspective:1200px;position:relative}
+.flip-inner{position:relative;min-height:640px;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.room-card.solved .flip-inner{transform:rotateY(180deg)}
+.room-face{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  padding:18px;
+  overflow:hidden;
+}
+.room-face.back{transform:rotateY(180deg)}
+.case-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.case-top h2{margin:3px 0 0;font-size:29px;line-height:1.04}
+.case-kicker{font-size:12px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:var(--micro)}
+.progress-pill{
+  border:2px solid #bfd8d1;
+  border-radius:999px;
+  padding:8px 11px;
+  font-size:12px;
+  font-weight:1000;
+  color:var(--micro-dark);
+  background:#f7fffb;
+  white-space:nowrap;
+}
+.envelope-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.envelope{
+  min-height:188px;
+  border:2px solid #e5c067;
+  background:
+    linear-gradient(135deg,transparent 0 48%,rgba(229,192,103,.42) 49% 52%,transparent 53%),
+    linear-gradient(180deg,#fff8de,#fffdf4);
+  border-radius:16px;
+  padding:14px;
+  position:relative;
+  overflow:hidden;
+}
+.envelope::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:52px;
+  background:linear-gradient(135deg,rgba(242,200,91,.38) 49%,transparent 50%),linear-gradient(-135deg,rgba(242,200,91,.38) 49%,transparent 50%);
+  opacity:.82;
+}
+.envelope.locked{filter:saturate(.45);background:#f1f4f7;border-color:#cad3dd}
+.envelope h3{position:relative;margin:0 0 10px;font-size:18px;color:#5a4100}
+.envelope.locked h3{color:#5f6876}
+.envelope-list{position:relative;z-index:1;margin:0;padding-left:18px;display:grid;gap:6px}
+.envelope-list li{font-size:14px;line-height:1.25;font-weight:800;color:#263246}
+.empty-envelope{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  min-height:98px;
+  text-align:center;
+  color:#70551a;
+  font-weight:900;
+}
+.section-label{font-size:13px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:var(--micro-dark);margin:6px 0 9px}
+.test-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.test-card{
+  min-height:92px;
+  border:2px solid #bed9d0;
+  border-radius:13px;
+  background:linear-gradient(180deg,#fff,#f4fbf8);
+  color:var(--ink);
+  padding:10px 8px;
+  text-align:left;
+  font-family:inherit;
+  font-weight:900;
+  cursor:pointer;
+  position:relative;
+}
+.test-card::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:10px;
+  height:8px;
+  border-radius:999px;
+  background:repeating-linear-gradient(90deg,#d5e9e2 0 8px,#fff 8px 13px);
+}
+.test-card small{display:block;margin-top:6px;color:var(--muted);font-weight:900}
+.test-card.correct{border-color:#4cae78;background:#effaf3}
+.test-card.wrong{border-color:#e5959e;background:#fff0f2;color:#8c2030}
+.test-card:disabled{cursor:not-allowed;opacity:.55}
+.printout-area{display:grid;gap:8px}
+.machine-printout{
+  border:2px solid #ccd5df;
+  border-radius:12px;
+  background:
+    repeating-linear-gradient(180deg,#fff 0 18px,#f6f9fb 18px 20px);
+  padding:12px 13px;
+  box-shadow:0 6px 0 #d7dee8;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+.machine-printout strong{display:block;color:var(--micro-dark);font-size:13px;margin-bottom:5px}
+.locked-printout{
+  border:2px dashed #cfd8df;
+  border-radius:12px;
+  background:#f8fafb;
+  padding:16px;
+  color:var(--muted);
+  font-weight:900;
+  text-align:center;
+}
+.side-card{padding:16px;display:grid;gap:13px}
+.timer-card{
+  border:2px solid #173f35;
+  border-radius:16px;
+  background:linear-gradient(180deg,#133b32,#0d2824);
+  color:#dffcf4;
+  padding:14px;
+}
+.timer-label{font-size:12px;font-weight:1000;letter-spacing:.16em;text-transform:uppercase;color:#a6ead8}
+.timer-value{font-size:46px;line-height:1;font-weight:1000;margin-top:4px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.timer-rule{font-size:12px;color:#c1efe2;margin-top:7px;font-weight:800}
+.penalty{
+  min-height:44px;
+  border:2px solid #d6dfeb;
+  border-radius:12px;
+  padding:10px 12px;
+  background:#fff;
+  color:var(--muted);
+  font-weight:900;
+}
+.penalty.bad{background:#fff0f2;border-color:#df9aa3;color:#9a2636}
+.penalty.good{background:#effaf3;border-color:#7ec695;color:#22683f}
+.organism-grid{display:grid;gap:8px}
+.organism-choice{
+  border:2px solid #cdd7df;
+  border-radius:13px;
+  background:#fff;
+  padding:11px 12px;
+  text-align:left;
+  font-family:inherit;
+  font-weight:1000;
+  color:var(--ink);
+  cursor:pointer;
+}
+.organism-choice:hover{border-color:var(--micro)}
+.organism-choice.wrong{border-color:#e5959e;background:#fff0f2;color:#8c2030}
+.organism-choice.correct{border-color:#4cae78;background:#effaf3;color:#22683f}
+.organism-choice:disabled{opacity:.58;cursor:not-allowed}
+.start-panel{
+  min-height:480px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:40px 22px;
+}
+.start-panel h2{font-size:34px;margin:0 0 8px}
+.start-panel p{color:var(--muted);font-size:17px;line-height:1.4;max-width:680px;margin:0 auto 18px}
+.deck-progress{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  margin-top:16px;
+}
+.case-dot{
+  border:2px solid #cddbd6;
+  border-radius:12px;
+  padding:9px 8px;
+  background:#fff;
+  font-size:12px;
+  font-weight:1000;
+}
+.case-dot.done{background:#effaf3;border-color:#5dbb8d;color:#22683f}
+.solved-board{
+  min-height:100%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.9),transparent 24%),
+    linear-gradient(135deg,#eafaf3,#ffffff 42%,#fff7df);
+}
+.stamp{
+  display:inline-block;
+  border:5px solid #1e8a55;
+  color:#1e8a55;
+  border-radius:16px;
+  padding:10px 18px;
+  font-size:34px;
+  font-weight:1000;
+  letter-spacing:.08em;
+  transform:rotate(-5deg);
+  margin-bottom:16px;
+  background:rgba(255,255,255,.68);
+}
+.stamp.deck-done{border-color:#905f00;color:#905f00}
+.solved-card{
+  width:min(100%,560px);
+  background:#fff;
+  border:2px solid #bcd8cf;
+  border-radius:18px;
+  padding:18px;
+  text-align:left;
+  box-shadow:var(--shadow);
+}
+.solved-card h3{font-size:25px;margin:0 0 10px;text-align:center}
+.solved-card dl{display:grid;gap:10px;margin:0}
+.solved-card dt{font-size:12px;font-weight:1000;letter-spacing:.1em;text-transform:uppercase;color:var(--micro-dark)}
+.solved-card dd{margin:2px 0 0;color:#263246;font-weight:800;line-height:1.35}
+.solved-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:16px}
+.printable-game{display:none}
+@media(max-width:980px){
+  .micro-wrap{padding:14px}
+  .hero,.game-grid{grid-template-columns:1fr}
+  .hero-mark{display:none}
+  .test-grid{grid-template-columns:1fr 1fr}
+  .room-card,.flip-inner{min-height:860px}
+}
+@media(max-width:640px){
+  .hero h1{font-size:34px}
+  .envelope-grid,.test-grid{grid-template-columns:1fr}
+  .deck-progress{grid-template-columns:1fr}
+  .timer-value{font-size:38px}
+}
+@media print{
+  @page{size:letter;margin:.2in}
+  @page microSingle{size:4in 6in;margin:0}
+  body{background:#fff!important;color:#000!important}
+  .screen-shell,.site-header{display:none!important}
+  .printable-game{display:block!important;color:#000!important;font-family:Arial,Helvetica,sans-serif}
+  .print-title{font-size:16pt;font-weight:900;margin:0 0 .12in;color:#000!important}
+  .print-sheet{
+    page-break-after:always;
+    display:grid;
+    grid-template-columns:repeat(2,4in);
+    gap:.14in;
+    justify-content:center;
+    align-items:start;
+  }
+  body.print-single .print-title{display:none!important}
+  body.print-single .print-sheet{display:block;page-break-after:auto}
+  .print-card{
+    box-sizing:border-box;
+    width:4in;
+    height:6in;
+    border:2px solid #000;
+    border-radius:.14in;
+    padding:.17in;
+    page-break-inside:avoid;
+    background:#fff!important;
+    color:#000!important;
+    display:grid;
+    grid-template-rows:auto auto 1fr auto;
+    gap:.08in;
+  }
+  body.print-single .print-card{
+    page:microSingle;
+    margin:0 auto;
+    page-break-after:always;
+  }
+  .print-card h2{font-size:17pt;line-height:1.05;margin:0;color:#000!important}
+  .print-card h3{font-size:12pt;margin:0;color:#000!important;border-top:1px solid #000;padding-top:.07in}
+  .print-card .meta{font-size:9.5pt;line-height:1.25;border:1px solid #000;padding:.06in;color:#000!important}
+  .print-card ul{margin:.02in 0 0;padding-left:.2in}
+  .print-card li{font-size:10.3pt;line-height:1.2;margin:.035in 0;color:#000!important}
+  .print-card-type{
+    justify-self:start;
+    border:1px solid #000;
+    border-radius:999px;
+    padding:.03in .08in;
+    font-size:9pt;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#000!important;
+  }
+  .print-cut{border-top:1px dashed #000;padding-top:.06in;font-size:9pt;font-weight:800;color:#000!important}
+}
+</style>
+</head>
+<body class="mls-interactive micro-case-room">
+<div class="screen-shell">
+  <header class="site-header">
+    <div>
+      <div class="logo">MLS/BOC PREP</div>
+      <div class="logo-sub">Interactive Learning</div>
+    </div>
+    <a class="mls-home-btn" href="index.html#interactive">Interactive Tools</a>
+  </header>
+
+  <main class="micro-wrap">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Microbiology Escape Room</div>
+        <h1>Micro Case Room</h1>
+        <p>Pick a body-site deck, open the patient and lab envelopes, choose the right placeholder tests, then identify the placeholder organism before time runs out.</p>
+        <div class="action-row">
+          <button class="game-btn" type="button" onclick="printMode('current')">Print Current Deck Set</button>
+          <button class="game-btn" type="button" onclick="printMode('single')">Print Current Case 4x6</button>
+          <button class="game-btn" type="button" onclick="printMode('all')">Print All Placeholder Sets</button>
+        </div>
+      </div>
+      <div class="hero-mark" aria-hidden="true"></div>
+    </section>
+
+    <section class="deck-panel">
+      <div class="deck-title">Specimen Flow Builder</div>
+      <div class="deck-tabs" id="deckTabs"></div>
+    </section>
+
+    <section id="gameRoot"></section>
+  </main>
+</div>
+
+<section class="printable-game" id="printableGame"></section>
+
+<script>
+const bodySiteNames = [
+  "Blood Cultures",
+  "CSF",
+  "Other Body Fluids",
+  "Respiratory Cultures",
+  "Ear/Eye Cultures",
+  "Urine Cultures",
+  "Genital Culture",
+  "Wound Cultures",
+  "Stool Cultures"
+];
+
+const testLabels = [
+  "Placeholder Test A",
+  "Placeholder Test B",
+  "Placeholder Test C",
+  "Placeholder Test D",
+  "Placeholder Test E"
+];
+
+function makeDecks(){
+  return bodySiteNames.map((name, deckIndex) => ({
+    name,
+    code: name.split(/\s+/).map(word => word[0]).join("").replace("/", "").slice(0, 3).toUpperCase(),
+    cases: Array.from({length:5}, (_, caseIndex) => makePlaceholderCase(name, deckIndex, caseIndex))
+  }));
+}
+
+function makePlaceholderCase(deckName, deckIndex, caseIndex){
+  const number = caseIndex + 1;
+  const requiredCount = number % 2 === 0 ? 2 : 1;
+  const primaryTest = caseIndex % testLabels.length;
+  const secondaryTest = (caseIndex + 2) % testLabels.length;
+  const requiredTests = requiredCount === 2 ? [primaryTest, secondaryTest] : [primaryTest];
+  const organismIndex = (deckIndex + caseIndex) % 5;
+  return {
+    id: `${deckIndex}-${caseIndex}`,
+    number,
+    deckName,
+    age: `Placeholder age ${number}`,
+    specimenSource: `${deckName} placeholder specimen source`,
+    symptoms: `Placeholder symptoms/history for ${deckName} case ${number}.`,
+    collectionNote: `Placeholder collection note for ${deckName} case ${number}.`,
+    gramStain: `Placeholder Gram stain clue ${number}.`,
+    colonyMorphology: `Placeholder colony morphology clue ${number}.`,
+    mediaGrowth: `Placeholder media growth clue ${number}.`,
+    extraClue: `Placeholder extra clue ${number}.`,
+    tests: testLabels.map((label, testIndex) => ({
+      id: `test-${testIndex}`,
+      label,
+      correct: requiredTests.includes(testIndex),
+      result: `Placeholder machine printout result for ${label}.`
+    })),
+    requiredTestIds: requiredTests.map(testIndex => `test-${testIndex}`),
+    organisms: Array.from({length:5}, (_, orgIndex) => ({
+      id: `org-${orgIndex}`,
+      label: `Placeholder Organism ${String.fromCharCode(65 + orgIndex)}`,
+      correct: orgIndex === organismIndex
+    })),
+    solved: {
+      organism: `Placeholder Organism ${String.fromCharCode(65 + organismIndex)}`,
+      keyClues: [
+        `Placeholder key clue from ${deckName} case ${number}.`,
+        `Placeholder lab clue pattern for case ${number}.`
+      ],
+      confirmatoryTests: requiredTests.map(testIndex => testLabels[testIndex])
+    }
+  };
+}
+
+const decks = makeDecks();
+const solvedCases = new Set();
+let state = freshState(0, 0, false);
+let timerId = null;
+
+function freshState(deckIndex, caseIndex, started){
+  return {
+    deckIndex,
+    caseIndex,
+    started,
+    patientOpen:false,
+    labOpen:false,
+    selectedTests:new Set(),
+    wrongTests:new Set(),
+    wrongOrganisms:new Set(),
+    solved:false,
+    remaining:15 * 60,
+    feedback: started ? "Open the patient envelope to begin the case." : "Choose a deck and start Case 1 of 5.",
+    feedbackType:"",
+    penalty:""
+  };
+}
+
+function esc(value){
+  return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function currentDeck(){
+  return decks[state.deckIndex];
+}
+
+function currentCase(){
+  return currentDeck().cases[state.caseIndex];
+}
+
+function caseCode(item){
+  const deck = decks.find(entry => entry.name === item.deckName) || currentDeck();
+  return `${deck.code}-${item.number}`;
+}
+
+function formatTime(seconds){
+  const safe = Math.max(0, seconds);
+  const mins = Math.floor(safe / 60);
+  const secs = safe % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+function stopTimer(){
+  if(timerId){
+    clearInterval(timerId);
+    timerId = null;
+  }
+}
+
+function startTimer(){
+  stopTimer();
+  timerId = setInterval(() => {
+    if(!state.started || state.solved)return;
+    state.remaining = Math.max(0, state.remaining - 1);
+    updateTimerDisplay();
+    if(state.remaining <= 0){
+      stopTimer();
+      state.feedback = "Time expired. Reset this case or start it again.";
+      state.feedbackType = "bad";
+      render();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  const timer = document.getElementById("timerValue");
+  if(timer)timer.textContent = formatTime(state.remaining);
+}
+
+function completedInDeck(deckIndex){
+  return decks[deckIndex].cases.filter(item => solvedCases.has(item.id)).length;
+}
+
+function selectDeck(index){
+  stopTimer();
+  state = freshState(index, 0, false);
+  render();
+}
+
+function startCase(index = state.caseIndex){
+  state = freshState(state.deckIndex, index, true);
+  startTimer();
+  render();
+}
+
+function resetCase(){
+  startCase(state.caseIndex);
+}
+
+function openPatientEnvelope(){
+  if(!state.started || state.remaining <= 0)return;
+  state.patientOpen = true;
+  state.feedback = "Patient envelope open. Open the lab clues envelope next.";
+  state.feedbackType = "good";
+  render();
+}
+
+function openLabEnvelope(){
+  if(!state.patientOpen){
+    state.feedback = "Open the patient envelope first.";
+    state.feedbackType = "bad";
+    render();
+    return;
+  }
+  if(state.remaining <= 0)return;
+  state.labOpen = true;
+  state.feedback = "Lab clues open. Choose the required test card or cards.";
+  state.feedbackType = "good";
+  render();
+}
+
+function requiredTestsComplete(){
+  const item = currentCase();
+  return item.requiredTestIds.every(testId => state.selectedTests.has(testId));
+}
+
+function penalize(message){
+  state.remaining = Math.max(0, state.remaining - 60);
+  state.penalty = `-1 minute: ${message}`;
+  state.feedback = state.penalty;
+  state.feedbackType = "bad";
+  if(state.remaining <= 0){
+    stopTimer();
+    state.feedback = "Time expired after the penalty.";
+  }
+}
+
+function chooseTest(testId){
+  const item = currentCase();
+  if(!state.labOpen || state.solved || state.remaining <= 0)return;
+  const test = item.tests.find(entry => entry.id === testId);
+  if(!test || state.selectedTests.has(testId) || state.wrongTests.has(testId))return;
+  if(test.correct){
+    state.selectedTests.add(testId);
+    state.penalty = "";
+    state.feedback = requiredTestsComplete()
+      ? "All required test printouts are open. Choose the final organism."
+      : "Correct test. One more required test printout is still locked.";
+    state.feedbackType = "good";
+  }else{
+    state.wrongTests.add(testId);
+    penalize("wrong test card selected");
+  }
+  render();
+}
+
+function chooseOrganism(orgId){
+  const item = currentCase();
+  if(state.solved || state.remaining <= 0)return;
+  if(!requiredTestsComplete()){
+    state.feedback = item.requiredTestIds.length === 2
+      ? "This case needs both correct test printouts before the organism choice opens."
+      : "Open the correct test printout before choosing the organism.";
+    state.feedbackType = "bad";
+    render();
+    return;
+  }
+  const organism = item.organisms.find(entry => entry.id === orgId);
+  if(!organism || state.wrongOrganisms.has(orgId))return;
+  if(organism.correct){
+    state.solved = true;
+    solvedCases.add(item.id);
+    stopTimer();
+    state.penalty = "";
+    state.feedback = "CASE SOLVED.";
+    state.feedbackType = "good";
+  }else{
+    state.wrongOrganisms.add(orgId);
+    penalize("wrong organism choice");
+  }
+  render();
+}
+
+function nextCase(){
+  if(!state.solved)return;
+  if(state.caseIndex < 4){
+    startCase(state.caseIndex + 1);
+  }else{
+    stopTimer();
+    state.started = false;
+    state.feedback = "Deck complete. Choose another body-site deck or print the placeholder set.";
+    state.feedbackType = "good";
+    render();
+  }
+}
+
+function renderDeckTabs(){
+  document.getElementById("deckTabs").innerHTML = decks.map((deck, index) => {
+    const done = completedInDeck(index);
+    const classes = ["deck-tab", index === state.deckIndex ? "active" : "", done === 5 ? "complete" : ""].filter(Boolean).join(" ");
+    return `<button class="${classes}" type="button" onclick="selectDeck(${index})">${esc(deck.name)} <span>${done}/5</span></button>`;
+  }).join("");
+}
+
+function renderStartPanel(){
+  const deck = currentDeck();
+  const done = completedInDeck(state.deckIndex);
+  const complete = done === 5;
+  return `<section class="room-card start-panel">
+    <div>
+      <div class="eyebrow">${esc(deck.name)}</div>
+      <h2>${complete ? "Deck Complete" : "Ready Room"}</h2>
+      <p>${complete ? "All 5 placeholder cases in this body-site deck are solved." : "Start Case 1 of 5. Each case gets 15 minutes, and wrong tests or organism choices subtract 1 minute."}</p>
+      <button class="game-btn primary" type="button" onclick="startCase(0)">${complete ? "Replay Deck" : "Start Case 1 of 5"}</button>
+      <div class="deck-progress">
+        ${deck.cases.map(item => `<div class="case-dot ${solvedCases.has(item.id) ? "done" : ""}">Case ${item.number}<br>${solvedCases.has(item.id) ? "Solved" : "Open"}</div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+}
+
+function renderEnvelope(title, open, locked, items, openAction){
+  if(locked){
+    return `<article class="envelope locked">
+      <h3>${esc(title)}</h3>
+      <div class="empty-envelope">Locked until the prior envelope opens.</div>
+    </article>`;
+  }
+  if(open){
+    return `<article class="envelope">
+      <h3>${esc(title)}</h3>
+      <ul class="envelope-list">${items.map(item => `<li>${esc(item)}</li>`).join("")}</ul>
+    </article>`;
+  }
+  return `<article class="envelope">
+    <h3>${esc(title)}</h3>
+    <div class="empty-envelope">
+      <button class="game-btn warn" type="button" onclick="${openAction}">Open ${esc(title)}</button>
+    </div>
+  </article>`;
+}
+
+function renderTests(item){
+  return item.tests.map(test => {
+    const chosen = state.selectedTests.has(test.id);
+    const wrong = state.wrongTests.has(test.id);
+    const classes = ["test-card", chosen ? "correct" : "", wrong ? "wrong" : ""].filter(Boolean).join(" ");
+    const status = chosen ? "Printout open" : (wrong ? "Penalty used" : "Envelope closed");
+    return `<button class="${classes}" type="button" onclick="chooseTest('${test.id}')" ${!state.labOpen || chosen || wrong || state.remaining <= 0 ? "disabled" : ""}>
+      ${esc(test.label)}
+      <small>${esc(status)}</small>
+    </button>`;
+  }).join("");
+}
+
+function renderPrintouts(item){
+  const openedTests = item.tests.filter(test => state.selectedTests.has(test.id));
+  if(!openedTests.length){
+    return `<div class="locked-printout">Machine printouts appear here after correct test cards are selected.</div>`;
+  }
+  return openedTests.map(test => `<div class="machine-printout">
+    <strong>${esc(test.label)} / PRINTOUT</strong>
+    ${esc(test.result)}
+  </div>`).join("");
+}
+
+function renderOrganismChoices(item){
+  const unlocked = requiredTestsComplete();
+  return item.organisms.map(org => {
+    const wrong = state.wrongOrganisms.has(org.id);
+    const correct = state.solved && org.correct;
+    const classes = ["organism-choice", wrong ? "wrong" : "", correct ? "correct" : ""].filter(Boolean).join(" ");
+    return `<button class="${classes}" type="button" onclick="chooseOrganism('${org.id}')" ${!unlocked || wrong || state.solved || state.remaining <= 0 ? "disabled" : ""}>${esc(org.label)}</button>`;
+  }).join("");
+}
+
+function renderActiveCase(){
+  const item = currentCase();
+  const patientItems = [
+    `Age: ${item.age}`,
+    `Specimen source: ${item.specimenSource}`,
+    `Symptoms/history: ${item.symptoms}`,
+    `Collection note: ${item.collectionNote}`
+  ];
+  const labItems = [
+    `Gram stain: ${item.gramStain}`,
+    `Colony morphology: ${item.colonyMorphology}`,
+    `Media growth: ${item.mediaGrowth}`,
+    `Extra clue: ${item.extraClue}`
+  ];
+  const deckDone = completedInDeck(state.deckIndex) === 5;
+  return `<section class="game-grid">
+    <article class="room-card ${state.solved ? "solved" : ""}">
+      <div class="flip-inner">
+        <div class="room-face front">
+          <div class="case-top">
+            <div>
+              <div class="case-kicker">${esc(item.deckName)}</div>
+              <h2>${caseCode(item)} Mystery Case</h2>
+            </div>
+            <div class="progress-pill">Case ${item.number} of 5</div>
+          </div>
+          <div class="envelope-grid">
+            ${renderEnvelope("Patient Envelope", state.patientOpen, false, patientItems, "openPatientEnvelope()")}
+            ${renderEnvelope("Lab Clues Envelope", state.labOpen, !state.patientOpen, labItems, "openLabEnvelope()")}
+          </div>
+          <div class="section-label">Test Cards / Envelopes</div>
+          <div class="test-grid">${renderTests(item)}</div>
+          <div class="section-label">Small Lab Machine Printout</div>
+          <div class="printout-area">${renderPrintouts(item)}</div>
+        </div>
+        <div class="room-face back">
+          <div class="solved-board">
+            <div>
+              <div class="stamp ${deckDone ? "deck-done" : ""}">${deckDone ? "DECK COMPLETE" : "CASE SOLVED"}</div>
+              <div class="solved-card">
+                <h3>${caseCode(item)} Solved Side</h3>
+                <dl>
+                  <div><dt>Organism</dt><dd>${esc(item.solved.organism)}</dd></div>
+                  <div><dt>Key Clues</dt><dd>${item.solved.keyClues.map(esc).join("<br>")}</dd></div>
+                  <div><dt>Best Confirmatory Tests</dt><dd>${item.solved.confirmatoryTests.map(esc).join(", ")}</dd></div>
+                </dl>
+              </div>
+              <div class="solved-actions">
+                <button class="game-btn primary" type="button" onclick="nextCase()">${item.number < 5 ? "Move to Next Case" : "Show Deck Complete"}</button>
+                <button class="game-btn" type="button" onclick="resetCase()">Replay This Case</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+    <aside class="side-card">
+      <div class="timer-card">
+        <div class="timer-label">Countdown Timer</div>
+        <div class="timer-value" id="timerValue">${formatTime(state.remaining)}</div>
+        <div class="timer-rule">15 minutes per case. Wrong test or organism choice = minus 1 minute.</div>
+      </div>
+      <div class="penalty ${state.feedbackType}">${esc(state.feedback)}</div>
+      <div>
+        <div class="section-label">Final Organism Choice</div>
+        <div class="organism-grid">${renderOrganismChoices(item)}</div>
+      </div>
+      <button class="game-btn" type="button" onclick="resetCase()">Reset Case</button>
+    </aside>
+  </section>`;
+}
+
+function render(){
+  renderDeckTabs();
+  document.getElementById("gameRoot").innerHTML = state.started ? renderActiveCase() : renderStartPanel();
+  updateTimerDisplay();
+}
+
+function printableCard(type, item, deck){
+  const body = {
+    patient: [
+      `Age: ${item.age}`,
+      `Specimen source: ${item.specimenSource}`,
+      `Symptoms/history: ${item.symptoms}`,
+      `Collection note: ${item.collectionNote}`
+    ],
+    lab: [
+      `Gram stain: ${item.gramStain}`,
+      `Colony morphology: ${item.colonyMorphology}`,
+      `Media growth: ${item.mediaGrowth}`,
+      `Extra clue: ${item.extraClue}`
+    ],
+    result: item.tests.filter(test => item.requiredTestIds.includes(test.id)).map(test => `${test.label}: ${test.result}`),
+    organism: item.organisms.map(org => org.label),
+    solved: [
+      `Organism: ${item.solved.organism}`,
+      `Key clues: ${item.solved.keyClues.join(" / ")}`,
+      `Best confirmatory tests: ${item.solved.confirmatoryTests.join(", ")}`
+    ]
+  };
+  const title = {
+    patient:"Patient Envelope Card",
+    lab:"Lab Clue Card",
+    result:"Test Result Card",
+    organism:"Organism Choice Card",
+    solved:"Solved Card"
+  }[type];
+  return `<article class="print-card">
+    <div class="print-card-type">${esc(title)}</div>
+    <h2>${esc(caseCode(item))} - ${esc(deck.name)}</h2>
+    <div class="meta">Placeholder printable card / 4x6 format / cut line friendly</div>
+    <div>
+      <h3>${esc(title)}</h3>
+      <ul>${body[type].map(line => `<li>${esc(line)}</li>`).join("")}</ul>
+    </div>
+    <div class="print-cut">Cut card. Placeholder content only.</div>
+  </article>`;
+}
+
+function renderPrintable(mode){
+  const deck = currentDeck();
+  const targetCases = mode === "all"
+    ? decks.flatMap(entry => entry.cases.map(item => ({deck:entry, item})))
+    : mode === "single"
+      ? [{deck, item:currentCase()}]
+      : deck.cases.map(item => ({deck, item}));
+  const cards = targetCases.flatMap(({deck:caseDeck, item}) => ["patient","lab","result","organism","solved"].map(type => printableCard(type, item, caseDeck)));
+  const sheets = [];
+  for(let i = 0; i < cards.length; i += 2){
+    sheets.push(`<div class="print-sheet">${cards.slice(i, i + 2).join("")}</div>`);
+  }
+  const title = mode === "all" ? "Micro Case Room - All Placeholder Decks" : `Micro Case Room - ${deck.name}`;
+  document.getElementById("printableGame").innerHTML = `<h1 class="print-title">${esc(title)}</h1>${sheets.join("")}`;
+}
+
+function printMode(mode){
+  renderPrintable(mode);
+  document.body.classList.remove("print-current", "print-single", "print-all");
+  document.body.classList.add(`print-${mode}`);
+  setTimeout(() => window.print(), 80);
+}
+
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("print-current", "print-single", "print-all");
+});
+
+window.selectDeck = selectDeck;
+window.startCase = startCase;
+window.resetCase = resetCase;
+window.openPatientEnvelope = openPatientEnvelope;
+window.openLabEnvelope = openLabEnvelope;
+window.chooseTest = chooseTest;
+window.chooseOrganism = chooseOrganism;
+window.nextCase = nextCase;
+window.printMode = printMode;
+
+renderPrintable("current");
+render();
+</script>
+</body>
+</html>
