@@ -654,18 +654,22 @@ body.room-intense .room-card{border-color:#b8ffe4;box-shadow:0 0 0 5px rgba(202,
   .timer-value{font-size:38px}
 }
 @media print{
-  @page{size:letter landscape;margin:.18in}
+  @page{size:letter landscape;margin:.12in}
   @page microSingle{size:6in 4in;margin:0}
   body{background:#fff!important;color:#000!important}
   .screen-shell,.site-header{display:none!important}
-  .printable-game{display:block!important;color:#000!important;font-family:Arial,Helvetica,sans-serif}
-  .print-title{font-size:16pt;font-weight:900;margin:0 0 .12in;color:#000!important}
+  .printable-game{
+    display:block!important;
+    color:#000!important;
+    font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
+  }
+  .print-title{display:none!important}
   .print-sheet{
     page-break-after:always;
     display:grid;
-    grid-template-columns:6in;
-    grid-template-rows:repeat(2,4in);
-    gap:.12in;
+    grid-template-columns:repeat(2,5.27in);
+    grid-template-rows:repeat(3,2.66in);
+    gap:.05in;
     justify-content:center;
     align-items:start;
   }
@@ -676,29 +680,42 @@ body.room-intense .room-card{border-color:#b8ffe4;box-shadow:0 0 0 5px rgba(202,
   body.print-single .print-token-section{display:none!important}
   .print-card{
     box-sizing:border-box;
-    width:6in;
-    height:4in;
+    width:5.27in;
+    height:2.66in;
     border:2px solid #000;
-    border-radius:.14in;
-    padding:.12in;
+    border-radius:.1in;
+    padding:.055in;
     page-break-inside:avoid;
     background:#fff!important;
     color:#000!important;
     display:grid;
-    grid-template-rows:auto 1fr auto;
-    gap:.055in;
+    grid-template-rows:auto auto 1fr auto;
+    gap:.022in;
+    position:relative;
+  }
+  .print-card::before{
+    content:"☣";
+    position:absolute;
+    right:.08in;
+    bottom:.02in;
+    font-size:13pt;
+    line-height:1;
+    color:#000!important;
+    opacity:1;
   }
   body.print-single .print-card{
     page:microSingle;
     margin:0 auto;
     page-break-after:always;
+    width:6in;
+    height:4in;
   }
-  .print-card h2{font-size:15pt;line-height:1;margin:0;color:#000!important}
+  .print-card h2{font-size:10.2pt;line-height:.92;margin:0;color:#000!important}
   .print-card-type{
     border:1px solid #000;
     border-radius:999px;
-    padding:.025in .07in;
-    font-size:8.2pt;
+    padding:.015in .045in;
+    font-size:6.2pt;
     font-weight:900;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -708,172 +725,208 @@ body.room-intense .room-card{border-color:#b8ffe4;box-shadow:0 0 0 5px rgba(202,
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:.08in;
+    gap:.05in;
   }
   .print-card-header strong{
-    font-size:9pt;
-    letter-spacing:.08em;
+    font-size:6.4pt;
+    letter-spacing:.05em;
     text-transform:uppercase;
     color:#000!important;
   }
   .print-escape-steps{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:.07in;
+    gap:.035in;
     min-height:0;
   }
   .print-envelope-mini{
     border:1px solid #000;
-    border-radius:.08in;
-    padding:.06in;
+    border-radius:.055in;
+    padding:.032in;
     overflow:hidden;
     display:grid;
     grid-template-rows:auto 1fr;
-    gap:.035in;
+    gap:.018in;
   }
   .print-envelope-mini h3{
     margin:0;
     border-bottom:1px solid #000;
-    padding-bottom:.03in;
-    font-size:9.2pt;
+    padding-bottom:.015in;
+    font-size:6.25pt;
     line-height:1;
     text-transform:uppercase;
-    letter-spacing:.05em;
+    letter-spacing:.035em;
     color:#000!important;
   }
   .print-envelope-mini ul{
     margin:0;
-    padding-left:.15in;
+    padding-left:.105in;
     display:grid;
-    gap:.018in;
+    gap:.012in;
   }
   .print-envelope-mini li{
-    font-size:7.8pt;
-    line-height:1.1;
+    font-family:"Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
+    font-size:5.65pt;
+    line-height:1;
     font-weight:700;
     color:#000!important;
   }
   .print-test-prompt{
     border:1px solid #000;
-    border-radius:.08in;
-    padding:.055in;
+    border-radius:.055in;
+    padding:.03in .22in .03in .03in;
     display:grid;
-    gap:.035in;
+    gap:.018in;
   }
   .print-test-prompt strong{
-    font-size:8.8pt;
+    font-size:6.5pt;
     text-transform:uppercase;
     letter-spacing:.06em;
     color:#000!important;
   }
-  .print-test-prompt span{font-size:7.6pt;font-weight:700;color:#000!important}
+  .print-test-prompt span{display:none!important}
   .print-test-list{
     display:grid;
     grid-template-columns:repeat(5,1fr);
-    gap:.035in;
+    gap:.018in;
   }
   .print-test-chip{
     border:1px solid #000;
-    border-radius:.05in;
-    padding:.035in;
-    min-height:.28in;
-    font-size:7.2pt;
-    line-height:1.05;
+    border-radius:.035in;
+    padding:.02in;
+    min-height:.18in;
+    font-family:"Arial Black","Arial Rounded MT Bold",Arial,sans-serif;
+    font-size:5.55pt;
+    line-height:1;
     font-weight:900;
     text-align:center;
     color:#000!important;
   }
+  .print-guide-pack,.print-receipt-pack,.print-token-pack{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:.08in;
+    align-items:start;
+  }
+  .print-receipt-pack,.print-token-pack{grid-template-columns:1fr}
   .print-test-guide,
   .print-receipt-section,
   .print-token-section{
-    page-break-after:always;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    margin:0 0 .08in;
     color:#000!important;
   }
   .print-test-guide h2,
   .print-receipt-section h2,
   .print-token-section h2{
-    font-size:16pt;
-    margin:0 0 .1in;
+    font-size:11.5pt;
+    line-height:1;
+    margin:0 0 .035in;
     color:#000!important;
   }
+  .print-test-guide h2::before,
+  .print-receipt-section h2::before,
+  .print-token-section h2::before{content:"◆ ";color:#000!important}
   .print-test-guide table{
     width:100%;
     border-collapse:collapse;
-    font-size:7.2pt;
-    line-height:1.15;
+    table-layout:fixed;
+    font-family:"Arial Black","Arial Rounded MT Bold",Arial,sans-serif;
+    font-size:8.9pt;
+    line-height:1.03;
   }
   .print-test-guide th,
   .print-test-guide td{
     border:1px solid #000;
     vertical-align:top;
-    padding:.04in;
+    padding:.025in;
+    overflow-wrap:anywhere;
+    word-break:break-word;
     color:#000!important;
   }
-  .print-test-guide th{font-size:7.8pt;text-align:left;background:#fff!important}
-  .print-test-note{font-size:8.5pt;font-weight:700;margin:.08in 0 .12in;color:#000!important}
+  .print-test-guide th{
+    width:.44in;
+    font-size:8.8pt;
+    text-align:center;
+    background:#fff!important;
+  }
+  .print-test-guide thead th{font-size:7.7pt}
+  .print-test-guide thead th:first-child{width:.38in}
+  .print-test-note{display:none!important}
+  .print-table-action,.print-test-head{
+    display:block;
+    color:#000!important;
+    text-align:center;
+    white-space:normal;
+  }
+  .print-table-action{font-size:8.8pt;line-height:1.04}
+  .print-test-head{font-size:7.5pt;line-height:.98}
   .print-receipt-grid{
     display:grid;
     grid-template-columns:repeat(5,1fr);
-    gap:.09in;
+    gap:.055in;
   }
   .print-receipt{
     border:1px dashed #000;
-    padding:.08in;
-    min-height:6.65in;
+    padding:.045in;
+    min-height:1.08in;
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    background:
-      repeating-linear-gradient(180deg,#fff 0 .18in,#f7f7f7 .18in .2in)!important;
+    background:#fff!important;
     color:#000!important;
     page-break-inside:avoid;
   }
   .print-receipt h3{
-    margin:.04in 0 .08in;
+    margin:.02in 0 .035in;
     border-top:1px dashed #000;
     border-bottom:1px dashed #000;
-    padding:.05in 0;
-    font-size:10pt;
+    padding:.025in 0;
+    font-size:7.1pt;
+    line-height:1.05;
     text-align:center;
     color:#000!important;
   }
   .receipt-top,.receipt-end{
     text-align:center;
-    font-size:8.2pt;
+    font-size:6.8pt;
+    line-height:1.05;
     font-weight:900;
     text-transform:uppercase;
-    letter-spacing:.05em;
+    letter-spacing:.02em;
     color:#000!important;
   }
-  .print-receipt ul{margin:.07in 0;padding-left:.16in}
-  .print-receipt li{font-size:7.2pt;line-height:1.18;margin:.035in 0;color:#000!important}
+  .print-receipt ul{margin:.035in 0;padding-left:.12in}
+  .print-receipt li{font-size:6.4pt;line-height:1.08;margin:.015in 0;color:#000!important}
   .receipt-end{
-    margin-top:.1in;
+    margin-top:.035in;
     border-top:1px dashed #000;
-    padding-top:.08in;
-    font-size:8.8pt;
+    padding-top:.03in;
+    font-size:6.8pt;
   }
   .print-token-grid{
     display:grid;
-    grid-template-columns:repeat(5,1.55in);
-    gap:.12in;
+    grid-template-columns:repeat(9,.98in);
+    gap:.055in;
     justify-content:center;
   }
   .print-org-token{
-    width:1.55in;
-    height:1.55in;
+    width:.98in;
+    height:.98in;
     border:2px solid #000;
     border-radius:50%;
     display:grid;
     place-items:center;
     text-align:center;
-    padding:.08in;
-    font-size:10pt;
-    line-height:1.05;
+    padding:.045in;
+    font-size:7.2pt;
+    line-height:1;
     font-weight:900;
     page-break-inside:avoid;
     color:#000!important;
     background:#fff!important;
   }
-  .print-org-token small{display:block;font-size:7pt;font-weight:700;margin-top:.04in}
+  .print-org-token::before{content:"☣";display:block;font-size:9pt;line-height:1}
+  .print-org-token small{display:block;font-size:5.8pt;font-weight:700;margin-top:.02in}
 }
 </style>
 </head>
@@ -1288,9 +1341,9 @@ function renderChrome(inner, sceneClass = ""){
     </div>
     <div class="chrome-right">
       <button class="game-btn micro-audio-btn" id="microMusicBtn" type="button" onclick="toggleMicroMusic()">Music Off</button>
+      <button class="game-btn" type="button" onclick="printMode('all')">Print Game</button>
       <button class="game-btn" type="button" onclick="printMode('current')">Print Deck</button>
-      <button class="game-btn" type="button" onclick="printMode('single')">Print 4x6</button>
-      <button class="game-btn" type="button" onclick="printMode('all')">Print All</button>
+      <button class="game-btn" type="button" onclick="printMode('single')">Print Case</button>
     </div>
   </div>
   <div class="scene ${sceneClass}">${inner}</div>`;
@@ -1525,6 +1578,19 @@ function render(){
   updateMicroMusicButton();
 }
 
+function printBreakLabel(value){
+  return String(value).split(/\s+/).filter(Boolean).flatMap(word => {
+    if(word.length <= 8)return [word];
+    const chunks = [];
+    for(let i = 0; i < word.length; i += 2)chunks.push(word.slice(i, i + 2));
+    return chunks;
+  }).map(part => esc(part)).join("<br>");
+}
+
+function printActionLines(lines){
+  return `<span class="print-table-action">${lines.map(line => esc(line)).join("<br>")}</span>`;
+}
+
 function renderPrintCaseCard(item, deck){
   const patientClues = [
     `Age: ${item.age}`,
@@ -1557,7 +1623,7 @@ function renderPrintCaseCard(item, deck){
     <div class="print-test-prompt">
       <strong>What tests?</strong>
       <span>Choose from the test list below, then check the Test Response Table for this case.</span>
-      <div class="print-test-list">${item.tests.map(test => `<div class="print-test-chip">${esc(test.label)}</div>`).join("")}</div>
+      <div class="print-test-list">${item.tests.map(test => `<div class="print-test-chip">${printBreakLabel(test.label)}</div>`).join("")}</div>
     </div>
   </article>`;
 }
@@ -1565,12 +1631,12 @@ function renderPrintCaseCard(item, deck){
 function testStatusForCase(item, test){
   const caseId = caseCode(item);
   const requiredIndex = item.requiredTestIds.indexOf(test.id);
-  if(requiredIndex === -1)return `${caseId} wrong test. Remove 1 minute and continue.`;
-  if(item.requiredTestIds.length === 1)return `${caseId} correct test. Refer to Result Receipt ${item.number}.`;
+  if(requiredIndex === -1)return printActionLines([caseId, "WRONG TEST", "-1 MIN", "CONTINUE"]);
+  if(item.requiredTestIds.length === 1)return printActionLines([caseId, "YES", "RESULT", `RECEIPT ${item.number}`]);
   const position = requiredIndex + 1;
   return position < item.requiredTestIds.length
-    ? `${caseId} yes test, ${position} of ${item.requiredTestIds.length}. Choose another test.`
-    : `${caseId} yes test, ${position} of ${item.requiredTestIds.length}. When both are complete, refer to Result Receipt ${item.number}.`;
+    ? printActionLines([caseId, "YES TEST", `${position}/${item.requiredTestIds.length}`, "CHOOSE", "ANOTHER"])
+    : printActionLines([caseId, "YES TEST", `${position}/${item.requiredTestIds.length}`, "IF BOTH YES", `RECEIPT ${item.number}`]);
 }
 
 function renderPrintTestGuide(entries, title){
@@ -1582,13 +1648,13 @@ function renderPrintTestGuide(entries, title){
       <thead>
         <tr>
           <th>Case</th>
-          ${allTests.map(test => `<th>${esc(test.label)}</th>`).join("")}
+          ${allTests.map(test => `<th><span class="print-test-head">${printBreakLabel(test.label)}</span></th>`).join("")}
         </tr>
       </thead>
       <tbody>
         ${entries.map(({item}) => `<tr>
           <th>${esc(caseCode(item))}</th>
-          ${allTests.map(test => `<td>${esc(testStatusForCase(item, test))}</td>`).join("")}
+          ${allTests.map(test => `<td>${testStatusForCase(item, test)}</td>`).join("")}
         </tr>`).join("")}
       </tbody>
     </table>
@@ -1637,18 +1703,24 @@ function renderPrintable(mode){
         entries:entry.cases.map(item => ({deck:entry, item}))
       }))
     : [{title:mode === "single" ? `Micro Case Room - ${deck.name} / ${caseCode(currentCase())}` : `Micro Case Room - ${deck.name}`, entries:targetCases}];
+  const receiptGroups = mode === "all"
+    ? [{title:"Micro Case Room - Whole Game", entries:targetCases}]
+    : guideGroups;
+  const tokenGroups = mode === "all"
+    ? [{title:"Micro Case Room - Whole Game", entries:targetCases}]
+    : guideGroups;
   const cards = targetCases.map(({deck:caseDeck, item}) => renderPrintCaseCard(item, caseDeck));
   const sheets = [];
-  for(let i = 0; i < cards.length; i += 2){
-    sheets.push(`<div class="print-sheet">${cards.slice(i, i + 2).join("")}</div>`);
+  for(let i = 0; i < cards.length; i += 6){
+    sheets.push(`<div class="print-sheet">${cards.slice(i, i + 6).join("")}</div>`);
   }
   const title = mode === "all" ? "Micro Case Room - All Placeholder Decks" : `Micro Case Room - ${deck.name}`;
   document.getElementById("printableGame").innerHTML = `
     <h1 class="print-title">${esc(title)} - Case Cards</h1>
     ${sheets.join("")}
-    ${guideGroups.map(group => renderPrintTestGuide(group.entries, group.title)).join("")}
-    ${guideGroups.map(group => renderPrintReceipts(group.entries, group.title)).join("")}
-    ${guideGroups.map(group => renderPrintTokens(group.entries, group.title)).join("")}
+    <div class="print-guide-pack">${guideGroups.map(group => renderPrintTestGuide(group.entries, group.title)).join("")}</div>
+    <div class="print-receipt-pack">${receiptGroups.map(group => renderPrintReceipts(group.entries, group.title)).join("")}</div>
+    <div class="print-token-pack">${tokenGroups.map(group => renderPrintTokens(group.entries, group.title)).join("")}</div>
   `;
 }
 
@@ -1677,7 +1749,7 @@ window.nextCase = nextCase;
 window.toggleMicroMusic = toggleMicroMusic;
 window.printMode = printMode;
 
-renderPrintable("current");
+renderPrintable("all");
 render();
 </script>
 </body>
