@@ -30,6 +30,19 @@ body.micro-case-room{
     linear-gradient(180deg,#f4faf7 0%,#e9f1f6 100%);
   color:var(--ink);
   font-family:"Trebuchet MS",Arial,Helvetica,sans-serif;
+  transition:background .45s ease,color .3s ease;
+}
+body.micro-case-room.room-active{
+  background:
+    radial-gradient(circle at 20% 18%,rgba(60,255,181,.24),transparent 28%),
+    radial-gradient(circle at 76% 8%,rgba(20,87,70,.36),transparent 34%),
+    linear-gradient(180deg,#dff7ec 0%,#9ccfc0 52%,#173d35 100%);
+}
+body.micro-case-room.room-intense{
+  background:
+    radial-gradient(circle at 18% 20%,rgba(127,255,203,.44),transparent 28%),
+    radial-gradient(circle at 78% 9%,rgba(28,150,106,.45),transparent 34%),
+    linear-gradient(180deg,#c7f5dd 0%,#3c9b76 54%,#09241f 100%);
 }
 .micro-wrap{max-width:1240px;margin:0 auto;padding:22px}
 .hero,.deck-panel,.room-card,.side-card{
@@ -104,7 +117,177 @@ body.micro-case-room{
 }
 .game-btn.primary{background:var(--micro);border-color:var(--micro);color:#fff}
 .game-btn.warn{background:#fff5d9;border-color:#deb34a;color:#725000}
+.game-btn.danger{background:#123d34;border-color:#123d34;color:#e6fff7}
 .game-btn:disabled{opacity:.5;cursor:not-allowed}
+.game-shell{
+  position:relative;
+  min-height:680px;
+  border:2px solid rgba(35,133,107,.35);
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 18% 8%,rgba(255,255,255,.92),transparent 20%),
+    linear-gradient(145deg,rgba(255,255,255,.88),rgba(232,247,241,.88));
+  box-shadow:0 28px 70px rgba(18,61,52,.18);
+  overflow:hidden;
+}
+body.room-active .game-shell,
+body.room-intense .game-shell{
+  background:
+    radial-gradient(circle at 18% 15%,rgba(233,255,246,.78),transparent 22%),
+    linear-gradient(145deg,rgba(217,255,239,.9),rgba(17,71,58,.78));
+  border-color:rgba(180,255,225,.7);
+}
+.game-shell::before{
+  content:"";
+  position:absolute;
+  inset:-90px;
+  background:
+    radial-gradient(circle at 16% 18%,rgba(35,133,107,.16),transparent 12%),
+    radial-gradient(circle at 84% 30%,rgba(18,61,52,.14),transparent 13%),
+    radial-gradient(circle at 60% 86%,rgba(35,133,107,.12),transparent 16%);
+  pointer-events:none;
+}
+.game-chrome{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  border-bottom:1px solid rgba(35,133,107,.2);
+  background:rgba(255,255,255,.58);
+  backdrop-filter:blur(10px);
+}
+body.room-active .game-chrome,
+body.room-intense .game-chrome{background:rgba(10,48,40,.56);border-bottom-color:rgba(210,255,236,.22)}
+.chrome-left,.chrome-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chrome-title{font-size:13px;font-weight:1000;letter-spacing:.14em;text-transform:uppercase;color:var(--micro-dark)}
+body.room-active .chrome-title,
+body.room-intense .chrome-title{color:#dffcf4}
+.micro-audio-btn.is-on{background:#123d34;border-color:#123d34;color:#dffcf4}
+.scene{
+  position:relative;
+  z-index:1;
+  min-height:610px;
+  padding:28px;
+}
+.welcome-scene{
+  display:grid;
+  place-items:center;
+  text-align:center;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 28%,rgba(255,255,255,.96),transparent 25%),
+    linear-gradient(135deg,#ffffff,#e7fff4 45%,#15493d);
+}
+.welcome-panel{max-width:820px;position:relative;z-index:2}
+.welcome-kicker{
+  color:#0f5f4d;
+  font-weight:1000;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-size:13px;
+}
+.welcome-title{
+  margin:8px 0 10px;
+  font-size:clamp(42px,8vw,92px);
+  line-height:.9;
+  color:#10382f;
+  text-shadow:4px 4px 0 #bdf3de,0 12px 32px rgba(14,76,62,.22);
+}
+.welcome-copy{font-size:20px;line-height:1.4;color:#29493f;margin:0 auto 22px;max-width:710px;font-weight:800}
+.enter-btn{
+  border:0;
+  border-radius:999px;
+  padding:18px 28px;
+  background:#0e4c3e;
+  color:#e7fff5;
+  font-size:22px;
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow:0 12px 0 #083129,0 20px 38px rgba(14,76,62,.32);
+  font-family:inherit;
+  transform:rotate(-1deg);
+}
+.enter-btn:hover{transform:translateY(-2px) rotate(1deg)}
+.microbe-field{position:absolute;inset:0;pointer-events:none;opacity:.75}
+.microbe{
+  position:absolute;
+  width:74px;
+  height:44px;
+  border-radius:50%;
+  border:4px solid #123d34;
+  background:#d8ffee;
+  transform:rotate(var(--rot,0deg));
+}
+.microbe::before,.microbe::after{content:"";position:absolute;inset:-12px;border-top:3px solid #123d34;border-radius:50%;transform:rotate(24deg)}
+.microbe::after{transform:rotate(-24deg)}
+.microbe.one{left:8%;top:16%;--rot:-18deg}
+.microbe.two{right:8%;top:20%;--rot:18deg;width:86px;background:#fff8d8}
+.microbe.three{left:18%;bottom:16%;--rot:28deg;width:64px;background:#ecf3ff}
+.microbe.four{right:22%;bottom:12%;--rot:-30deg;width:78px;background:#dff5ff}
+.scene-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.scene-top h1{font-size:42px;line-height:1;margin:0;color:var(--ink)}
+.scene-top p{margin:6px 0 0;color:var(--muted);font-size:16px;font-weight:800;max-width:720px}
+body.room-active .scene-top h1,
+body.room-intense .scene-top h1{color:#f2fff9}
+body.room-active .scene-top p,
+body.room-intense .scene-top p{color:#d0f4e8}
+.deck-select-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.deck-choice-card{
+  min-height:164px;
+  border:2px solid #a5d3c5;
+  border-radius:20px;
+  padding:18px;
+  background:
+    radial-gradient(circle at 86% 12%,rgba(35,133,107,.16),transparent 24%),
+    linear-gradient(180deg,#fff,#effaf5);
+  text-align:left;
+  color:var(--ink);
+  font-family:inherit;
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(18,61,52,.08);
+  transition:.18s ease;
+}
+.deck-choice-card:hover{transform:translateY(-3px);border-color:var(--micro);box-shadow:0 18px 36px rgba(18,61,52,.14)}
+.deck-choice-card.complete{background:linear-gradient(180deg,#f3fff7,#e3f7e9);border-color:#61b47c}
+.deck-choice-card h2{margin:0;font-size:24px;line-height:1.05}
+.deck-choice-card p{margin:10px 0 0;color:var(--muted);font-size:14px;font-weight:800;line-height:1.35}
+.deck-badge{display:inline-block;margin-bottom:12px;border-radius:999px;border:1px solid #9bcfc0;padding:5px 9px;color:var(--micro-dark);font-size:12px;font-weight:1000}
+.case-card-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:12px;
+}
+.big-case-card{
+  min-height:330px;
+  border:2px solid #9bcfc0;
+  border-radius:22px;
+  padding:16px;
+  background:
+    linear-gradient(135deg,transparent 0 48%,rgba(35,133,107,.16) 49% 52%,transparent 53%),
+    linear-gradient(180deg,#fff,#effaf5);
+  color:var(--ink);
+  text-align:left;
+  font-family:inherit;
+  cursor:pointer;
+  box-shadow:0 16px 28px rgba(18,61,52,.1);
+  transition:.18s ease;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  overflow:hidden;
+}
+.big-case-card:hover{transform:translateY(-4px) rotate(-.5deg);border-color:#0e4c3e}
+.big-case-card.solved{border-color:#64bb84;background:#effaf3}
+.case-number{font-size:13px;font-weight:1000;letter-spacing:.14em;text-transform:uppercase;color:var(--micro-dark)}
+.big-case-card h2{font-size:34px;margin:10px 0 8px;line-height:.95}
+.case-card-copy{color:#596b63;font-size:14px;font-weight:800;line-height:1.35}
+.case-card-footer{border-top:1px dashed #91c7b8;padding-top:12px;font-size:12px;font-weight:1000;text-transform:uppercase;color:var(--micro-dark)}
 .deck-panel{padding:16px;margin-bottom:16px}
 .deck-title{font-size:13px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:var(--micro-dark);margin-bottom:10px}
 .deck-tabs{display:flex;flex-wrap:wrap;gap:9px}
@@ -130,8 +313,19 @@ body.micro-case-room{
   align-items:start;
 }
 .room-card{min-height:640px;perspective:1200px;position:relative}
+body.room-intense .room-card{border-color:#b8ffe4;box-shadow:0 0 0 5px rgba(202,255,231,.15),0 26px 70px rgba(3,31,26,.36)}
+.room-card.case-enter{animation:caseCardIn .62s cubic-bezier(.18,.82,.2,1)}
 .flip-inner{position:relative;min-height:640px;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
 .room-card.solved .flip-inner{transform:rotateY(180deg)}
+.room-card:not(.solved) .room-face.front{
+  background:
+    radial-gradient(circle at 85% 6%,rgba(114,236,182,.2),transparent 25%),
+    linear-gradient(180deg,rgba(255,255,255,.88),rgba(238,255,247,.88));
+}
+@keyframes caseCardIn{
+  0%{opacity:0;transform:rotateY(-28deg) scale(.94)}
+  100%{opacity:1;transform:rotateY(0) scale(1)}
+}
 .room-face{
   position:absolute;
   inset:0;
@@ -162,10 +356,10 @@ body.micro-case-room{
 .envelope-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .envelope{
   min-height:188px;
-  border:2px solid #e5c067;
+  border:2px solid #40a77c;
   background:
-    linear-gradient(135deg,transparent 0 48%,rgba(229,192,103,.42) 49% 52%,transparent 53%),
-    linear-gradient(180deg,#fff8de,#fffdf4);
+    linear-gradient(135deg,transparent 0 48%,rgba(64,167,124,.36) 49% 52%,transparent 53%),
+    linear-gradient(180deg,#e8fff5,#f8fffc);
   border-radius:16px;
   padding:14px;
   position:relative;
@@ -178,11 +372,11 @@ body.micro-case-room{
   right:0;
   top:0;
   height:52px;
-  background:linear-gradient(135deg,rgba(242,200,91,.38) 49%,transparent 50%),linear-gradient(-135deg,rgba(242,200,91,.38) 49%,transparent 50%);
+  background:linear-gradient(135deg,rgba(64,167,124,.32) 49%,transparent 50%),linear-gradient(-135deg,rgba(64,167,124,.32) 49%,transparent 50%);
   opacity:.82;
 }
 .envelope.locked{filter:saturate(.45);background:#f1f4f7;border-color:#cad3dd}
-.envelope h3{position:relative;margin:0 0 10px;font-size:18px;color:#5a4100}
+.envelope h3{position:relative;margin:0 0 10px;font-size:18px;color:#0e4c3e}
 .envelope.locked h3{color:#5f6876}
 .envelope-list{position:relative;z-index:1;margin:0;padding-left:18px;display:grid;gap:6px}
 .envelope-list li{font-size:14px;line-height:1.25;font-weight:800;color:#263246}
@@ -193,7 +387,7 @@ body.micro-case-room{
   place-items:center;
   min-height:98px;
   text-align:center;
-  color:#70551a;
+  color:#0e4c3e;
   font-weight:900;
 }
 .section-label{font-size:13px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:var(--micro-dark);margin:6px 0 9px}
@@ -350,11 +544,17 @@ body.micro-case-room{
   .micro-wrap{padding:14px}
   .hero,.game-grid{grid-template-columns:1fr}
   .hero-mark{display:none}
+  .game-chrome{align-items:flex-start;flex-direction:column}
+  .deck-select-grid{grid-template-columns:1fr 1fr}
+  .case-card-grid{grid-template-columns:1fr 1fr}
   .test-grid{grid-template-columns:1fr 1fr}
   .room-card,.flip-inner{min-height:860px}
 }
 @media(max-width:640px){
   .hero h1{font-size:34px}
+  .scene{padding:18px}
+  .welcome-copy{font-size:16px}
+  .deck-select-grid,.case-card-grid{grid-template-columns:1fr}
   .envelope-grid,.test-grid{grid-template-columns:1fr}
   .deck-progress{grid-template-columns:1fr}
   .timer-value{font-size:38px}
@@ -426,26 +626,7 @@ body.micro-case-room{
   </header>
 
   <main class="micro-wrap">
-    <section class="hero">
-      <div>
-        <div class="eyebrow">Microbiology Escape Room</div>
-        <h1>Micro Case Room</h1>
-        <p>Pick a body-site deck, open the patient and lab envelopes, choose the right placeholder tests, then identify the placeholder organism before time runs out.</p>
-        <div class="action-row">
-          <button class="game-btn" type="button" onclick="printMode('current')">Print Current Deck Set</button>
-          <button class="game-btn" type="button" onclick="printMode('single')">Print Current Case 4x6</button>
-          <button class="game-btn" type="button" onclick="printMode('all')">Print All Placeholder Sets</button>
-        </div>
-      </div>
-      <div class="hero-mark" aria-hidden="true"></div>
-    </section>
-
-    <section class="deck-panel">
-      <div class="deck-title">Specimen Flow Builder</div>
-      <div class="deck-tabs" id="deckTabs"></div>
-    </section>
-
-    <section id="gameRoot"></section>
+    <section class="game-shell" id="gameRoot"></section>
   </main>
 </div>
 
@@ -525,7 +706,14 @@ function makePlaceholderCase(deckName, deckIndex, caseIndex){
 const decks = makeDecks();
 const solvedCases = new Set();
 let state = freshState(0, 0, false);
+let scene = "welcome";
 let timerId = null;
+let microAudio = {audio:null, customUrl:null, on:false};
+
+const QUIZ_MUSIC_DB = "mlsboc_quiz_media";
+const QUIZ_MUSIC_STORE = "files";
+const QUIZ_MUSIC_KEY = "quiz_music";
+const QUIZ_MUSIC_VOLUME_KEY = "mlsboc_quiz_music_volume";
 
 function freshState(deckIndex, caseIndex, started){
   return {
@@ -600,14 +788,126 @@ function completedInDeck(deckIndex){
   return decks[deckIndex].cases.filter(item => solvedCases.has(item.id)).length;
 }
 
+function getQuizMusicVolume(){
+  const raw = Number(localStorage.getItem(QUIZ_MUSIC_VOLUME_KEY));
+  return Number.isFinite(raw) ? Math.max(0, Math.min(1, raw)) : .45;
+}
+
+function openQuizMediaDB(){
+  return new Promise((resolve, reject) => {
+    if(!window.indexedDB){
+      reject(new Error("IndexedDB is not supported in this browser."));
+      return;
+    }
+    const req = indexedDB.open(QUIZ_MUSIC_DB, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if(!db.objectStoreNames.contains(QUIZ_MUSIC_STORE))db.createObjectStore(QUIZ_MUSIC_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error("Could not open music storage."));
+  });
+}
+
+async function quizMusicStore(mode, fn){
+  const db = await openQuizMediaDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(QUIZ_MUSIC_STORE, mode);
+    const store = tx.objectStore(QUIZ_MUSIC_STORE);
+    const req = fn(store);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error("Music storage failed."));
+    tx.oncomplete = () => db.close();
+    tx.onerror = () => {
+      try{db.close();}catch(e){}
+      reject(tx.error || new Error("Music storage failed."));
+    };
+  });
+}
+
+async function loadQuizMusicUrl(){
+  if(microAudio.customUrl)return microAudio.customUrl;
+  try{
+    const rec = await quizMusicStore("readonly", store => store.get(QUIZ_MUSIC_KEY));
+    if(!rec || !rec.blob)return "";
+    microAudio.customUrl = URL.createObjectURL(rec.blob);
+    return microAudio.customUrl;
+  }catch(err){
+    console.warn("Micro Case Room music load failed", err);
+    return "";
+  }
+}
+
+async function startMicroMusic(){
+  try{
+    if(microAudio.on)return;
+    const url = await loadQuizMusicUrl();
+    if(!url){
+      alert("No quiz music is loaded yet. Add music from the quiz media controls first, then come back here.");
+      return;
+    }
+    if(microAudio.audio){
+      try{microAudio.audio.pause();}catch(e){}
+    }
+    const audio = new Audio(url);
+    audio.loop = true;
+    audio.volume = getQuizMusicVolume();
+    audio.preload = "auto";
+    await audio.play();
+    microAudio.audio = audio;
+    microAudio.on = true;
+    updateMicroMusicButton();
+  }catch(err){
+    console.warn("Micro Case Room music failed", err);
+    alert("Music could not start in this browser. The game still works without it.");
+  }
+}
+
+function stopMicroMusic(){
+  if(microAudio.audio){
+    try{microAudio.audio.pause();microAudio.audio.currentTime = 0;}catch(e){}
+    microAudio.audio = null;
+  }
+  microAudio.on = false;
+  updateMicroMusicButton();
+}
+
+function toggleMicroMusic(){
+  if(microAudio.on)stopMicroMusic();
+  else startMicroMusic();
+}
+
+function updateMicroMusicButton(){
+  const btn = document.getElementById("microMusicBtn");
+  if(!btn)return;
+  btn.classList.toggle("is-on", microAudio.on);
+  btn.textContent = microAudio.on ? "Music On" : "Music Off";
+}
+
+function showWelcome(){
+  stopTimer();
+  scene = "welcome";
+  state.started = false;
+  render();
+}
+
+function showDecks(){
+  stopTimer();
+  scene = "decks";
+  state.started = false;
+  render();
+}
+
 function selectDeck(index){
   stopTimer();
   state = freshState(index, 0, false);
+  scene = "cases";
   render();
 }
 
 function startCase(index = state.caseIndex){
   state = freshState(state.deckIndex, index, true);
+  scene = "active";
   startTimer();
   render();
 }
@@ -703,9 +1003,12 @@ function chooseOrganism(orgId){
 function nextCase(){
   if(!state.solved)return;
   if(state.caseIndex < 4){
-    startCase(state.caseIndex + 1);
+    state = freshState(state.deckIndex, state.caseIndex + 1, false);
+    scene = "cases";
+    render();
   }else{
     stopTimer();
+    scene = "deckComplete";
     state.started = false;
     state.feedback = "Deck complete. Choose another body-site deck or print the placeholder set.";
     state.feedbackType = "good";
@@ -713,29 +1016,110 @@ function nextCase(){
   }
 }
 
-function renderDeckTabs(){
-  document.getElementById("deckTabs").innerHTML = decks.map((deck, index) => {
-    const done = completedInDeck(index);
-    const classes = ["deck-tab", index === state.deckIndex ? "active" : "", done === 5 ? "complete" : ""].filter(Boolean).join(" ");
-    return `<button class="${classes}" type="button" onclick="selectDeck(${index})">${esc(deck.name)} <span>${done}/5</span></button>`;
-  }).join("");
+function renderChrome(inner, sceneClass = ""){
+  const inWelcome = scene === "welcome";
+  return `<div class="game-chrome">
+    <div class="chrome-left">
+      <div class="chrome-title">Micro Case Room</div>
+      ${!inWelcome ? `<button class="game-btn" type="button" onclick="showWelcome()">Welcome</button>
+      <button class="game-btn" type="button" onclick="showDecks()">Choose Deck</button>` : ""}
+    </div>
+    <div class="chrome-right">
+      <button class="game-btn micro-audio-btn" id="microMusicBtn" type="button" onclick="toggleMicroMusic()">Music Off</button>
+      <button class="game-btn" type="button" onclick="printMode('current')">Print Deck</button>
+      <button class="game-btn" type="button" onclick="printMode('single')">Print 4x6</button>
+      <button class="game-btn" type="button" onclick="printMode('all')">Print All</button>
+    </div>
+  </div>
+  <div class="scene ${sceneClass}">${inner}</div>`;
 }
 
-function renderStartPanel(){
-  const deck = currentDeck();
-  const done = completedInDeck(state.deckIndex);
-  const complete = done === 5;
-  return `<section class="room-card start-panel">
-    <div>
-      <div class="eyebrow">${esc(deck.name)}</div>
-      <h2>${complete ? "Deck Complete" : "Ready Room"}</h2>
-      <p>${complete ? "All 5 placeholder cases in this body-site deck are solved." : "Start Case 1 of 5. Each case gets 15 minutes, and wrong tests or organism choices subtract 1 minute."}</p>
-      <button class="game-btn primary" type="button" onclick="startCase(0)">${complete ? "Replay Deck" : "Start Case 1 of 5"}</button>
-      <div class="deck-progress">
-        ${deck.cases.map(item => `<div class="case-dot ${solvedCases.has(item.id) ? "done" : ""}">Case ${item.number}<br>${solvedCases.has(item.id) ? "Solved" : "Open"}</div>`).join("")}
+function renderWelcome(){
+  return renderChrome(`<section class="welcome-scene">
+    <div class="microbe-field" aria-hidden="true">
+      <span class="microbe one"></span>
+      <span class="microbe two"></span>
+      <span class="microbe three"></span>
+      <span class="microbe four"></span>
+    </div>
+    <div class="welcome-panel">
+      <div class="welcome-kicker">Welcome to the specimen wing</div>
+      <h1 class="welcome-title">Micro Case Room</h1>
+      <p class="welcome-copy">A placeholder microbiology escape-room simulation. Pick a body-site deck, enter a case, open the evidence envelopes, and solve before the countdown drains.</p>
+      <button class="enter-btn" type="button" onclick="showDecks()">Enter if you dare!</button>
+    </div>
+  </section>`, "welcome-wrap");
+}
+
+function renderDeckSelect(){
+  return renderChrome(`<section>
+    <div class="scene-top">
+      <div>
+        <div class="eyebrow">Choose Your Deck</div>
+        <h1>Specimen Flow Builder</h1>
+        <p>Each body-site deck has 5 placeholder cases. Solve the deck to clear the room.</p>
       </div>
     </div>
-  </section>`;
+    <div class="deck-select-grid">
+      ${decks.map((deck, index) => {
+        const done = completedInDeck(index);
+        const classes = ["deck-choice-card", done === 5 ? "complete" : ""].filter(Boolean).join(" ");
+        return `<button class="${classes}" type="button" onclick="selectDeck(${index})">
+          <span class="deck-badge">${done}/5 solved</span>
+          <h2>${esc(deck.name)}</h2>
+          <p>Open the ${esc(deck.name)} case drawer. Placeholder content is ready for later organism details.</p>
+        </button>`;
+      }).join("")}
+    </div>
+  </section>`, "deck-scene");
+}
+
+function renderCaseSelect(){
+  const deck = currentDeck();
+  return renderChrome(`<section>
+    <div class="scene-top">
+      <div>
+        <div class="eyebrow">${esc(deck.name)}</div>
+        <h1>Choose a Case File</h1>
+        <p>Click a big case card to flip into the room and start the 15-minute timer.</p>
+      </div>
+      <button class="game-btn" type="button" onclick="showDecks()">Switch Deck</button>
+    </div>
+    <div class="case-card-grid">
+      ${deck.cases.map((item, index) => {
+        const solved = solvedCases.has(item.id);
+        return `<button class="big-case-card ${solved ? "solved" : ""}" type="button" onclick="startCase(${index})">
+          <div>
+            <div class="case-number">Case ${item.number} of 5</div>
+            <h2>${caseCode(item)}</h2>
+            <div class="case-card-copy">${solved ? "Solved file. Replay anytime." : "Sealed placeholder evidence file. Timer starts when opened."}</div>
+          </div>
+          <div></div>
+          <div class="case-card-footer">${solved ? "Case solved" : "Click card to enter"}</div>
+        </button>`;
+      }).join("")}
+    </div>
+  </section>`, "case-scene");
+}
+
+function renderDeckComplete(){
+  const deck = currentDeck();
+  return renderChrome(`<section class="solved-board">
+    <div>
+      <div class="stamp deck-done">DECK COMPLETE</div>
+      <div class="solved-card">
+        <h3>${esc(deck.name)} cleared</h3>
+        <dl>
+          <div><dt>Progress</dt><dd>5 of 5 placeholder cases solved.</dd></div>
+          <div><dt>Next Move</dt><dd>Replay a case, choose another body-site deck, or print the placeholder game set.</dd></div>
+        </dl>
+      </div>
+      <div class="solved-actions">
+        <button class="game-btn primary" type="button" onclick="selectDeck(${state.deckIndex})">Replay Deck</button>
+        <button class="game-btn" type="button" onclick="showDecks()">Choose Another Deck</button>
+      </div>
+    </div>
+  </section>`, "deck-complete-scene");
 }
 
 function renderEnvelope(title, open, locked, items, openAction){
@@ -808,8 +1192,8 @@ function renderActiveCase(){
     `Extra clue: ${item.extraClue}`
   ];
   const deckDone = completedInDeck(state.deckIndex) === 5;
-  return `<section class="game-grid">
-    <article class="room-card ${state.solved ? "solved" : ""}">
+  return renderChrome(`<section class="game-grid">
+    <article class="room-card case-enter ${state.solved ? "solved" : ""}">
       <div class="flip-inner">
         <div class="room-face front">
           <div class="case-top">
@@ -862,13 +1246,20 @@ function renderActiveCase(){
       </div>
       <button class="game-btn" type="button" onclick="resetCase()">Reset Case</button>
     </aside>
-  </section>`;
+  </section>`, "active-scene");
 }
 
 function render(){
-  renderDeckTabs();
-  document.getElementById("gameRoot").innerHTML = state.started ? renderActiveCase() : renderStartPanel();
+  document.body.classList.toggle("room-active", scene === "active");
+  document.body.classList.toggle("room-intense", scene === "active" && (state.patientOpen || state.labOpen) && !state.solved);
+  const root = document.getElementById("gameRoot");
+  if(scene === "welcome")root.innerHTML = renderWelcome();
+  else if(scene === "decks")root.innerHTML = renderDeckSelect();
+  else if(scene === "cases")root.innerHTML = renderCaseSelect();
+  else if(scene === "deckComplete")root.innerHTML = renderDeckComplete();
+  else root.innerHTML = renderActiveCase();
   updateTimerDisplay();
+  updateMicroMusicButton();
 }
 
 function printableCard(type, item, deck){
@@ -938,7 +1329,10 @@ function printMode(mode){
 window.addEventListener("afterprint", () => {
   document.body.classList.remove("print-current", "print-single", "print-all");
 });
+window.addEventListener("beforeunload", stopMicroMusic);
 
+window.showWelcome = showWelcome;
+window.showDecks = showDecks;
 window.selectDeck = selectDeck;
 window.startCase = startCase;
 window.resetCase = resetCase;
@@ -947,6 +1341,7 @@ window.openLabEnvelope = openLabEnvelope;
 window.chooseTest = chooseTest;
 window.chooseOrganism = chooseOrganism;
 window.nextCase = nextCase;
+window.toggleMicroMusic = toggleMicroMusic;
 window.printMode = printMode;
 
 renderPrintable("current");

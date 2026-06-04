@@ -5,23 +5,25 @@
   <rect x="28" y="28" width="744" height="394" rx="22" fill="#fff" stroke="#23856b" stroke-width="7"/>
   <text x="58" y="76" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="900" fill="#123d34">Micro Case Room</text>
   <text x="58" y="108" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#4d665d">Escape-room style placeholder microbiology cases</text>
-  <g transform="translate(58 142)">
+  <rect x="58" y="122" width="190" height="36" rx="18" fill="#123d34"/>
+  <text x="153" y="146" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="900" fill="#dffcf4">ENTER IF YOU DARE!</text>
+  <g transform="translate(58 172)">
     <rect width="190" height="132" rx="15" fill="#fffdf0" stroke="#111" stroke-width="4"/>
     <path d="M0 24 95 74 190 24" fill="none" stroke="#111" stroke-width="4"/>
     <text x="95" y="103" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="900" fill="#111">Patient</text>
   </g>
-  <g transform="translate(284 142)">
+  <g transform="translate(284 172)">
     <rect width="190" height="132" rx="15" fill="#fffdf0" stroke="#111" stroke-width="4"/>
     <path d="M0 24 95 74 190 24" fill="none" stroke="#111" stroke-width="4"/>
     <text x="95" y="103" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="900" fill="#111">Lab Clues</text>
   </g>
-  <g transform="translate(524 124)">
+  <g transform="translate(524 144)">
     <rect width="174" height="72" rx="14" fill="#123d34" stroke="#111" stroke-width="4"/>
     <text x="87" y="50" text-anchor="middle" font-family="Consolas, monospace" font-size="32" font-weight="900" fill="#dffcf4">15:00</text>
     <rect x="10" y="108" width="154" height="116" rx="10" fill="#fff" stroke="#111" stroke-width="4"/>
     <path d="M20 136h134M20 160h134M20 184h100" stroke="#111" stroke-width="5" stroke-linecap="round"/>
   </g>
-  <g transform="translate(70 322)">
+  <g transform="translate(70 342)">
     <rect width="110" height="44" rx="12" fill="#fff" stroke="#23856b" stroke-width="4"/>
     <rect x="128" width="110" height="44" rx="12" fill="#fff" stroke="#23856b" stroke-width="4"/>
     <rect x="256" width="110" height="44" rx="12" fill="#fff" stroke="#23856b" stroke-width="4"/>
@@ -29,7 +31,7 @@
     <text x="183" y="29" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="900" fill="#111">Test B</text>
     <text x="311" y="29" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="900" fill="#111">Test C</text>
   </g>
-  <g transform="translate(508 314) rotate(-6 91 35)">
+  <g transform="translate(508 334) rotate(-6 91 35)">
     <rect width="182" height="70" rx="12" fill="#fff" stroke="#23856b" stroke-width="6"/>
     <text x="91" y="45" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="900" fill="#23856b">CASE SOLVED</text>
   </g>
