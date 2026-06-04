@@ -6649,7 +6649,7 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
       if(qs.length){
         y+=2;doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=4;
         writeText('Questions',{size:10,bold:true,color:[40,40,40]});y+=1;
-        const letters=['a','b','c','d'];
+        const letters=['a','b','c','d','e'];
         qs.forEach((q,qi)=>{
           checkPage(28);writeText('Q'+(qi+1)+'. '+q.question,{size:10,bold:true,indent:2,color:[20,20,20]});
           (q.options||[]).forEach((opt,oi)=>{
@@ -7274,7 +7274,7 @@ function renderMicroCaseQuestion(caseId,q,qi,selState){
   const checked=selState[qi]?.checked===true;
   const chosen=selState[qi]?.choice;
   const reveal=caseAnswersAvailable();
-  const letters=['a','b','c','d'];
+  const letters=['a','b','c','d','e'];
   const correctIdx=letters.indexOf(q.correct);
   return `
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 18px;box-shadow:0 2px 8px #0002">
@@ -7363,7 +7363,7 @@ function adminMicroCaseControls(){
 function downloadMicroCaseTemplate(){
   dlCSV([[
     'case_key','title','group_label','scenario','test_results',
-    'question','option_a','option_b','option_c','option_d','correct','explanation','is_draft'
+    'question','option_a','option_b','option_c','option_d','option_e','correct','explanation','is_draft'
   ]],'microbiology_cases_template.csv');
 }
 
@@ -7398,9 +7398,9 @@ function microImportTableFromText(text){
 
 function microCorrectLetter(raw,options){
   const val=String(raw||'').trim().toLowerCase();
-  const letters=['a','b','c','d'];
+  const letters=['a','b','c','d','e'];
   if(letters.includes(val))return val;
-  if(['1','2','3','4'].includes(val))return letters[Number(val)-1];
+  if(['1','2','3','4','5'].includes(val))return letters[Number(val)-1];
   const optIdx=(options||[]).findIndex(o=>String(o||'').trim().toLowerCase()===val);
   return optIdx>=0?letters[optIdx]:'a';
 }
@@ -7428,7 +7428,7 @@ async function importMicroCasesCSV(event){
         group_label:normalizeMicroCaseGroup(csvField(row,['group_label','gram_group','group'],2)),
         table_data:microImportTableFromText(tableText),
         questions:[],
-        is_draft:String(csvField(row,['is_draft','draft','status'],12)||'').toLowerCase().includes('true'),
+        is_draft:String(csvField(row,['is_draft','draft','status'],13)||'').toLowerCase().includes('true'),
         images:[]
       });
     }
@@ -7438,12 +7438,12 @@ async function importMicroCasesCSV(event){
     if(!item.group_label)item.group_label=normalizeMicroCaseGroup(csvField(row,['group_label','gram_group','group'],2));
     if(!item.table_data)item.table_data=microImportTableFromText(csvField(row,['test_results','results','table','case_data','lab_data'],4));
     if(question){
-      const options=['option_a','option_b','option_c','option_d'].map((name,oi)=>microImportText(csvField(row,[name,String.fromCharCode(97+oi),'choice_'+String.fromCharCode(97+oi)],6+oi)));
+      const options=['option_a','option_b','option_c','option_d','option_e'].map((name,oi)=>microImportText(csvField(row,[name,String.fromCharCode(97+oi),'choice_'+String.fromCharCode(97+oi)],6+oi)));
       item.questions.push({
         question,
         options,
-        correct:microCorrectLetter(csvField(row,['correct','correct_answer','answer','key'],10),options),
-        explanation:microImportText(csvField(row,['explanation','rationale','notes'],11))
+        correct:microCorrectLetter(csvField(row,['correct','correct_answer','answer','key'],11),options),
+        explanation:microImportText(csvField(row,['explanation','rationale','notes'],12))
       });
     }
   });
@@ -7520,8 +7520,8 @@ function addMCTableCol(){
   container.appendChild(div.firstElementChild);
 }
 function mcQuestionEditor(i,q){
-  q=q||{question:'',options:['','','',''],correct:'a',explanation:''};
-  const opts=q.options||['','','',''];
+  q=q||{question:'',options:['','','','',''],correct:'a',explanation:''};
+  const opts=q.options||['','','','',''];
   return `<div class="card-sm mb-12" id="mc-q-${i}" style="border-left:3px solid var(--accent)">
     <div class="flex-center gap-8 mb-10">
       <span style="font-size:12px;font-weight:600;color:var(--accent);font-family:var(--mono)">Q${i+1}</span>
@@ -7529,10 +7529,10 @@ function mcQuestionEditor(i,q){
     </div>
     <div class="form-group"><label>Question</label><textarea id="mc-qq-${i}" style="min-height:60px">${q.question||''}</textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      ${['a','b','c','d'].map((l,oi)=>`<div><label>${l.toUpperCase()}.</label><input type="text" id="mc-qo-${i}-${l}" value="${esc(opts[oi]||'')}" placeholder="Option ${l.toUpperCase()}"></div>`).join('')}
+      ${['a','b','c','d','e'].map((l,oi)=>`<div><label>${l.toUpperCase()}.</label><input type="text" id="mc-qo-${i}-${l}" value="${esc(opts[oi]||'')}" placeholder="Option ${l.toUpperCase()}"></div>`).join('')}
     </div>
     <div class="form-group"><label>Correct Answer</label>
-      <select id="mc-qc-${i}">${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
+      <select id="mc-qc-${i}">${['a','b','c','d','e'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
     </div>
     <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
       <input type="text" id="mc-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
@@ -7564,7 +7564,7 @@ async function saveMicroCase(caseId){
   for(let i=0;i<(window._mcQCount||0);i++){
     const qEl=document.getElementById('mc-q-'+i);if(!qEl||!qEl.isConnected)continue;
     const question=document.getElementById('mc-qq-'+i)?.value.trim()||'';if(!question)continue;
-    const options=['a','b','c','d'].map(l=>document.getElementById('mc-qo-'+i+'-'+l)?.value.trim()||'');
+    const options=['a','b','c','d','e'].map(l=>document.getElementById('mc-qo-'+i+'-'+l)?.value.trim()||'');
     const correct=document.getElementById('mc-qc-'+i)?.value||'a';
     const explanation=document.getElementById('mc-qe-'+i)?.value.trim()||'';
     questions.push({question,options,correct,explanation});
@@ -9323,7 +9323,7 @@ async function generateCasePDF(){
         writeHR([180,180,180]);
         writeText('Questions', {size:10, bold:true, color:[40,40,40]});
         y += 1;
-        const letters=['a','b','c','d'];
+        const letters=['a','b','c','d','e'];
         qs.forEach((q,qi)=>{
           checkPage(28);
           writeText(`Q${qi+1}. ${q.question}`, {size:10, bold:true, indent:2, color:[20,20,20]});
@@ -9351,7 +9351,7 @@ async function generateCasePDF(){
         checkPage(16);
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(40,40,40);
         doc.text(`${src.label} — Case ${ci+1}: ${c.title||'Untitled'}`,margin,y);y+=7;
-        const letters=['a','b','c','d'];
+        const letters=['a','b','c','d','e'];
         qs.forEach((q,qi)=>{
           checkPage(14);
           const correctIdx=letters.indexOf(q.correct||'a');
@@ -10406,7 +10406,7 @@ function normalizeCSVHeader(h){
   return String(h||'').toLowerCase().trim().replace(/^\uFEFF/,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
 }
 function looksLikeCSVHeader(row){
-  const known=new Set(['question','prompt','stem','name','title','folder','key_features','notes','description','scenario','case_data','answer','group_label','a','b','c','d','option_a','option_b','option_c','option_d','correct','correct_answer','explanation']);
+  const known=new Set(['question','prompt','stem','name','title','folder','key_features','notes','description','scenario','case_data','answer','group_label','a','b','c','d','e','option_a','option_b','option_c','option_d','option_e','correct','correct_answer','explanation']);
   return (row||[]).map(normalizeCSVHeader).some(h=>known.has(h));
 }
 function parseCSV(text){
