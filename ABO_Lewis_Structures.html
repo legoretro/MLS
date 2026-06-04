@@ -196,7 +196,7 @@
 
   .structure{
     position:relative;
-    height:380px;
+    height:400px;
     background:#fff;
     border:2px solid #ebe5d8;
     border-radius:12px;
@@ -204,8 +204,8 @@
   }
 
   .blood-chain-structure{
-    height:380px;
-    min-height:380px;
+    height:400px;
+    min-height:400px;
   }
 
   .chain-note{
@@ -222,9 +222,9 @@
   .rbc-anchor{
     position:absolute;
     left:calc(50% - 34px);
-    bottom:10px;
+    bottom:8px;
     width:68px;
-    height:40px;
+    height:28px;
     border-radius:50%;
     background:radial-gradient(circle at 36% 35%, #ff6d62 0 22%, #cc1b24 58%, #94131a 100%);
     color:#fff;
@@ -236,17 +236,37 @@
     box-shadow:0 8px 16px rgba(160,20,35,.18);
   }
 
+  .secretor-anchor{
+    position:absolute;
+    left:calc(50% - 56px);
+    bottom:8px;
+    width:112px;
+    height:30px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#d9fff6,#81dcc9);
+    border:2px solid #2fa68d;
+    color:#0b4b40;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:.58rem;
+    line-height:1.05;
+    font-weight:900;
+    box-shadow:0 8px 16px rgba(47,166,141,.12);
+  }
+
   .blood-chain-structure .line{
     background:#c91946;
   }
 
-  .blood-chain-structure .line-base-1{ left:calc(50% - 2px); top:306px; height:18px; }
-  .blood-chain-structure .line-base-2{ left:calc(50% - 2px); top:228px; height:18px; }
-  .blood-chain-structure .line-base-3{ left:calc(50% - 2px); top:154px; height:12px; }
-  .blood-chain-structure .line-top{ left:calc(50% - 2px); top:78px; height:16px; }
-  .type2-structure .line-side{ left:calc(50% - 116px); top:123px; width:72px; }
-  .type1-structure .line-side-secretor{ left:calc(50% - 116px); top:123px; width:72px; }
-  .type1-structure .line-side-lewis{ left:calc(50% - 116px); top:203px; width:72px; }
+  .blood-chain-structure .line-base-1{ left:calc(50% - 2px); top:289px; height:12px; }
+  .blood-chain-structure .line-base-2{ left:calc(50% - 2px); top:224px; height:8px; }
+  .blood-chain-structure .line-base-3{ left:calc(50% - 2px); top:144px; height:14px; }
+  .blood-chain-structure .line-top{ left:calc(50% - 2px); top:72px; height:14px; }
+  .type2-structure .line-side{ left:calc(50% - 116px); top:113px; width:72px; }
+  .type1-structure .line-side-secretor{ left:calc(50% - 116px); top:113px; width:72px; }
+  .type1-structure .line-side-lewis{ left:calc(50% - 116px); top:189px; width:72px; }
 
   .blood-chain-structure .sugar-shape{
     box-shadow:none;
@@ -257,9 +277,9 @@
 
   .blood-chain-structure .chain-glc{
     left:calc(50% - 44px);
-    top:320px;
+    top:302px;
     width:88px;
-    height:68px;
+    height:56px;
     background:#87c58c;
     clip-path:polygon(50% 2%, 98% 96%, 2% 96%);
     align-items:flex-end;
@@ -268,9 +288,9 @@
 
   .blood-chain-structure .chain-gal-low{
     left:calc(50% - 42px);
-    top:246px;
+    top:231px;
     width:84px;
-    height:62px;
+    height:58px;
     background:#41c7d5;
     border-radius:50%;
     clip-path:none;
@@ -278,9 +298,9 @@
 
   .blood-chain-structure .chain-glcnac{
     left:calc(50% - 37px);
-    top:166px;
+    top:158px;
     width:74px;
-    height:74px;
+    height:66px;
     background:#ffe15d;
     border-radius:12px;
     clip-path:none;
@@ -288,9 +308,9 @@
 
   .blood-chain-structure .chain-gal-terminal{
     left:calc(50% - 42px);
-    top:94px;
+    top:86px;
     width:84px;
-    height:62px;
+    height:58px;
     background:#41c7d5;
     border-radius:50%;
     clip-path:none;
@@ -305,13 +325,13 @@
     font-size:.62rem;
   }
 
-  .type2-structure .fut-drop{ top:96px; }
-  .type1-structure .secretor-drop{ top:96px; }
-  .type1-structure .lewis-drop{ top:176px; }
+  .type2-structure .fut-drop{ top:88px; }
+  .type1-structure .secretor-drop{ top:88px; }
+  .type1-structure .lewis-drop{ top:164px; }
 
   .blood-chain-structure .antigen-drop{
     left:calc(50% - 42px);
-    top:18px;
+    top:14px;
     width:84px;
     height:62px;
     font-size:.72rem;
@@ -730,8 +750,8 @@
   }
 </style>
 <script src="interactive_theme.js"></script>
-<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-9">
-<script src="interactive_music.js?v=bb-theme-9" defer></script>
+<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-10">
+<script src="interactive_music.js?v=bb-theme-10" defer></script>
 </head>
 <body class="mls-interactive bb-theme blood-structures-game">
 <header class="site-header">
@@ -815,7 +835,7 @@
   <header>
     <div>
       <h1>Lewis / Secretor Type 1 Structures</h1>
-      <p>Build the Type 1 chain with the top Gal included. FUT2 attaches to the top Gal, FUT3 attaches to GlcNAc, then ABH sugars go above.</p>
+      <p>Build the Type 1 chain in secretions/saliva. FUT2 attaches to the top Gal, FUT3 attaches to GlcNAc, then ABH sugars go above.</p>
     </div>
     <div class="badge">Type 1</div>
   </header>
@@ -838,8 +858,8 @@
       <div class="main-title">Type 1 Chain</div>
       <div class="main-body">
         <div class="structure blood-chain-structure type1-structure" aria-label="Type 1 chain base structure">
-          <div class="chain-note">Type 1 precursor. FUT2 = top Gal. FUT3 = GlcNAc.</div>
-          <div class="rbc-anchor">RBC</div>
+          <div class="chain-note">Type 1 precursor in saliva/secretions. FUT2 = top Gal. FUT3 = GlcNAc.</div>
+          <div class="secretor-anchor">Saliva / secretions</div>
           <div class="line v line-base-1"></div>
           <div class="line v line-base-2"></div>
           <div class="line v line-base-3"></div>
