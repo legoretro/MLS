@@ -47,6 +47,12 @@
   .titleblock{min-width:0}
   h1{margin:0;font-size:28px;line-height:1.08;letter-spacing:-.02em}
   .subtitle{margin-top:4px;color:var(--muted);font-size:13px}
+  .funky-title{
+    display:inline-block;
+    color:#fff;
+    text-shadow:3px 3px 0 #8a1430, 0 0 18px rgba(201,22,67,.45);
+    letter-spacing:.01em;
+  }
   .round-badge{
     margin-left:auto;
     border:1px solid rgba(201,22,67,.45);
@@ -57,6 +63,18 @@
     font-size:12px;
     font-weight:800;
     white-space:nowrap;
+  }
+  .print-controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:0 0 14px;
+  }
+  .print-btn{
+    background:linear-gradient(135deg,#fff,#ffdbe4);
+    color:#611428;
+    border:1px solid rgba(255,255,255,.35);
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
   }
   .deck-panel{
     background:rgba(21,24,35,.78);
@@ -150,7 +168,10 @@
     backface-visibility:hidden;
     border-radius:12px;
     overflow:hidden;
-    background:#fff7f7;
+    background:
+      radial-gradient(circle at 27% 43%, rgba(255,255,255,.92) 0 7%, rgba(122,232,240,.9) 8% 16%, transparent 17%),
+      repeating-conic-gradient(from -18deg at 28% 44%, rgba(255,255,255,.85) 0deg 5deg, rgba(98,229,238,.86) 5deg 9deg, rgba(255,255,255,.15) 9deg 12deg),
+      linear-gradient(132deg,#1bbccb 0 43%,#f5363f 44% 100%);
     border:1px solid rgba(255,255,255,.18);
     display:flex;
     align-items:center;
@@ -158,6 +179,12 @@
     padding:20px;
   }
   .face.back{transform:rotateY(180deg)}
+  .face.back{
+    background:
+      radial-gradient(circle at 50% 38%, rgba(255,255,255,.9) 0 10%, transparent 11%),
+      repeating-conic-gradient(from 0deg at 50% 40%, rgba(255,255,255,.55) 0deg 4deg, rgba(255,205,218,.2) 4deg 8deg),
+      linear-gradient(135deg,#181c2b,#3c1120);
+  }
   .mystery-img{
     width:88%;
     height:88%;
@@ -184,6 +211,49 @@
     line-height:1.4;
     padding:20px;
   }
+  .mystery-burst{
+    position:relative;
+    width:min(76%,300px);
+    aspect-ratio:1/1;
+    display:grid;
+    place-items:center;
+  }
+  .mystery-burst::before{
+    content:'';
+    position:absolute;
+    inset:3%;
+    border-radius:50%;
+    background:radial-gradient(circle,#fff 0 18%,rgba(255,255,255,.72) 19% 34%,transparent 35%);
+    filter:blur(1px);
+  }
+  .antigen-silhouette{
+    position:relative;
+    width:154px;
+    height:154px;
+    filter:drop-shadow(0 8px 0 rgba(0,0,0,.18));
+  }
+  .antigen-silhouette span{
+    position:absolute;
+    display:block;
+    background:#111;
+  }
+  .antigen-silhouette .stem{left:70px;top:88px;width:28px;height:66px;border-radius:18px}
+  .antigen-silhouette .core{left:47px;top:58px;width:58px;height:58px;border-radius:50%}
+  .antigen-silhouette .left-dot{left:18px;top:20px;width:42px;height:42px;border-radius:50%}
+  .antigen-silhouette .right-dot{right:13px;top:19px;width:42px;height:42px;border-radius:50%}
+  .antigen-silhouette .arm-left{left:39px;top:44px;width:62px;height:12px;transform:rotate(45deg);border-radius:999px}
+  .antigen-silhouette .arm-right{left:80px;top:43px;width:66px;height:12px;transform:rotate(-45deg);border-radius:999px}
+  .mystery-question{
+    position:absolute;
+    right:22px;
+    top:28px;
+    color:#ffd84a;
+    font-size:74px;
+    font-weight:1000;
+    line-height:.8;
+    text-shadow:4px 4px 0 #22508c, 0 0 10px rgba(255,255,255,.25);
+    transform:rotate(8deg);
+  }
   .mystery-label{
     position:absolute;
     left:16px;
@@ -197,6 +267,39 @@
     border:1px solid rgba(255,255,255,.2);
     border-radius:999px;
     padding:7px 10px;
+  }
+  .screen-title{
+    position:absolute;
+    left:18px;
+    right:18px;
+    bottom:18px;
+    text-align:center;
+    color:#fff;
+    font-size:25px;
+    line-height:1.02;
+    font-weight:1000;
+    letter-spacing:.02em;
+    text-shadow:3px 3px 0 #7a1330, 0 0 16px rgba(0,0,0,.25);
+  }
+  .reveal-token{
+    width:min(82%,340px);
+    min-height:174px;
+    border:3px solid rgba(255,255,255,.8);
+    border-radius:24px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    color:#fff;
+    background:rgba(0,0,0,.62);
+    box-shadow:0 16px 38px rgba(0,0,0,.28);
+    padding:24px;
+  }
+  .reveal-token .token-caption{
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:#ffd5df;
+    margin-bottom:10px;
   }
   .solved-stamp{
     position:absolute;
@@ -320,6 +423,88 @@
   }
   .feedback.good{color:#c9f7dd;border-color:rgba(61,220,132,.4);background:rgba(61,220,132,.11)}
   .feedback.bad{color:#ffd5da;border-color:rgba(240,100,116,.42);background:rgba(240,100,116,.12)}
+  .print-only{display:none}
+  @page bloodGroupCards{size:letter;margin:.25in}
+  @page bloodGroupSingle{size:4in 6in;margin:.12in}
+  @media print{
+    body{background:#fff!important;color:#000!important}
+    .wrap{display:none!important}
+    .print-only{display:block!important;color:#000!important;font-family:Arial, Helvetica, sans-serif}
+    .print-page{break-after:page;padding:.15in}
+    .print-title{font-size:18pt;line-height:1.1;margin:0 0 .18in;color:#000!important;font-weight:1000;letter-spacing:.02em}
+    .print-subtitle{font-size:10pt;margin:-.1in 0 .18in;color:#000!important}
+    .print-grid{display:grid;grid-template-columns:repeat(2,4in);gap:.18in;align-items:start}
+    body.print-single .print-page{page:bloodGroupSingle;padding:0}
+    body.print-single .print-title, body.print-single .print-subtitle{display:none!important}
+    body.print-single .print-grid{display:block}
+    .print-card{
+      width:4in;
+      min-height:5.72in;
+      border:2px solid #000;
+      border-radius:.16in;
+      padding:.18in;
+      break-inside:avoid;
+      color:#000!important;
+      background:#fff!important;
+      position:relative;
+    }
+    body.print-single .print-card{margin:0 auto .01in;break-after:page}
+    .print-card h2{font-size:18pt;line-height:1.05;margin:0 0 .08in;color:#000!important}
+    .print-card h3{font-size:13pt;margin:.06in 0 .08in;color:#000!important;border-top:1px solid #000;padding-top:.08in}
+    .print-card ul{margin:.05in 0 0;padding-left:.22in}
+    .print-card li{font-size:11.5pt;line-height:1.24;margin:.045in 0;color:#000!important}
+    .print-mystery-mark{
+      position:absolute;
+      right:.16in;
+      top:.14in;
+      width:.62in;
+      height:.62in;
+      border:2px solid #000;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:28pt;
+      font-weight:1000;
+      color:#000!important;
+    }
+    .print-token-spot{
+      position:absolute;
+      left:.18in;
+      right:.18in;
+      bottom:.16in;
+      border:2px dashed #000;
+      border-radius:.14in;
+      min-height:.68in;
+      display:grid;
+      place-items:center;
+      font-size:11pt;
+      font-weight:900;
+      color:#000!important;
+      text-align:center;
+    }
+    .print-token-grid{display:grid;grid-template-columns:repeat(4,1.85in);gap:.18in}
+    .print-token{
+      width:1.85in;
+      height:1.85in;
+      border:3px solid #000;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      font-size:18pt;
+      line-height:1.05;
+      font-weight:1000;
+      color:#000!important;
+      background:#fff!important;
+      break-inside:avoid;
+      padding:.08in;
+    }
+    .print-token.long{font-size:12pt}
+    body.print-clues .print-token-section{display:none!important}
+    body.print-single .print-token-section{display:none!important}
+    body.print-tokens .print-clue-section{display:none!important}
+    body.print-full .print-clue-section + .print-token-section{break-before:page}
+  }
   @media(max-width:980px){
     .deck-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
     .game{grid-template-columns:1fr}
@@ -340,10 +525,17 @@
   <div class="topbar">
     <a class="back" href="index.html#interactive">Back to tools</a>
     <div class="titleblock">
-      <h1>Blood Group</h1>
-      <div class="subtitle">Open both clue cards, choose the system, then reveal the antigen image.</div>
+      <h1><span class="funky-title">Who's That Blood Group!!!?</span></h1>
+      <div class="subtitle">Open both clue cards, choose the system, then match the blood group token.</div>
     </div>
     <div class="round-badge" id="card-badge">Card 1 of 9</div>
+  </div>
+
+  <div class="print-controls">
+    <button class="print-btn" onclick="printClueCards('two')">Print Clue Cards</button>
+    <button class="print-btn" onclick="printClueCards('single')">Print Single 4x6</button>
+    <button class="print-btn" onclick="printTokens()">Print Blood Group Tokens</button>
+    <button class="print-btn" onclick="printFullPack()">Print Full Pack</button>
   </div>
 
   <section class="deck-panel">
@@ -357,27 +549,35 @@
   <main class="game">
     <section class="panel">
       <div class="panel-head">
-        <div class="panel-title">Mystery antigen</div>
+        <div class="panel-title">Mystery blood group</div>
         <div class="panel-note" id="reveal-note">Hidden</div>
       </div>
       <div class="mystery-stage">
         <div class="flip-card" id="mystery-card">
           <div class="flip-inner">
             <div class="face front" id="front-face">
-              <img class="mystery-img" id="front-img" src="" alt="">
-              <div class="mystery-placeholder" id="front-placeholder">Image and clues will be added later.</div>
-              <div class="mystery-label">Who is this blood group?</div>
+              <div class="mystery-burst">
+                <div class="antigen-silhouette" aria-hidden="true">
+                  <span class="stem"></span>
+                  <span class="core"></span>
+                  <span class="left-dot"></span>
+                  <span class="right-dot"></span>
+                  <span class="arm-left"></span>
+                  <span class="arm-right"></span>
+                </div>
+              </div>
+              <div class="mystery-question">?</div>
+              <div class="mystery-label">Match the clues + token</div>
+              <div class="screen-title">Who's That Blood Group!!!?</div>
             </div>
             <div class="face back" id="back-face">
-              <img class="mystery-img" id="back-img" src="" alt="">
-              <div class="mystery-placeholder" id="back-placeholder">Image and clues will be added later.</div>
               <div class="solved-stamp">Solved</div>
-              <div class="answer-ribbon">
+              <div class="reveal-token">
                 <div>
+                  <div class="token-caption">Blood group token matched</div>
                   <div class="answer-name"><span class="answer-secret" id="answer-secret">Hidden answer</span></div>
-                  <div class="answer-sub" id="answer-sub">Antigen image revealed</div>
+                  <div class="answer-sub" id="answer-sub">Answer hidden until this card is completed</div>
                 </div>
-                <div class="answer-sub" id="answer-extra">Solved</div>
               </div>
             </div>
           </div>
@@ -409,19 +609,15 @@
     </section>
   </main>
 </div>
+<section class="print-only" id="print-area"></section>
 
 <script>
-const imagePath = 'assets/interactive-previews/blood_group_type2_substance.png';
 const cards = [
   {
     id:'abo',
     label:'ABO',
     answer:'ABO',
     status:'ready',
-    image:imagePath,
-    imageAlt:'Type 2 substance antigen structure',
-    imageNote:'Antigen image: Type 2 Substance',
-    extra:'Chromosome 9',
     clues:[
       [
         'Gene location: chromosome 9.',
@@ -484,27 +680,11 @@ function renderDeck(){
 
 function renderMystery(){
   const card = currentCard();
-  const hasImage = Boolean(card.image);
   const solved = solvedCards.has(card.id);
-  const frontImg = document.getElementById('front-img');
-  const backImg = document.getElementById('back-img');
-  const frontPlaceholder = document.getElementById('front-placeholder');
-  const backPlaceholder = document.getElementById('back-placeholder');
-  frontImg.style.display = hasImage ? 'block' : 'none';
-  backImg.style.display = hasImage ? 'block' : 'none';
-  frontPlaceholder.style.display = hasImage ? 'none' : 'flex';
-  backPlaceholder.style.display = hasImage ? 'none' : 'flex';
-  if(hasImage){
-    frontImg.src = card.image;
-    backImg.src = card.image;
-    frontImg.alt = 'Blurred mystery antigen structure';
-    backImg.alt = card.imageAlt || 'Revealed antigen structure';
-  }
   document.getElementById('answer-secret').textContent = solved ? card.answer + ' Blood Group System' : 'Hidden answer';
-  document.getElementById('answer-sub').textContent = solved ? (card.imageNote || 'Antigen image revealed') : 'Answer hidden until this card is completed';
-  document.getElementById('answer-extra').textContent = solved ? (card.extra || 'Solved') : 'Hidden';
+  document.getElementById('answer-sub').textContent = solved ? 'Solved stamp added. Match this to the printed blood group token.' : 'Answer hidden until this card is completed';
   document.getElementById('mystery-card').classList.toggle('revealed', solved);
-  document.getElementById('reveal-note').textContent = solved ? 'Solved' : (card.status === 'ready' ? 'Blurred' : 'Waiting');
+  document.getElementById('reveal-note').textContent = solved ? 'Solved' : (card.status === 'ready' ? 'Mystery' : 'Waiting');
 }
 
 function renderClues(){
@@ -623,10 +803,75 @@ function renderAll(){
   updateFeedback();
 }
 
+function readyCards(){
+  return cards.filter(card => card.status === 'ready');
+}
+
+function printClueCardHtml(card, clueIndex){
+  const clueSet = (card.clues && card.clues[clueIndex]) || [];
+  return '<article class="print-card">'
+    + '<div class="print-mystery-mark">?</div>'
+    + '<h2>Who&#39;s That Blood Group!!!?</h2>'
+    + '<h3>Clue Card '+(clueIndex + 1)+'</h3>'
+    + '<ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>'
+    + '<div class="print-token-spot">Match the blood group token here</div>'
+    + '</article>';
+}
+
+function renderPrintClues(){
+  const printable = readyCards();
+  return '<section class="print-clue-section print-page">'
+    + '<h1 class="print-title">Who&#39;s That Blood Group!!!? - Clue Cards</h1>'
+    + '<p class="print-subtitle">Black-and-white clue cards. Cut out, then match with the blood group token sheet.</p>'
+    + '<div class="print-grid">'
+    + printable.flatMap(card => [printClueCardHtml(card, 0), printClueCardHtml(card, 1)]).join('')
+    + '</div>'
+    + '</section>';
+}
+
+function renderPrintTokens(){
+  return '<section class="print-token-section print-page">'
+    + '<h1 class="print-title">Blood Group Tokens</h1>'
+    + '<p class="print-subtitle">Cut out the tokens and match them to clue cards.</p>'
+    + '<div class="print-token-grid">'
+    + cards.map(card => '<div class="print-token '+(card.label.length > 10 ? 'long' : '')+'">'+esc(card.label)+'</div>').join('')
+    + '</div>'
+    + '</section>';
+}
+
+function resetPrintClasses(){
+  document.body.classList.remove('print-clues', 'print-single', 'print-tokens', 'print-full');
+}
+
+function printClueCards(mode){
+  document.getElementById('print-area').innerHTML = renderPrintClues();
+  resetPrintClasses();
+  document.body.classList.add(mode === 'single' ? 'print-single' : 'print-clues');
+  setTimeout(() => window.print(), 80);
+}
+
+function printTokens(){
+  document.getElementById('print-area').innerHTML = renderPrintTokens();
+  resetPrintClasses();
+  document.body.classList.add('print-tokens');
+  setTimeout(() => window.print(), 80);
+}
+
+function printFullPack(){
+  document.getElementById('print-area').innerHTML = renderPrintClues() + renderPrintTokens();
+  resetPrintClasses();
+  document.body.classList.add('print-full');
+  setTimeout(() => window.print(), 80);
+}
+
+window.addEventListener('afterprint', resetPrintClasses);
 window.openClue = openClue;
 window.selectSystem = selectSystem;
 window.selectCard = selectCard;
 window.resetCurrentCard = resetCurrentCard;
+window.printClueCards = printClueCards;
+window.printTokens = printTokens;
+window.printFullPack = printFullPack;
 renderAll();
 </script>
 </body>
