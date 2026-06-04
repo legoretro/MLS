@@ -103,6 +103,35 @@
     align-items:center;
   }
 
+  .rh-mode-tabs{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-bottom:10px;
+  }
+
+  .rh-mode-tab{
+    border:2px solid #ddd4c4;
+    background:var(--panel);
+    color:var(--text);
+    box-shadow:var(--shadow);
+    min-height:48px;
+  }
+
+  .rh-mode-tab.active{
+    background:var(--top-dark);
+    border-color:var(--top-dark);
+    color:var(--top-yellow);
+  }
+
+  .rh-tab-panel{
+    display:none;
+  }
+
+  .rh-tab-panel.active{
+    display:block;
+  }
+
   button{
     border:none;
     border-radius:8px;
@@ -141,6 +170,14 @@
     grid-template-columns: 230px 1fr 230px;
     gap:10px;
     align-items:start;
+  }
+
+  .rh-rank-layout{
+    grid-template-columns: 230px 1fr;
+  }
+
+  .rh-translation-layout{
+    grid-template-columns: 1fr 230px;
   }
 
   .donor-section{
@@ -187,6 +224,12 @@
     opacity:.45;
   }
 
+  .chip.selected{
+    border-color:var(--bad);
+    box-shadow:0 0 0 3px rgba(192,57,43,.14);
+    transform:translateY(-1px);
+  }
+
   .chip.used{
     opacity:.22;
     pointer-events:none;
@@ -204,6 +247,31 @@
     display:grid;
     grid-template-columns: repeat(3, 1fr);
     gap:10px;
+  }
+
+  .translation-board{
+    background:var(--panel);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  .translation-board table{
+    background:var(--cell);
+  }
+
+  .translation-board th:first-child,
+  .translation-board td:first-child{
+    width:36%;
+  }
+
+  .fixed-symbol{
+    min-height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:1rem;
   }
 
   .section{
@@ -449,6 +517,14 @@
   }
 
   @media (max-width: 700px){
+    body{
+      padding:8px;
+    }
+
+    .rh-mode-tabs{
+      grid-template-columns:1fr;
+    }
+
     .tables{
       grid-template-columns:1fr;
     }
@@ -467,6 +543,11 @@
       grid-template-columns:1fr;
     }
 
+    .rh-rank-layout,
+    .rh-translation-layout{
+      grid-template-columns:1fr;
+    }
+
     .bank{
       position:static;
     }
@@ -482,8 +563,8 @@
   }
 </style>
 <script src="interactive_theme.js"></script>
-<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-8">
-<script src="interactive_music.js?v=bb-theme-8" defer></script>
+<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-11">
+<script src="interactive_music.js?v=bb-theme-11" defer></script>
 </head>
 <body class="mls-interactive bb-theme">
 <header class="site-header">
@@ -501,33 +582,64 @@
   <header>
     <div>
       <h1>🩸 Rh Haplotype Frequency – Rank It!</h1>
-      <p>Drag each haplotype into the correct order for White, Black, and Asian populations. Top row = most frequent. Bottom row = least frequent. Click a filled box to return it.</p>
+      <p>Rank the Wiener haplotypes first, then switch tabs to translate each Wiener symbol into Fisher-Race notation. Top row = most frequent. Bottom row = least frequent.</p>
     </div>
-    <div class="badge">8 Haplotypes</div>
+    <div class="badge">2 Tabs</div>
   </header>
 
-  <div class="section-controls">
-    <button id="rhCheckBtn" class="checkBtn">✔ Check Rh Section</button>
-    <button id="rhResetBtn" class="resetBtn">↺ Reset Rh Section</button>
-    <button id="rhShowAnswersBtn" class="resetBtn">Show answers</button>
-    <div id="rhMsg" class="score"></div>
+  <div class="rh-mode-tabs" aria-label="Rh game modes">
+    <button type="button" class="rh-mode-tab active" data-rh-tab="rank">Rank Wiener</button>
+    <button type="button" class="rh-mode-tab" data-rh-tab="translate">Wiener → Fisher-Race</button>
   </div>
 
-  <div class="layout">
-    <div class="bank">
-      <h2>Weiner Bank</h2>
-      <div class="hint">Each Weiner symbol can be used once in each section, so up to 3 times total.</div>
-      <div id="weinerWrap"></div>
+  <section class="rh-tab-panel active" data-rh-panel="rank">
+    <div class="section-controls">
+      <button id="rhCheckBtn" class="checkBtn">✔ Check Ranking</button>
+      <button id="rhResetBtn" class="resetBtn">↺ Reset Ranking</button>
+      <button id="rhShowAnswersBtn" class="resetBtn">Show answers</button>
+      <div id="rhMsg" class="score"></div>
     </div>
 
-    <div class="tables" id="tablesWrap"></div>
+    <div class="layout rh-rank-layout">
+      <div class="bank">
+        <h2>Wiener Bank</h2>
+        <div class="hint">Tap or drag each Wiener symbol into the correct population order. Each can be used once per population.</div>
+        <div id="weinerWrap"></div>
+      </div>
 
-    <div class="bank">
-      <h2>Fisher-Race Bank</h2>
-      <div class="hint">Each Fisher-Race symbol can be used once in each section, so up to 3 times total.</div>
-      <div id="fisherWrap"></div>
+      <div class="tables" id="tablesWrap"></div>
     </div>
-  </div>
+  </section>
+
+  <section class="rh-tab-panel" data-rh-panel="translate">
+    <div class="section-controls">
+      <button id="translateCheckBtn" class="checkBtn">✔ Check Translation</button>
+      <button id="translateResetBtn" class="resetBtn">↺ Reset Translation</button>
+      <button id="translateShowAnswersBtn" class="resetBtn">Show answers</button>
+      <div id="translateMsg" class="score"></div>
+    </div>
+
+    <div class="layout rh-translation-layout">
+      <div class="translation-board">
+        <div class="section-title">Wiener → Fisher-Race</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Wiener</th>
+              <th>Fisher-Race Match</th>
+            </tr>
+          </thead>
+          <tbody id="translationBody"></tbody>
+        </table>
+      </div>
+
+      <div class="bank">
+        <h2>Fisher-Race Bank</h2>
+        <div class="hint">Tap or drag one Fisher-Race symbol to match each Wiener symbol.</div>
+        <div id="translateFisherWrap"></div>
+      </div>
+    </div>
+  </section>
 
   <section class="donor-section">
     <div class="donor-wrap">
@@ -584,66 +696,6 @@
     </div>
   </section>
 
-  <div id="rhAnswersSection" style="display:none; margin-top:20px; background:var(--panel); border-radius:12px; padding:14px; box-shadow:var(--shadow);">
-    <div style="font-weight:900; margin-bottom:10px;">Rh Section Answers</div>
-    <div class="tables">
-      <div class="section">
-        <div class="section-title">WHITE</div>
-        <table>
-          <thead>
-            <tr><th>Weiner</th><th>Fisher-Race</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>R1</td><td>DCe</td></tr>
-            <tr><td>r</td><td>dce</td></tr>
-            <tr><td>R2</td><td>DcE</td></tr>
-            <tr><td>R0</td><td>Dce</td></tr>
-            <tr><td>r’</td><td>dCe</td></tr>
-            <tr><td>r’’</td><td>dcE</td></tr>
-            <tr><td>RZ</td><td>DCE</td></tr>
-            <tr><td>rY</td><td>dCE</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="section">
-        <div class="section-title">BLACK</div>
-        <table>
-          <thead>
-            <tr><th>Weiner</th><th>Fisher-Race</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>R0</td><td>Dce</td></tr>
-            <tr><td>r</td><td>dce</td></tr>
-            <tr><td>R1</td><td>DCe</td></tr>
-            <tr><td>R2</td><td>DcE</td></tr>
-            <tr><td>r’</td><td>dCe</td></tr>
-            <tr><td>r’’</td><td>dcE</td></tr>
-            <tr><td>rY</td><td>dCE</td></tr>
-            <tr><td>RZ</td><td>DCE</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="section">
-        <div class="section-title">ASIAN</div>
-        <table>
-          <thead>
-            <tr><th>Weiner</th><th>Fisher-Race</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>R1</td><td>DCe</td></tr>
-            <tr><td>R2</td><td>DcE</td></tr>
-            <tr><td>R0</td><td>Dce</td></tr>
-            <tr><td>r</td><td>dce</td></tr>
-            <tr><td>r’</td><td>dCe</td></tr>
-            <tr><td>RZ</td><td>DCE</td></tr>
-            <tr><td>r’’</td><td>dcE</td></tr>
-            <tr><td>rY</td><td>dCE</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <script>
@@ -653,19 +705,27 @@
 
 const WEINERS = ["R0","R1","R2","RZ","r","r’","r’’","rY"];
 const FISHERS = ["Dce","DCe","DcE","DCE","dce","dCe","dcE","dCE"];
+const RANK_COLS = ["weiner"];
+const TRANSLATION_ANSWERS = {
+  "R0": "Dce",
+  "R1": "DCe",
+  "R2": "DcE",
+  "RZ": "DCE",
+  "r": "dce",
+  "r’": "dCe",
+  "r’’": "dcE",
+  "rY": "dCE"
+};
 
 const ANSWERS = {
   white: {
-    weiner: ["R1","r","R2","R0","r’","r’’","RZ","rY"],
-    fisher: ["DCe","dce","DcE","Dce","dCe","dcE","DCE","dCE"]
+    weiner: ["R1","r","R2","R0","r’","r’’","RZ","rY"]
   },
   black: {
-    weiner: ["R0","r","R1","R2","r’","r’’","rY","RZ"],
-    fisher: ["Dce","dce","DCe","DcE","dCe","dcE","dCE","DCE"]
+    weiner: ["R0","r","R1","R2","r’","r’’","rY","RZ"]
   },
   asian: {
-    weiner: ["R1","R2","R0","r","r’","RZ","r’’","rY"],
-    fisher: ["DCe","DcE","Dce","dce","dCe","DCE","dcE","dCE"]
+    weiner: ["R1","R2","R0","r","r’","RZ","r’’","rY"]
   }
 };
 
@@ -676,11 +736,18 @@ const GROUPS = [
 ];
 
 const state = {};
+const translationState = {};
 let dragItem = null;
 let dragFrom = null;
+let selectedRankItem = null;
+let selectedTranslateItem = null;
 
 function slotKey(group, row, col){
   return `${group}-${row}-${col}`;
+}
+
+function translationKey(weiner){
+  return `translate-${cssSafe(weiner)}`;
 }
 
 function getState(key){
@@ -692,10 +759,27 @@ function setState(key, value){
   else state[key] = value;
 }
 
-function countUses(type, value){
+function getTranslationState(key){
+  return translationState[key] || null;
+}
+
+function setTranslationState(key, value){
+  if(value === null) delete translationState[key];
+  else translationState[key] = value;
+}
+
+function countRankUses(type, value){
   let count = 0;
   Object.values(state).forEach(v => {
     if(v && v.type === type && v.value === value) count++;
+  });
+  return count;
+}
+
+function countTranslationUses(value){
+  let count = 0;
+  Object.values(translationState).forEach(v => {
+    if(v && v.type === "fisher" && v.value === value) count++;
   });
   return count;
 }
@@ -713,29 +797,73 @@ function shuffleArray(arr){
   return copy;
 }
 
+function colLabel(col){
+  return col === "weiner" ? "Wiener" : "Fisher-Race";
+}
+
+function clearSelectedChips(){
+  document.querySelectorAll(".chip.selected").forEach(chip => chip.classList.remove("selected"));
+}
+
+function clearTapSelections(){
+  selectedRankItem = null;
+  selectedTranslateItem = null;
+  clearSelectedChips();
+}
+
+function selectRankItem(value){
+  if(countRankUses("weiner", value) >= 3) return;
+  const id = `weiner-${cssSafe(value)}`;
+  const alreadySelected = selectedRankItem && selectedRankItem.value === value;
+  clearTapSelections();
+  if(alreadySelected) return;
+  selectedRankItem = { section: "rh", type: "weiner", value };
+  const chip = document.getElementById(id);
+  if(chip) chip.classList.add("selected");
+}
+
+function selectTranslateItem(value){
+  if(countTranslationUses(value) >= 1) return;
+  const id = `translate-fisher-${cssSafe(value)}`;
+  const alreadySelected = selectedTranslateItem && selectedTranslateItem.value === value;
+  clearTapSelections();
+  if(alreadySelected) return;
+  selectedTranslateItem = { section: "translate", type: "fisher", value };
+  const chip = document.getElementById(id);
+  if(chip) chip.classList.add("selected");
+}
+
 function renderBankUsage(){
   WEINERS.forEach(value => {
     const chip = document.getElementById(`weiner-${cssSafe(value)}`);
     if(!chip) return;
-    const count = countUses("weiner", value);
+    const count = countRankUses("weiner", value);
     chip.querySelector(".use-count").textContent = `${count}/3`;
     chip.classList.toggle("used", count >= 3);
+    if(count >= 3 && selectedRankItem && selectedRankItem.value === value){
+      selectedRankItem = null;
+      chip.classList.remove("selected");
+    }
   });
+}
 
+function renderTranslationBankUsage(){
   FISHERS.forEach(value => {
-    const chip = document.getElementById(`fisher-${cssSafe(value)}`);
+    const chip = document.getElementById(`translate-fisher-${cssSafe(value)}`);
     if(!chip) return;
-    const count = countUses("fisher", value);
-    chip.querySelector(".use-count").textContent = `${count}/3`;
-    chip.classList.toggle("used", count >= 3);
+    const count = countTranslationUses(value);
+    chip.querySelector(".use-count").textContent = `${count}/1`;
+    chip.classList.toggle("used", count >= 1);
+    if(count >= 1 && selectedTranslateItem && selectedTranslateItem.value === value){
+      selectedTranslateItem = null;
+      chip.classList.remove("selected");
+    }
   });
 }
 
 function buildBanks(){
   const weinerWrap = document.getElementById("weinerWrap");
-  const fisherWrap = document.getElementById("fisherWrap");
   weinerWrap.innerHTML = "";
-  fisherWrap.innerHTML = "";
 
   WEINERS.forEach(value => {
     const chip = document.createElement("div");
@@ -745,10 +873,11 @@ function buildBanks(){
     chip.innerHTML = `${value}<span class="use-count">0/3</span>`;
 
     chip.addEventListener("dragstart", e => {
-      if(countUses("weiner", value) >= 3){
+      if(countRankUses("weiner", value) >= 3){
         e.preventDefault();
         return;
       }
+      clearTapSelections();
       dragItem = { section: "rh", type: "weiner", value };
       dragFrom = null;
       chip.classList.add("dragging");
@@ -758,22 +887,32 @@ function buildBanks(){
       chip.classList.remove("dragging");
     });
 
+    chip.addEventListener("click", () => selectRankItem(value));
+
     weinerWrap.appendChild(chip);
   });
+
+  renderBankUsage();
+}
+
+function buildTranslationBank(){
+  const fisherWrap = document.getElementById("translateFisherWrap");
+  fisherWrap.innerHTML = "";
 
   FISHERS.forEach(value => {
     const chip = document.createElement("div");
     chip.className = "chip";
-    chip.id = `fisher-${cssSafe(value)}`;
+    chip.id = `translate-fisher-${cssSafe(value)}`;
     chip.draggable = true;
-    chip.innerHTML = `${value}<span class="use-count">0/3</span>`;
+    chip.innerHTML = `${value}<span class="use-count">0/1</span>`;
 
     chip.addEventListener("dragstart", e => {
-      if(countUses("fisher", value) >= 3){
+      if(countTranslationUses(value) >= 1){
         e.preventDefault();
         return;
       }
-      dragItem = { section: "rh", type: "fisher", value };
+      clearTapSelections();
+      dragItem = { section: "translate", type: "fisher", value };
       dragFrom = null;
       chip.classList.add("dragging");
     });
@@ -782,10 +921,12 @@ function buildBanks(){
       chip.classList.remove("dragging");
     });
 
+    chip.addEventListener("click", () => selectTranslateItem(value));
+
     fisherWrap.appendChild(chip);
   });
 
-  renderBankUsage();
+  renderTranslationBankUsage();
 }
 
 function buildTables(){
@@ -801,8 +942,7 @@ function buildTables(){
       <table>
         <thead>
           <tr>
-            <th>Weiner</th>
-            <th>Fisher-Race</th>
+            <th>Wiener Rank</th>
           </tr>
         </thead>
         <tbody id="tbody-${group.key}"></tbody>
@@ -814,23 +954,63 @@ function buildTables(){
 
     for(let row = 1; row <= 8; row++){
       const tr = document.createElement("tr");
-
       const tdWeiner = document.createElement("td");
-      const tdFisher = document.createElement("td");
-
       tdWeiner.appendChild(makeDropzone(group.key, row, "weiner"));
-      tdFisher.appendChild(makeDropzone(group.key, row, "fisher"));
-
       tr.appendChild(tdWeiner);
-      tr.appendChild(tdFisher);
       tbody.appendChild(tr);
     }
   });
 }
 
+function buildTranslationTable(){
+  const body = document.getElementById("translationBody");
+  body.innerHTML = "";
+
+  WEINERS.forEach(weiner => {
+    const tr = document.createElement("tr");
+    const fixedTd = document.createElement("td");
+    const matchTd = document.createElement("td");
+    const fixed = document.createElement("div");
+    fixed.className = "fixed-symbol";
+    fixed.textContent = weiner;
+    fixedTd.appendChild(fixed);
+    matchTd.appendChild(makeTranslationDropzone(weiner));
+    tr.appendChild(fixedTd);
+    tr.appendChild(matchTd);
+    body.appendChild(tr);
+  });
+}
+
+function placeRankItem(group, row, col, item, fromKey){
+  if(!item || item.section !== "rh" || item.type !== col) return false;
+  const key = slotKey(group, row, col);
+
+  const alreadyUsedInThisGroup = Object.entries(state).some(([k, v]) => {
+    return k !== key && k !== fromKey && k.startsWith(group + "-") && k.endsWith("-" + col) && v && v.value === item.value;
+  });
+
+  if(alreadyUsedInThisGroup) return false;
+
+  const atMax = countRankUses(col, item.value) >= 3;
+  const movingSameItem = fromKey && getState(fromKey) && getState(fromKey).value === item.value;
+
+  if(atMax && !movingSameItem) return false;
+
+  if(fromKey && fromKey !== key){
+    setState(fromKey, null);
+    renderSlot(fromKey);
+  }
+
+  setState(key, { ...item });
+  renderSlot(key);
+  clearRhMarks();
+  renderBankUsage();
+  return true;
+}
+
 function makeDropzone(group, row, col){
   const dz = document.createElement("div");
-  dz.className = "dropzone";
+  dz.className = "dropzone rank-dropzone";
   dz.id = `slot-${slotKey(group, row, col)}`;
   dz.draggable = true;
   renderSlotContent(dz, null, col);
@@ -852,41 +1032,19 @@ function makeDropzone(group, row, col){
     if(!dragItem || dragItem.section !== "rh" || dragItem.type !== col) return;
 
     const key = slotKey(group, row, col);
-
-    const alreadyUsedInThisGroup = Object.entries(state).some(([k, v]) => {
-      return k !== key && k.startsWith(group + "-") && k.endsWith("-" + col) && v && v.value === dragItem.value;
-    });
-
-    if(alreadyUsedInThisGroup){
-      dragItem = null;
-      dragFrom = null;
-      return;
-    }
-
-    const atMax = countUses(col, dragItem.value) >= 3;
-    const movingSameItem = dragFrom && getState(dragFrom) && getState(dragFrom).value === dragItem.value;
-
-    if(atMax && !movingSameItem){
-      dragItem = null;
-      dragFrom = null;
-      return;
-    }
-
-    if(dragFrom && dragFrom !== key){
-      setState(dragFrom, null);
-      renderSlot(dragFrom);
-    }
-
-    setState(key, { ...dragItem });
-    renderSlot(key);
+    placeRankItem(group, row, col, dragItem, dragFrom);
     dragItem = null;
     dragFrom = null;
-    clearRhMarks();
-    renderBankUsage();
   });
 
   dz.addEventListener("click", () => {
     const key = slotKey(group, row, col);
+    if(selectedRankItem && selectedRankItem.type === col){
+      if(placeRankItem(group, row, col, selectedRankItem, null)){
+        clearTapSelections();
+      }
+      return;
+    }
     if(!getState(key)) return;
     setState(key, null);
     renderSlot(key);
@@ -910,7 +1068,7 @@ function makeDropzone(group, row, col){
 
 function renderSlotContent(slotEl, value, col){
   if(!value){
-    slotEl.innerHTML = `<div class="placeholder">— drop ${col} here —</div>`;
+    slotEl.innerHTML = `<div class="placeholder">— drop ${colLabel(col)} here —</div>`;
     slotEl.classList.remove("filled");
     return;
   }
@@ -928,8 +1086,101 @@ function renderSlot(key){
   renderSlotContent(slot, getState(key), col);
 }
 
+function placeTranslationItem(weiner, item, fromKey){
+  if(!item || item.section !== "translate" || item.type !== "fisher") return false;
+  const key = translationKey(weiner);
+  const atMax = countTranslationUses(item.value) >= 1;
+  const movingSameItem = fromKey && getTranslationState(fromKey) && getTranslationState(fromKey).value === item.value;
+
+  if(atMax && !movingSameItem) return false;
+
+  if(fromKey && fromKey !== key){
+    setTranslationState(fromKey, null);
+    renderTranslationSlot(fromKey);
+  }
+
+  setTranslationState(key, { ...item });
+  renderTranslationSlot(key);
+  clearTranslationMarks();
+  renderTranslationBankUsage();
+  return true;
+}
+
+function makeTranslationDropzone(weiner){
+  const dz = document.createElement("div");
+  dz.className = "dropzone translation-dropzone";
+  dz.id = `slot-${translationKey(weiner)}`;
+  dz.draggable = true;
+  renderTranslationSlotContent(dz, null);
+
+  dz.addEventListener("dragover", e => {
+    if(dragItem && dragItem.section === "translate" && dragItem.type === "fisher"){
+      e.preventDefault();
+      dz.classList.add("drag-over");
+    }
+  });
+
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    placeTranslationItem(weiner, dragItem, dragFrom);
+    dragItem = null;
+    dragFrom = null;
+  });
+
+  dz.addEventListener("click", () => {
+    const key = translationKey(weiner);
+    if(selectedTranslateItem){
+      if(placeTranslationItem(weiner, selectedTranslateItem, null)){
+        clearTapSelections();
+      }
+      return;
+    }
+    if(!getTranslationState(key)) return;
+    setTranslationState(key, null);
+    renderTranslationSlot(key);
+    clearTranslationMarks();
+    renderTranslationBankUsage();
+  });
+
+  dz.addEventListener("dragstart", e => {
+    const key = translationKey(weiner);
+    const current = getTranslationState(key);
+    if(!current){
+      e.preventDefault();
+      return;
+    }
+    clearTapSelections();
+    dragItem = { ...current };
+    dragFrom = key;
+  });
+
+  return dz;
+}
+
+function renderTranslationSlotContent(slotEl, value){
+  if(!value){
+    slotEl.innerHTML = `<div class="placeholder">— drop Fisher-Race here —</div>`;
+    slotEl.classList.remove("filled");
+    return;
+  }
+
+  slotEl.textContent = value.value;
+  slotEl.classList.add("filled");
+}
+
+function renderTranslationSlot(key){
+  const slot = document.getElementById(`slot-${key}`);
+  if(!slot) return;
+
+  slot.classList.remove("correct", "wrong");
+  renderTranslationSlotContent(slot, getTranslationState(key));
+}
+
 function clearRhMarks(){
-  document.querySelectorAll(".dropzone").forEach(z => {
+  document.querySelectorAll(".rank-dropzone").forEach(z => {
     z.classList.remove("correct", "wrong");
   });
   const msg = document.getElementById("rhMsg");
@@ -937,13 +1188,22 @@ function clearRhMarks(){
   msg.className = "score";
 }
 
+function clearTranslationMarks(){
+  document.querySelectorAll(".translation-dropzone").forEach(z => {
+    z.classList.remove("correct", "wrong");
+  });
+  const msg = document.getElementById("translateMsg");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
 function checkRhAnswers(){
   let correct = 0;
-  const total = GROUPS.length * 8 * 2;
+  const total = GROUPS.length * 8 * RANK_COLS.length;
 
   GROUPS.forEach(group => {
     for(let row = 1; row <= 8; row++){
-      ["weiner","fisher"].forEach(col => {
+      RANK_COLS.forEach(col => {
         const key = slotKey(group.key, row, col);
         const slot = document.getElementById(`slot-${key}`);
         const current = getState(key);
@@ -966,23 +1226,56 @@ function checkRhAnswers(){
   msg.className = `score ${correct === total ? "good" : "bad"}`;
 }
 
+function checkTranslationAnswers(){
+  let correct = 0;
+  const total = WEINERS.length;
+
+  WEINERS.forEach(weiner => {
+    const key = translationKey(weiner);
+    const slot = document.getElementById(`slot-${key}`);
+    const current = getTranslationState(key);
+    const rightValue = TRANSLATION_ANSWERS[weiner];
+
+    slot.classList.remove("correct", "wrong");
+    if(current && current.value === rightValue){
+      slot.classList.add("correct");
+      correct++;
+    } else {
+      slot.classList.add("wrong");
+    }
+  });
+
+  const msg = document.getElementById("translateMsg");
+  msg.textContent = `${correct}/${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
 function resetRh(){
   Object.keys(state).forEach(k => delete state[k]);
 
   GROUPS.forEach(group => {
     for(let row = 1; row <= 8; row++){
-      ["weiner","fisher"].forEach(col => renderSlot(slotKey(group.key, row, col)));
+      RANK_COLS.forEach(col => renderSlot(slotKey(group.key, row, col)));
     }
   });
 
+  clearTapSelections();
   clearRhMarks();
   renderBankUsage();
+}
+
+function resetTranslation(){
+  Object.keys(translationState).forEach(k => delete translationState[k]);
+  WEINERS.forEach(weiner => renderTranslationSlot(translationKey(weiner)));
+  clearTapSelections();
+  clearTranslationMarks();
+  renderTranslationBankUsage();
 }
 
 function showRhAnswers(){
   GROUPS.forEach(group => {
     for(let row = 1; row <= 8; row++){
-      ["weiner","fisher"].forEach(col => {
+      RANK_COLS.forEach(col => {
         const key = slotKey(group.key, row, col);
         setState(key, { section: "rh", type: col, value: ANSWERS[group.key][col][row - 1] });
         renderSlot(key);
@@ -991,6 +1284,31 @@ function showRhAnswers(){
   });
   renderBankUsage();
   checkRhAnswers();
+}
+
+function showTranslationAnswers(){
+  WEINERS.forEach(weiner => {
+    const key = translationKey(weiner);
+    setTranslationState(key, { section: "translate", type: "fisher", value: TRANSLATION_ANSWERS[weiner] });
+    renderTranslationSlot(key);
+  });
+  renderTranslationBankUsage();
+  checkTranslationAnswers();
+}
+
+function setupRhTabs(){
+  document.querySelectorAll("[data-rh-tab]").forEach(tab => {
+    tab.addEventListener("click", () => {
+      const next = tab.getAttribute("data-rh-tab");
+      clearTapSelections();
+      document.querySelectorAll("[data-rh-tab]").forEach(btn => {
+        btn.classList.toggle("active", btn === tab);
+      });
+      document.querySelectorAll("[data-rh-panel]").forEach(panel => {
+        panel.classList.toggle("active", panel.getAttribute("data-rh-panel") === next);
+      });
+    });
+  });
 }
 
 /* =========================
@@ -1303,16 +1621,23 @@ function showDonorAnswers(){
 
 document.getElementById("rhCheckBtn").addEventListener("click", checkRhAnswers);
 document.getElementById("rhResetBtn").addEventListener("click", resetRh);
+document.getElementById("translateCheckBtn").addEventListener("click", checkTranslationAnswers);
+document.getElementById("translateResetBtn").addEventListener("click", resetTranslation);
 document.getElementById("donorCheckBtn").addEventListener("click", checkDonorAnswers);
 document.getElementById("donorResetBtn").addEventListener("click", resetDonor);
 document.getElementById("rhShowAnswersBtn").addEventListener("click", showRhAnswers);
+document.getElementById("translateShowAnswersBtn").addEventListener("click", showTranslationAnswers);
 document.getElementById("donorShowAnswersBtn").addEventListener("click", showDonorAnswers);
 
+setupRhTabs();
 buildBanks();
 buildTables();
+buildTranslationBank();
+buildTranslationTable();
 buildDonorBanks();
 buildDonorTable();
 resetRh();
+resetTranslation();
 resetDonor();
 </script>
 </body>
