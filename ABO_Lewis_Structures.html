@@ -203,6 +203,115 @@
     overflow:hidden;
   }
 
+  .type2-structure{
+    height:500px;
+    min-height:500px;
+  }
+
+  .type2-note{
+    position:absolute;
+    left:18px;
+    top:18px;
+    max-width:158px;
+    color:#6c1732;
+    font-weight:900;
+    font-size:.72rem;
+    line-height:1.2;
+  }
+
+  .rbc-anchor{
+    position:absolute;
+    left:244px;
+    bottom:18px;
+    width:92px;
+    height:54px;
+    border-radius:50%;
+    background:radial-gradient(circle at 36% 35%, #ff6d62 0 22%, #cc1b24 58%, #94131a 100%);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    letter-spacing:.08em;
+    box-shadow:0 8px 16px rgba(160,20,35,.18);
+  }
+
+  .type2-structure .line{
+    background:#c91946;
+  }
+
+  .type2-structure .line-base-1{ left:288px; top:356px; height:52px; }
+  .type2-structure .line-base-2{ left:288px; top:266px; height:52px; }
+  .type2-structure .line-base-3{ left:288px; top:176px; height:52px; }
+  .type2-structure .line-top{ left:288px; top:84px; height:52px; }
+  .type2-structure .line-side{ left:196px; top:214px; width:78px; }
+
+  .type2-structure .sugar-shape{
+    box-shadow:none;
+    border:3px solid rgba(139,107,40,.55);
+    color:#151515;
+    font-size:.84rem;
+  }
+
+  .type2-structure .sugar-glc{
+    left:238px;
+    top:404px;
+    width:108px;
+    height:88px;
+    background:#87c58c;
+    clip-path:polygon(50% 2%, 98% 96%, 2% 96%);
+    align-items:flex-end;
+    padding-bottom:18px;
+  }
+
+  .type2-structure .sugar-gal-low{
+    left:238px;
+    top:316px;
+    width:108px;
+    height:86px;
+    background:#41c7d5;
+    border-radius:50%;
+    clip-path:none;
+  }
+
+  .type2-structure .sugar-glcnac{
+    left:246px;
+    top:226px;
+    width:92px;
+    height:92px;
+    background:#ffe15d;
+    border-radius:14px;
+    clip-path:none;
+  }
+
+  .type2-structure .sugar-gal-terminal{
+    left:238px;
+    top:136px;
+    width:108px;
+    height:86px;
+    background:#41c7d5;
+    border-radius:50%;
+    clip-path:none;
+  }
+
+  .type2-structure .fut-drop{
+    left:92px;
+    top:184px;
+    width:122px;
+    height:74px;
+    border-radius:18px;
+    clip-path:none;
+    font-size:.72rem;
+  }
+
+  .type2-structure .antigen-drop{
+    left:238px;
+    top:36px;
+    width:108px;
+    height:86px;
+    font-size:.72rem;
+  }
+
   .line{
     position:absolute;
     background:#9a8d74;
@@ -561,10 +670,81 @@
       margin-left:0;
     }
   }
+
+  @media (max-width: 640px){
+    body{
+      padding:8px;
+    }
+
+    .section-controls{
+      display:grid;
+      grid-template-columns:1fr;
+    }
+
+    button,
+    .score,
+    .chip,
+    .label-drop{
+      min-height:46px;
+    }
+
+    .bank{
+      padding:12px;
+    }
+
+    .type2-structure{
+      height:500px !important;
+      min-height:500px !important;
+      border-radius:18px;
+    }
+
+    .type2-note{
+      left:14px;
+      top:14px;
+      max-width:122px;
+      font-size:.66rem;
+    }
+
+    .rbc-anchor{
+      left:calc(50% - 46px);
+      bottom:16px;
+    }
+
+    .type2-structure .line-base-1{ left:calc(50% - 2px); top:356px; height:50px; }
+    .type2-structure .line-base-2{ left:calc(50% - 2px); top:266px; height:50px; }
+    .type2-structure .line-base-3{ left:calc(50% - 2px); top:176px; height:50px; }
+    .type2-structure .line-top{ left:calc(50% - 2px); top:84px; height:50px; }
+    .type2-structure .line-side{ left:calc(50% - 108px); top:214px; width:76px; }
+
+    .type2-structure .sugar-glc{ left:calc(50% - 54px); top:404px; }
+    .type2-structure .sugar-gal-low{ left:calc(50% - 54px); top:316px; }
+    .type2-structure .sugar-glcnac{ left:calc(50% - 46px); top:226px; }
+    .type2-structure .sugar-gal-terminal{ left:calc(50% - 54px); top:136px; }
+    .type2-structure .fut-drop{ left:calc(50% - 210px); top:184px; }
+    .type2-structure .antigen-drop{ left:calc(50% - 54px); top:36px; }
+  }
+
+  @media (max-width: 460px){
+    .type2-note{
+      max-width:104px;
+      font-size:.58rem;
+    }
+
+    .type2-structure .line-side{
+      left:14px;
+      width:calc(50% - 68px);
+    }
+
+    .type2-structure .fut-drop{
+      left:10px;
+      width:104px;
+      font-size:.62rem;
+    }
+  }
 </style>
 <script src="interactive_theme.js"></script>
-<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-5">
-<script src="interactive_music.js?v=bb-theme-5" defer></script>
+<link rel="stylesheet" href="interactive_learning.css?v=bb-theme-8">
+<script src="interactive_music.js?v=bb-theme-8" defer></script>
 </head>
 <body class="mls-interactive bb-theme">
 <header class="site-header">
@@ -588,7 +768,7 @@
   <header>
     <div>
       <h1>🩸 Blood Structures</h1>
-      <p>Use one base structure. The chain runs bottom to top. Add FUT1 or FUT2 to the side and add the antigen sugar to the top to build Bombay, H, A, B, or Acquired B-Antigen.</p>
+      <p>Use the Type 2 base chain. FUT1 attaches to the side Gal, then the top sugar determines H, A, B, or Acquired B-Antigen. Bombay stays blank.</p>
     </div>
     <div class="badge">ABH Type 2</div>
   </header>
@@ -603,26 +783,29 @@
   <div class="layout">
     <div class="bank">
       <h2>Final Sugar Bank</h2>
-      <div class="hint">Drag the side and top sugars.</div>
+      <div class="hint">Tap or drag. FUT1 goes on the side Gal; antigen sugars go on top.</div>
       <div id="sugarWrap"></div>
     </div>
 
     <div class="main-card">
-      <div class="main-title">Type 2 Chain Base Structure</div>
+      <div class="main-title">Type 2 Chain</div>
       <div class="main-body">
-        <div class="structure">
-          <div class="line v" style="left:267px; top:246px; height:70px;"></div>
-          <div class="line v" style="left:267px; top:158px; height:70px;"></div>
+        <div class="structure type2-structure" aria-label="Type 2 chain base structure">
+          <div class="type2-note">Type 2 precursor stays the same. Build upward from the RBC.</div>
+          <div class="rbc-anchor">RBC</div>
+          <div class="line v line-base-1"></div>
+          <div class="line v line-base-2"></div>
+          <div class="line v line-base-3"></div>
+          <div class="line v line-top"></div>
+          <div class="line h line-side"></div>
 
-          <div class="line h" style="left:184px; top:196px; width:78px;"></div>
-          <div class="line v" style="left:267px; top:74px; height:64px;"></div>
+          <div class="hex fixed sugar-shape sugar-glc">Glc</div>
+          <div class="hex fixed sugar-shape sugar-gal-low">Gal</div>
+          <div class="hex fixed sugar-shape sugar-glcnac">GlcNAc</div>
+          <div class="hex fixed sugar-shape sugar-gal-terminal">Gal</div>
 
-          <div class="hex fixed" style="left:218px; top:302px;">Glucose</div>
-          <div class="hex fixed" style="left:218px; top:214px;">Galactose</div>
-          <div class="hex fixed" style="left:218px; top:126px;">N-acetyl-<br>glucosamine</div>
-
-          <div class="hex dropzone" id="drop-side" style="left:92px; top:152px;"></div>
-          <div class="hex dropzone" id="drop-top" style="left:218px; top:36px;"></div>
+          <div class="hex dropzone fut-drop" id="drop-side"></div>
+          <div class="hex dropzone antigen-drop" id="drop-top"></div>
         </div>
 
         <div class="label-wrap">
@@ -738,25 +921,25 @@
       </div>
       <div class="answer-card">
         <h3>H antigen</h3>
-        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Side Gal:</strong> FUT1</div>
         <div><strong>Top:</strong> blank</div>
         <div><strong>Label:</strong> H antigen</div>
       </div>
       <div class="answer-card">
         <h3>A antigen</h3>
-        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Side Gal:</strong> FUT1</div>
         <div><strong>Top:</strong> N-acetylgalactosamine</div>
         <div><strong>Label:</strong> A antigen</div>
       </div>
       <div class="answer-card">
         <h3>B antigen</h3>
-        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Side Gal:</strong> FUT1</div>
         <div><strong>Top:</strong> Galactose</div>
         <div><strong>Label:</strong> B antigen</div>
       </div>
       <div class="answer-card">
         <h3>Acquired B-Antigen</h3>
-        <div><strong>Side:</strong> FUT1</div>
+        <div><strong>Side Gal:</strong> FUT1</div>
         <div><strong>Top:</strong> galactosamine</div>
         <div><strong>Label:</strong> Acquired B-Antigen</div>
       </div>
@@ -852,7 +1035,6 @@
 <script>
 const SUGAR_CHIPS = [
   "FUT1",
-  "FUT2",
   "N-acetylgalactosamine",
   "Galactose",
   "galactosamine"
@@ -883,6 +1065,8 @@ const state = {
 let currentTarget = "bombay";
 let dragItem = null;
 let dragFrom = null;
+let selectedSugar = null;
+let selectedLabel = null;
 
 function clearMarks(){
   document.querySelectorAll(".dropzone, .label-drop").forEach(el => {
@@ -902,6 +1086,49 @@ function countSugarUses(value){
 
 function countLabelUses(value){
   return state.label === value ? 1 : 0;
+}
+
+function isValidSugarForSlot(stateKey, value){
+  if(stateKey === "side") return value === "FUT1";
+  if(stateKey === "top") return value !== "FUT1";
+  return false;
+}
+
+function clearTapSelections(){
+  selectedSugar = null;
+  selectedLabel = null;
+  renderSugarBankUsage();
+  renderLabelBankUsage();
+}
+
+function placeSugarValue(stateKey, value, fromKey = null){
+  if(!isValidSugarForSlot(stateKey, value)) return false;
+
+  const usedElsewhere =
+    (stateKey !== "side" && state.side === value) ||
+    (stateKey !== "top" && state.top === value);
+
+  if(usedElsewhere && fromKey !== stateKey) return false;
+
+  if(fromKey && fromKey !== stateKey){
+    state[fromKey] = null;
+    renderSugarDrop(fromKey);
+  }
+
+  state[stateKey] = value;
+  renderSugarDrop(stateKey);
+  updateTargetGuess();
+  clearMarks();
+  renderSugarBankUsage();
+  return true;
+}
+
+function placeLabelValue(value){
+  state.label = value;
+  renderLabelDrop();
+  clearMarks();
+  renderLabelBankUsage();
+  return true;
 }
 
 function buildSugarBank(){
@@ -929,6 +1156,15 @@ function buildSugarBank(){
       chip.classList.remove("dragging");
     });
 
+    chip.addEventListener("click", () => {
+      if(countSugarUses(value) >= 1) return;
+      selectedSugar = selectedSugar === value ? null : value;
+      selectedLabel = null;
+      renderSugarBankUsage();
+      renderLabelBankUsage();
+      clearMarks();
+    });
+
     wrap.appendChild(chip);
   });
 
@@ -938,6 +1174,7 @@ function buildSugarBank(){
 function renderSugarBankUsage(){
   document.querySelectorAll("#sugarWrap .chip").forEach(chip => {
     chip.classList.toggle("used", countSugarUses(chip.textContent) >= 1);
+    chip.classList.toggle("selected", selectedSugar === chip.textContent);
   });
 }
 
@@ -966,6 +1203,15 @@ function buildLabelBank(){
       chip.classList.remove("dragging");
     });
 
+    chip.addEventListener("click", () => {
+      if(countLabelUses(value) >= 1) return;
+      selectedLabel = selectedLabel === value ? null : value;
+      selectedSugar = null;
+      renderLabelBankUsage();
+      renderSugarBankUsage();
+      clearMarks();
+    });
+
     wrap.appendChild(chip);
   });
 
@@ -975,6 +1221,7 @@ function buildLabelBank(){
 function renderLabelBankUsage(){
   document.querySelectorAll("#labelWrap .chip").forEach(chip => {
     chip.classList.toggle("used", countLabelUses(chip.textContent) >= 1);
+    chip.classList.toggle("selected", selectedLabel === chip.textContent);
   });
 }
 
@@ -983,7 +1230,7 @@ function setupSugarDrop(slotId, stateKey){
   el.draggable = true;
 
   el.addEventListener("dragover", e => {
-    if(dragItem && dragItem.type === "sugar"){
+    if(dragItem && dragItem.type === "sugar" && isValidSugarForSlot(stateKey, dragItem.value)){
       e.preventDefault();
       el.classList.add("drag-over");
     }
@@ -998,32 +1245,19 @@ function setupSugarDrop(slotId, stateKey){
     el.classList.remove("drag-over");
     if(!dragItem || dragItem.type !== "sugar") return;
 
-    const usedElsewhere =
-      (stateKey !== "side" && state.side === dragItem.value) ||
-      (stateKey !== "top" && state.top === dragItem.value);
-
-    if(usedElsewhere && dragFrom !== stateKey){
-      dragItem = null;
-      dragFrom = null;
-      return;
-    }
-
-    if(dragFrom && dragFrom !== stateKey){
-      state[dragFrom] = null;
-      renderSugarDrop(dragFrom);
-    }
-
-    state[stateKey] = dragItem.value;
-    renderSugarDrop(stateKey);
-    updateTargetGuess();
-
+    placeSugarValue(stateKey, dragItem.value, dragFrom);
     dragItem = null;
     dragFrom = null;
-    clearMarks();
-    renderSugarBankUsage();
+    clearTapSelections();
   });
 
   el.addEventListener("click", () => {
+    if(selectedSugar){
+      if(placeSugarValue(stateKey, selectedSugar)){
+        clearTapSelections();
+      }
+      return;
+    }
     if(!state[stateKey]) return;
     state[stateKey] = null;
     renderSugarDrop(stateKey);
@@ -1052,7 +1286,8 @@ function renderSugarDrop(stateKey){
     el.textContent = state[stateKey];
     el.classList.add("filled");
   } else {
-    el.innerHTML = `<div class="placeholder">— drop sugar here —</div>`;
+    const copy = stateKey === "side" ? "tap FUT1 here" : "tap antigen sugar here";
+    el.innerHTML = `<div class="placeholder">— ${copy} —</div>`;
   }
 }
 
@@ -1076,16 +1311,19 @@ function setupLabelDrop(){
     el.classList.remove("drag-over");
     if(!dragItem || dragItem.type !== "label") return;
 
-    state.label = dragItem.value;
-    renderLabelDrop();
-
+    placeLabelValue(dragItem.value);
     dragItem = null;
     dragFrom = null;
-    clearMarks();
-    renderLabelBankUsage();
+    clearTapSelections();
   });
 
   el.addEventListener("click", () => {
+    if(selectedLabel){
+      if(placeLabelValue(selectedLabel)){
+        clearTapSelections();
+      }
+      return;
+    }
     if(!state.label) return;
     state.label = null;
     renderLabelDrop();
@@ -1596,6 +1834,8 @@ function showCurrentAnswer(){
   state.side = ans.side;
   state.top = ans.top;
   state.label = ans.label;
+  selectedSugar = null;
+  selectedLabel = null;
   renderSugarDrop("side");
   renderSugarDrop("top");
   renderLabelDrop();
@@ -1646,6 +1886,8 @@ function resetAll(){
   state.top = null;
   state.label = null;
   currentTarget = "bombay";
+  selectedSugar = null;
+  selectedLabel = null;
 
   renderSugarDrop("side");
   renderSugarDrop("top");
