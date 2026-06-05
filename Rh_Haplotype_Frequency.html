@@ -601,7 +601,35 @@
   }
 
   body.rh-haplotype-game .rh-translation-layout{
-    grid-template-columns:minmax(0,1fr) 220px;
+    grid-template-columns:1fr;
+  }
+
+  body.rh-haplotype-game .translation-landscape{
+    table-layout:fixed;
+    min-width:760px;
+  }
+
+  body.rh-haplotype-game .translation-landscape th,
+  body.rh-haplotype-game .translation-landscape td{
+    width:12.5%;
+  }
+
+  body.rh-haplotype-game .translation-landscape .dropzone{
+    min-height:58px;
+  }
+
+  body.rh-haplotype-game .translation-bank{
+    position:static;
+  }
+
+  body.rh-haplotype-game .translation-board{
+    overflow-x:auto;
+  }
+
+  body.rh-haplotype-game #translateFisherWrap{
+    display:grid;
+    grid-template-columns:repeat(8,minmax(72px,1fr));
+    gap:8px;
   }
 
   body.rh-haplotype-game .tables{
@@ -668,6 +696,13 @@
     color:var(--bb-deep, #641525) !important;
   }
 
+  body.rh-haplotype-game .rh-export-bar{
+    max-width:1180px;
+    margin:0 auto 10px;
+    display:flex;
+    justify-content:flex-end;
+  }
+
   .rh-print-area{
     display:none;
   }
@@ -689,6 +724,10 @@
     body.rh-haplotype-game .bank{
       position:static;
     }
+
+    body.rh-haplotype-game #translateFisherWrap{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
   }
 
   @media print{
@@ -706,11 +745,12 @@
       display:block !important;
       color:#000 !important;
       font-family:'Nunito', Arial, sans-serif;
-      padding:0.25in;
+      padding:0;
     }
 
     .rh-print-sheet{
-      page-break-after:always;
+      page-break-after:auto;
+      page-break-inside:avoid;
     }
 
     .rh-print-sheet:last-child{
@@ -720,22 +760,29 @@
     .rh-print-title{
       font-size:18pt;
       font-weight:900;
-      margin:0 0 6pt;
+      margin:0 0 3pt;
       text-transform:uppercase;
       letter-spacing:1pt;
+      color:#000 !important;
     }
 
     .rh-print-note{
-      font-size:9pt;
+      font-size:8.5pt;
       font-weight:800;
-      margin:0 0 8pt;
+      margin:0 0 6pt;
+      color:#000 !important;
+    }
+
+    .rh-print-section{
+      margin-top:7pt;
     }
 
     .rh-print-table{
       width:100%;
       border-collapse:collapse;
       table-layout:fixed;
-      font-size:11pt;
+      font-size:10pt;
+      color:#000 !important;
     }
 
     .rh-print-table th,
@@ -743,24 +790,40 @@
       border:1.5pt solid #000 !important;
       background:#fff !important;
       color:#000 !important;
-      padding:5pt;
+      padding:2.5pt 4pt;
       text-align:center;
       vertical-align:middle;
-      min-height:24pt;
+      height:18pt;
+    }
+
+    .rh-print-subtitle{
+      font-size:11.5pt;
+      margin:0 0 4pt;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.5pt;
+      color:#000 !important;
     }
 
     .rh-print-table th{
       font-weight:900;
       text-transform:uppercase;
+      color:#000 !important;
     }
 
     .rh-print-blank{
-      height:24pt;
+      height:13pt;
+    }
+
+    .rh-translation-print th,
+    .rh-translation-print td{
+      width:12.5%;
+      height:22pt;
     }
 
     @page{
       size:letter landscape;
-      margin:0.3in;
+      margin:0.5in;
     }
   }
 </style>
@@ -791,13 +854,15 @@
     <button type="button" class="rh-mode-tab" data-rh-tab="translate">Wiener → Fisher-Race</button>
   </div>
 
+  <div class="rh-export-bar">
+    <button id="rhExportCombinedBtn" class="printBtn">Export Combined Chart</button>
+  </div>
+
   <section class="rh-tab-panel active" data-rh-panel="rank">
     <div class="section-controls">
       <button id="rhCheckBtn" class="checkBtn">✔ Check Ranking</button>
       <button id="rhResetBtn" class="resetBtn">↺ Reset Ranking</button>
       <button id="rhShowAnswersBtn" class="resetBtn">Show answers</button>
-      <button id="rhPrintBlankBtn" class="printBtn">Print Blank Chart</button>
-      <button id="rhPrintAnswersBtn" class="printBtn">Print Answer Chart</button>
       <div id="rhMsg" class="score"></div>
     </div>
 
@@ -817,26 +882,18 @@
       <button id="translateCheckBtn" class="checkBtn">✔ Check Translation</button>
       <button id="translateResetBtn" class="resetBtn">↺ Reset Translation</button>
       <button id="translateShowAnswersBtn" class="resetBtn">Show answers</button>
-      <button id="translatePrintBlankBtn" class="printBtn">Print Blank Chart</button>
-      <button id="translatePrintAnswersBtn" class="printBtn">Print Answer Chart</button>
       <div id="translateMsg" class="score"></div>
     </div>
 
     <div class="layout rh-translation-layout">
       <div class="translation-board">
         <div class="section-title">Wiener → Fisher-Race</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Wiener</th>
-              <th>Fisher-Race Match</th>
-            </tr>
-          </thead>
+        <table class="translation-landscape">
           <tbody id="translationBody"></tbody>
         </table>
       </div>
 
-      <div class="bank">
+      <div class="bank translation-bank">
         <h2>Fisher-Race Bank</h2>
         <div class="hint">Tap or drag one Fisher-Race symbol to match each Wiener symbol.</div>
         <div id="translateFisherWrap"></div>
@@ -1215,19 +1272,20 @@ function buildTranslationTable(){
   const body = document.getElementById("translationBody");
   body.innerHTML = "";
 
+  const headerRow = document.createElement("tr");
+  const matchRow = document.createElement("tr");
+
   WEINERS.forEach(weiner => {
-    const tr = document.createElement("tr");
-    const fixedTd = document.createElement("td");
+    const fixedTh = document.createElement("th");
     const matchTd = document.createElement("td");
-    const fixed = document.createElement("div");
-    fixed.className = "fixed-symbol";
-    fixed.textContent = weiner;
-    fixedTd.appendChild(fixed);
+    fixedTh.textContent = weiner;
     matchTd.appendChild(makeTranslationDropzone(weiner));
-    tr.appendChild(fixedTd);
-    tr.appendChild(matchTd);
-    body.appendChild(tr);
+    headerRow.appendChild(fixedTh);
+    matchRow.appendChild(matchTd);
   });
+
+  body.appendChild(headerRow);
+  body.appendChild(matchRow);
 }
 
 function placeRankItem(group, row, col, item, fromKey){
@@ -1595,63 +1653,71 @@ function blankCell(){
   return `<div class="rh-print-blank">&nbsp;</div>`;
 }
 
-function buildRankPrintSheet(withAnswers){
+function printCell(value){
+  const normalized = String(value || "").trim();
+  return normalized ? escapeHtml(normalized) : blankCell();
+}
+
+function currentRankPrintValue(group, rank, col){
+  if(col === "weiner"){
+    const current = getState(slotKey(group, rank, "weiner"));
+    return current ? current.value : "";
+  }
+
+  const input = document.getElementById(rankFrequencyInputId(group, rank));
+  return input ? input.value : "";
+}
+
+function currentTranslationPrintValue(weiner){
+  const current = getTranslationState(translationKey(weiner));
+  return current ? current.value : "";
+}
+
+function buildCombinedPrintSheet(){
   const rows = Array.from({ length: 8 }, (_, index) => {
     const rank = index + 1;
     const cells = GROUPS.map(group => {
-      const weiner = ANSWERS[group.key].weiner[index];
-      const frequency = rankFrequencyAnswer(group.key, rank);
       return `
-        <td>${withAnswers ? escapeHtml(weiner) : blankCell()}</td>
-        <td>${withAnswers ? escapeHtml(frequency) : blankCell()}</td>
+        <td>${printCell(currentRankPrintValue(group.key, rank, "weiner"))}</td>
+        <td>${printCell(currentRankPrintValue(group.key, rank, "frequency"))}</td>
       `;
     }).join("");
     return `<tr><td>${rank}</td>${cells}</tr>`;
   }).join("");
 
+  const translationHeaders = WEINERS.map(weiner => `<th>${escapeHtml(weiner)}</th>`).join("");
+  const translationCells = WEINERS.map(weiner => `<td>${printCell(currentTranslationPrintValue(weiner))}</td>`).join("");
+
   return `
     <section class="rh-print-sheet">
-      <h1 class="rh-print-title">Rh Haplotype Rank - ${withAnswers ? "Answer Chart" : "Blank Chart"}</h1>
-      <p class="rh-print-note">Top row is greatest frequency. Bottom row is least frequency. Use 0.01 for very rare values.</p>
-      <table class="rh-print-table">
-        <thead>
-          <tr><th rowspan="2">Rank</th><th colspan="2">White</th><th colspan="2">Black</th><th colspan="2">Asian</th></tr>
-          <tr><th>Wiener</th><th>#</th><th>Wiener</th><th>#</th><th>Wiener</th><th>#</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
+      <h1 class="rh-print-title">Rh Haplotype Combined Chart</h1>
+      <p class="rh-print-note">Top rank row is greatest frequency. Bottom rank row is least frequency. Use 0.01 for very rare values.</p>
+      <div class="rh-print-section">
+        <h2 class="rh-print-subtitle">Rank Wiener + Frequency</h2>
+        <table class="rh-print-table">
+          <thead>
+            <tr><th rowspan="2">Rank</th><th colspan="2">White</th><th colspan="2">Black</th><th colspan="2">Asian</th></tr>
+            <tr><th>Wiener</th><th>#</th><th>Wiener</th><th>#</th><th>Wiener</th><th>#</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="rh-print-section">
+        <h2 class="rh-print-subtitle">Wiener to Fisher-Race</h2>
+        <table class="rh-print-table rh-translation-print">
+          <tbody>
+            <tr>${translationHeaders}</tr>
+            <tr>${translationCells}</tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   `;
 }
 
-function buildTranslationPrintSheet(withAnswers){
-  const rows = WEINERS.map(weiner => {
-    const answer = withAnswers ? escapeHtml(TRANSLATION_ANSWERS[weiner]) : blankCell();
-    return `<tr><td>${escapeHtml(weiner)}</td><td>${answer}</td></tr>`;
-  }).join("");
-
-  return `
-    <section class="rh-print-sheet">
-      <h1 class="rh-print-title">Wiener to Fisher-Race - ${withAnswers ? "Answer Chart" : "Blank Chart"}</h1>
-      <p class="rh-print-note">Match each Wiener symbol to its Fisher-Race notation.</p>
-      <table class="rh-print-table">
-        <thead>
-          <tr><th>Wiener</th><th>Fisher-Race</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </section>
-  `;
-}
-
-function printRhSheet(mode, withAnswers){
+function exportCombinedChart(){
   const printArea = document.getElementById("rhPrintArea");
-  const builders = {
-    rank: buildRankPrintSheet,
-    translate: buildTranslationPrintSheet
-  };
-
-  printArea.innerHTML = builders[mode](withAnswers);
+  printArea.innerHTML = buildCombinedPrintSheet();
   printArea.setAttribute("aria-hidden", "false");
   setTimeout(() => window.print(), 50);
 }
@@ -1978,10 +2044,7 @@ document.getElementById("donorResetBtn").addEventListener("click", resetDonor);
 document.getElementById("rhShowAnswersBtn").addEventListener("click", showRhAnswers);
 document.getElementById("translateShowAnswersBtn").addEventListener("click", showTranslationAnswers);
 document.getElementById("donorShowAnswersBtn").addEventListener("click", showDonorAnswers);
-document.getElementById("rhPrintBlankBtn").addEventListener("click", () => printRhSheet("rank", false));
-document.getElementById("rhPrintAnswersBtn").addEventListener("click", () => printRhSheet("rank", true));
-document.getElementById("translatePrintBlankBtn").addEventListener("click", () => printRhSheet("translate", false));
-document.getElementById("translatePrintAnswersBtn").addEventListener("click", () => printRhSheet("translate", true));
+document.getElementById("rhExportCombinedBtn").addEventListener("click", exportCombinedChart);
 
 setupRhTabs();
 buildBanks();
