@@ -374,6 +374,138 @@ body.hormone-game .mls-audio-btn{
   font-weight:1000;
   line-height:1.35;
 }
+.visual-map{
+  border:2px solid #9fc4df;
+  border-radius:18px;
+  background:linear-gradient(180deg,#ffffff 0%,#eef8ff 100%);
+  padding:16px;
+  margin-bottom:14px;
+  overflow:hidden;
+}
+.map-mission{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:14px;
+}
+.map-mission strong{
+  color:#10243a;
+  font-size:22px;
+  line-height:1;
+}
+.map-mission span{
+  color:#40536a;
+  font-size:13px;
+  font-weight:900;
+}
+.map-track{
+  display:grid;
+  grid-template-columns:1fr 42px 1fr 42px 1fr;
+  align-items:stretch;
+}
+.map-node{
+  min-height:190px;
+  display:grid;
+  align-content:center;
+  gap:8px;
+  text-align:center;
+  border:3px dashed #9fc4df;
+  border-radius:22px;
+  padding:16px 12px;
+  background:#f8fcff;
+  transition:.2s ease;
+}
+.visual-map.built .map-node{
+  border-style:solid;
+  border-color:var(--chem);
+  background:#fff;
+  box-shadow:0 12px 26px rgba(41,128,185,.14);
+}
+.node-zone{
+  color:var(--chem-dark);
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.node-name{
+  color:#10243a;
+  font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
+  font-size:clamp(26px,4vw,42px);
+  line-height:.95;
+}
+.node-detail{
+  color:#40536a;
+  font-size:13px;
+  font-weight:900;
+  line-height:1.25;
+}
+.map-arrow{
+  display:grid;
+  place-items:center;
+  color:var(--chem);
+  font-size:34px;
+  font-weight:1000;
+}
+.route-token-grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:9px;
+}
+.route-token{
+  min-height:92px;
+  border:2px solid #9fc4df;
+  border-radius:17px;
+  background:#fff;
+  color:#10243a;
+  padding:10px;
+  display:grid;
+  gap:7px;
+  align-content:center;
+  justify-items:center;
+  font-family:inherit;
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow:0 6px 0 rgba(41,128,185,.12);
+}
+.route-token:hover,
+.route-token.active{
+  border-color:var(--chem);
+  transform:translateY(-1px);
+}
+.route-token.active{
+  background:#e6f5ff;
+}
+.route-token.solved{
+  border-color:var(--good);
+  background:#edfbf4;
+}
+.route-token-path{
+  display:grid;
+  grid-template-columns:repeat(3,18px);
+  gap:8px;
+  align-items:center;
+}
+.route-token-path span{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--chem);
+  box-shadow:0 0 0 4px rgba(41,128,185,.13);
+}
+.route-token-name{
+  font-size:14px;
+  line-height:1;
+}
+.visual-helper{
+  margin:10px 0 0;
+  color:#40536a;
+  font-size:13px;
+  font-weight:900;
+  line-height:1.35;
+}
 .card-bank{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -474,6 +606,7 @@ html[data-mls-theme="dark"] body.hormone-game .panel,
 html[data-mls-theme="dark"] body.hormone-game .map-card,
 html[data-mls-theme="dark"] body.hormone-game .ladder-wrap,
 html[data-mls-theme="dark"] body.hormone-game .choice-panel,
+html[data-mls-theme="dark"] body.hormone-game .visual-map,
 html[data-mls-theme="dark"] body.hormone-game .study-map{
   background:#101a2b !important;
   border-color:#406996 !important;
@@ -483,11 +616,15 @@ html[data-mls-theme="dark"] body.hormone-game .panel-title,
 html[data-mls-theme="dark"] body.hormone-game .eyebrow,
 html[data-mls-theme="dark"] body.hormone-game .case-row strong,
 html[data-mls-theme="dark"] body.hormone-game .slot-kicker,
+html[data-mls-theme="dark"] body.hormone-game .node-zone,
 html[data-mls-theme="dark"] body.hormone-game .study-map h3{
   color:#bde8ff !important;
 }
 html[data-mls-theme="dark"] body.hormone-game .map-card h2,
 html[data-mls-theme="dark"] body.hormone-game .slot-label,
+html[data-mls-theme="dark"] body.hormone-game .map-mission strong,
+html[data-mls-theme="dark"] body.hormone-game .node-name,
+html[data-mls-theme="dark"] body.hormone-game .route-token,
 html[data-mls-theme="dark"] body.hormone-game .path-card h3{
   color:#ffffff !important;
 }
@@ -495,6 +632,8 @@ html[data-mls-theme="dark"] body.hormone-game .case-row,
 html[data-mls-theme="dark"] body.hormone-game .case-question,
 html[data-mls-theme="dark"] body.hormone-game .slot,
 html[data-mls-theme="dark"] body.hormone-game .path-card,
+html[data-mls-theme="dark"] body.hormone-game .map-node,
+html[data-mls-theme="dark"] body.hormone-game .route-token,
 html[data-mls-theme="dark"] body.hormone-game .choice-empty,
 html[data-mls-theme="dark"] body.hormone-game .study-map-grid div{
   background:#17243a !important;
@@ -507,6 +646,9 @@ html[data-mls-theme="dark"] body.hormone-game .slot.active{
 }
 html[data-mls-theme="dark"] body.hormone-game .slot-copy,
 html[data-mls-theme="dark"] body.hormone-game .path-card p,
+html[data-mls-theme="dark"] body.hormone-game .map-mission span,
+html[data-mls-theme="dark"] body.hormone-game .node-detail,
+html[data-mls-theme="dark"] body.hormone-game .visual-helper,
 html[data-mls-theme="dark"] body.hormone-game .choice-note,
 html[data-mls-theme="dark"] body.hormone-game .ladder-note{
   color:#d8eaff !important;
@@ -525,6 +667,10 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
   .board-grid{grid-template-columns:1fr}
   .build-layout{grid-template-columns:1fr}
   .card-bank{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .map-track{grid-template-columns:1fr;gap:8px}
+  .map-arrow{font-size:28px;transform:rotate(90deg)}
+  .map-node{min-height:132px}
+  .route-token-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:620px){
   .screen-shell{padding:14px}
@@ -537,6 +683,8 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
   .case-row{grid-template-columns:1fr;gap:3px}
   .slot{grid-template-columns:38px 1fr}
   .slot-label{font-size:18px}
+  .route-token-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .map-mission strong{font-size:19px}
 }
 </style>
 </head>
@@ -559,10 +707,11 @@ const routes = [
     title:"Adrenal Stress Route",
     caseCode:"HG-1",
     caseTitle:"Hormone Case HG-1",
+    badge:"Stress",
     caseRows:[
-      ["Patient","Placeholder age and short patient story for this hormone case."],
-      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
-      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+      ["Patient","Placeholder case note."],
+      ["Chart","Placeholder chart clue."],
+      ["Mission","Build the matching hormone map."]
     ],
     goal:"Cortisol",
     axis:"CRH -> ACTH -> Cortisol",
@@ -577,10 +726,11 @@ const routes = [
     title:"Thyroid Heat Route",
     caseCode:"HG-2",
     caseTitle:"Hormone Case HG-2",
+    badge:"Thyroid",
     caseRows:[
-      ["Patient","Placeholder age and short patient story for this hormone case."],
-      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
-      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+      ["Patient","Placeholder case note."],
+      ["Chart","Placeholder chart clue."],
+      ["Mission","Build the matching hormone map."]
     ],
     goal:"T3 and T4",
     axis:"TRH / Somatostatin -> TSH -> T3, T4",
@@ -595,10 +745,11 @@ const routes = [
     title:"Ovary Cycle Route",
     caseCode:"HG-3",
     caseTitle:"Hormone Case HG-3",
+    badge:"Ovary",
     caseRows:[
-      ["Patient","Placeholder age and short patient story for this hormone case."],
-      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
-      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+      ["Patient","Placeholder case note."],
+      ["Chart","Placeholder chart clue."],
+      ["Mission","Build the matching hormone map."]
     ],
     goal:"Estradiol, progesterone, inhibin, follistatin",
     axis:"GnRH -> LH/FSH -> ovarian hormones",
@@ -613,10 +764,11 @@ const routes = [
     title:"Testis Signal Route",
     caseCode:"HG-4",
     caseTitle:"Hormone Case HG-4",
+    badge:"Testis",
     caseRows:[
-      ["Patient","Placeholder age and short patient story for this hormone case."],
-      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
-      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+      ["Patient","Placeholder case note."],
+      ["Chart","Placeholder chart clue."],
+      ["Mission","Build the matching hormone map."]
     ],
     goal:"Testosterone and inhibin",
     axis:"GnRH -> LH/FSH -> testicular hormones",
@@ -631,10 +783,11 @@ const routes = [
     title:"Growth Route",
     caseCode:"HG-5",
     caseTitle:"Hormone Case HG-5",
+    badge:"Growth",
     caseRows:[
-      ["Patient","Placeholder age and short patient story for this hormone case."],
-      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
-      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+      ["Patient","Placeholder case note."],
+      ["Chart","Placeholder chart clue."],
+      ["Mission","Build the matching hormone map."]
     ],
     goal:"IGF-1",
     axis:"GHRH / Somatostatin -> GH -> IGF-1",
@@ -649,10 +802,11 @@ const routes = [
     title:"Lactation Route",
     caseCode:"HG-6",
     caseTitle:"Hormone Case HG-6",
+    badge:"Lactation",
     caseRows:[
-      ["Patient","Placeholder age and short patient story for this hormone case."],
-      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
-      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+      ["Patient","Placeholder case note."],
+      ["Chart","Placeholder chart clue."],
+      ["Mission","Build the matching hormone map."]
     ],
     goal:"PRL",
     axis:"Dopamine suppression -> PRL -> lactation",
@@ -665,22 +819,22 @@ const routes = [
 ];
 
 const cards = [
-  {id:"start-adrenal",type:"start",name:"CRH",copy:"Hypothalamus starter. Stimulates corticotrophs."},
-  {id:"mid-adrenal",type:"middle",name:"Corticotroph + ACTH",copy:"Pituitary bridge. ACTH stimulates adrenal gland."},
-  {id:"final-adrenal",type:"final",name:"Adrenal gland + Cortisol",copy:"Final hormone: cortisol. Action: cell homeostasis and function."},
-  {id:"start-thyroid",type:"start",name:"TRH + Somatostatin",copy:"Hypothalamus controls. TRH stimulates; somatostatin suppresses."},
-  {id:"mid-thyroid",type:"middle",name:"Thyrotroph + TSH",copy:"Pituitary bridge. TSH stimulates thyroid gland."},
-  {id:"final-thyroid",type:"final",name:"Thyroid gland + T3/T4",copy:"Final hormones: T3 and T4. Actions: thermogenesis and protein synthesis."},
-  {id:"start-gonadal",type:"start",name:"GnRH",copy:"Hypothalamus starter. Stimulates gonadotrophs."},
-  {id:"mid-gonadal",type:"middle",name:"Gonadotroph + LH/FSH",copy:"Pituitary bridge. LH and FSH stimulate ovary and testis."},
-  {id:"final-ovary",type:"final",name:"Ovary hormones",copy:"Estradiol, progesterone, inhibin, follistatin. Action: ovulation."},
-  {id:"final-testis",type:"final",name:"Testis hormones",copy:"Testosterone and inhibin. Action: spermatogenesis."},
-  {id:"start-growth",type:"start",name:"GHRH + Somatostatin",copy:"Hypothalamus controls. GHRH stimulates; somatostatin suppresses."},
-  {id:"mid-growth",type:"middle",name:"Somatotroph + GH",copy:"Pituitary bridge. GH stimulates liver and bone growth cells."},
-  {id:"final-growth",type:"final",name:"Liver + IGF-1",copy:"Final hormone: IGF-1. Actions: growth and anabolic metabolism."},
-  {id:"start-prl",type:"start",name:"Dopamine",copy:"Hypothalamus suppressor. Dopamine suppresses lactotrophs."},
-  {id:"mid-prl",type:"middle",name:"Lactotroph + PRL",copy:"Pituitary bridge. PRL travels to the breast."},
-  {id:"final-prl",type:"final",name:"Breast + Lactation",copy:"Target/action card for lactation."}
+  {id:"start-adrenal",type:"start",name:"CRH",short:"CRH",copy:"Hypothalamus starter. Stimulates corticotrophs."},
+  {id:"mid-adrenal",type:"middle",name:"Corticotroph + ACTH",short:"ACTH",copy:"Pituitary bridge. ACTH stimulates adrenal gland."},
+  {id:"final-adrenal",type:"final",name:"Adrenal gland + Cortisol",short:"Cortisol",copy:"Final hormone: cortisol. Action: cell homeostasis and function."},
+  {id:"start-thyroid",type:"start",name:"TRH + Somatostatin",short:"TRH / SST",copy:"Hypothalamus controls. TRH stimulates; somatostatin suppresses."},
+  {id:"mid-thyroid",type:"middle",name:"Thyrotroph + TSH",short:"TSH",copy:"Pituitary bridge. TSH stimulates thyroid gland."},
+  {id:"final-thyroid",type:"final",name:"Thyroid gland + T3/T4",short:"T3 / T4",copy:"Final hormones: T3 and T4. Actions: thermogenesis and protein synthesis."},
+  {id:"start-gonadal",type:"start",name:"GnRH",short:"GnRH",copy:"Hypothalamus starter. Stimulates gonadotrophs."},
+  {id:"mid-gonadal",type:"middle",name:"Gonadotroph + LH/FSH",short:"LH / FSH",copy:"Pituitary bridge. LH and FSH stimulate ovary and testis."},
+  {id:"final-ovary",type:"final",name:"Ovary hormones",short:"Ovary",copy:"Estradiol, progesterone, inhibin, follistatin. Action: ovulation."},
+  {id:"final-testis",type:"final",name:"Testis hormones",short:"Testis",copy:"Testosterone and inhibin. Action: spermatogenesis."},
+  {id:"start-growth",type:"start",name:"GHRH + Somatostatin",short:"GHRH / SST",copy:"Hypothalamus controls. GHRH stimulates; somatostatin suppresses."},
+  {id:"mid-growth",type:"middle",name:"Somatotroph + GH",short:"GH",copy:"Pituitary bridge. GH stimulates liver and bone growth cells."},
+  {id:"final-growth",type:"final",name:"Liver + IGF-1",short:"IGF-1",copy:"Final hormone: IGF-1. Actions: growth and anabolic metabolism."},
+  {id:"start-prl",type:"start",name:"Dopamine",short:"Dopamine",copy:"Hypothalamus suppressor. Dopamine suppresses lactotrophs."},
+  {id:"mid-prl",type:"middle",name:"Lactotroph + PRL",short:"PRL",copy:"Pituitary bridge. PRL travels to the breast."},
+  {id:"final-prl",type:"final",name:"Breast + Lactation",short:"Lactation",copy:"Target/action card for lactation."}
 ];
 
 const ladderSteps = [
@@ -691,6 +845,7 @@ const ladderSteps = [
 const typeLabels = {start:"1 Hypothalamus",middle:"2 Pituitary",final:"3 Target"};
 let scene = "welcome";
 let currentRoute = null;
+let builtRoute = null;
 let slots = [null,null,null];
 let selectedId = "";
 let solved = new Set();
@@ -732,7 +887,7 @@ function stepPrompt(index){
 
 function enterGame(){
   scene = "board";
-  feedback = "Pick a hormone case. Then build the ladder one rung at a time.";
+  feedback = "Pick a hormone case. Then tap one route token to build the map.";
   feedbackType = "";
   render();
 }
@@ -741,11 +896,32 @@ function drawMap(){
   const available = routes.filter(route => !solved.has(route.id));
   const pool = available.length ? available : routes;
   currentRoute = pool[Math.floor(Math.random() * pool.length)];
+  builtRoute = null;
   slots = [null,null,null];
   selectedId = "";
-  feedback = "Case opened. " + stepPrompt(0);
+  feedback = "Case opened. Tap a route token and the map will build itself.";
   feedbackType = "";
   order = shuffle(cards.map(card => card.id));
+  render();
+}
+
+function chooseRoute(routeId){
+  if(!currentRoute){
+    feedback = "Pick a hormone case first.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  builtRoute = routes.find(route => route.id === routeId);
+  if(!builtRoute)return;
+  if(builtRoute.id === currentRoute.id){
+    solved.add(currentRoute.id);
+    feedback = "CASE SOLVED. This map matches the case.";
+    feedbackType = "good";
+  }else{
+    feedback = "Map built. Compare the shape with the case clue, or tap another route token.";
+    feedbackType = "";
+  }
   render();
 }
 
@@ -804,9 +980,10 @@ function clearSlot(index){
 }
 
 function resetRound(){
+  builtRoute = null;
   slots = [null,null,null];
   selectedId = "";
-  feedback = currentRoute ? "Case reset. " + stepPrompt(0) : "Pick a hormone case to begin.";
+  feedback = currentRoute ? "Board cleared. Tap a route token to rebuild the map." : "Pick a hormone case to begin.";
   feedbackType = "";
   render();
 }
@@ -843,8 +1020,10 @@ function showAnswer(){
     drawMap();
     return;
   }
+  builtRoute = currentRoute;
+  solved.add(currentRoute.id);
   slots = routeExpected(currentRoute);
-  feedback = "Answer revealed for this case. Study the ladder, then pick another case.";
+  feedback = "Case map revealed. Study the pathway shape, then pick another case.";
   feedbackType = "good";
   render();
 }
@@ -861,7 +1040,7 @@ function renderHero(){
     <div class="hero-panel">
       <div class="eyebrow">Welcome to the endocrine arcade</div>
       <h1 class="game-font">Hormone Game</h1>
-      <p class="hero-copy">Pick a hormone case, read the tiny patient/chart clue, then build the 3-card hormone ladder without seeing the answer first.</p>
+      <p class="hero-copy">Open a hormone case, tap a route token, and watch the hormone map build itself.</p>
       <button class="enter-btn" type="button" onclick="enterGame()">Enter the Hormone Arcade!</button>
     </div>
   </section>`;
@@ -871,9 +1050,8 @@ function renderToolbar(){
   return `<div class="toolbar">
     <div class="toolbar-left">
       <button class="primary-btn" type="button" onclick="drawMap()">Pick a Hormone Case</button>
-      <button class="ghost-btn" type="button" onclick="checkPath()">Check Pathway</button>
-      <button class="ghost-btn" type="button" onclick="showAnswer()">Show Answer</button>
-      <button class="danger-btn" type="button" onclick="resetRound()">Reset Case</button>
+      <button class="ghost-btn" type="button" onclick="showAnswer()">Build Case Map</button>
+      <button class="danger-btn" type="button" onclick="resetRound()">Clear Map</button>
     </div>
     <div class="toolbar-right">
       <button class="print-btn" type="button" onclick="printGamePack()">Print Game Pack</button>
@@ -889,7 +1067,7 @@ function renderMapCard(){
       <div>
         <div class="eyebrow">Hormone case deck</div>
         <h2 class="game-font">Pick a case</h2>
-        <p class="hero-copy" style="font-size:17px;margin-bottom:18px">A minimal patient/chart clue will appear here. Build the hormone ladder that might explain it.</p>
+        <p class="hero-copy" style="font-size:17px;margin-bottom:18px">Open a tiny case clue, then build its hormone map.</p>
         <button class="primary-btn" type="button" onclick="drawMap()">Open Random Case</button>
       </div>
     </section>`;
@@ -901,7 +1079,7 @@ function renderMapCard(){
     <div class="case-chart">
       ${currentRoute.caseRows.map(row => `<div class="case-row"><strong>${esc(row[0])}</strong><span>${esc(row[1])}</span></div>`).join("")}
     </div>
-    <div class="case-question">Build the hormone ladder: start signal -> pituitary bridge -> target/final. What might be happening?</div>
+    <div class="case-question">Tap a route token. Watch the hormone map fill in.</div>
   </section>`;
 }
 
@@ -980,6 +1158,52 @@ function renderCardBank(){
   </section>`;
 }
 
+function routeStep(route, index){
+  if(!route)return null;
+  const card = cardById(routeExpected(route)[index]);
+  return card || null;
+}
+
+function renderVisualMap(){
+  const route = builtRoute;
+  const zones = ["Hypothalamus","Pituitary","Target"];
+  const emptyNames = ["Start","Bridge","Finish"];
+  const emptyDetails = ["Brain signal","Trophic hormone","Organ / final effect"];
+  return `<section class="visual-map ${route ? "built" : ""}">
+    <div class="map-mission">
+      <strong>${route ? esc(route.badge + " Map") : "Build the Map"}</strong>
+      <span>${route ? "Tap another route token to redraw instantly." : "Tap one route token below. The board fills itself."}</span>
+    </div>
+    <div class="map-track">
+      ${[0,1,2].map(index => {
+        const card = routeStep(route, index);
+        return `<div class="map-node">
+          <div class="node-zone">${esc(zones[index])}</div>
+          <div class="node-name">${card ? esc(card.short) : esc(emptyNames[index])}</div>
+          <div class="node-detail">${card ? esc(card.name) : esc(emptyDetails[index])}</div>
+        </div>${index < 2 ? `<div class="map-arrow">→</div>` : ""}`;
+      }).join("")}
+    </div>
+    <p class="visual-helper">${route ? esc(route.title + " · " + route.action) : "No sorting. No tiny deck. Just pick a map shape and see the pathway."}</p>
+  </section>`;
+}
+
+function renderRouteTokens(){
+  return `<section>
+    <div class="panel-title">Route Tokens</div>
+    <div class="route-token-grid">
+      ${routes.map(route => {
+        const active = builtRoute && builtRoute.id === route.id;
+        const routeSolved = solved.has(route.id);
+        return `<button class="route-token ${active ? "active" : ""} ${routeSolved ? "solved" : ""}" type="button" onclick="chooseRoute('${esc(route.id)}')">
+          <span class="route-token-path"><span></span><span></span><span></span></span>
+          <span class="route-token-name">${esc(route.badge)}</span>
+        </button>`;
+      }).join("")}
+    </div>
+  </section>`;
+}
+
 function renderStudyMap(){
   if(!currentRoute)return "";
   return `<section class="study-map ${feedbackType === "good" ? "visible" : ""}">
@@ -1000,11 +1224,9 @@ function renderBoard(){
       ${renderStudyMap()}
     </div>
     <section class="panel">
-      <div class="panel-title">Build the hormone ladder</div>
-      <div class="build-layout">
-        ${renderSlots()}
-        ${renderCardBank()}
-      </div>
+      <div class="panel-title">Visual Hormone Map</div>
+      ${renderVisualMap()}
+      ${renderRouteTokens()}
     </section>
   </div>`;
 }
@@ -1094,6 +1316,7 @@ function printAnswerKey(){
 window.enterGame = enterGame;
 window.drawMap = drawMap;
 window.placeCard = placeCard;
+window.chooseRoute = chooseRoute;
 window.clearSlot = clearSlot;
 window.checkPath = checkPath;
 window.resetRound = resetRound;
@@ -1101,6 +1324,12 @@ window.showAnswer = showAnswer;
 window.printGamePack = printGamePack;
 window.printMapCards = printMapCards;
 window.printAnswerKey = printAnswerKey;
+if(new URLSearchParams(window.location.search).get("preview") === "board"){
+  scene = "board";
+  currentRoute = routes[0];
+  builtRoute = null;
+  feedback = "Case opened. Tap a route token and the map will build itself.";
+}
 render();
 </script>
 </body>
