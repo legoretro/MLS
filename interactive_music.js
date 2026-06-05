@@ -3,7 +3,7 @@
   const MUSIC_STORE = "files";
   const MUSIC_KEY = "quiz_music";
   const VOLUME_KEY = "mlsboc_quiz_music_volume";
-  const enabledSelector = "body.bb-theme";
+  const enabledSelector = "body.bb-theme, body.hormone-game";
   const state = {audio:null, url:null, on:false, ready:false};
 
   function getVolume(){

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hormone Game</title>
+<script src="interactive_theme.js"></script>
+<link rel="stylesheet" href="interactive_learning.css?v=hormone-game-1">
+<script src="interactive_music.js?v=hormone-game-2" defer></script>
+<style>
+:root{
+  --chem:#2980b9;
+  --chem-dark:#0f4770;
+  --chem-deep:#09283f;
+  --chem-soft:#e6f5ff;
+  --chem-glow:#bde8ff;
+  --ink:#122033;
+  --muted:#66728d;
+  --panel:#ffffff;
+  --line:#bad4ea;
+  --good:#1f9d64;
+  --bad:#d64d5f;
+  --gold:#f4bd4f;
+  --shadow:0 22px 54px rgba(18,48,84,.16);
+}
+*{box-sizing:border-box}
+body.hormone-game{
+  margin:0;
+  min-height:100vh;
+  font-family:"Trebuchet MS",Arial,Helvetica,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 14% 0%,rgba(41,128,185,.22),transparent 30%),
+    linear-gradient(180deg,#f4f9ff 0%,#e6eef8 100%);
+}
+body.hormone-game .site-header{
+  border-bottom-color:var(--chem);
+}
+body.hormone-game .site-header .logo,
+body.hormone-game .mls-home-btn,
+body.hormone-game .mls-theme-btn,
+body.hormone-game .mls-audio-btn{
+  color:var(--chem-dark);
+}
+body.hormone-game .mls-home-btn,
+body.hormone-game .mls-theme-btn,
+body.hormone-game .mls-audio-btn{
+  border-color:#9fc4df;
+  box-shadow:0 6px 0 rgba(41,128,185,.16);
+}
+.screen-shell{max-width:1240px;margin:0 auto;padding:22px}
+.game-font{
+  font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
+  letter-spacing:.01em;
+}
+.hero,.panel,.map-card,.slot,.path-card,.study-map{
+  background:rgba(255,255,255,.94);
+  border:2px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+.hero{
+  min-height:620px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:34px 22px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 22% 20%,rgba(255,255,255,.9),transparent 18%),
+    radial-gradient(circle at 78% 18%,rgba(41,128,185,.20),transparent 24%),
+    linear-gradient(135deg,#f8fdff 0%,#d7f0ff 48%,#16486b 100%);
+}
+.hero::before,.hero::after{
+  content:"";
+  position:absolute;
+  width:250px;
+  height:250px;
+  border:14px solid rgba(9,40,63,.18);
+  border-radius:34% 66% 48% 52%;
+  transform:rotate(-22deg);
+}
+.hero::before{left:-88px;top:96px}
+.hero::after{right:-72px;bottom:68px}
+.hero-panel{position:relative;z-index:1;max-width:860px}
+.eyebrow{
+  color:var(--chem-dark);
+  font-size:13px;
+  font-weight:1000;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.hero h1{
+  margin:8px 0 10px;
+  color:#10243a;
+  font-size:clamp(52px,9vw,118px);
+  line-height:.86;
+  font-weight:1000;
+  text-shadow:7px 8px 0 rgba(255,255,255,.72), 11px 12px 0 rgba(41,128,185,.22);
+}
+.hero-copy{
+  margin:12px auto 22px;
+  max-width:760px;
+  font-size:21px;
+  line-height:1.35;
+  color:#18334c;
+  font-weight:900;
+}
+.enter-btn,.primary-btn,.ghost-btn,.danger-btn,.print-btn{
+  border:0;
+  border-radius:999px;
+  padding:12px 16px;
+  font-family:inherit;
+  font-weight:1000;
+  cursor:pointer;
+}
+.enter-btn{
+  min-width:min(100%,430px);
+  background:var(--chem);
+  color:#fff;
+  padding:22px 28px;
+  font-size:26px;
+  box-shadow:0 12px 0 #0d4166, 0 26px 42px rgba(0,0,0,.23);
+  transform:rotate(-1deg);
+}
+.enter-btn:hover{transform:translateY(-2px) rotate(-1deg)}
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+.toolbar-left,.toolbar-right{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.primary-btn{background:var(--chem);color:#fff}
+.ghost-btn{background:#fff;color:var(--chem-dark);border:2px solid #9fc4df}
+.danger-btn{background:#fff2f4;color:#7b1f31;border:2px solid #efb3bf}
+.print-btn{background:#fefefe;color:var(--chem-dark);border:2px solid #9fc4df}
+.board-grid{
+  display:grid;
+  grid-template-columns:minmax(300px,.78fr) minmax(440px,1.22fr);
+  gap:16px;
+  align-items:start;
+}
+.panel{padding:16px}
+.panel-title{
+  color:var(--chem-dark);
+  font-size:14px;
+  font-weight:1000;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.map-card{
+  min-height:260px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.96),rgba(225,244,255,.96)),
+    repeating-linear-gradient(45deg,transparent 0 14px,rgba(41,128,185,.07) 14px 17px);
+  padding:18px;
+  position:relative;
+  overflow:hidden;
+}
+.map-card.empty{
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+.map-card h2{margin:0;color:#10243a;font-size:30px;line-height:1}
+.map-goal{
+  display:inline-flex;
+  margin:10px 0;
+  padding:7px 11px;
+  border-radius:999px;
+  background:#0f4770;
+  color:#fff;
+  font-weight:1000;
+}
+.map-meta{
+  display:grid;
+  gap:7px;
+  margin-top:10px;
+  font-weight:900;
+  color:#284861;
+}
+.map-meta span{
+  display:block;
+  border:1px solid #bad4ea;
+  border-radius:12px;
+  padding:8px 10px;
+  background:#fff;
+}
+.progress-strip{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+  margin-top:12px;
+}
+.progress-dot{
+  min-height:34px;
+  border-radius:999px;
+  border:2px solid #9fc4df;
+  display:grid;
+  place-items:center;
+  font-size:11px;
+  font-weight:1000;
+  color:var(--chem-dark);
+  background:#fff;
+}
+.progress-dot.solved{
+  border-color:var(--good);
+  background:#e7fbf1;
+  color:#136b43;
+}
+.slots{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+.slot{
+  min-height:178px;
+  padding:12px;
+  display:grid;
+  align-content:start;
+  gap:7px;
+  border-style:dashed;
+  background:#f8fcff;
+  cursor:pointer;
+}
+.slot.filled{
+  border-style:solid;
+  background:#fff;
+}
+.slot.correct{border-color:var(--good);background:#edfbf4}
+.slot.wrong{border-color:var(--bad);background:#fff1f3}
+.slot-kicker{
+  color:var(--chem-dark);
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.slot-label{font-size:18px;font-weight:1000;color:#10243a;line-height:1.05}
+.slot-copy{font-size:13px;line-height:1.3;color:#40536a;font-weight:800}
+.card-bank{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+.path-card{
+  min-height:132px;
+  padding:12px;
+  text-align:left;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.path-card:hover{transform:translateY(-2px);border-color:var(--chem)}
+.path-card.used{opacity:.42}
+.path-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,189,79,.23)}
+.card-type{
+  display:inline-flex;
+  margin-bottom:8px;
+  border-radius:999px;
+  padding:4px 8px;
+  background:#e6f5ff;
+  color:var(--chem-dark);
+  font-size:10px;
+  font-weight:1000;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.path-card h3{margin:0;color:#10243a;font-size:18px;line-height:1.02}
+.path-card p{margin:7px 0 0;color:#526178;font-size:12px;line-height:1.28;font-weight:800}
+.feedback{
+  margin-top:12px;
+  min-height:48px;
+  border-radius:14px;
+  padding:12px 14px;
+  background:rgba(255,255,255,.78);
+  border:2px solid #bad4ea;
+  color:#40536a;
+  font-weight:900;
+  line-height:1.35;
+}
+.feedback.good{border-color:rgba(31,157,100,.55);background:#edfbf4;color:#176540}
+.feedback.bad{border-color:rgba(214,77,95,.55);background:#fff1f3;color:#8b2738}
+.study-map{
+  margin-top:14px;
+  padding:14px;
+  display:none;
+}
+.study-map.visible{display:block}
+.study-map h3{margin:0 0 8px;color:var(--chem-dark);font-size:17px}
+.study-map-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.study-map-grid div{
+  border:1px solid #bad4ea;
+  border-radius:12px;
+  padding:9px;
+  background:#fff;
+  font-weight:900;
+  font-size:13px;
+  line-height:1.3;
+}
+.print-only{display:none}
+@page hormoneCards{size:letter;margin:.28in}
+@media print{
+  body{background:#fff!important;color:#000!important}
+  .site-header,.screen-shell{display:none!important}
+  .print-only{display:block!important;font-family:Arial,Helvetica,sans-serif;color:#000!important}
+  .print-page{break-after:page}
+  .print-title{font-size:19pt;margin:0 0 .1in;font-weight:900;color:#000!important}
+  .print-note{font-size:10pt;margin:0 0 .16in;color:#000!important}
+  .print-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.14in}
+  .print-card{
+    border:2px solid #000;
+    border-radius:.12in;
+    padding:.12in;
+    min-height:2.05in;
+    break-inside:avoid;
+    color:#000!important;
+    background:#fff!important;
+  }
+  .print-card h2{font-size:15pt;margin:0 0 .06in;color:#000!important}
+  .print-card h3{font-size:10pt;margin:.03in 0;color:#000!important;text-transform:uppercase;letter-spacing:.08em}
+  .print-card p,.print-card li{font-size:9.5pt;line-height:1.22;color:#000!important}
+  .print-card ul{margin:.05in 0 0;padding-left:.2in}
+  .answer-table{width:100%;border-collapse:collapse;font-size:9pt}
+  .answer-table th,.answer-table td{border:1px solid #000;padding:.06in;text-align:left;vertical-align:top;color:#000!important}
+  .answer-table th{font-weight:900}
+}
+@media(max-width:960px){
+  .board-grid{grid-template-columns:1fr}
+  .slots{grid-template-columns:1fr}
+  .card-bank{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .screen-shell{padding:14px}
+  .hero{min-height:540px}
+  .hero-copy{font-size:17px}
+  .enter-btn{font-size:20px;padding:18px 20px}
+  .card-bank{grid-template-columns:1fr}
+  .toolbar{display:grid}
+  .toolbar-left,.toolbar-right{display:grid;grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body class="mls-interactive hormone-game">
+<header class="site-header">
+  <div>
+    <div class="logo">MLS<span style="color:var(--mls-text3)">/</span>BOC<span style="color:var(--mls-text3);font-size:12px;margin-left:8px">PREP</span></div>
+    <div class="logo-sub">Interactive Learning</div>
+  </div>
+  <a class="mls-home-btn" href="index.html#interactive">Back to tools</a>
+</header>
+
+<main class="screen-shell" id="app"></main>
+<section class="print-only" id="print-area"></section>
+
+<script>
+const routes = [
+  {
+    id:"adrenal",
+    title:"Adrenal Stress Route",
+    goal:"Cortisol",
+    axis:"CRH -> ACTH -> Cortisol",
+    start:"start-adrenal",
+    middle:"mid-adrenal",
+    final:"final-adrenal",
+    action:"Cell homeostasis and function",
+    details:["CRH stimulates pituitary corticotrophs.","ACTH stimulates the adrenal gland.","Cortisol suppresses CRH and ACTH feedback."]
+  },
+  {
+    id:"thyroid",
+    title:"Thyroid Heat Route",
+    goal:"T3 and T4",
+    axis:"TRH / Somatostatin -> TSH -> T3, T4",
+    start:"start-thyroid",
+    middle:"mid-thyroid",
+    final:"final-thyroid",
+    action:"Thermogenesis and protein synthesis",
+    details:["TRH stimulates thyrotrophs.","Somatostatin suppresses thyrotroph signaling.","T3 and T4 suppress TRH and TSH feedback."]
+  },
+  {
+    id:"ovary",
+    title:"Ovary Cycle Route",
+    goal:"Estradiol, progesterone, inhibin, follistatin",
+    axis:"GnRH -> LH/FSH -> ovarian hormones",
+    start:"start-gonadal",
+    middle:"mid-gonadal",
+    final:"final-ovary",
+    action:"Ovulation",
+    details:["GnRH stimulates gonadotrophs.","LH and FSH stimulate the ovary.","Ovarian hormones feed back to the hypothalamus and pituitary."]
+  },
+  {
+    id:"testis",
+    title:"Testis Signal Route",
+    goal:"Testosterone and inhibin",
+    axis:"GnRH -> LH/FSH -> testicular hormones",
+    start:"start-gonadal",
+    middle:"mid-gonadal",
+    final:"final-testis",
+    action:"Spermatogenesis",
+    details:["GnRH stimulates gonadotrophs.","LH and FSH stimulate the testis.","Testosterone and inhibin feed back to the hypothalamus and pituitary."]
+  },
+  {
+    id:"growth",
+    title:"Growth Route",
+    goal:"IGF-1",
+    axis:"GHRH / Somatostatin -> GH -> IGF-1",
+    start:"start-growth",
+    middle:"mid-growth",
+    final:"final-growth",
+    action:"Growth, anabolic metabolism, linear and organ growth",
+    details:["GHRH stimulates somatotrophs.","Somatostatin suppresses somatotroph signaling.","GH stimulates liver IGF-1 and supports bone growth through osteoblasts and chondrocytes."]
+  },
+  {
+    id:"prolactin",
+    title:"Lactation Route",
+    goal:"PRL",
+    axis:"Dopamine suppression -> PRL -> lactation",
+    start:"start-prl",
+    middle:"mid-prl",
+    final:"final-prl",
+    action:"Lactation",
+    details:["Dopamine suppresses lactotrophs.","Less dopamine allows PRL activity.","PRL targets the breast for lactation."]
+  }
+];
+
+const cards = [
+  {id:"start-adrenal",type:"start",name:"CRH",copy:"Hypothalamus starter. Stimulates corticotrophs."},
+  {id:"mid-adrenal",type:"middle",name:"Corticotroph + ACTH",copy:"Pituitary bridge. ACTH stimulates adrenal gland."},
+  {id:"final-adrenal",type:"final",name:"Adrenal gland + Cortisol",copy:"Final hormone: cortisol. Action: cell homeostasis and function."},
+  {id:"start-thyroid",type:"start",name:"TRH + Somatostatin",copy:"Hypothalamus controls. TRH stimulates; somatostatin suppresses."},
+  {id:"mid-thyroid",type:"middle",name:"Thyrotroph + TSH",copy:"Pituitary bridge. TSH stimulates thyroid gland."},
+  {id:"final-thyroid",type:"final",name:"Thyroid gland + T3/T4",copy:"Final hormones: T3 and T4. Actions: thermogenesis and protein synthesis."},
+  {id:"start-gonadal",type:"start",name:"GnRH",copy:"Hypothalamus starter. Stimulates gonadotrophs."},
+  {id:"mid-gonadal",type:"middle",name:"Gonadotroph + LH/FSH",copy:"Pituitary bridge. LH and FSH stimulate ovary and testis."},
+  {id:"final-ovary",type:"final",name:"Ovary hormones",copy:"Estradiol, progesterone, inhibin, follistatin. Action: ovulation."},
+  {id:"final-testis",type:"final",name:"Testis hormones",copy:"Testosterone and inhibin. Action: spermatogenesis."},
+  {id:"start-growth",type:"start",name:"GHRH + Somatostatin",copy:"Hypothalamus controls. GHRH stimulates; somatostatin suppresses."},
+  {id:"mid-growth",type:"middle",name:"Somatotroph + GH",copy:"Pituitary bridge. GH stimulates liver and bone growth cells."},
+  {id:"final-growth",type:"final",name:"Liver + IGF-1",copy:"Final hormone: IGF-1. Actions: growth and anabolic metabolism."},
+  {id:"start-prl",type:"start",name:"Dopamine",copy:"Hypothalamus suppressor. Dopamine suppresses lactotrophs."},
+  {id:"mid-prl",type:"middle",name:"Lactotroph + PRL",copy:"Pituitary bridge. PRL travels to the breast."},
+  {id:"final-prl",type:"final",name:"Breast + Lactation",copy:"Final action: lactation."}
+];
+
+const typeLabels = {start:"1 Hypothalamus",middle:"2 Pituitary",final:"3 Target"};
+let scene = "welcome";
+let currentRoute = null;
+let slots = [null,null,null];
+let selectedId = "";
+let solved = new Set();
+let feedback = "Grab a map card to begin.";
+let feedbackType = "";
+let order = shuffle(cards.map(card => card.id));
+
+function esc(text){
+  return String(text).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));
+}
+
+function shuffle(list){
+  const copy = [...list];
+  for(let i = copy.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function cardById(id){
+  return cards.find(card => card.id === id);
+}
+
+function routeExpected(route){
+  return [route.start, route.middle, route.final];
+}
+
+function enterGame(){
+  scene = "board";
+  feedback = "Grab a map card. Then place exactly 3 cards in order.";
+  feedbackType = "";
+  render();
+}
+
+function drawMap(){
+  const available = routes.filter(route => !solved.has(route.id));
+  const pool = available.length ? available : routes;
+  currentRoute = pool[Math.floor(Math.random() * pool.length)];
+  slots = [null,null,null];
+  selectedId = "";
+  feedback = "Map drawn: build the pathway from start to final hormone/action.";
+  feedbackType = "";
+  order = shuffle(cards.map(card => card.id));
+  render();
+}
+
+function placeCard(id){
+  if(!currentRoute){
+    feedback = "Grab a map card first.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  const existing = slots.indexOf(id);
+  if(existing !== -1){
+    slots[existing] = null;
+    selectedId = "";
+    feedback = "Card returned to the deck.";
+    feedbackType = "";
+    render();
+    return;
+  }
+  const openIndex = slots.findIndex(value => !value);
+  if(openIndex === -1){
+    selectedId = id;
+    feedback = "All 3 slots are full. Tap a slot to clear it, or reset this map.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  slots[openIndex] = id;
+  selectedId = id;
+  feedback = "Card placed. Fill the pathway in order: hypothalamus, pituitary, target.";
+  feedbackType = "";
+  render();
+}
+
+function clearSlot(index){
+  slots[index] = null;
+  selectedId = "";
+  feedback = "Slot cleared.";
+  feedbackType = "";
+  render();
+}
+
+function resetRound(){
+  slots = [null,null,null];
+  selectedId = "";
+  feedback = currentRoute ? "Round reset. Build the 3-card pathway again." : "Grab a map card to begin.";
+  feedbackType = "";
+  render();
+}
+
+function checkPath(){
+  if(!currentRoute){
+    feedback = "Grab a map card first.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  if(slots.some(value => !value)){
+    feedback = "You need all 3 cards before checking.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  const expected = routeExpected(currentRoute);
+  const correct = expected.every((id, index) => slots[index] === id);
+  if(correct){
+    solved.add(currentRoute.id);
+    feedback = "PATHWAY SOLVED. You reached " + currentRoute.goal + ".";
+    feedbackType = "good";
+  }else{
+    const firstMiss = slots.findIndex((id, index) => id !== expected[index]);
+    feedback = "Route jam at slot " + (firstMiss + 1) + ". Check the order from hypothalamus to final target.";
+    feedbackType = "bad";
+  }
+  render();
+}
+
+function showAnswer(){
+  if(!currentRoute){
+    drawMap();
+    return;
+  }
+  slots = routeExpected(currentRoute);
+  feedback = "Answer shown for this map. Study the route, then draw another.";
+  feedbackType = "good";
+  render();
+}
+
+function slotStatus(index){
+  if(!currentRoute || !slots[index])return "";
+  if(feedbackType !== "good" && feedbackType !== "bad")return "";
+  const expected = routeExpected(currentRoute);
+  return slots[index] === expected[index] ? "correct" : "wrong";
+}
+
+function renderHero(){
+  return `<section class="hero">
+    <div class="hero-panel">
+      <div class="eyebrow">Welcome to the endocrine arcade</div>
+      <h1 class="game-font">Hormone Game</h1>
+      <p class="hero-copy">Draw a hormone map card, then build the 3-card pathway from hypothalamus to pituitary to the final hormone or action.</p>
+      <button class="enter-btn" type="button" onclick="enterGame()">Enter the Hormone Arcade!</button>
+    </div>
+  </section>`;
+}
+
+function renderToolbar(){
+  return `<div class="toolbar">
+    <div class="toolbar-left">
+      <button class="primary-btn" type="button" onclick="drawMap()">Grab a Map Card</button>
+      <button class="ghost-btn" type="button" onclick="checkPath()">Check Pathway</button>
+      <button class="ghost-btn" type="button" onclick="showAnswer()">Show Answer</button>
+      <button class="danger-btn" type="button" onclick="resetRound()">Reset Map</button>
+    </div>
+    <div class="toolbar-right">
+      <button class="print-btn" type="button" onclick="printGamePack()">Print Game Pack</button>
+      <button class="print-btn" type="button" onclick="printMapCards()">Print Map Cards</button>
+      <button class="print-btn" type="button" onclick="printAnswerKey()">Print Answer Key</button>
+    </div>
+  </div>`;
+}
+
+function renderMapCard(){
+  if(!currentRoute){
+    return `<section class="map-card empty">
+      <div>
+        <div class="eyebrow">Map deck</div>
+        <h2 class="game-font">Grab a card</h2>
+        <p class="hero-copy" style="font-size:17px;margin-bottom:18px">A random endocrine route will appear here. Build it with 3 ordered cards.</p>
+        <button class="primary-btn" type="button" onclick="drawMap()">Draw Random Map</button>
+      </div>
+    </section>`;
+  }
+  return `<section class="map-card">
+    <div class="eyebrow">Map card</div>
+    <h2 class="game-font">${esc(currentRoute.title)}</h2>
+    <span class="map-goal">Goal: ${esc(currentRoute.goal)}</span>
+    <div class="map-meta">
+      <span><strong>Route clue:</strong> ${esc(currentRoute.axis)}</span>
+      <span><strong>Final action:</strong> ${esc(currentRoute.action)}</span>
+      <span><strong>Rule:</strong> Place 3 cards in order: start, bridge, final.</span>
+    </div>
+  </section>`;
+}
+
+function renderProgress(){
+  return `<div class="progress-strip">
+    ${routes.map(route => `<div class="progress-dot ${solved.has(route.id) ? "solved" : ""}">${esc(route.goal.split(" ")[0])}</div>`).join("")}
+  </div>`;
+}
+
+function renderSlots(){
+  const labels = ["Hypothalamus Card","Pituitary/Trophic Card","Target/Final Card"];
+  return `<div class="slots">
+    ${slots.map((id, index) => {
+      const card = id ? cardById(id) : null;
+      return `<button class="slot ${id ? "filled" : ""} ${slotStatus(index)}" type="button" onclick="clearSlot(${index})">
+        <div class="slot-kicker">Slot ${index + 1}</div>
+        <div class="slot-label">${card ? esc(card.name) : esc(labels[index])}</div>
+        <div class="slot-copy">${card ? esc(card.copy) : "Tap a pathway card to fill this slot."}</div>
+      </button>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderCardBank(){
+  return `<div class="card-bank">
+    ${order.map(id => {
+      const card = cardById(id);
+      const used = slots.includes(id);
+      const selected = selectedId === id;
+      return `<button class="path-card ${used ? "used" : ""} ${selected ? "selected" : ""}" type="button" onclick="placeCard('${esc(id)}')">
+        <span class="card-type">${esc(typeLabels[card.type])}</span>
+        <h3>${esc(card.name)}</h3>
+        <p>${esc(card.copy)}</p>
+      </button>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderStudyMap(){
+  if(!currentRoute)return "";
+  return `<section class="study-map ${feedbackType === "good" ? "visible" : ""}">
+    <h3>Study map: ${esc(currentRoute.title)}</h3>
+    <div class="study-map-grid">
+      ${currentRoute.details.map(item => `<div>${esc(item)}</div>`).join("")}
+    </div>
+  </section>`;
+}
+
+function renderBoard(){
+  return `${renderToolbar()}
+  <div class="board-grid">
+    <div>
+      ${renderMapCard()}
+      ${renderProgress()}
+      <div class="feedback ${feedbackType}">${esc(feedback)}</div>
+      ${renderStudyMap()}
+    </div>
+    <section class="panel">
+      <div class="panel-title">Build the 3-card hormone pathway</div>
+      ${renderSlots()}
+      <div class="panel-title">Pathway card deck</div>
+      ${renderCardBank()}
+    </section>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("app").innerHTML = scene === "welcome" ? renderHero() : renderBoard();
+}
+
+function printCard(title, label, body){
+  return `<article class="print-card">
+    <h3>${esc(label)}</h3>
+    <h2>${esc(title)}</h2>
+    <p>${esc(body)}</p>
+  </article>`;
+}
+
+function renderPrintMaps(){
+  return `<section class="print-page">
+    <h1 class="print-title">Hormone Game - Map Cards</h1>
+    <p class="print-note">Draw one map card. Build the route with 3 ordered pathway cards.</p>
+    <div class="print-grid">
+      ${routes.map(route => printCard(route.title, "Map Card", "Goal: " + route.goal + ". Route: " + route.axis + ". Action: " + route.action + ".")).join("")}
+    </div>
+  </section>`;
+}
+
+function renderPrintPathCards(){
+  return `<section class="print-page">
+    <h1 class="print-title">Hormone Game - Pathway Cards</h1>
+    <p class="print-note">Use these cards to build hypothalamus, pituitary, and target/final routes.</p>
+    <div class="print-grid">
+      ${cards.map(card => printCard(card.name, typeLabels[card.type], card.copy)).join("")}
+    </div>
+  </section>`;
+}
+
+function renderPrintKey(){
+  return `<section class="print-page">
+    <h1 class="print-title">Hormone Game - Answer Key</h1>
+    <p class="print-note">Low-ink route key from the provided anterior pituitary hormone map.</p>
+    <table class="answer-table">
+      <thead><tr><th>Map</th><th>Card 1</th><th>Card 2</th><th>Card 3</th><th>Feedback</th></tr></thead>
+      <tbody>
+        ${routes.map(route => {
+          const expected = routeExpected(route).map(cardById);
+          return `<tr>
+            <td>${esc(route.title)}</td>
+            <td>${esc(expected[0].name)}</td>
+            <td>${esc(expected[1].name)}</td>
+            <td>${esc(expected[2].name)}</td>
+            <td>${esc(route.details.join(" "))}</td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  </section>`;
+}
+
+function doPrint(markup){
+  document.getElementById("print-area").innerHTML = markup;
+  setTimeout(() => window.print(), 80);
+}
+
+function printGamePack(){
+  doPrint(renderPrintMaps() + renderPrintPathCards() + renderPrintKey());
+}
+
+function printMapCards(){
+  doPrint(renderPrintMaps());
+}
+
+function printAnswerKey(){
+  doPrint(renderPrintKey());
+}
+
+window.enterGame = enterGame;
+window.drawMap = drawMap;
+window.placeCard = placeCard;
+window.clearSlot = clearSlot;
+window.checkPath = checkPath;
+window.resetRound = resetRound;
+window.showAnswer = showAnswer;
+window.printGamePack = printGamePack;
+window.printMapCards = printMapCards;
+window.printAnswerKey = printAnswerKey;
+render();
+</script>
+</body>
+</html>
