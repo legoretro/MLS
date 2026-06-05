@@ -190,6 +190,39 @@ body.hormone-game .mls-audio-btn{
   padding:8px 10px;
   background:#fff;
 }
+.case-chart{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+.case-row{
+  display:grid;
+  grid-template-columns:110px 1fr;
+  gap:10px;
+  align-items:start;
+  border:1px solid #bad4ea;
+  border-radius:13px;
+  padding:9px 10px;
+  background:#fff;
+  color:#284861;
+  font-weight:900;
+}
+.case-row strong{
+  color:var(--chem-dark);
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.case-question{
+  margin-top:12px;
+  border:2px dashed #9fc4df;
+  border-radius:14px;
+  padding:10px 12px;
+  background:#f8fcff;
+  color:#123f62;
+  font-weight:1000;
+  line-height:1.35;
+}
 .progress-strip{
   display:grid;
   grid-template-columns:repeat(6,1fr);
@@ -346,6 +379,7 @@ body.hormone-game .mls-audio-btn{
   .card-bank{grid-template-columns:1fr}
   .toolbar{display:grid}
   .toolbar-left,.toolbar-right{display:grid;grid-template-columns:1fr 1fr}
+  .case-row{grid-template-columns:1fr;gap:3px}
 }
 </style>
 </head>
@@ -366,6 +400,13 @@ const routes = [
   {
     id:"adrenal",
     title:"Adrenal Stress Route",
+    caseCode:"HG-1",
+    caseTitle:"Hormone Case HG-1",
+    caseRows:[
+      ["Patient","Placeholder age and short patient story for this hormone case."],
+      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
+      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+    ],
     goal:"Cortisol",
     axis:"CRH -> ACTH -> Cortisol",
     start:"start-adrenal",
@@ -377,6 +418,13 @@ const routes = [
   {
     id:"thyroid",
     title:"Thyroid Heat Route",
+    caseCode:"HG-2",
+    caseTitle:"Hormone Case HG-2",
+    caseRows:[
+      ["Patient","Placeholder age and short patient story for this hormone case."],
+      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
+      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+    ],
     goal:"T3 and T4",
     axis:"TRH / Somatostatin -> TSH -> T3, T4",
     start:"start-thyroid",
@@ -388,6 +436,13 @@ const routes = [
   {
     id:"ovary",
     title:"Ovary Cycle Route",
+    caseCode:"HG-3",
+    caseTitle:"Hormone Case HG-3",
+    caseRows:[
+      ["Patient","Placeholder age and short patient story for this hormone case."],
+      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
+      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+    ],
     goal:"Estradiol, progesterone, inhibin, follistatin",
     axis:"GnRH -> LH/FSH -> ovarian hormones",
     start:"start-gonadal",
@@ -399,6 +454,13 @@ const routes = [
   {
     id:"testis",
     title:"Testis Signal Route",
+    caseCode:"HG-4",
+    caseTitle:"Hormone Case HG-4",
+    caseRows:[
+      ["Patient","Placeholder age and short patient story for this hormone case."],
+      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
+      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+    ],
     goal:"Testosterone and inhibin",
     axis:"GnRH -> LH/FSH -> testicular hormones",
     start:"start-gonadal",
@@ -410,6 +472,13 @@ const routes = [
   {
     id:"growth",
     title:"Growth Route",
+    caseCode:"HG-5",
+    caseTitle:"Hormone Case HG-5",
+    caseRows:[
+      ["Patient","Placeholder age and short patient story for this hormone case."],
+      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
+      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+    ],
     goal:"IGF-1",
     axis:"GHRH / Somatostatin -> GH -> IGF-1",
     start:"start-growth",
@@ -421,6 +490,13 @@ const routes = [
   {
     id:"prolactin",
     title:"Lactation Route",
+    caseCode:"HG-6",
+    caseTitle:"Hormone Case HG-6",
+    caseRows:[
+      ["Patient","Placeholder age and short patient story for this hormone case."],
+      ["Chart","Placeholder minimal chart clue: symptom trend, quick lab note, or image note."],
+      ["Question","Build the hormone ladder. Which pathway might explain what is happening?"]
+    ],
     goal:"PRL",
     axis:"Dopamine suppression -> PRL -> lactation",
     start:"start-prl",
@@ -447,7 +523,7 @@ const cards = [
   {id:"final-growth",type:"final",name:"Liver + IGF-1",copy:"Final hormone: IGF-1. Actions: growth and anabolic metabolism."},
   {id:"start-prl",type:"start",name:"Dopamine",copy:"Hypothalamus suppressor. Dopamine suppresses lactotrophs."},
   {id:"mid-prl",type:"middle",name:"Lactotroph + PRL",copy:"Pituitary bridge. PRL travels to the breast."},
-  {id:"final-prl",type:"final",name:"Breast + Lactation",copy:"Final action: lactation."}
+  {id:"final-prl",type:"final",name:"Breast + Lactation",copy:"Target/action card for lactation."}
 ];
 
 const typeLabels = {start:"1 Hypothalamus",middle:"2 Pituitary",final:"3 Target"};
@@ -456,7 +532,7 @@ let currentRoute = null;
 let slots = [null,null,null];
 let selectedId = "";
 let solved = new Set();
-let feedback = "Grab a map card to begin.";
+let feedback = "Pick a hormone case to begin.";
 let feedbackType = "";
 let order = shuffle(cards.map(card => card.id));
 
@@ -483,7 +559,7 @@ function routeExpected(route){
 
 function enterGame(){
   scene = "board";
-  feedback = "Grab a map card. Then place exactly 3 cards in order.";
+  feedback = "Pick a hormone case. Then place exactly 3 ladder cards in order.";
   feedbackType = "";
   render();
 }
@@ -494,7 +570,7 @@ function drawMap(){
   currentRoute = pool[Math.floor(Math.random() * pool.length)];
   slots = [null,null,null];
   selectedId = "";
-  feedback = "Map drawn: build the pathway from start to final hormone/action.";
+  feedback = "Case opened. Read the patient/chart clue, then build the hormone ladder.";
   feedbackType = "";
   order = shuffle(cards.map(card => card.id));
   render();
@@ -502,7 +578,7 @@ function drawMap(){
 
 function placeCard(id){
   if(!currentRoute){
-    feedback = "Grab a map card first.";
+    feedback = "Pick a hormone case first.";
     feedbackType = "bad";
     render();
     return;
@@ -542,14 +618,14 @@ function clearSlot(index){
 function resetRound(){
   slots = [null,null,null];
   selectedId = "";
-  feedback = currentRoute ? "Round reset. Build the 3-card pathway again." : "Grab a map card to begin.";
+  feedback = currentRoute ? "Case reset. Build the 3-card hormone ladder again." : "Pick a hormone case to begin.";
   feedbackType = "";
   render();
 }
 
 function checkPath(){
   if(!currentRoute){
-    feedback = "Grab a map card first.";
+    feedback = "Pick a hormone case first.";
     feedbackType = "bad";
     render();
     return;
@@ -568,7 +644,7 @@ function checkPath(){
     feedbackType = "good";
   }else{
     const firstMiss = slots.findIndex((id, index) => id !== expected[index]);
-    feedback = "Route jam at slot " + (firstMiss + 1) + ". Check the order from hypothalamus to final target.";
+    feedback = "Ladder jam at slot " + (firstMiss + 1) + ". Check the order: hypothalamus, pituitary, target/final.";
     feedbackType = "bad";
   }
   render();
@@ -580,7 +656,7 @@ function showAnswer(){
     return;
   }
   slots = routeExpected(currentRoute);
-  feedback = "Answer shown for this map. Study the route, then draw another.";
+  feedback = "Answer revealed for this case. Study the ladder, then pick another case.";
   feedbackType = "good";
   render();
 }
@@ -597,7 +673,7 @@ function renderHero(){
     <div class="hero-panel">
       <div class="eyebrow">Welcome to the endocrine arcade</div>
       <h1 class="game-font">Hormone Game</h1>
-      <p class="hero-copy">Draw a hormone map card, then build the 3-card pathway from hypothalamus to pituitary to the final hormone or action.</p>
+      <p class="hero-copy">Pick a hormone case, read the tiny patient/chart clue, then build the 3-card hormone ladder without seeing the answer first.</p>
       <button class="enter-btn" type="button" onclick="enterGame()">Enter the Hormone Arcade!</button>
     </div>
   </section>`;
@@ -606,14 +682,14 @@ function renderHero(){
 function renderToolbar(){
   return `<div class="toolbar">
     <div class="toolbar-left">
-      <button class="primary-btn" type="button" onclick="drawMap()">Grab a Map Card</button>
+      <button class="primary-btn" type="button" onclick="drawMap()">Pick a Hormone Case</button>
       <button class="ghost-btn" type="button" onclick="checkPath()">Check Pathway</button>
       <button class="ghost-btn" type="button" onclick="showAnswer()">Show Answer</button>
-      <button class="danger-btn" type="button" onclick="resetRound()">Reset Map</button>
+      <button class="danger-btn" type="button" onclick="resetRound()">Reset Case</button>
     </div>
     <div class="toolbar-right">
       <button class="print-btn" type="button" onclick="printGamePack()">Print Game Pack</button>
-      <button class="print-btn" type="button" onclick="printMapCards()">Print Map Cards</button>
+      <button class="print-btn" type="button" onclick="printMapCards()">Print Case Cards</button>
       <button class="print-btn" type="button" onclick="printAnswerKey()">Print Answer Key</button>
     </div>
   </div>`;
@@ -623,28 +699,27 @@ function renderMapCard(){
   if(!currentRoute){
     return `<section class="map-card empty">
       <div>
-        <div class="eyebrow">Map deck</div>
-        <h2 class="game-font">Grab a card</h2>
-        <p class="hero-copy" style="font-size:17px;margin-bottom:18px">A random endocrine route will appear here. Build it with 3 ordered cards.</p>
-        <button class="primary-btn" type="button" onclick="drawMap()">Draw Random Map</button>
+        <div class="eyebrow">Hormone case deck</div>
+        <h2 class="game-font">Pick a case</h2>
+        <p class="hero-copy" style="font-size:17px;margin-bottom:18px">A minimal patient/chart clue will appear here. Build the hormone ladder that might explain it.</p>
+        <button class="primary-btn" type="button" onclick="drawMap()">Open Random Case</button>
       </div>
     </section>`;
   }
   return `<section class="map-card">
-    <div class="eyebrow">Map card</div>
-    <h2 class="game-font">${esc(currentRoute.title)}</h2>
-    <span class="map-goal">Goal: ${esc(currentRoute.goal)}</span>
-    <div class="map-meta">
-      <span><strong>Route clue:</strong> ${esc(currentRoute.axis)}</span>
-      <span><strong>Final action:</strong> ${esc(currentRoute.action)}</span>
-      <span><strong>Rule:</strong> Place 3 cards in order: start, bridge, final.</span>
+    <div class="eyebrow">Hormone case</div>
+    <h2 class="game-font">${esc(currentRoute.caseTitle)}</h2>
+    <span class="map-goal">Answer hidden</span>
+    <div class="case-chart">
+      ${currentRoute.caseRows.map(row => `<div class="case-row"><strong>${esc(row[0])}</strong><span>${esc(row[1])}</span></div>`).join("")}
     </div>
+    <div class="case-question">Build the hormone ladder: start signal -> pituitary bridge -> target/final. What might be happening?</div>
   </section>`;
 }
 
 function renderProgress(){
   return `<div class="progress-strip">
-    ${routes.map(route => `<div class="progress-dot ${solved.has(route.id) ? "solved" : ""}">${esc(route.goal.split(" ")[0])}</div>`).join("")}
+    ${routes.map(route => `<div class="progress-dot ${solved.has(route.id) ? "solved" : ""}">${esc(route.caseCode)}</div>`).join("")}
   </div>`;
 }
 
@@ -680,7 +755,7 @@ function renderCardBank(){
 function renderStudyMap(){
   if(!currentRoute)return "";
   return `<section class="study-map ${feedbackType === "good" ? "visible" : ""}">
-    <h3>Study map: ${esc(currentRoute.title)}</h3>
+    <h3>Study ladder: ${esc(currentRoute.title)}</h3>
     <div class="study-map-grid">
       ${currentRoute.details.map(item => `<div>${esc(item)}</div>`).join("")}
     </div>
@@ -717,12 +792,23 @@ function printCard(title, label, body){
   </article>`;
 }
 
+function printCaseCard(route){
+  return `<article class="print-card">
+    <h3>Hormone Case Card</h3>
+    <h2>${esc(route.caseTitle)}</h2>
+    <ul>
+      ${route.caseRows.map(row => `<li><strong>${esc(row[0])}:</strong> ${esc(row[1])}</li>`).join("")}
+    </ul>
+    <p><strong>Build the hormone ladder:</strong> start signal -> pituitary bridge -> target/final. Answer hidden.</p>
+  </article>`;
+}
+
 function renderPrintMaps(){
   return `<section class="print-page">
-    <h1 class="print-title">Hormone Game - Map Cards</h1>
-    <p class="print-note">Draw one map card. Build the route with 3 ordered pathway cards.</p>
+    <h1 class="print-title">Hormone Game - Case Cards</h1>
+    <p class="print-note">Pick one case card. Use the patient/chart clue to build the 3-card hormone ladder. These cards do not include answers.</p>
     <div class="print-grid">
-      ${routes.map(route => printCard(route.title, "Map Card", "Goal: " + route.goal + ". Route: " + route.axis + ". Action: " + route.action + ".")).join("")}
+      ${routes.map(route => printCaseCard(route)).join("")}
     </div>
   </section>`;
 }
@@ -740,14 +826,14 @@ function renderPrintPathCards(){
 function renderPrintKey(){
   return `<section class="print-page">
     <h1 class="print-title">Hormone Game - Answer Key</h1>
-    <p class="print-note">Low-ink route key from the provided anterior pituitary hormone map.</p>
+    <p class="print-note">Low-ink case key from the provided anterior pituitary hormone map.</p>
     <table class="answer-table">
-      <thead><tr><th>Map</th><th>Card 1</th><th>Card 2</th><th>Card 3</th><th>Feedback</th></tr></thead>
+      <thead><tr><th>Case</th><th>Card 1</th><th>Card 2</th><th>Card 3</th><th>Feedback</th></tr></thead>
       <tbody>
         ${routes.map(route => {
           const expected = routeExpected(route).map(cardById);
           return `<tr>
-            <td>${esc(route.title)}</td>
+            <td>${esc(route.caseCode + " - " + route.title)}</td>
             <td>${esc(expected[0].name)}</td>
             <td>${esc(expected[1].name)}</td>
             <td>${esc(expected[2].name)}</td>
