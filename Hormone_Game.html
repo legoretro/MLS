@@ -152,6 +152,12 @@ body.hormone-game .mls-audio-btn{
   text-transform:uppercase;
   margin-bottom:10px;
 }
+.build-layout{
+  display:grid;
+  grid-template-columns:minmax(260px,.82fr) minmax(300px,1.18fr);
+  gap:14px;
+  align-items:start;
+}
 .map-card{
   min-height:260px;
   background:
@@ -245,28 +251,80 @@ body.hormone-game .mls-audio-btn{
   background:#e7fbf1;
   color:#136b43;
 }
+.ladder-wrap,.choice-panel{
+  background:#f8fcff;
+  border:2px solid #bad4ea;
+  border-radius:18px;
+  padding:14px;
+}
+.ladder-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:7px;
+}
+.ladder-head .panel-title{margin:0}
+.ladder-status{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:5px 9px;
+  background:#e6f5ff;
+  color:var(--chem-dark);
+  font-size:11px;
+  font-weight:1000;
+}
+.ladder-note,.choice-note{
+  margin:0 0 12px;
+  color:#40536a;
+  font-size:13px;
+  line-height:1.35;
+  font-weight:900;
+}
 .slots{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  margin-bottom:14px;
+  grid-template-columns:1fr;
+  gap:0;
 }
 .slot{
-  min-height:178px;
+  min-height:118px;
   padding:12px;
   display:grid;
+  grid-template-columns:44px 1fr;
   align-content:start;
+  align-items:start;
   gap:7px;
   border-style:dashed;
   background:#f8fcff;
   cursor:pointer;
+  text-align:left;
+  width:100%;
+  position:relative;
 }
 .slot.filled{
   border-style:solid;
   background:#fff;
 }
+.slot.active{
+  border-color:var(--chem);
+  background:#eef8ff;
+  box-shadow:0 0 0 4px rgba(41,128,185,.12);
+}
 .slot.correct{border-color:var(--good);background:#edfbf4}
 .slot.wrong{border-color:var(--bad);background:#fff1f3}
+.slot-number{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--chem);
+  color:#fff;
+  font-size:15px;
+  font-weight:1000;
+  box-shadow:0 4px 0 rgba(15,71,112,.22);
+}
 .slot-kicker{
   color:var(--chem-dark);
   font-size:11px;
@@ -274,15 +332,55 @@ body.hormone-game .mls-audio-btn{
   letter-spacing:.1em;
   text-transform:uppercase;
 }
-.slot-label{font-size:18px;font-weight:1000;color:#10243a;line-height:1.05}
+.slot-label{font-size:20px;font-weight:1000;color:#10243a;line-height:1.05}
 .slot-copy{font-size:13px;line-height:1.3;color:#40536a;font-weight:800}
+.ladder-arrow{
+  display:grid;
+  place-items:center;
+  height:28px;
+  color:var(--chem);
+  font-size:24px;
+  line-height:1;
+  font-weight:1000;
+}
+.choice-head{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:7px;
+}
+.choice-head .panel-title{margin:0}
+.current-step{
+  display:inline-flex;
+  border-radius:999px;
+  padding:6px 10px;
+  background:var(--chem);
+  color:#fff;
+  font-size:12px;
+  font-weight:1000;
+}
+.choice-empty{
+  min-height:160px;
+  border:2px dashed #9fc4df;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:18px;
+  color:#123f62;
+  background:#fff;
+  font-weight:1000;
+  line-height:1.35;
+}
 .card-bank{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:9px;
 }
 .path-card{
-  min-height:132px;
+  min-height:124px;
   padding:12px;
   text-align:left;
   cursor:pointer;
@@ -366,9 +464,66 @@ body.hormone-game .mls-audio-btn{
   .answer-table th,.answer-table td{border:1px solid #000;padding:.06in;text-align:left;vertical-align:top;color:#000!important}
   .answer-table th{font-weight:900}
 }
+html[data-mls-theme="dark"] body.hormone-game{
+  background:
+    radial-gradient(circle at 14% 0%,rgba(41,128,185,.18),transparent 30%),
+    linear-gradient(180deg,#07101d 0%,#111827 100%) !important;
+  color:#f4f9ff;
+}
+html[data-mls-theme="dark"] body.hormone-game .panel,
+html[data-mls-theme="dark"] body.hormone-game .map-card,
+html[data-mls-theme="dark"] body.hormone-game .ladder-wrap,
+html[data-mls-theme="dark"] body.hormone-game .choice-panel,
+html[data-mls-theme="dark"] body.hormone-game .study-map{
+  background:#101a2b !important;
+  border-color:#406996 !important;
+  color:#f4f9ff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .panel-title,
+html[data-mls-theme="dark"] body.hormone-game .eyebrow,
+html[data-mls-theme="dark"] body.hormone-game .case-row strong,
+html[data-mls-theme="dark"] body.hormone-game .slot-kicker,
+html[data-mls-theme="dark"] body.hormone-game .study-map h3{
+  color:#bde8ff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .map-card h2,
+html[data-mls-theme="dark"] body.hormone-game .slot-label,
+html[data-mls-theme="dark"] body.hormone-game .path-card h3{
+  color:#ffffff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .case-row,
+html[data-mls-theme="dark"] body.hormone-game .case-question,
+html[data-mls-theme="dark"] body.hormone-game .slot,
+html[data-mls-theme="dark"] body.hormone-game .path-card,
+html[data-mls-theme="dark"] body.hormone-game .choice-empty,
+html[data-mls-theme="dark"] body.hormone-game .study-map-grid div{
+  background:#17243a !important;
+  border-color:#5d82ab !important;
+  color:#e8f5ff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .slot.active{
+  background:#123a5b !important;
+  border-color:#87d8ff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .slot-copy,
+html[data-mls-theme="dark"] body.hormone-game .path-card p,
+html[data-mls-theme="dark"] body.hormone-game .choice-note,
+html[data-mls-theme="dark"] body.hormone-game .ladder-note{
+  color:#d8eaff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .card-type,
+html[data-mls-theme="dark"] body.hormone-game .ladder-status{
+  background:#244d72 !important;
+  color:#dff4ff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .feedback{
+  background:#17243a !important;
+  border-color:#5d82ab !important;
+  color:#e8f5ff !important;
+}
 @media(max-width:960px){
   .board-grid{grid-template-columns:1fr}
-  .slots{grid-template-columns:1fr}
+  .build-layout{grid-template-columns:1fr}
   .card-bank{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:620px){
@@ -380,6 +535,8 @@ body.hormone-game .mls-audio-btn{
   .toolbar{display:grid}
   .toolbar-left,.toolbar-right{display:grid;grid-template-columns:1fr 1fr}
   .case-row{grid-template-columns:1fr;gap:3px}
+  .slot{grid-template-columns:38px 1fr}
+  .slot-label{font-size:18px}
 }
 </style>
 </head>
@@ -526,6 +683,11 @@ const cards = [
   {id:"final-prl",type:"final",name:"Breast + Lactation",copy:"Target/action card for lactation."}
 ];
 
+const ladderSteps = [
+  {type:"start",label:"Start Signal",slot:"Hypothalamus / Controller",hint:"Choose the hypothalamus signal card for rung 1."},
+  {type:"middle",label:"Pituitary Bridge",slot:"Pituitary / Trophic Hormone",hint:"Choose the pituitary bridge card for rung 2."},
+  {type:"final",label:"Target / Final",slot:"Target Organ / Final Hormone",hint:"Choose the target or final hormone/action card for rung 3."}
+];
 const typeLabels = {start:"1 Hypothalamus",middle:"2 Pituitary",final:"3 Target"};
 let scene = "welcome";
 let currentRoute = null;
@@ -557,9 +719,20 @@ function routeExpected(route){
   return [route.start, route.middle, route.final];
 }
 
+function activeSlotIndex(){
+  if(!currentRoute)return -1;
+  return slots.findIndex(value => !value);
+}
+
+function stepPrompt(index){
+  if(index < 0)return "Ladder is full.";
+  const step = ladderSteps[index];
+  return "Choose rung " + (index + 1) + ": " + step.label + ".";
+}
+
 function enterGame(){
   scene = "board";
-  feedback = "Pick a hormone case. Then place exactly 3 ladder cards in order.";
+  feedback = "Pick a hormone case. Then build the ladder one rung at a time.";
   feedbackType = "";
   render();
 }
@@ -570,7 +743,7 @@ function drawMap(){
   currentRoute = pool[Math.floor(Math.random() * pool.length)];
   slots = [null,null,null];
   selectedId = "";
-  feedback = "Case opened. Read the patient/chart clue, then build the hormone ladder.";
+  feedback = "Case opened. " + stepPrompt(0);
   feedbackType = "";
   order = shuffle(cards.map(card => card.id));
   render();
@@ -595,22 +768,37 @@ function placeCard(id){
   const openIndex = slots.findIndex(value => !value);
   if(openIndex === -1){
     selectedId = id;
-    feedback = "All 3 slots are full. Tap a slot to clear it, or reset this map.";
+    feedback = "All 3 rungs are full. Tap Check Pathway, or tap a rung to clear and replace it.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  const card = cardById(id);
+  const step = ladderSteps[openIndex];
+  if(card.type !== step.type){
+    feedback = "That card belongs to a different rung. " + stepPrompt(openIndex);
     feedbackType = "bad";
     render();
     return;
   }
   slots[openIndex] = id;
   selectedId = id;
-  feedback = "Card placed. Fill the pathway in order: hypothalamus, pituitary, target.";
+  const nextIndex = activeSlotIndex();
+  feedback = nextIndex === -1 ? "Ladder filled. Tap Check Pathway." : "Rung " + (openIndex + 1) + " placed. " + stepPrompt(nextIndex);
   feedbackType = "";
   render();
 }
 
 function clearSlot(index){
+  if(!currentRoute){
+    feedback = "Pick a hormone case first.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
   slots[index] = null;
   selectedId = "";
-  feedback = "Slot cleared.";
+  feedback = "Rung " + (index + 1) + " cleared. " + stepPrompt(activeSlotIndex());
   feedbackType = "";
   render();
 }
@@ -618,7 +806,7 @@ function clearSlot(index){
 function resetRound(){
   slots = [null,null,null];
   selectedId = "";
-  feedback = currentRoute ? "Case reset. Build the 3-card hormone ladder again." : "Pick a hormone case to begin.";
+  feedback = currentRoute ? "Case reset. " + stepPrompt(0) : "Pick a hormone case to begin.";
   feedbackType = "";
   render();
 }
@@ -724,22 +912,61 @@ function renderProgress(){
 }
 
 function renderSlots(){
-  const labels = ["Hypothalamus Card","Pituitary/Trophic Card","Target/Final Card"];
-  return `<div class="slots">
+  const activeIndex = activeSlotIndex();
+  return `<section class="ladder-wrap">
+    <div class="ladder-head">
+      <div class="panel-title">Hormone Ladder</div>
+      <span class="ladder-status">${activeIndex === -1 && currentRoute ? "Ready to check" : currentRoute ? "Rung " + (activeIndex + 1) : "Open a case"}</span>
+    </div>
+    <p class="ladder-note">Build top to bottom. Tap a filled rung if you want to change it.</p>
+    <div class="slots">
     ${slots.map((id, index) => {
       const card = id ? cardById(id) : null;
-      return `<button class="slot ${id ? "filled" : ""} ${slotStatus(index)}" type="button" onclick="clearSlot(${index})">
-        <div class="slot-kicker">Slot ${index + 1}</div>
-        <div class="slot-label">${card ? esc(card.name) : esc(labels[index])}</div>
-        <div class="slot-copy">${card ? esc(card.copy) : "Tap a pathway card to fill this slot."}</div>
-      </button>`;
+      const step = ladderSteps[index];
+      const active = currentRoute && activeIndex === index && !id;
+      return `<button class="slot ${id ? "filled" : ""} ${active ? "active" : ""} ${slotStatus(index)}" type="button" onclick="clearSlot(${index})">
+        <div class="slot-number">${index + 1}</div>
+        <div>
+          <div class="slot-kicker">${esc(step.label)}</div>
+          <div class="slot-label">${card ? esc(card.name) : esc(step.slot)}</div>
+          <div class="slot-copy">${card ? esc(card.copy) : esc(step.hint)}</div>
+        </div>
+      </button>${index < slots.length - 1 ? `<div class="ladder-arrow">↓</div>` : ""}`;
     }).join("")}
-  </div>`;
+    </div>
+  </section>`;
 }
 
 function renderCardBank(){
-  return `<div class="card-bank">
-    ${order.map(id => {
+  if(!currentRoute){
+    return `<section class="choice-panel">
+      <div class="choice-head">
+        <div class="panel-title">Choice Cards</div>
+        <span class="current-step">No case yet</span>
+      </div>
+      <div class="choice-empty">Open a hormone case first. Then this area will only show the cards for the rung you are building.</div>
+    </section>`;
+  }
+  const activeIndex = activeSlotIndex();
+  if(activeIndex === -1){
+    return `<section class="choice-panel">
+      <div class="choice-head">
+        <div class="panel-title">Choice Cards</div>
+        <span class="current-step">Ladder full</span>
+      </div>
+      <div class="choice-empty">The ladder has 3 cards. Tap Check Pathway, or tap a rung on the ladder to clear and replace it.</div>
+    </section>`;
+  }
+  const step = ladderSteps[activeIndex];
+  const visibleIds = order.filter(id => cardById(id).type === step.type);
+  return `<section class="choice-panel">
+    <div class="choice-head">
+      <div class="panel-title">Choose Rung ${activeIndex + 1}</div>
+      <span class="current-step">${esc(step.label)}</span>
+    </div>
+    <p class="choice-note">${esc(step.hint)} Only this rung's cards are shown right now.</p>
+    <div class="card-bank">
+    ${visibleIds.map(id => {
       const card = cardById(id);
       const used = slots.includes(id);
       const selected = selectedId === id;
@@ -749,7 +976,8 @@ function renderCardBank(){
         <p>${esc(card.copy)}</p>
       </button>`;
     }).join("")}
-  </div>`;
+    </div>
+  </section>`;
 }
 
 function renderStudyMap(){
@@ -772,10 +1000,11 @@ function renderBoard(){
       ${renderStudyMap()}
     </div>
     <section class="panel">
-      <div class="panel-title">Build the 3-card hormone pathway</div>
-      ${renderSlots()}
-      <div class="panel-title">Pathway card deck</div>
-      ${renderCardBank()}
+      <div class="panel-title">Build the hormone ladder</div>
+      <div class="build-layout">
+        ${renderSlots()}
+        ${renderCardBank()}
+      </div>
     </section>
   </div>`;
 }
