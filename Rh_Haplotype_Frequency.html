@@ -565,8 +565,207 @@
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css?v=bb-theme-11">
 <script src="interactive_music.js?v=bb-theme-11" defer></script>
+<style id="rh-page-overrides">
+  body.rh-haplotype-game .wrap{
+    width:min(100%,1220px) !important;
+    max-width:1220px !important;
+    overflow:visible !important;
+    padding-inline:10px;
+  }
+
+  body.rh-haplotype-game header:not(.site-header),
+  body.rh-haplotype-game .section-controls,
+  body.rh-haplotype-game .rh-mode-tabs,
+  body.rh-haplotype-game .rh-tab-panel{
+    max-width:1180px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  body.rh-haplotype-game .rh-mode-tabs{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  body.rh-haplotype-game .rh-mode-tab{
+    min-height:44px;
+  }
+
+  body.rh-haplotype-game .layout{
+    width:100%;
+    max-width:1180px;
+    margin-inline:auto;
+  }
+
+  body.rh-haplotype-game .rh-rank-layout{
+    grid-template-columns:210px minmax(0,1fr);
+  }
+
+  body.rh-haplotype-game .rh-translation-layout{
+    grid-template-columns:minmax(0,1fr) 220px;
+  }
+
+  body.rh-haplotype-game .tables{
+    gap:8px;
+  }
+
+  body.rh-haplotype-game .bank{
+    padding:10px;
+  }
+
+  body.rh-haplotype-game .chip{
+    min-height:42px;
+    padding:6px 8px;
+  }
+
+  body.rh-haplotype-game .dropzone,
+  body.rh-haplotype-game .rank-frequency-input{
+    min-height:38px;
+  }
+
+  body.rh-haplotype-game .rank-frequency-input{
+    width:100%;
+    border:2px solid color-mix(in srgb,var(--bb-red, #c91643) 20%,#ffffff) !important;
+    background:#fff !important;
+    color:var(--mls-text, #111) !important;
+    border-radius:12px !important;
+    text-align:center;
+    font-family:'Nunito', sans-serif;
+    font-weight:900;
+    font-size:.9rem;
+    padding:4px 6px;
+  }
+
+  body.rh-haplotype-game .rank-frequency-input.correct{
+    background:#edf8f1 !important;
+    border-color:var(--good) !important;
+    color:var(--good) !important;
+  }
+
+  body.rh-haplotype-game .rank-frequency-input.wrong{
+    background:#fff0ee !important;
+    border-color:var(--bad) !important;
+    color:var(--bad) !important;
+  }
+
+  body.rh-haplotype-game .rank-table th:nth-child(1),
+  body.rh-haplotype-game .rank-table td:nth-child(1){
+    width:64%;
+  }
+
+  body.rh-haplotype-game .rank-table th:nth-child(2),
+  body.rh-haplotype-game .rank-table td:nth-child(2){
+    width:36%;
+  }
+
+  body.rh-haplotype-game th,
+  body.rh-haplotype-game td{
+    padding:6px;
+  }
+
+  body.rh-haplotype-game .printBtn{
+    background:#fff !important;
+    border:2px solid color-mix(in srgb,var(--bb-red, #c91643) 28%,#ffffff) !important;
+    color:var(--bb-deep, #641525) !important;
+  }
+
+  .rh-print-area{
+    display:none;
+  }
+
+  @media (max-width: 980px){
+    body.rh-haplotype-game .rh-mode-tabs{
+      grid-template-columns:1fr;
+    }
+
+    body.rh-haplotype-game .rh-rank-layout,
+    body.rh-haplotype-game .rh-translation-layout{
+      grid-template-columns:1fr !important;
+    }
+
+    body.rh-haplotype-game .tables{
+      grid-template-columns:1fr;
+    }
+
+    body.rh-haplotype-game .bank{
+      position:static;
+    }
+  }
+
+  @media print{
+    body.rh-haplotype-game{
+      background:#fff !important;
+      color:#000 !important;
+      padding:0 !important;
+    }
+
+    body.rh-haplotype-game > *:not(.rh-print-area){
+      display:none !important;
+    }
+
+    body.rh-haplotype-game .rh-print-area{
+      display:block !important;
+      color:#000 !important;
+      font-family:'Nunito', Arial, sans-serif;
+      padding:0.25in;
+    }
+
+    .rh-print-sheet{
+      page-break-after:always;
+    }
+
+    .rh-print-sheet:last-child{
+      page-break-after:auto;
+    }
+
+    .rh-print-title{
+      font-size:18pt;
+      font-weight:900;
+      margin:0 0 6pt;
+      text-transform:uppercase;
+      letter-spacing:1pt;
+    }
+
+    .rh-print-note{
+      font-size:9pt;
+      font-weight:800;
+      margin:0 0 8pt;
+    }
+
+    .rh-print-table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      font-size:11pt;
+    }
+
+    .rh-print-table th,
+    .rh-print-table td{
+      border:1.5pt solid #000 !important;
+      background:#fff !important;
+      color:#000 !important;
+      padding:5pt;
+      text-align:center;
+      vertical-align:middle;
+      min-height:24pt;
+    }
+
+    .rh-print-table th{
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .rh-print-blank{
+      height:24pt;
+    }
+
+    @page{
+      size:letter landscape;
+      margin:0.3in;
+    }
+  }
+</style>
 </head>
-<body class="mls-interactive bb-theme">
+<body class="mls-interactive bb-theme rh-haplotype-game">
 <header class="site-header">
   <div>
     <div class="logo">MLS<span style="color:var(--mls-text3)">/</span>BOC<span style="color:var(--mls-text3);font-size:12px;margin-left:8px">PREP</span></div>
@@ -582,7 +781,7 @@
   <header>
     <div>
       <h1>🩸 Rh Haplotype Frequency – Rank It!</h1>
-      <p>Rank the Wiener haplotypes first, then switch tabs to translate each Wiener symbol into Fisher-Race notation. Top row = most frequent. Bottom row = least frequent.</p>
+      <p>Rank each population from greatest to least. Drop the Wiener symbol, then type the matching frequency number beside it.</p>
     </div>
     <div class="badge">2 Tabs</div>
   </header>
@@ -597,13 +796,15 @@
       <button id="rhCheckBtn" class="checkBtn">✔ Check Ranking</button>
       <button id="rhResetBtn" class="resetBtn">↺ Reset Ranking</button>
       <button id="rhShowAnswersBtn" class="resetBtn">Show answers</button>
+      <button id="rhPrintBlankBtn" class="printBtn">Print Blank Chart</button>
+      <button id="rhPrintAnswersBtn" class="printBtn">Print Answer Chart</button>
       <div id="rhMsg" class="score"></div>
     </div>
 
     <div class="layout rh-rank-layout">
       <div class="bank">
         <h2>Wiener Bank</h2>
-        <div class="hint">Tap or drag each Wiener symbol into the correct population order. Each can be used once per population.</div>
+        <div class="hint">Tap or drag each Wiener symbol into the correct population order. Then type the frequency number in the next box.</div>
         <div id="weinerWrap"></div>
       </div>
 
@@ -616,6 +817,8 @@
       <button id="translateCheckBtn" class="checkBtn">✔ Check Translation</button>
       <button id="translateResetBtn" class="resetBtn">↺ Reset Translation</button>
       <button id="translateShowAnswersBtn" class="resetBtn">Show answers</button>
+      <button id="translatePrintBlankBtn" class="printBtn">Print Blank Chart</button>
+      <button id="translatePrintAnswersBtn" class="printBtn">Print Answer Chart</button>
       <div id="translateMsg" class="score"></div>
     </div>
 
@@ -698,6 +901,8 @@
 
 </div>
 
+<div id="rhPrintArea" class="rh-print-area" aria-hidden="true"></div>
+
 <script>
 /* =========================
    RH HAPLOTYPE SECTION
@@ -716,6 +921,17 @@ const TRANSLATION_ANSWERS = {
   "r’’": "dcE",
   "rY": "dCE"
 };
+
+const FREQUENCY_ROWS = [
+  { weiner: "R0", fisher: "Dce", white: "4", black: "44", asian: "3" },
+  { weiner: "R1", fisher: "DCe", white: "42", black: "17", asian: "70" },
+  { weiner: "R2", fisher: "DcE", white: "14", black: "11", asian: "21" },
+  { weiner: "RZ", fisher: "DCE", white: "0.2", black: "0", asian: "1" },
+  { weiner: "r", fisher: "dce", white: "37", black: "26", asian: "3" },
+  { weiner: "r’", fisher: "dCe", white: "2", black: "2", asian: "2" },
+  { weiner: "r’’", fisher: "dcE", white: "1", black: "0.01", asian: "0.01" },
+  { weiner: "rY", fisher: "dCE", white: "0.01", black: "0.01", asian: "0.01" }
+];
 
 const ANSWERS = {
   white: {
@@ -748,6 +964,10 @@ function slotKey(group, row, col){
 
 function translationKey(weiner){
   return `translate-${cssSafe(weiner)}`;
+}
+
+function rankFrequencyInputId(group, row){
+  return `rank-frequency-${group}-${row}`;
 }
 
 function getState(key){
@@ -799,6 +1019,23 @@ function shuffleArray(arr){
 
 function colLabel(col){
   return col === "weiner" ? "Wiener" : "Fisher-Race";
+}
+
+function frequencyFor(weiner, pop){
+  const row = FREQUENCY_ROWS.find(item => item.weiner === weiner);
+  return row ? row[pop] : "";
+}
+
+function rankFrequencyAnswer(group, row){
+  const weiner = ANSWERS[group].weiner[row - 1];
+  return frequencyFor(weiner, group);
+}
+
+function normalizeFrequency(value){
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/^</, "");
 }
 
 function clearSelectedChips(){
@@ -939,10 +1176,11 @@ function buildTables(){
 
     section.innerHTML = `
       <div class="section-title">${group.label}</div>
-      <table>
+      <table class="rank-table">
         <thead>
           <tr>
             <th>Wiener Rank</th>
+            <th>#</th>
           </tr>
         </thead>
         <tbody id="tbody-${group.key}"></tbody>
@@ -955,8 +1193,19 @@ function buildTables(){
     for(let row = 1; row <= 8; row++){
       const tr = document.createElement("tr");
       const tdWeiner = document.createElement("td");
+      const tdFrequency = document.createElement("td");
+      const frequencyInput = document.createElement("input");
+      frequencyInput.className = "rank-frequency-input";
+      frequencyInput.id = rankFrequencyInputId(group.key, row);
+      frequencyInput.type = "text";
+      frequencyInput.inputMode = "decimal";
+      frequencyInput.placeholder = "#";
+      frequencyInput.setAttribute("aria-label", `${group.label} rank ${row} frequency`);
+      frequencyInput.addEventListener("input", clearRhMarks);
       tdWeiner.appendChild(makeDropzone(group.key, row, "weiner"));
+      tdFrequency.appendChild(frequencyInput);
       tr.appendChild(tdWeiner);
+      tr.appendChild(tdFrequency);
       tbody.appendChild(tr);
     }
   });
@@ -1183,6 +1432,9 @@ function clearRhMarks(){
   document.querySelectorAll(".rank-dropzone").forEach(z => {
     z.classList.remove("correct", "wrong");
   });
+  document.querySelectorAll(".rank-frequency-input").forEach(input => {
+    input.classList.remove("correct", "wrong");
+  });
   const msg = document.getElementById("rhMsg");
   msg.textContent = "";
   msg.className = "score";
@@ -1199,7 +1451,7 @@ function clearTranslationMarks(){
 
 function checkRhAnswers(){
   let correct = 0;
-  const total = GROUPS.length * 8 * RANK_COLS.length;
+  const total = GROUPS.length * 8 * 2;
 
   GROUPS.forEach(group => {
     for(let row = 1; row <= 8; row++){
@@ -1218,6 +1470,16 @@ function checkRhAnswers(){
           slot.classList.add("wrong");
         }
       });
+
+      const frequencyInput = document.getElementById(rankFrequencyInputId(group.key, row));
+      const rightFrequency = rankFrequencyAnswer(group.key, row);
+      frequencyInput.classList.remove("correct", "wrong");
+      if(normalizeFrequency(frequencyInput.value) === normalizeFrequency(rightFrequency)){
+        frequencyInput.classList.add("correct");
+        correct++;
+      } else {
+        frequencyInput.classList.add("wrong");
+      }
     }
   });
 
@@ -1256,6 +1518,11 @@ function resetRh(){
   GROUPS.forEach(group => {
     for(let row = 1; row <= 8; row++){
       RANK_COLS.forEach(col => renderSlot(slotKey(group.key, row, col)));
+      const frequencyInput = document.getElementById(rankFrequencyInputId(group.key, row));
+      if(frequencyInput){
+        frequencyInput.value = "";
+        frequencyInput.classList.remove("correct", "wrong");
+      }
     }
   });
 
@@ -1280,6 +1547,10 @@ function showRhAnswers(){
         setState(key, { section: "rh", type: col, value: ANSWERS[group.key][col][row - 1] });
         renderSlot(key);
       });
+      const frequencyInput = document.getElementById(rankFrequencyInputId(group.key, row));
+      if(frequencyInput){
+        frequencyInput.value = rankFrequencyAnswer(group.key, row);
+      }
     }
   });
   renderBankUsage();
@@ -1310,6 +1581,85 @@ function setupRhTabs(){
     });
   });
 }
+
+function escapeHtml(value){
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function blankCell(){
+  return `<div class="rh-print-blank">&nbsp;</div>`;
+}
+
+function buildRankPrintSheet(withAnswers){
+  const rows = Array.from({ length: 8 }, (_, index) => {
+    const rank = index + 1;
+    const cells = GROUPS.map(group => {
+      const weiner = ANSWERS[group.key].weiner[index];
+      const frequency = rankFrequencyAnswer(group.key, rank);
+      return `
+        <td>${withAnswers ? escapeHtml(weiner) : blankCell()}</td>
+        <td>${withAnswers ? escapeHtml(frequency) : blankCell()}</td>
+      `;
+    }).join("");
+    return `<tr><td>${rank}</td>${cells}</tr>`;
+  }).join("");
+
+  return `
+    <section class="rh-print-sheet">
+      <h1 class="rh-print-title">Rh Haplotype Rank - ${withAnswers ? "Answer Chart" : "Blank Chart"}</h1>
+      <p class="rh-print-note">Top row is greatest frequency. Bottom row is least frequency. Use 0.01 for very rare values.</p>
+      <table class="rh-print-table">
+        <thead>
+          <tr><th rowspan="2">Rank</th><th colspan="2">White</th><th colspan="2">Black</th><th colspan="2">Asian</th></tr>
+          <tr><th>Wiener</th><th>#</th><th>Wiener</th><th>#</th><th>Wiener</th><th>#</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </section>
+  `;
+}
+
+function buildTranslationPrintSheet(withAnswers){
+  const rows = WEINERS.map(weiner => {
+    const answer = withAnswers ? escapeHtml(TRANSLATION_ANSWERS[weiner]) : blankCell();
+    return `<tr><td>${escapeHtml(weiner)}</td><td>${answer}</td></tr>`;
+  }).join("");
+
+  return `
+    <section class="rh-print-sheet">
+      <h1 class="rh-print-title">Wiener to Fisher-Race - ${withAnswers ? "Answer Chart" : "Blank Chart"}</h1>
+      <p class="rh-print-note">Match each Wiener symbol to its Fisher-Race notation.</p>
+      <table class="rh-print-table">
+        <thead>
+          <tr><th>Wiener</th><th>Fisher-Race</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </section>
+  `;
+}
+
+function printRhSheet(mode, withAnswers){
+  const printArea = document.getElementById("rhPrintArea");
+  const builders = {
+    rank: buildRankPrintSheet,
+    translate: buildTranslationPrintSheet
+  };
+
+  printArea.innerHTML = builders[mode](withAnswers);
+  printArea.setAttribute("aria-hidden", "false");
+  setTimeout(() => window.print(), 50);
+}
+
+window.addEventListener("afterprint", () => {
+  const printArea = document.getElementById("rhPrintArea");
+  printArea.setAttribute("aria-hidden", "true");
+});
 
 /* =========================
    DONOR FREQUENCY SECTION
@@ -1628,6 +1978,10 @@ document.getElementById("donorResetBtn").addEventListener("click", resetDonor);
 document.getElementById("rhShowAnswersBtn").addEventListener("click", showRhAnswers);
 document.getElementById("translateShowAnswersBtn").addEventListener("click", showTranslationAnswers);
 document.getElementById("donorShowAnswersBtn").addEventListener("click", showDonorAnswers);
+document.getElementById("rhPrintBlankBtn").addEventListener("click", () => printRhSheet("rank", false));
+document.getElementById("rhPrintAnswersBtn").addEventListener("click", () => printRhSheet("rank", true));
+document.getElementById("translatePrintBlankBtn").addEventListener("click", () => printRhSheet("translate", false));
+document.getElementById("translatePrintAnswersBtn").addEventListener("click", () => printRhSheet("translate", true));
 
 setupRhTabs();
 buildBanks();
