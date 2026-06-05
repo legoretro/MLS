@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blood Group</title>
+<title>Who's That Blood Group?</title>
 <style>
   :root{
     --bg:#0d0f12;
@@ -75,6 +75,91 @@
     color:#611428;
     border:1px solid rgba(255,255,255,.35);
     box-shadow:0 8px 20px rgba(0,0,0,.18);
+  }
+  .arena-intro{
+    min-height:610px;
+    border:2px solid rgba(255,190,208,.42);
+    border-radius:24px;
+    background:
+      radial-gradient(circle at 22% 15%, rgba(255,255,255,.82), transparent 21%),
+      radial-gradient(circle at 77% 12%, rgba(201,22,67,.18), transparent 24%),
+      linear-gradient(135deg, #fff3f7 0%, #ffd8e4 48%, #491120 100%);
+    box-shadow:0 28px 70px rgba(0,0,0,.24);
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:34px 22px;
+    margin-top:14px;
+    position:relative;
+    overflow:hidden;
+  }
+  .arena-intro::before,
+  .arena-intro::after{
+    content:"";
+    position:absolute;
+    width:240px;
+    height:240px;
+    border:12px solid rgba(97,20,40,.25);
+    border-radius:50%;
+    transform:rotate(-18deg);
+  }
+  .arena-intro::before{left:-80px;top:70px}
+  .arena-intro::after{right:-70px;bottom:62px}
+  .arena-panel{
+    position:relative;
+    z-index:1;
+    max-width:860px;
+  }
+  .arena-kicker{
+    color:#7a1430;
+    font-size:13px;
+    font-weight:1000;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .arena-title{
+    margin:0;
+    color:#11141d;
+    font-size:clamp(44px, 8vw, 104px);
+    line-height:.88;
+    font-weight:1000;
+    text-shadow:6px 7px 0 rgba(255,255,255,.65), 10px 11px 0 rgba(201,22,67,.24);
+  }
+  .arena-tag{
+    margin:18px 0 0;
+    color:#611428;
+    font-size:clamp(22px, 3vw, 36px);
+    font-weight:1000;
+  }
+  .arena-copy{
+    margin:12px auto 24px;
+    color:#30131d;
+    max-width:720px;
+    font-size:21px;
+    line-height:1.35;
+    font-weight:900;
+  }
+  .arena-enter{
+    min-width:min(100%,420px);
+    border:0;
+    border-radius:30px;
+    background:#c91643;
+    color:#fff;
+    padding:22px 30px;
+    font-size:26px;
+    font-weight:1000;
+    box-shadow:0 12px 0 #75162e, 0 24px 38px rgba(0,0,0,.23);
+    transform:rotate(-1deg);
+  }
+  .arena-enter:hover{transform:translateY(-2px) rotate(-1deg)}
+  body:not(.arena-open) .print-controls,
+  body:not(.arena-open) .deck-panel,
+  body:not(.arena-open) .game{
+    display:none;
+  }
+  body.arena-open .arena-intro{
+    display:none;
   }
   .deck-panel{
     background:rgba(21,24,35,.78);
@@ -514,6 +599,9 @@
     .wrap{padding:14px}
     .topbar{align-items:flex-start;flex-wrap:wrap}
     .round-badge{margin-left:0}
+    .arena-intro{min-height:520px}
+    .arena-copy{font-size:17px}
+    .arena-enter{font-size:20px;padding:18px 20px}
     .deck-grid{grid-template-columns:1fr 1fr}
     .clue-grid{grid-template-columns:1fr}
     .system-grid{grid-template-columns:1fr 1fr}
@@ -528,23 +616,33 @@
   <div class="topbar">
     <a class="back" href="index.html#interactive">Back to tools</a>
     <div class="titleblock">
-      <h1><span class="funky-title">Who's That Blood Group!!!?</span></h1>
-      <div class="subtitle">Open both clue cards, choose the system, then match the blood group token.</div>
+      <h1><span class="funky-title">Who's That Blood Group?</span></h1>
+      <div class="subtitle">Gotta type them all. Use both clue cards before choosing a BG token.</div>
     </div>
     <div class="round-badge" id="card-badge">Card 1 of 9</div>
   </div>
 
+  <section class="arena-intro" id="arena-intro">
+    <div class="arena-panel">
+      <div class="arena-kicker">Welcome to the Blood Bank Arena</div>
+      <h2 class="arena-title">Who's That Blood Group?</h2>
+      <p class="arena-tag">Gotta type them all.</p>
+      <p class="arena-copy">Use the clues to identify the blood group before the answer is revealed.</p>
+      <button class="arena-enter" type="button" onclick="enterArena()">Enter the Blood Group Arena!</button>
+    </div>
+  </section>
+
   <div class="print-controls">
     <button class="print-btn" onclick="printClueCards('two')">Print Clue Cards</button>
     <button class="print-btn" onclick="printClueCards('single')">Print Single 4x6</button>
-    <button class="print-btn" onclick="printTokens()">Print Blood Group Tokens</button>
+    <button class="print-btn" onclick="printTokens()">Print BG Tokens</button>
     <button class="print-btn" onclick="printFullPack()">Print Full Pack</button>
   </div>
 
   <section class="deck-panel">
     <div class="deck-head">
-      <div class="deck-title">Blood group deck</div>
-      <div class="deck-note">First card is ready. Add the next clue sets when you send them.</div>
+      <div class="deck-title">BG arena deck</div>
+      <div class="deck-note">Placeholder cases only. Real clues, images, and answers can be added when you send them.</div>
     </div>
     <div class="deck-grid" id="deck-grid"></div>
   </section>
@@ -552,7 +650,7 @@
   <main class="game">
     <section class="panel">
       <div class="panel-head">
-        <div class="panel-title">Mystery blood group</div>
+        <div class="panel-title">Mystery BG case</div>
         <div class="panel-note" id="reveal-note">Hidden</div>
       </div>
       <div class="mystery-stage">
@@ -571,13 +669,13 @@
               </div>
               <div class="mystery-question">?</div>
               <div class="mystery-label">Match the clues + token</div>
-              <div class="screen-title">Who's That Blood Group!!!?</div>
+              <div class="screen-title">Who's That Blood Group?</div>
             </div>
             <div class="face back" id="back-face">
               <div class="solved-stamp">Solved</div>
               <div class="reveal-token">
                 <div>
-                  <div class="token-caption">Blood group token matched</div>
+                  <div class="token-caption">BG token matched</div>
                   <div class="answer-name"><span class="answer-secret" id="answer-secret">Hidden answer</span></div>
                   <div class="answer-sub" id="answer-sub">Answer hidden until this card is completed</div>
                 </div>
@@ -600,7 +698,7 @@
         </div>
 
         <div>
-          <div class="panel-title" style="margin-bottom:9px">Match the system</div>
+          <div class="panel-title" style="margin-bottom:9px">Match the BG token</div>
           <div class="system-grid" id="system-grid"></div>
         </div>
 
@@ -615,47 +713,36 @@
 <section class="print-only" id="print-area"></section>
 
 <script>
-const cards = [
-  {
-    id:'abo',
-    label:'ABO',
-    answer:'ABO',
-    status:'ready',
+const cards = Array.from({length:9}, (_, index) => {
+  const number = index + 1;
+  const label = 'BG' + number;
+  return {
+    id:'bg' + number,
+    label,
+    answer:label,
+    status:'placeholder',
     clues:[
       [
-        'Gene location: chromosome 9.',
-        'Null pattern: Bombay has no H antigen through FUT1 and FUT2.',
-        'Parabombay lacks H antigen through FUT1, but has secretor FUT2 activity.',
-        'Transferase attaches oligosaccharide to glycoproteins and glycosphingolipids.',
-        'Antigen structure is extrinsic.',
-        'Related substance: Type 2 chains through FUT1.',
-        'Expressed on baby cells.'
+        'PLACEHOLDER - ' + label + ' Clue Card 1.',
+        'Exact frequencies, trends, and study-reference clues will go here.',
+        'Antigen image/reference note will be added when you send it.',
+        'Use this clue with Clue Card 2 before choosing a BG token.'
       ],
       [
-        'Antibodies are naturally occurring.',
-        'Mostly IgM and typically cold reacting.',
-        'Can fix complement.',
-        'Not destroyed by routine treatment; enzyme enhancement can occur.',
-        'No dosage.',
-        'Can cause mild HDN and severe HTRXN.',
-        'Immunogenic and clinically important if transfusion is incompatible.'
+        'PLACEHOLDER - ' + label + ' Clue Card 2.',
+        'Answer-sheet check instructions will go here.',
+        'If this BG is not solved, continue to the next BG and return later.',
+        'When both clues agree, choose the matching BG token.'
       ]
     ]
-  },
-  {id:'rh',label:'Rh',answer:'Rh',status:'needs_clues'},
-  {id:'kell',label:'Kell',answer:'Kell',status:'needs_clues'},
-  {id:'duffy',label:'Duffy',answer:'Duffy',status:'needs_clues'},
-  {id:'kidd',label:'Kidd',answer:'Kidd',status:'needs_clues'},
-  {id:'mns',label:'MNS',answer:'MNS',status:'needs_clues'},
-  {id:'p1pk',label:'P1PK / Globoside',answer:'P1PK / Globoside',status:'needs_clues'},
-  {id:'lewis',label:'Lewis',answer:'Lewis',status:'needs_clues'},
-  {id:'lutheran',label:'Lutheran',answer:'Lutheran',status:'needs_clues'}
-];
+  };
+});
 
 let currentIndex = 0;
 let opened = new Set();
 let selected = '';
 let solvedCards = new Set();
+let arenaEntered = false;
 
 function esc(text){
   return String(text).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -663,6 +750,11 @@ function esc(text){
 
 function currentCard(){
   return cards[currentIndex];
+}
+
+function enterArena(){
+  arenaEntered = true;
+  document.body.classList.add('arena-open');
 }
 
 function renderDeck(){
@@ -673,7 +765,7 @@ function renderDeck(){
       index === currentIndex ? 'active' : '',
       solvedCards.has(card.id) ? 'done' : ''
     ].filter(Boolean).join(' ');
-    const status = solvedCards.has(card.id) ? 'Solved' : (card.status === 'ready' ? 'Ready' : 'Needs clues');
+    const status = solvedCards.has(card.id) ? 'Solved' : 'Placeholder';
     return '<button class="'+classes+'" onclick="selectCard('+index+')">'
       + '<div class="deck-label">'+esc(card.label)+'</div>'
       + '<div class="deck-status">'+esc(status)+'</div>'
@@ -684,10 +776,10 @@ function renderDeck(){
 function renderMystery(){
   const card = currentCard();
   const solved = solvedCards.has(card.id);
-  document.getElementById('answer-secret').textContent = solved ? card.answer + ' Blood Group System' : 'Hidden answer';
-  document.getElementById('answer-sub').textContent = solved ? 'Solved stamp added. Match this to the printed blood group token.' : 'Answer hidden until this card is completed';
+  document.getElementById('answer-secret').textContent = solved ? card.label + ' token' : 'Hidden answer';
+  document.getElementById('answer-sub').textContent = solved ? 'Solved stamp added. Real answer will be added with your clue set.' : 'Answer hidden until this card is completed';
   document.getElementById('mystery-card').classList.toggle('revealed', solved);
-  document.getElementById('reveal-note').textContent = solved ? 'Solved' : (card.status === 'ready' ? 'Mystery' : 'Waiting');
+  document.getElementById('reveal-note').textContent = solved ? 'Solved' : 'Mystery';
 }
 
 function renderClues(){
@@ -695,18 +787,15 @@ function renderClues(){
   for(let i = 1; i <= 2; i++){
     const el = document.getElementById('clue-'+i);
     const clueSet = card.clues && card.clues[i - 1];
-    if(card.status !== 'ready'){
-      el.className = 'clue-card locked';
-      el.innerHTML = '<div class="locked-note">Clue Card '+i+' will be added when you send the '+esc(card.label)+' clues.</div>';
-    }else if(opened.has(i)){
+    if(opened.has(i)){
       el.className = 'clue-card';
-      el.innerHTML = '<h2>Clue Card '+i+'</h2><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>';
+      el.innerHTML = '<h2>'+esc(card.label)+' Clue Card '+i+'</h2><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>';
     }else{
       el.className = 'clue-card locked';
-      el.innerHTML = '<button class="primary" onclick="openClue('+i+')">Open Clue '+i+'</button>';
+      el.innerHTML = '<button class="primary" onclick="openClue('+i+')">Open '+esc(card.label)+' Clue '+i+'</button>';
     }
   }
-  document.getElementById('clue-note').textContent = card.status === 'ready' ? '2 required' : 'Waiting for clues';
+  document.getElementById('clue-note').textContent = '2 required';
 }
 
 function renderSystems(){
@@ -725,7 +814,7 @@ function renderSystems(){
     const tokenText = isCorrect
       ? '<span class="token-secret">'+esc(label)+'</span><span class="token-solved">Solved</span>'
       : esc(label);
-    return '<button class="'+cls+'" onclick="selectSystem(\''+esc(label).replace(/&#39;/g,"\\'")+'\')" '+(card.status !== 'ready' ? 'disabled' : '')+'>'+tokenText+'</button>';
+    return '<button class="'+cls+'" onclick="selectSystem(\''+esc(label).replace(/&#39;/g,"\\'")+'\')">'+tokenText+'</button>';
   }).join('');
 }
 
@@ -737,20 +826,16 @@ function updateFeedback(text, type){
     return;
   }
   const card = currentCard();
-  if(card.status !== 'ready'){
-    fb.textContent = 'This card is set up and waiting for the clues you will provide later.';
-  }else if(solvedCards.has(card.id)){
-    fb.textContent = 'Solved. The antigen is revealed, and the answer label is blurred.';
+  if(solvedCards.has(card.id)){
+    fb.textContent = 'Solved. The placeholder BG token is revealed; the real answer is not added yet.';
   }else if(opened.size < 2){
     fb.textContent = 'Open both clue cards before matching.';
   }else{
-    fb.textContent = 'Both clues are open. Choose the matching blood group system.';
+    fb.textContent = 'Both clues are open. Choose the matching BG token.';
   }
 }
 
 function openClue(num){
-  const card = currentCard();
-  if(card.status !== 'ready')return;
   opened.add(num);
   renderClues();
   updateFeedback();
@@ -758,23 +843,19 @@ function openClue(num){
 
 function selectSystem(system){
   const card = currentCard();
-  if(card.status !== 'ready'){
-    updateFeedback('This card is waiting for its clue set.', 'bad');
-    return;
-  }
   if(opened.size < 2){
     selected = system;
     renderSystems();
-    updateFeedback('Open both clue cards first, then match the system.', 'bad');
+    updateFeedback('Open both clue cards first, then match the BG token.', 'bad');
     return;
   }
   selected = system;
   if(system === card.answer){
     solvedCards.add(card.id);
     document.getElementById('mystery-card').classList.add('revealed');
-    updateFeedback('Correct. Solved stamp added and the answer label is blurred.', 'good');
+    updateFeedback('Correct. Solved stamp added and the placeholder token is revealed.', 'good');
   }else{
-    updateFeedback('Not this one. Compare both clue cards and try another system.', 'bad');
+    updateFeedback('Not this one. Compare both clue cards and try another BG token.', 'bad');
   }
   renderDeck();
   renderMystery();
@@ -807,25 +888,25 @@ function renderAll(){
 }
 
 function readyCards(){
-  return cards.filter(card => card.status === 'ready');
+  return cards;
 }
 
 function printClueCardHtml(card, clueIndex){
   const clueSet = (card.clues && card.clues[clueIndex]) || [];
   return '<article class="print-card">'
     + '<div class="print-mystery-mark">?</div>'
-    + '<h2>Who&#39;s That Blood Group!!!?</h2>'
-    + '<h3>Clue Card '+(clueIndex + 1)+'</h3>'
+    + '<h2>Who&#39;s That Blood Group?</h2>'
+    + '<h3>'+esc(card.label)+' Clue Card '+(clueIndex + 1)+'</h3>'
     + '<ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>'
-    + '<div class="print-token-spot">Match the blood group token here</div>'
+    + '<div class="print-token-spot">Match the BG token here</div>'
     + '</article>';
 }
 
 function renderPrintClues(){
   const printable = readyCards();
   return '<section class="print-clue-section print-page">'
-    + '<h1 class="print-title">Who&#39;s That Blood Group!!!? - Clue Cards</h1>'
-    + '<p class="print-subtitle">Black-and-white clue cards. Cut out, then match with the blood group token sheet.</p>'
+    + '<h1 class="print-title">Who&#39;s That Blood Group? - Placeholder Clue Cards</h1>'
+    + '<p class="print-subtitle">Black-and-white BG placeholders. Replace with final clue text when ready.</p>'
     + '<div class="print-grid">'
     + printable.flatMap(card => [printClueCardHtml(card, 0), printClueCardHtml(card, 1)]).join('')
     + '</div>'
@@ -834,8 +915,8 @@ function renderPrintClues(){
 
 function renderPrintTokens(){
   return '<section class="print-token-section print-page">'
-    + '<h1 class="print-title">Blood Group Tokens</h1>'
-    + '<p class="print-subtitle">Cut out the tokens and match them to clue cards.</p>'
+    + '<h1 class="print-title">BG Tokens</h1>'
+    + '<p class="print-subtitle">Placeholder BG tokens for the arena deck.</p>'
     + '<div class="print-token-grid">'
     + cards.map(card => '<div class="print-token '+(card.label.length > 10 ? 'long' : '')+'">'+esc(card.label)+'</div>').join('')
     + '</div>'
