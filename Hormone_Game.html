@@ -533,154 +533,161 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
 const puzzles = [
   {
     id:"oxytocin",
-    title:"Posterior Pituitary Puzzle 1",
+    title:"Oxytocin",
     code:"HP-1",
-    summary:"Reproductive smooth muscle and breast line.",
-    path:"Hypothalamus -> Oxytocin -> Posterior pituitary -> Uterus/Breast",
-    output:"Uterine contraction and lactation support",
+    summary:"Posterior pituitary line for uterus and breast.",
+    path:"Hypothalamus -> Oxytocin -> Posterior pituitary -> Uterus/Breast -> Lactation",
+    output:"Uterine contractions and milk letdown",
     entries:[
-      ["Hypothalamus","Map center that sends the posterior pituitary signal."],
-      ["Oxytocin","Posterior pituitary peptide connected to uterus and breast."],
-      ["Posterior Pituitary","Pituitary lobe that releases this peptide."],
-      ["Uterus","Target organ for contraction."],
-      ["Breast","Target organ for milk letdown."],
-      ["Lactation","Breast-related output connected to this line."]
+      ["Hypothalamus","What starts this line?"],
+      ["Oxytocin","What peptide does #1 send to the posterior pituitary?"],
+      ["Posterior","Which pituitary lobe releases #2?"],
+      ["Uterus","What organ does #2 stimulate for contractions?"],
+      ["Breast","What organ does #2 stimulate for milk letdown?"],
+      ["Lactation","What final action is tied to #5?"]
     ]
   },
   {
     id:"adh",
-    title:"Posterior Pituitary Puzzle 2",
+    title:"ADH / Vasopressin",
     code:"HP-2",
-    summary:"Water-balance and pressure-support line.",
-    path:"Osmoreceptors -> ADH -> Posterior pituitary -> Kidneys/Blood pressure",
+    summary:"Posterior pituitary line for water balance.",
+    path:"Hypothalamus -> ADH -> Posterior pituitary -> Kidneys -> Water/pressure",
     output:"Water retention and blood pressure support",
     entries:[
-      ["Osmoreceptors","Sensors that monitor water concentration."],
-      ["ADH","Posterior pituitary hormone also called vasopressin."],
-      ["Posterior Pituitary","Pituitary lobe that releases ADH."],
-      ["Kidneys","Direct effector for water retention."],
-      ["Blood Pressure","Indirect effect supported by ADH."],
-      ["Vasopressin","Another name for ADH."]
+      ["Hypothalamus","What starts this line?"],
+      ["ADH","What peptide does #1 send to the posterior pituitary?"],
+      ["Posterior","Which pituitary lobe releases #2?"],
+      ["Vasopressin","What is another name for #2?"],
+      ["Kidneys","What organ responds to #2?"],
+      ["Water","What does #5 retain?"],
+      ["Pressure","What vital sign can #2 support?"]
     ]
   },
   {
     id:"prolactin",
-    title:"Anterior Pituitary Puzzle 1",
+    title:"PRL / Prolactin",
     code:"HP-3",
     summary:"Lactotroph-control line.",
     path:"Dopamine -| Lactotroph -> PRL -> Breast",
     output:"Lactation",
     entries:[
-      ["Dopamine","Hypothalamus signal that inhibits lactotrophs."],
-      ["Anterior Pituitary","Pituitary lobe with lactotroph cells."],
-      ["Lactotroph","Pituitary cell that releases PRL."],
-      ["PRL","Peptide hormone released by lactotrophs."],
-      ["Breast","Target organ for PRL."],
-      ["Lactation","Final action for the PRL line."]
+      ["Hypothalamus","What starts this line?"],
+      ["Dopamine","What amine does #1 release to suppress this line?"],
+      ["Lactotroph","What pituitary cell is suppressed by #2?"],
+      ["PRL","What hormone does #3 release?"],
+      ["Breast","What target organ responds to #4?"],
+      ["Lactation","What final action comes from #5?"]
     ]
   },
   {
     id:"thyroid",
-    title:"Anterior Pituitary Puzzle 2",
+    title:"T3 / T4",
     code:"HP-4",
-    summary:"Metabolic heat-control line.",
+    summary:"Thyroid hormone line.",
     path:"TRH/Somatostatin -> Thyrotroph -> TSH -> Thyroid -> T3/T4",
-    output:"Thyroid hormone production",
+    output:"Thermogenesis and protein synthesis",
     entries:[
-      ["TRH","Hypothalamic peptide that stimulates thyrotrophs."],
-      ["Somatostatin","Hypothalamic peptide that inhibits this line."],
-      ["Anterior Pituitary","Pituitary lobe with thyrotroph cells."],
-      ["Thyrotroph","Pituitary cell that releases TSH."],
-      ["TSH","Glycoprotein hormone that stimulates the thyroid."],
-      ["Thyroid","Target gland for TSH."],
-      ["T3 T4","Thyroid hormones at the end of this map line."]
+      ["Hypothalamus","What starts this line?"],
+      ["TRH","What peptide from #1 stimulates this line?"],
+      ["Somatostatin","What peptide from #1 suppresses this line?"],
+      ["Thyrotroph","What pituitary cell does #2 stimulate?"],
+      ["TSH","What hormone does #4 release?"],
+      ["Thyroid","What gland does #5 stimulate?"],
+      ["T3/T4","What hormones does #6 release?"],
+      ["Thermogenesis","What major body action is tied to #7?"]
     ]
   },
   {
     id:"acth",
-    title:"Anterior Pituitary Puzzle 3",
+    title:"Cortisol",
     code:"HP-5",
     summary:"Stress-adrenal line.",
-    path:"CRH -> Corticotroph -> ACTH -> Adrenal -> Cortisol/DHEA",
-    output:"Cortisol and adrenal androgen signaling",
+    path:"CRH -> Corticotroph -> ACTH -> Adrenal -> Cortisol",
+    output:"Cell homeostasis and function",
     entries:[
-      ["CRH","Hypothalamic peptide that stimulates corticotrophs."],
-      ["Anterior Pituitary","Pituitary lobe with corticotroph cells."],
-      ["Corticotroph","Pituitary cell that releases ACTH."],
-      ["ACTH","Peptide hormone that stimulates adrenal cortex."],
-      ["Adrenal","Target gland for ACTH."],
-      ["Cortisol","Steroid hormone on this stress line."],
-      ["DHEA","Adrenal androgen shown with adrenal zones."]
+      ["Hypothalamus","What starts this line?"],
+      ["CRH","What peptide does #1 release?"],
+      ["Corticotroph","What pituitary cell does #2 stimulate?"],
+      ["ACTH","What hormone does #3 release?"],
+      ["Adrenal","What gland does #4 stimulate?"],
+      ["Cortisol","What steroid hormone does #5 release?"],
+      ["Homeostasis","What body function is tied to #6?"]
     ]
   },
   {
     id:"growth",
-    title:"Anterior Pituitary Puzzle 4",
+    title:"IGF-1",
     code:"HP-6",
-    summary:"Growth and lower-right gland connection.",
-    path:"GHRH/Somatostatin -> Somatotroph -> GH -> Liver/IGF-1 and adrenal connection",
-    output:"Growth, IGF-1, and adrenal-line connection",
+    summary:"Growth hormone line.",
+    path:"GHRH/Somatostatin -> Somatotroph -> GH -> Liver -> IGF-1",
+    output:"Growth and anabolic metabolism",
     entries:[
-      ["GHRH","Hypothalamic peptide that stimulates somatotrophs."],
-      ["Somatostatin","Hypothalamic peptide that inhibits somatotrophs."],
-      ["Somatotroph","Pituitary cell that releases growth hormone."],
-      ["GH","Growth hormone abbreviation."],
-      ["Liver","Target organ that releases IGF-1."],
-      ["IGF 1","Peptide downstream of GH from liver."],
-      ["Adrenal","Gland also connected in the GH/lower-right map area."]
+      ["Hypothalamus","What starts this line?"],
+      ["GHRH","What peptide from #1 stimulates this line?"],
+      ["Somatostatin","What peptide from #1 suppresses this line?"],
+      ["Somatotroph","What pituitary cell does #2 stimulate?"],
+      ["GH","What hormone does #4 release?"],
+      ["Liver","What organ does #5 stimulate for IGF-1?"],
+      ["IGF-1","What peptide does #6 release?"],
+      ["Adrenal","What gland does #5 also reach on the map?"],
+      ["Growth","What body effect is tied to #7?"]
     ]
   },
   {
     id:"fsh",
-    title:"Anterior Pituitary Puzzle 5",
+    title:"Inhibin / Follistatin",
     code:"HP-7",
     summary:"Gonadal support-feedback line.",
     path:"GnRH -> Gonadotroph -> FSH -> Ovary/Testis -> Inhibin",
     output:"Follicle and Sertoli-line feedback",
     entries:[
-      ["GnRH","Hypothalamic peptide that stimulates gonadotrophs."],
-      ["Gonadotroph","Pituitary cell that releases LH and FSH."],
-      ["FSH","Glycoprotein hormone on follicle/Sertoli line."],
-      ["Ovary","Female target organ on this line."],
-      ["Testis","Male target organ on this line."],
-      ["Inhibin","Feedback hormone shown from gonadal targets."]
+      ["Hypothalamus","What starts this line?"],
+      ["GnRH","What peptide does #1 release?"],
+      ["Gonadotroph","What pituitary cell does #2 stimulate?"],
+      ["FSH","What hormone does #3 release on this line?"],
+      ["Ovary","What female organ does #4 stimulate?"],
+      ["Testis","What male organ does #4 stimulate?"],
+      ["Inhibin","What feedback hormone comes from #5 and #6?"],
+      ["Follistatin","What other ovarian feedback hormone is shown?"]
     ]
   },
   {
     id:"lh",
-    title:"Anterior Pituitary Puzzle 6",
+    title:"Gonadal Steroids",
     code:"HP-8",
     summary:"Gonadal steroid line.",
     path:"GnRH -> Gonadotroph -> LH -> Ovary/Testis -> Steroids",
     output:"Estradiol, progesterone, and testosterone",
     entries:[
-      ["GnRH","Hypothalamic peptide that stimulates gonadotrophs."],
-      ["Gonadotroph","Pituitary cell that releases LH and FSH."],
-      ["LH","Glycoprotein hormone on steroid-producing gonadal line."],
-      ["Ovary","Target organ connected to estrogen and progesterone."],
-      ["Testis","Target organ connected to testosterone."],
-      ["Estradiol","Estrogen label shown near the ovary."],
-      ["Progesterone","Steroid label shown near the ovary."],
-      ["Testosterone","Steroid label shown near the testis."]
+      ["Hypothalamus","What starts this line?"],
+      ["GnRH","What peptide does #1 release?"],
+      ["Gonadotroph","What pituitary cell does #2 stimulate?"],
+      ["LH","What hormone does #3 release on this line?"],
+      ["Ovary","What female organ does #4 stimulate?"],
+      ["Testis","What male organ does #4 stimulate?"],
+      ["Estradiol","What estrogen is released from #5?"],
+      ["Progesterone","What other steroid is released from #5?"],
+      ["Testosterone","What steroid is released from #6?"]
     ]
   },
   {
     id:"raas",
-    title:"RAAS Puzzle",
+    title:"Aldosterone",
     code:"HP-9",
     summary:"Kidney-liver-lung-adrenal cascade.",
-    path:"Low blood pressure -> Renin -> Angiotensinogen -> ACE -> Angiotensin II -> Aldosterone",
+    path:"Hypotension -> RAAS -> Renin -> Angiotensinogen -> ACE -> Angiotensin II -> Aldosterone",
     output:"Aldosterone from zona glomerulosa",
     entries:[
-      ["Low Blood Pressure","Red trigger box that starts the RAAS line."],
-      ["Renin","Kidney release that begins the cascade."],
-      ["Angiotensinogen","Liver protein converted in the RAAS line."],
-      ["Angiotensin I","Intermediate before ACE conversion."],
-      ["ACE","Lung/vascular endothelial enzyme in the map."],
-      ["Angiotensin II","Product that stimulates adrenal cortex."],
-      ["Adrenal","Gland receiving the RAAS signal."],
-      ["Zona Glomerulosa","Adrenal cortex zone that produces aldosterone."],
-      ["Aldosterone","Steroid output at the end of the RAAS line."]
+      ["Hypotension","What blood pressure state starts this line?"],
+      ["RAAS","What cascade turns on after #1?"],
+      ["Renin","What kidney enzyme begins #2?"],
+      ["Angiotensinogen","What liver protein is converted in #2?"],
+      ["ACE","What enzyme keeps the cascade moving?"],
+      ["AngiotensinII","What active signal stimulates adrenal cortex?"],
+      ["Adrenal","What gland does #6 stimulate?"],
+      ["Glomerulosa","Which adrenal cortex zone makes the final hormone?"],
+      ["Aldosterone","What steroid hormone is released at the end?"]
     ]
   }
 ].map(puzzle => ({
@@ -778,19 +785,42 @@ function handleCellInput(event){
   if(value)focusNextCell(input);
 }
 
-function focusNextCell(input){
-  const cells = [...document.querySelectorAll(".cell-input")];
-  const index = cells.indexOf(input);
-  const next = cells[index + 1];
+function setActiveEntryFromCell(cellId){
+  const crossword = makeCrossword(currentPuzzle().entries);
+  const cell = crossword.cells.get(cellId);
+  if(!cell)return;
+  if(!cell.entries.includes(activeEntryIndex)){
+    activeEntryIndex = cell.entries[0];
+  }
+}
+
+function focusCell(cellId){
+  const next = document.querySelector(`.cell-input[data-cell="${cellId}"]`);
   if(next)next.focus();
+}
+
+function focusRelativeCell(input, direction){
+  const puzzle = currentPuzzle();
+  const crossword = makeCrossword(puzzle.entries);
+  const cellId = input.dataset.cell;
+  const cell = crossword.cells.get(cellId);
+  if(!cell)return;
+  if(!cell.entries.includes(activeEntryIndex))activeEntryIndex = cell.entries[0];
+  const placement = crossword.placements[activeEntryIndex];
+  if(!placement)return;
+  const index = placement.cells.findIndex(cell => `${cell.r},${cell.c}` === cellId);
+  if(index === -1)return;
+  const target = placement.cells[index + direction];
+  if(target)focusCell(`${target.r},${target.c}`);
+}
+
+function focusNextCell(input){
+  focusRelativeCell(input, 1);
 }
 
 function handleCellKey(event){
   if(event.key === "Backspace" && !event.target.value){
-    const cells = [...document.querySelectorAll(".cell-input")];
-    const index = cells.indexOf(event.target);
-    const previous = cells[index - 1];
-    if(previous)previous.focus();
+    focusRelativeCell(event.target, -1);
   }
 }
 
@@ -1018,7 +1048,7 @@ function renderCrossword(puzzle){
           const wrong = showWrong && value && value !== cell.letter;
           return `<label class="cell ${cellActive ? "active" : ""} ${wrong ? "wrong" : ""}">
             ${number ? `<span class="cell-number">${number}</span>` : ""}
-            <input class="cell-input" value="${esc(value)}" maxlength="1" inputmode="text" autocomplete="off" spellcheck="false" data-puzzle="${esc(puzzle.id)}" data-cell="${esc(id)}" oninput="handleCellInput(event)" onkeydown="handleCellKey(event)" aria-label="Crossword box${number ? " " + number : ""}">
+            <input class="cell-input" value="${esc(value)}" maxlength="1" inputmode="text" autocomplete="off" spellcheck="false" data-puzzle="${esc(puzzle.id)}" data-cell="${esc(id)}" onfocus="setActiveEntryFromCell('${esc(id)}')" oninput="handleCellInput(event)" onkeydown="handleCellKey(event)" aria-label="Crossword box${number ? " " + number : ""}">
           </label>`;
         }).join("")}
       </div>
@@ -1114,6 +1144,7 @@ window.openPuzzle = openPuzzle;
 window.backToHall = backToHall;
 window.clearPuzzle = clearPuzzle;
 window.selectEntry = selectEntry;
+window.setActiveEntryFromCell = setActiveEntryFromCell;
 window.handleCellInput = handleCellInput;
 window.handleCellKey = handleCellKey;
 window.checkCrossword = checkCrossword;
