@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hormone Game</title>
+<title>Hormone Crosswords</title>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css?v=hormone-crossword-1">
 <script src="interactive_music.js?v=hormone-game-2" defer></script>
@@ -234,6 +234,36 @@ body.hormone-game .mls-audio-btn{
   color:#fff;
   font-weight:1000;
 }
+.pathway-strip{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:8px;
+  margin-top:14px;
+}
+.pathway-step{
+  border:2px solid #bad4ea;
+  border-radius:15px;
+  background:#f8fcff;
+  padding:10px;
+  color:#10243a;
+  font-weight:1000;
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.pathway-step strong{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  color:#fff;
+  background:var(--chem);
+  box-shadow:0 4px 0 rgba(15,71,112,.18);
+}
+.pathway-step.active{border-color:var(--chem);background:#e7f5ff}
 .step-pills{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(38px,1fr));
@@ -256,6 +286,49 @@ body.hormone-game .mls-audio-btn{
 .clue-card{padding:16px;margin-top:14px}
 .clue-card h3{margin:0 0 8px;color:#10243a;font-size:22px}
 .clue-card p{margin:0 0 12px;color:#40536a;font-weight:900;line-height:1.35}
+.ordered-clues{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+.term-step{
+  border:2px solid #bad4ea;
+  border-radius:16px;
+  background:#fff;
+  color:#10243a;
+  padding:12px;
+  text-align:left;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:10px;
+  align-items:start;
+  cursor:pointer;
+  font-family:inherit;
+}
+.term-step.active{border-color:var(--chem);background:#e6f5ff;box-shadow:0 8px 18px rgba(41,128,185,.14)}
+.term-step-number{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:var(--chem);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:1000;
+}
+.term-step-name{
+  font-size:20px;
+  font-weight:1000;
+  line-height:1.05;
+}
+.term-step-clue{
+  display:block;
+  margin-top:4px;
+  color:#40536a;
+  font-size:14px;
+  font-weight:900;
+  line-height:1.25;
+}
 .answer-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
 .answer-input{
   width:100%;
@@ -324,8 +397,8 @@ body.hormone-game .mls-audio-btn{
   background:transparent;
   box-shadow:none;
 }
-.cell.active{background:#fff7d7;border-color:var(--gold)}
-.cell.solved{background:#edfbf4;border-color:#77bf9e}
+.cell.solved{background:#f8fcff;border-color:#86b9dc}
+.cell.active{background:#fff2be;border-color:#d39a25;box-shadow:0 0 0 3px rgba(244,189,79,.24)}
 .cell-number{
   position:absolute;
   top:1px;
@@ -399,6 +472,7 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
   color:#d8eaff !important;
 }
 @media print{
+  @page{size:letter landscape;margin:.5in}
   body{background:#fff!important;color:#000!important}
   .site-header,.screen-shell{display:none!important}
   .print-only{display:block!important;font-family:Arial,Helvetica,sans-serif;color:#000!important}
@@ -422,6 +496,22 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
   .answer-table{width:100%;border-collapse:collapse;font-size:9pt}
   .answer-table th,.answer-table td{border:1px solid #000;padding:.06in;text-align:left;vertical-align:top;color:#000!important}
   .answer-table th{font-weight:900}
+  .print-crossword{display:grid;gap:.03in;width:max-content;margin:.08in 0}
+  .print-cell{
+    width:.22in;
+    height:.22in;
+    border:1px solid #000;
+    display:grid;
+    place-items:center;
+    position:relative;
+    font-size:9pt;
+    font-weight:900;
+  }
+  .print-cell.empty{border-color:transparent}
+  .print-cell-number{position:absolute;top:0;left:.02in;font-size:5pt}
+  .print-ordered{width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:.08in}
+  .print-ordered th,.print-ordered td{border:1px solid #000;padding:.04in;color:#000!important;vertical-align:top}
+  .print-ordered th{font-weight:900}
 }
 </style>
 </head>
@@ -603,10 +693,9 @@ const puzzles = [
 
 let scene = new URLSearchParams(window.location.search).get("preview") === "puzzle" ? "puzzle" : "welcome";
 let activePuzzleId = scene === "puzzle" ? puzzles[0].id : "";
-let solved = {};
-let feedback = "Choose a hormone puzzle.";
+let activeEntryIndex = 0;
+let feedback = "Choose a hormone crossword.";
 let feedbackType = "";
-let typedAnswer = "";
 
 function normalize(value){
   return String(value).replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
@@ -620,22 +709,9 @@ function currentPuzzle(){
   return puzzles.find(puzzle => puzzle.id === activePuzzleId) || puzzles[0];
 }
 
-function solvedSet(puzzleId){
-  if(!solved[puzzleId])solved[puzzleId] = new Set();
-  return solved[puzzleId];
-}
-
-function activeIndex(puzzle){
-  return puzzle.entries.findIndex((entry, index) => !solvedSet(puzzle.id).has(index));
-}
-
-function isSolved(puzzle){
-  return activeIndex(puzzle) === -1;
-}
-
 function enterHall(){
   scene = "hall";
-  feedback = "Choose one puzzle line from the hormone map.";
+  feedback = "Choose one crossword line from the hormone map.";
   feedbackType = "";
   render();
 }
@@ -643,70 +719,33 @@ function enterHall(){
 function openPuzzle(id){
   activePuzzleId = id;
   scene = "puzzle";
-  typedAnswer = "";
-  feedback = "Solve the crossword one clue at a time.";
+  activeEntryIndex = 0;
+  feedback = "Everything is visible. Tap any numbered term to highlight it on the crossword.";
   feedbackType = "";
   render();
-  setTimeout(() => {
-    const input = document.getElementById("answerInput");
-    if(input && typeof input.focus === "function")input.focus();
-  }, 50);
 }
 
 function backToHall(){
   scene = "hall";
-  typedAnswer = "";
   feedbackType = "";
   render();
 }
 
 function clearPuzzle(){
   if(!activePuzzleId)return;
-  solved[activePuzzleId] = new Set();
-  typedAnswer = "";
-  feedback = "Puzzle cleared. Start again at step 1.";
+  activeEntryIndex = 0;
+  feedback = "Highlight reset to step 1.";
   feedbackType = "";
   render();
 }
 
-function submitStep(){
+function selectEntry(index){
   const puzzle = currentPuzzle();
-  const index = activeIndex(puzzle);
-  if(index === -1){
-    feedback = "This puzzle is already complete. Choose another hormone puzzle.";
-    feedbackType = "good";
-    render();
-    return;
-  }
-  const entry = puzzle.entries[index];
-  const given = normalize(typedAnswer || document.getElementById("answerInput")?.value || "");
-  if(given === entry.answer){
-    solvedSet(puzzle.id).add(index);
-    typedAnswer = "";
-    if(isSolved(puzzle)){
-      feedback = "Puzzle solved. Final output revealed: " + puzzle.output + ".";
-      feedbackType = "good";
-    }else{
-      feedback = "Correct. Next step unlocked.";
-      feedbackType = "good";
-    }
-  }else{
-    feedback = "Not yet. Stay on this step and try the map term again.";
-    feedbackType = "bad";
-  }
+  activeEntryIndex = Math.max(0, Math.min(index, puzzle.entries.length - 1));
+  const entry = puzzle.entries[activeEntryIndex];
+  feedback = `Step ${activeEntryIndex + 1} highlighted: ${entry.term}.`;
+  feedbackType = "";
   render();
-  setTimeout(() => {
-    const input = document.getElementById("answerInput");
-    if(input && typeof input.focus === "function")input.focus();
-  }, 50);
-}
-
-function handleAnswerInput(event){
-  typedAnswer = event.target.value;
-}
-
-function handleAnswerKey(event){
-  if(event.key === "Enter")submitStep();
 }
 
 function makeCrossword(entries){
@@ -797,8 +836,8 @@ function renderHero(){
   return `<section class="hero">
     <div class="hero-panel">
       <div class="eyebrow">Welcome to the endocrine arcade</div>
-      <h1 class="game-font">Hormone Game</h1>
-      <p class="hero-copy">Choose one hormone-map line, solve its crossword one step at a time, then reveal the final output.</p>
+      <h1 class="game-font">Hormone Crosswords</h1>
+      <p class="hero-copy">Choose one hormone-map line and study its numbered crossword. Every term is visible, so you can build the pathway in any order.</p>
       <button class="game-btn enter-btn" type="button" onclick="enterHall()">Enter the Hormone Puzzle Hall!</button>
     </div>
   </section>`;
@@ -809,20 +848,18 @@ function renderHall(){
     <div class="hero-panel">
       <div class="eyebrow">Choose your hormone puzzle</div>
       <h1 class="game-font">Puzzle Hall</h1>
-      <p class="hero-copy">Each card is one line from the hormone diagram. Pick one, solve only its map terms, then come back for another.</p>
+      <p class="hero-copy">Each card is one line from the hormone diagram. Pick one, read the numbered pathway, and use the crossword as the visual map.</p>
     </div>
   </section>
   <section class="puzzle-grid">
     ${puzzles.map((puzzle, index) => {
-      const done = solvedSet(puzzle.id).size;
-      const complete = done === puzzle.entries.length;
-      return `<button class="puzzle-card ${complete ? "solved" : ""}" type="button" onclick="openPuzzle('${esc(puzzle.id)}')">
+      return `<button class="puzzle-card" type="button" onclick="openPuzzle('${esc(puzzle.id)}')">
         <div>
           <span class="puzzle-number">${index + 1}</span>
           <h2 class="game-font">${esc(puzzle.title)}</h2>
           <p>${esc(puzzle.summary)}</p>
         </div>
-        <div class="puzzle-status">${done}/${puzzle.entries.length} crossword terms</div>
+        <div class="puzzle-status">${puzzle.entries.length} ordered crossword terms</div>
       </button>`;
     }).join("")}
   </section>`;
@@ -832,9 +869,10 @@ function renderToolbar(){
   return `<div class="toolbar">
     <div class="toolbar-left">
       <button class="game-btn primary-btn" type="button" onclick="backToHall()">Choose Another Puzzle</button>
-      <button class="game-btn danger-btn" type="button" onclick="clearPuzzle()">Clear This Puzzle</button>
+      <button class="game-btn danger-btn" type="button" onclick="clearPuzzle()">Reset Highlight</button>
     </div>
     <div class="toolbar-right">
+      <button class="game-btn print-btn" type="button" onclick="printCurrentPuzzle()">Print This Puzzle</button>
       <button class="game-btn print-btn" type="button" onclick="printGamePack()">Print Puzzle Pack</button>
       <button class="game-btn print-btn" type="button" onclick="printAnswerKey()">Print Answer Key</button>
     </div>
@@ -842,32 +880,31 @@ function renderToolbar(){
 }
 
 function renderPuzzleInfo(puzzle){
-  const solvedEntries = solvedSet(puzzle.id);
-  const current = activeIndex(puzzle);
-  const complete = current === -1;
-  const entry = complete ? null : puzzle.entries[current];
+  const current = Math.max(0, Math.min(activeEntryIndex, puzzle.entries.length - 1));
+  const entry = puzzle.entries[current];
   return `<section class="panel">
     <div class="eyebrow">Hormone puzzle</div>
     <h1 class="game-font puzzle-title">${esc(puzzle.title)}</h1>
-    <span class="map-line">${esc(puzzle.code)} / ${solvedEntries.size} of ${puzzle.entries.length}</span>
-    ${isSolved(puzzle) ? `<div class="mini-map">
-      ${puzzle.path.split("->").map(part => `<span>${esc(part.trim())}</span>`).join("")}
-    </div>` : `<div class="mini-map"><span>Path hidden until solved</span><span>${esc(puzzle.summary)}</span></div>`}
-    <div class="step-pills">
-      ${puzzle.entries.map((entryItem, index) => `<span class="step-pill ${index === current ? "active" : ""} ${solvedEntries.has(index) ? "solved" : ""}">${index + 1}</span>`).join("")}
+    <span class="map-line">${esc(puzzle.code)} / ${puzzle.entries.length} visible terms</span>
+    <div class="pathway-strip">
+      ${puzzle.entries.map((entryItem, index) => `<button class="pathway-step ${index === current ? "active" : ""}" type="button" onclick="selectEntry(${index})"><strong>${index + 1}</strong><span>${esc(entryItem.term)}</span></button>`).join("")}
     </div>
     <div class="clue-card">
-      ${complete ? `<h3>Crossword complete</h3>
-        <p>All terms from this map line are solved. The output is revealed below.</p>` : `<h3>Step ${current + 1}</h3>
-        <p>${esc(entry.clue)}</p>
-        <div class="answer-row">
-          <input class="answer-input" id="answerInput" type="text" value="${esc(typedAnswer)}" oninput="handleAnswerInput(event)" onkeydown="handleAnswerKey(event)" autocomplete="off" spellcheck="false" placeholder="Type the map term">
-          <button class="game-btn primary-btn" type="button" onclick="submitStep()">Submit Step</button>
-        </div>`}
+      <h3>Step ${current + 1}: ${esc(entry.term)}</h3>
+      <p>${esc(entry.clue)}</p>
+      <div class="ordered-clues">
+        ${puzzle.entries.map((entryItem, index) => `<button class="term-step ${index === current ? "active" : ""}" type="button" onclick="selectEntry(${index})">
+          <span class="term-step-number">${index + 1}</span>
+          <span>
+            <span class="term-step-name">${esc(entryItem.term)}</span>
+            <span class="term-step-clue">${esc(entryItem.clue)}</span>
+          </span>
+        </button>`).join("")}
+      </div>
     </div>
     <div class="feedback ${feedbackType}">${esc(feedback)}</div>
-    <div class="output-card ${complete ? "visible" : ""}">
-      <h3>Output Revealed</h3>
+    <div class="output-card visible">
+      <h3>Output</h3>
       <p>${esc(puzzle.output)}</p>
     </div>
   </section>`;
@@ -875,16 +912,15 @@ function renderPuzzleInfo(puzzle){
 
 function renderCrossword(puzzle){
   const crossword = makeCrossword(puzzle.entries);
-  const solvedEntries = solvedSet(puzzle.id);
-  const current = activeIndex(puzzle);
+  const current = Math.max(0, Math.min(activeEntryIndex, puzzle.entries.length - 1));
   return `<section class="crossword-shell">
     <div class="crossword-head">
       <div>
         <div class="panel-title">Crossword Board</div>
         <h2 class="game-font">${esc(puzzle.code)} Map Terms</h2>
-        <p>Only this hormone-map line is in this crossword.</p>
+        <p>All terms are visible. Tap any numbered term to highlight its letters.</p>
       </div>
-      <span class="map-line">${current === -1 ? "Solved" : "Step " + (current + 1)}</span>
+      <span class="map-line">Highlight step ${current + 1}</span>
     </div>
     <div class="crossword-board-wrap">
       <div class="crossword-board" style="grid-template-columns:repeat(${crossword.cols},28px)">
@@ -893,13 +929,11 @@ function renderCrossword(puzzle){
           const c = rawIndex % crossword.cols;
           const cell = crossword.cells.get(`${r},${c}`);
           if(!cell)return `<div class="cell empty" aria-hidden="true"></div>`;
-          const cellSolved = cell.entries.some(index => solvedEntries.has(index));
           const cellActive = current !== -1 && cell.entries.includes(current);
-          const showLetter = cellSolved;
           const number = cell.starts.length ? cell.starts[0] : "";
-          return `<div class="cell ${cellSolved ? "solved" : ""} ${cellActive ? "active" : ""}">
+          return `<div class="cell solved ${cellActive ? "active" : ""}">
             ${number ? `<span class="cell-number">${number}</span>` : ""}
-            <span class="cell-letter">${showLetter ? esc(cell.letter) : ""}</span>
+            <span class="cell-letter">${esc(cell.letter)}</span>
           </div>`;
         }).join("")}
       </div>
@@ -920,22 +954,22 @@ function printCard(puzzle){
   return `<article class="print-card">
     <h3>${esc(puzzle.code)}</h3>
     <h2>${esc(puzzle.title)}</h2>
-    <p><strong>Map line:</strong> ${esc(puzzle.path)}</p>
-    <ul>${puzzle.entries.map((entry, index) => `<li>${index + 1}. ${esc(entry.clue)}</li>`).join("")}</ul>
+    <p><strong>Output:</strong> ${esc(puzzle.output)}</p>
+    <ul>${puzzle.entries.map((entry, index) => `<li><strong>${index + 1}. ${esc(entry.term)}:</strong> ${esc(entry.clue)}</li>`).join("")}</ul>
   </article>`;
 }
 
 function renderPrintPack(){
   return `<section class="print-page">
-    <h1 class="print-title">Hormone Game - Crossword Puzzle Pack</h1>
-    <p class="print-note">Each card uses only terms from one hormone-map line.</p>
+    <h1 class="print-title">Hormone Crosswords - Puzzle Pack</h1>
+    <p class="print-note">Each card uses only terms from one hormone-map line. Numbers show pathway order.</p>
     <div class="print-grid">${puzzles.map(printCard).join("")}</div>
   </section>`;
 }
 
 function renderPrintKey(){
   return `<section class="print-page">
-    <h1 class="print-title">Hormone Game - Answer Key</h1>
+    <h1 class="print-title">Hormone Crosswords - Answer Key</h1>
     <table class="answer-table">
       <thead><tr><th>Puzzle</th><th>Terms in order</th><th>Output</th></tr></thead>
       <tbody>${puzzles.map(puzzle => `<tr>
@@ -947,6 +981,32 @@ function renderPrintKey(){
   </section>`;
 }
 
+function renderPrintCrossword(puzzle){
+  const crossword = makeCrossword(puzzle.entries);
+  return `<div class="print-crossword" style="grid-template-columns:repeat(${crossword.cols},.22in)">
+    ${Array.from({length:crossword.rows * crossword.cols}, (_, rawIndex) => {
+      const r = Math.floor(rawIndex / crossword.cols);
+      const c = rawIndex % crossword.cols;
+      const cell = crossword.cells.get(`${r},${c}`);
+      if(!cell)return `<div class="print-cell empty"></div>`;
+      const number = cell.starts.length ? cell.starts[0] : "";
+      return `<div class="print-cell">${number ? `<span class="print-cell-number">${number}</span>` : ""}${esc(cell.letter)}</div>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderPrintPuzzle(puzzle){
+  return `<section class="print-page">
+    <h1 class="print-title">${esc(puzzle.code)} - ${esc(puzzle.title)}</h1>
+    <p class="print-note">Hormone Crosswords. Numbers show pathway order. Output: ${esc(puzzle.output)}</p>
+    ${renderPrintCrossword(puzzle)}
+    <table class="print-ordered">
+      <thead><tr><th>#</th><th>Term</th><th>Clue</th></tr></thead>
+      <tbody>${puzzle.entries.map((entry, index) => `<tr><td>${index + 1}</td><td>${esc(entry.term)}</td><td>${esc(entry.clue)}</td></tr>`).join("")}</tbody>
+    </table>
+  </section>`;
+}
+
 function doPrint(markup){
   document.getElementById("print-area").innerHTML = markup;
   setTimeout(() => window.print(), 80);
@@ -954,6 +1014,7 @@ function doPrint(markup){
 
 function printGamePack(){doPrint(renderPrintPack())}
 function printAnswerKey(){doPrint(renderPrintKey())}
+function printCurrentPuzzle(){doPrint(renderPrintPuzzle(currentPuzzle()))}
 
 function render(){
   const root = document.getElementById("app");
@@ -966,14 +1027,13 @@ window.enterHall = enterHall;
 window.openPuzzle = openPuzzle;
 window.backToHall = backToHall;
 window.clearPuzzle = clearPuzzle;
-window.submitStep = submitStep;
-window.handleAnswerInput = handleAnswerInput;
-window.handleAnswerKey = handleAnswerKey;
+window.selectEntry = selectEntry;
 window.printGamePack = printGamePack;
 window.printAnswerKey = printAnswerKey;
+window.printCurrentPuzzle = printCurrentPuzzle;
 
 if(scene === "puzzle"){
-  feedback = "Solve the crossword one clue at a time.";
+  feedback = "Everything is visible. Tap any numbered term to highlight it on the crossword.";
 }
 render();
 </script>
