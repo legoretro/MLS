@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hormone Game</title>
 <script src="interactive_theme.js"></script>
-<link rel="stylesheet" href="interactive_learning.css?v=hormone-game-1">
+<link rel="stylesheet" href="interactive_learning.css?v=hormone-crossword-1">
 <script src="interactive_music.js?v=hormone-game-2" defer></script>
 <style>
 :root{
@@ -15,7 +15,7 @@
   --chem-soft:#e6f5ff;
   --chem-glow:#bde8ff;
   --ink:#122033;
-  --muted:#66728d;
+  --muted:#54657c;
   --panel:#ffffff;
   --line:#bad4ea;
   --good:#1f9d64;
@@ -33,15 +33,11 @@ body.hormone-game{
     radial-gradient(circle at 14% 0%,rgba(41,128,185,.22),transparent 30%),
     linear-gradient(180deg,#f4f9ff 0%,#e6eef8 100%);
 }
-body.hormone-game .site-header{
-  border-bottom-color:var(--chem);
-}
+body.hormone-game .site-header{border-bottom-color:var(--chem)}
 body.hormone-game .site-header .logo,
 body.hormone-game .mls-home-btn,
 body.hormone-game .mls-theme-btn,
-body.hormone-game .mls-audio-btn{
-  color:var(--chem-dark);
-}
+body.hormone-game .mls-audio-btn{color:var(--chem-dark)}
 body.hormone-game .mls-home-btn,
 body.hormone-game .mls-theme-btn,
 body.hormone-game .mls-audio-btn{
@@ -53,7 +49,7 @@ body.hormone-game .mls-audio-btn{
   font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
   letter-spacing:.01em;
 }
-.hero,.panel,.map-card,.slot,.path-card,.study-map{
+.hero,.panel,.puzzle-card,.crossword-shell,.clue-card,.output-card{
   background:rgba(255,255,255,.94);
   border:2px solid var(--line);
   border-radius:20px;
@@ -69,10 +65,10 @@ body.hormone-game .mls-audio-btn{
   overflow:hidden;
   background:
     radial-gradient(circle at 22% 20%,rgba(255,255,255,.9),transparent 18%),
-    radial-gradient(circle at 78% 18%,rgba(41,128,185,.20),transparent 24%),
+    radial-gradient(circle at 78% 18%,rgba(41,128,185,.2),transparent 24%),
     linear-gradient(135deg,#f8fdff 0%,#d7f0ff 48%,#16486b 100%);
 }
-.hero::before,.hero::after{
+.hero::before,.hero::after,.hall-hero::before,.hall-hero::after{
   content:"";
   position:absolute;
   width:250px;
@@ -80,10 +76,11 @@ body.hormone-game .mls-audio-btn{
   border:14px solid rgba(9,40,63,.18);
   border-radius:34% 66% 48% 52%;
   transform:rotate(-22deg);
+  pointer-events:none;
 }
-.hero::before{left:-88px;top:96px}
-.hero::after{right:-72px;bottom:68px}
-.hero-panel{position:relative;z-index:1;max-width:860px}
+.hero::before,.hall-hero::before{left:-88px;top:96px}
+.hero::after,.hall-hero::after{right:-72px;bottom:68px}
+.hero-panel{position:relative;z-index:1;max-width:900px}
 .eyebrow{
   color:var(--chem-dark);
   font-size:13px;
@@ -91,23 +88,23 @@ body.hormone-game .mls-audio-btn{
   letter-spacing:.22em;
   text-transform:uppercase;
 }
-.hero h1{
+.hero h1,.hall-hero h1{
   margin:8px 0 10px;
   color:#10243a;
   font-size:clamp(52px,9vw,118px);
   line-height:.86;
   font-weight:1000;
-  text-shadow:7px 8px 0 rgba(255,255,255,.72), 11px 12px 0 rgba(41,128,185,.22);
+  text-shadow:7px 8px 0 rgba(255,255,255,.72),11px 12px 0 rgba(41,128,185,.22);
 }
 .hero-copy{
   margin:12px auto 22px;
-  max-width:760px;
+  max-width:780px;
   font-size:21px;
   line-height:1.35;
   color:#18334c;
   font-weight:900;
 }
-.enter-btn,.primary-btn,.ghost-btn,.danger-btn,.print-btn{
+.game-btn{
   border:0;
   border-radius:999px;
   padding:12px 16px;
@@ -121,10 +118,14 @@ body.hormone-game .mls-audio-btn{
   color:#fff;
   padding:22px 28px;
   font-size:26px;
-  box-shadow:0 12px 0 #0d4166, 0 26px 42px rgba(0,0,0,.23);
+  box-shadow:0 12px 0 #0d4166,0 26px 42px rgba(0,0,0,.23);
   transform:rotate(-1deg);
 }
 .enter-btn:hover{transform:translateY(-2px) rotate(-1deg)}
+.primary-btn{background:var(--chem);color:#fff}
+.ghost-btn{background:#fff;color:var(--chem-dark);border:2px solid #9fc4df}
+.danger-btn{background:#fff2f4;color:#7b1f31;border:2px solid #efb3bf}
+.print-btn{background:#fefefe;color:var(--chem-dark);border:2px solid #9fc4df}
 .toolbar{
   display:flex;
   flex-wrap:wrap;
@@ -133,17 +134,84 @@ body.hormone-game .mls-audio-btn{
   margin-bottom:14px;
 }
 .toolbar-left,.toolbar-right{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.primary-btn{background:var(--chem);color:#fff}
-.ghost-btn{background:#fff;color:var(--chem-dark);border:2px solid #9fc4df}
-.danger-btn{background:#fff2f4;color:#7b1f31;border:2px solid #efb3bf}
-.print-btn{background:#fefefe;color:var(--chem-dark);border:2px solid #9fc4df}
-.board-grid{
+.hall-hero{
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  min-height:330px;
   display:grid;
-  grid-template-columns:minmax(300px,.78fr) minmax(440px,1.22fr);
+  place-items:center;
+  padding:34px 22px;
+  margin-bottom:18px;
+  border:2px solid var(--chem);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 22% 18%,rgba(255,255,255,.9),transparent 22%),
+    radial-gradient(circle at 76% 20%,rgba(41,128,185,.2),transparent 24%),
+    linear-gradient(135deg,#f8fdff 0%,#d9f1ff 52%,#2a7fb7 100%);
+  box-shadow:var(--shadow);
+}
+.hall-hero h1{font-size:clamp(48px,7vw,92px)}
+.puzzle-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.puzzle-card{
+  min-height:176px;
+  text-align:left;
+  padding:18px;
+  cursor:pointer;
+  display:grid;
+  align-content:space-between;
+  color:var(--ink);
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+.puzzle-card:hover{
+  transform:translateY(-3px);
+  border-color:var(--chem);
+  box-shadow:0 22px 42px rgba(41,128,185,.17);
+}
+.puzzle-card.solved{border-color:var(--good);background:#edfbf4}
+.puzzle-number{
+  display:inline-flex;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  align-items:center;
+  justify-content:center;
+  background:var(--chem);
+  color:#fff;
+  font-weight:1000;
+  box-shadow:0 5px 0 rgba(15,71,112,.22);
+}
+.puzzle-card h2{
+  margin:12px 0 8px;
+  font-size:26px;
+  line-height:1;
+  color:#10243a;
+}
+.puzzle-card p{
+  margin:0;
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.35;
+}
+.puzzle-status{
+  margin-top:16px;
+  font-size:12px;
+  font-weight:1000;
+  color:var(--chem-dark);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.puzzle-layout{
+  display:grid;
+  grid-template-columns:minmax(320px,.72fr) minmax(520px,1.28fr);
   gap:16px;
   align-items:start;
 }
-.panel{padding:16px}
+.panel{padding:18px}
 .panel-title{
   color:var(--chem-dark);
   font-size:14px;
@@ -152,427 +220,53 @@ body.hormone-game .mls-audio-btn{
   text-transform:uppercase;
   margin-bottom:10px;
 }
-.build-layout{
-  display:grid;
-  grid-template-columns:minmax(260px,.82fr) minmax(300px,1.18fr);
-  gap:14px;
-  align-items:start;
+.puzzle-title{
+  margin:4px 0 12px;
+  font-size:clamp(32px,5vw,54px);
+  line-height:.9;
+  color:#10243a;
 }
-.map-card{
-  min-height:260px;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.96),rgba(225,244,255,.96)),
-    repeating-linear-gradient(45deg,transparent 0 14px,rgba(41,128,185,.07) 14px 17px);
-  padding:18px;
-  position:relative;
-  overflow:hidden;
-}
-.map-card.empty{
-  display:grid;
-  place-items:center;
-  text-align:center;
-}
-.map-card h2{margin:0;color:#10243a;font-size:30px;line-height:1}
-.map-goal{
+.map-line{
   display:inline-flex;
-  margin:10px 0;
-  padding:7px 11px;
   border-radius:999px;
+  padding:8px 11px;
   background:#0f4770;
   color:#fff;
   font-weight:1000;
 }
-.map-meta{
+.step-pills{
   display:grid;
-  gap:7px;
-  margin-top:10px;
-  font-weight:900;
-  color:#284861;
+  grid-template-columns:repeat(auto-fit,minmax(38px,1fr));
+  gap:6px;
+  margin-top:14px;
 }
-.map-meta span{
-  display:block;
-  border:1px solid #bad4ea;
-  border-radius:12px;
-  padding:8px 10px;
-  background:#fff;
-}
-.case-chart{
+.step-pill{
+  min-height:34px;
+  border:2px solid #9fc4df;
+  border-radius:999px;
   display:grid;
-  gap:8px;
-  margin-top:12px;
-}
-.case-row{
-  display:grid;
-  grid-template-columns:110px 1fr;
-  gap:10px;
-  align-items:start;
-  border:1px solid #bad4ea;
-  border-radius:13px;
-  padding:9px 10px;
-  background:#fff;
-  color:#284861;
-  font-weight:900;
-}
-.case-row strong{
-  color:var(--chem-dark);
+  place-items:center;
   font-size:11px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
+  font-weight:1000;
+  color:var(--chem-dark);
+  background:#fff;
 }
-.case-question{
-  margin-top:12px;
-  border:2px dashed #9fc4df;
+.step-pill.active{border-color:var(--chem);background:#e6f5ff}
+.step-pill.solved{border-color:var(--good);background:#edfbf4;color:#176540}
+.clue-card{padding:16px;margin-top:14px}
+.clue-card h3{margin:0 0 8px;color:#10243a;font-size:22px}
+.clue-card p{margin:0 0 12px;color:#40536a;font-weight:900;line-height:1.35}
+.answer-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.answer-input{
+  width:100%;
+  min-height:48px;
+  border:2px solid #9fc4df;
   border-radius:14px;
   padding:10px 12px;
-  background:#f8fcff;
-  color:#123f62;
-  font-weight:1000;
-  line-height:1.35;
-}
-.progress-strip{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:6px;
-  margin-top:12px;
-}
-.progress-dot{
-  min-height:34px;
-  border-radius:999px;
-  border:2px solid #9fc4df;
-  display:grid;
-  place-items:center;
-  font-size:11px;
-  font-weight:1000;
-  color:var(--chem-dark);
-  background:#fff;
-  cursor:pointer;
-  font-family:inherit;
-}
-.progress-dot.active{border-color:var(--chem);background:#e6f5ff;box-shadow:0 0 0 3px rgba(41,128,185,.13)}
-.progress-dot.solved{
-  border-color:var(--good);
-  background:#e7fbf1;
-  color:#136b43;
-}
-.ladder-wrap,.choice-panel{
-  background:#f8fcff;
-  border:2px solid #bad4ea;
-  border-radius:18px;
-  padding:14px;
-}
-.ladder-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:7px;
-}
-.ladder-head .panel-title{margin:0}
-.ladder-status{
-  display:inline-flex;
-  align-items:center;
-  border-radius:999px;
-  padding:5px 9px;
-  background:#e6f5ff;
-  color:var(--chem-dark);
-  font-size:11px;
-  font-weight:1000;
-}
-.ladder-note,.choice-note{
-  margin:0 0 12px;
-  color:#40536a;
-  font-size:13px;
-  line-height:1.35;
-  font-weight:900;
-}
-.slots{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-}
-.slot{
-  min-height:94px;
-  padding:10px;
-  display:grid;
-  grid-template-columns:36px 1fr;
-  align-content:start;
-  align-items:start;
-  gap:7px;
-  border-style:dashed;
-  background:#f8fcff;
-  cursor:pointer;
-  text-align:left;
-  width:100%;
-  position:relative;
-}
-.slot.filled{
-  border-style:solid;
-  background:#fff;
-}
-.slot.active{
-  border-color:var(--chem);
-  background:#eef8ff;
-  box-shadow:0 0 0 4px rgba(41,128,185,.12);
-}
-.slot.correct{border-color:var(--good);background:#edfbf4}
-.slot.wrong{border-color:var(--bad);background:#fff1f3}
-.slot-number{
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  background:var(--chem);
-  color:#fff;
-  font-size:14px;
-  font-weight:1000;
-  box-shadow:0 4px 0 rgba(15,71,112,.22);
-}
-.slot-kicker{
-  color:var(--chem-dark);
-  font-size:11px;
-  font-weight:1000;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-}
-.slot-label{font-size:17px;font-weight:1000;color:#10243a;line-height:1.05}
-.slot-copy{font-size:12px;line-height:1.25;color:#40536a;font-weight:800}
-.ladder-arrow{
-  display:grid;
-  place-items:center;
-  height:28px;
-  color:var(--chem);
-  font-size:24px;
-  line-height:1;
-  font-weight:1000;
-}
-.choice-head{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:7px;
-}
-.choice-head .panel-title{margin:0}
-.current-step{
-  display:inline-flex;
-  border-radius:999px;
-  padding:6px 10px;
-  background:var(--chem);
-  color:#fff;
-  font-size:12px;
-  font-weight:1000;
-}
-.choice-empty{
-  min-height:160px;
-  border:2px dashed #9fc4df;
-  border-radius:16px;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  padding:18px;
-  color:#123f62;
-  background:#fff;
-  font-weight:1000;
-  line-height:1.35;
-}
-.visual-map{
-  border:2px solid #9fc4df;
-  border-radius:18px;
-  background:linear-gradient(180deg,#ffffff 0%,#eef8ff 100%);
-  padding:16px;
-  margin-bottom:14px;
-  overflow:hidden;
-}
-.map-mission{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:space-between;
-  gap:10px;
-  align-items:center;
-  margin-bottom:14px;
-}
-.map-mission strong{
+  font:1000 18px/1.1 "Trebuchet MS",Arial,Helvetica,sans-serif;
   color:#10243a;
-  font-size:22px;
-  line-height:1;
-}
-.map-mission span{
-  color:#40536a;
-  font-size:13px;
-  font-weight:900;
-}
-.map-track{
-  display:grid;
-  grid-template-columns:1fr 42px 1fr 42px 1fr;
-  align-items:stretch;
-}
-.map-node{
-  min-height:190px;
-  display:grid;
-  align-content:center;
-  gap:8px;
-  text-align:center;
-  border:3px dashed #9fc4df;
-  border-radius:22px;
-  padding:16px 12px;
-  background:#f8fcff;
-  transition:.2s ease;
-}
-.visual-map.built .map-node{
-  border-style:solid;
-  border-color:var(--chem);
   background:#fff;
-  box-shadow:0 12px 26px rgba(41,128,185,.14);
 }
-.visual-map.revealed .map-node.output-node{
-  border-color:var(--good);
-  background:#edfbf4;
-}
-.visual-map.locked .map-node.output-node{
-  background:
-    repeating-linear-gradient(-45deg,#f8fcff 0 12px,#eef8ff 12px 24px);
-}
-.node-zone{
-  color:var(--chem-dark);
-  font-size:12px;
-  font-weight:1000;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-}
-.node-name{
-  color:#10243a;
-  font-family:"Cooper Black","Arial Black","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;
-  font-size:clamp(26px,4vw,42px);
-  line-height:.95;
-}
-.node-detail{
-  color:#40536a;
-  font-size:13px;
-  font-weight:900;
-  line-height:1.25;
-}
-.map-arrow{
-  display:grid;
-  place-items:center;
-  color:var(--chem);
-  font-size:34px;
-  font-weight:1000;
-}
-.route-token-grid{
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:9px;
-}
-.route-token{
-  min-height:92px;
-  border:2px solid #9fc4df;
-  border-radius:17px;
-  background:#fff;
-  color:#10243a;
-  padding:10px;
-  display:grid;
-  gap:7px;
-  align-content:center;
-  justify-items:center;
-  font-family:inherit;
-  font-weight:1000;
-  cursor:pointer;
-  box-shadow:0 6px 0 rgba(41,128,185,.12);
-}
-.route-token:hover,
-.route-token.active{
-  border-color:var(--chem);
-  transform:translateY(-1px);
-}
-.route-token.active{
-  background:#e6f5ff;
-}
-.route-token.solved{
-  border-color:var(--good);
-  background:#edfbf4;
-}
-.route-token-path{
-  display:grid;
-  grid-template-columns:repeat(3,18px);
-  gap:8px;
-  align-items:center;
-}
-.route-token-path span{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:var(--chem);
-  box-shadow:0 0 0 4px rgba(41,128,185,.13);
-}
-.route-token-name{
-  font-size:14px;
-  line-height:1;
-}
-.visual-helper{
-  margin:10px 0 0;
-  color:#40536a;
-  font-size:13px;
-  font-weight:900;
-  line-height:1.35;
-}
-.card-bank{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:9px;
-}
-.word-bank-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-.word-bank{
-  display:grid;
-  gap:8px;
-}
-.word-bank-title{
-  color:var(--chem-dark);
-  font-size:12px;
-  font-weight:1000;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-.word-bank .path-card{
-  min-height:74px;
-  padding:10px;
-}
-.word-bank .path-card h3{font-size:17px}
-.word-bank .path-card p{display:none}
-.path-card{
-  min-height:124px;
-  padding:12px;
-  text-align:left;
-  cursor:pointer;
-  transition:.15s ease;
-}
-.path-card:hover{transform:translateY(-2px);border-color:var(--chem)}
-.path-card.used{opacity:.58}
-.word-bank .path-card.used{
-  opacity:1;
-  border-color:var(--good);
-  background:#edfbf4;
-}
-.path-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,189,79,.23)}
-.card-type{
-  display:inline-flex;
-  margin-bottom:8px;
-  border-radius:999px;
-  padding:4px 8px;
-  background:#e6f5ff;
-  color:var(--chem-dark);
-  font-size:10px;
-  font-weight:1000;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-.path-card h3{margin:0;color:#10243a;font-size:18px;line-height:1.02}
-.path-card p{margin:7px 0 0;color:#526178;font-size:12px;line-height:1.28;font-weight:800}
 .feedback{
   margin-top:12px;
   min-height:48px;
@@ -586,29 +280,124 @@ body.hormone-game .mls-audio-btn{
 }
 .feedback.good{border-color:rgba(31,157,100,.55);background:#edfbf4;color:#176540}
 .feedback.bad{border-color:rgba(214,77,95,.55);background:#fff1f3;color:#8b2738}
-.study-map{
+.output-card{
   margin-top:14px;
-  padding:14px;
+  padding:16px;
   display:none;
 }
-.study-map.visible{display:block}
-.study-map h3{margin:0 0 8px;color:var(--chem-dark);font-size:17px}
-.study-map-grid{
+.output-card.visible{display:block}
+.output-card h3{margin:0 0 8px;color:#176540;font-size:25px}
+.output-card p{margin:0;color:#263d34;font-weight:900;line-height:1.35}
+.crossword-shell{padding:18px;overflow:hidden}
+.crossword-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:12px;
+}
+.crossword-head h2{margin:0;color:#10243a;font-size:30px}
+.crossword-head p{margin:5px 0 0;color:var(--muted);font-weight:900}
+.crossword-board-wrap{overflow:auto;padding-bottom:6px}
+.crossword-board{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:3px;
+  justify-content:start;
+  width:max-content;
+  min-width:100%;
+}
+.cell{
+  width:28px;
+  height:28px;
+  border:2px solid #86b9dc;
+  border-radius:7px;
+  background:#fff;
+  display:grid;
+  place-items:center;
+  position:relative;
+  font-weight:1000;
+  color:#10243a;
+  box-shadow:0 2px 0 rgba(41,128,185,.12);
+}
+.cell.empty{
+  border-color:transparent;
+  background:transparent;
+  box-shadow:none;
+}
+.cell.active{background:#fff7d7;border-color:var(--gold)}
+.cell.solved{background:#edfbf4;border-color:#77bf9e}
+.cell-number{
+  position:absolute;
+  top:1px;
+  left:3px;
+  font-size:8px;
+  color:var(--chem-dark);
+  line-height:1;
+}
+.cell-letter{font-size:15px;line-height:1}
+.mini-map{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
   gap:8px;
 }
-.study-map-grid div{
-  border:1px solid #bad4ea;
-  border-radius:12px;
+.mini-map span{
+  border:2px solid #bad4ea;
+  border-radius:13px;
+  background:#f8fcff;
   padding:9px;
-  background:#fff;
-  font-weight:900;
-  font-size:13px;
-  line-height:1.3;
+  text-align:center;
+  color:#10243a;
+  font-weight:1000;
+  min-height:46px;
+  display:grid;
+  place-items:center;
 }
 .print-only{display:none}
-@page hormoneCards{size:letter;margin:.28in}
+@media(max-width:980px){
+  .puzzle-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .puzzle-layout{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .screen-shell{padding:14px}
+  .hero{min-height:540px}
+  .hero-copy{font-size:17px}
+  .enter-btn{font-size:20px;padding:18px 20px}
+  .toolbar{display:grid}
+  .toolbar-left,.toolbar-right{display:grid;grid-template-columns:1fr 1fr}
+  .puzzle-grid{grid-template-columns:1fr}
+  .answer-row{grid-template-columns:1fr}
+  .cell{width:24px;height:24px;border-radius:6px}
+  .cell-letter{font-size:13px}
+}
+html[data-mls-theme="dark"] body.hormone-game{
+  background:
+    radial-gradient(circle at 14% 0%,rgba(41,128,185,.18),transparent 30%),
+    linear-gradient(180deg,#07101d 0%,#111827 100%) !important;
+  color:#f4f9ff;
+}
+html[data-mls-theme="dark"] body.hormone-game .panel,
+html[data-mls-theme="dark"] body.hormone-game .puzzle-card,
+html[data-mls-theme="dark"] body.hormone-game .crossword-shell,
+html[data-mls-theme="dark"] body.hormone-game .clue-card,
+html[data-mls-theme="dark"] body.hormone-game .output-card{
+  background:#101a2b !important;
+  border-color:#406996 !important;
+  color:#f4f9ff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game h1,
+html[data-mls-theme="dark"] body.hormone-game h2,
+html[data-mls-theme="dark"] body.hormone-game h3,
+html[data-mls-theme="dark"] body.hormone-game .puzzle-title,
+html[data-mls-theme="dark"] body.hormone-game .crossword-head h2{
+  color:#fff !important;
+}
+html[data-mls-theme="dark"] body.hormone-game .puzzle-card p,
+html[data-mls-theme="dark"] body.hormone-game .clue-card p,
+html[data-mls-theme="dark"] body.hormone-game .crossword-head p,
+html[data-mls-theme="dark"] body.hormone-game .feedback{
+  color:#d8eaff !important;
+}
 @media print{
   body{background:#fff!important;color:#000!important}
   .site-header,.screen-shell{display:none!important}
@@ -621,7 +410,7 @@ body.hormone-game .mls-audio-btn{
     border:2px solid #000;
     border-radius:.12in;
     padding:.12in;
-    min-height:2.05in;
+    min-height:1.85in;
     break-inside:avoid;
     color:#000!important;
     background:#fff!important;
@@ -633,98 +422,6 @@ body.hormone-game .mls-audio-btn{
   .answer-table{width:100%;border-collapse:collapse;font-size:9pt}
   .answer-table th,.answer-table td{border:1px solid #000;padding:.06in;text-align:left;vertical-align:top;color:#000!important}
   .answer-table th{font-weight:900}
-}
-html[data-mls-theme="dark"] body.hormone-game{
-  background:
-    radial-gradient(circle at 14% 0%,rgba(41,128,185,.18),transparent 30%),
-    linear-gradient(180deg,#07101d 0%,#111827 100%) !important;
-  color:#f4f9ff;
-}
-html[data-mls-theme="dark"] body.hormone-game .panel,
-html[data-mls-theme="dark"] body.hormone-game .map-card,
-html[data-mls-theme="dark"] body.hormone-game .ladder-wrap,
-html[data-mls-theme="dark"] body.hormone-game .choice-panel,
-html[data-mls-theme="dark"] body.hormone-game .visual-map,
-html[data-mls-theme="dark"] body.hormone-game .study-map{
-  background:#101a2b !important;
-  border-color:#406996 !important;
-  color:#f4f9ff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .panel-title,
-html[data-mls-theme="dark"] body.hormone-game .eyebrow,
-html[data-mls-theme="dark"] body.hormone-game .case-row strong,
-html[data-mls-theme="dark"] body.hormone-game .slot-kicker,
-html[data-mls-theme="dark"] body.hormone-game .node-zone,
-html[data-mls-theme="dark"] body.hormone-game .study-map h3{
-  color:#bde8ff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .map-card h2,
-html[data-mls-theme="dark"] body.hormone-game .slot-label,
-html[data-mls-theme="dark"] body.hormone-game .map-mission strong,
-html[data-mls-theme="dark"] body.hormone-game .node-name,
-html[data-mls-theme="dark"] body.hormone-game .route-token,
-html[data-mls-theme="dark"] body.hormone-game .path-card h3{
-  color:#ffffff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .case-row,
-html[data-mls-theme="dark"] body.hormone-game .case-question,
-html[data-mls-theme="dark"] body.hormone-game .slot,
-html[data-mls-theme="dark"] body.hormone-game .path-card,
-html[data-mls-theme="dark"] body.hormone-game .map-node,
-html[data-mls-theme="dark"] body.hormone-game .route-token,
-html[data-mls-theme="dark"] body.hormone-game .choice-empty,
-html[data-mls-theme="dark"] body.hormone-game .study-map-grid div{
-  background:#17243a !important;
-  border-color:#5d82ab !important;
-  color:#e8f5ff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .slot.active{
-  background:#123a5b !important;
-  border-color:#87d8ff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .slot-copy,
-html[data-mls-theme="dark"] body.hormone-game .path-card p,
-html[data-mls-theme="dark"] body.hormone-game .map-mission span,
-html[data-mls-theme="dark"] body.hormone-game .node-detail,
-html[data-mls-theme="dark"] body.hormone-game .visual-helper,
-html[data-mls-theme="dark"] body.hormone-game .choice-note,
-html[data-mls-theme="dark"] body.hormone-game .ladder-note{
-  color:#d8eaff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .card-type,
-html[data-mls-theme="dark"] body.hormone-game .ladder-status{
-  background:#244d72 !important;
-  color:#dff4ff !important;
-}
-html[data-mls-theme="dark"] body.hormone-game .feedback{
-  background:#17243a !important;
-  border-color:#5d82ab !important;
-  color:#e8f5ff !important;
-}
-@media(max-width:960px){
-  .board-grid{grid-template-columns:1fr}
-  .build-layout{grid-template-columns:1fr}
-  .word-bank-grid{grid-template-columns:1fr}
-  .card-bank{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .map-track{grid-template-columns:1fr;gap:8px}
-  .map-arrow{font-size:28px;transform:rotate(90deg)}
-  .map-node{min-height:132px}
-  .route-token-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:620px){
-  .screen-shell{padding:14px}
-  .hero{min-height:540px}
-  .hero-copy{font-size:17px}
-  .enter-btn{font-size:20px;padding:18px 20px}
-  .card-bank{grid-template-columns:1fr}
-  .toolbar{display:grid}
-  .toolbar-left,.toolbar-right{display:grid;grid-template-columns:1fr 1fr}
-  .case-row{grid-template-columns:1fr;gap:3px}
-  .slot{grid-template-columns:38px 1fr}
-  .slots{grid-template-columns:1fr}
-  .slot-label{font-size:18px}
-  .route-token-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .map-mission strong{font-size:19px}
 }
 </style>
 </head>
@@ -741,327 +438,359 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
 <section class="print-only" id="print-area"></section>
 
 <script>
-const routes = [
+const puzzles = [
   {
-    id:"adrenal",
-    title:"Adrenal Stress Route",
-    caseCode:"HG-1",
-    caseTitle:"Hormone Case HG-1",
-    badge:"Stress",
-    caseRows:[
-      ["Patient","Placeholder case note."],
-      ["Chart","Placeholder chart clue."],
-      ["Mission","Build the matching hormone map."]
-    ],
-    goal:"Cortisol",
-    axis:"CRH -> ACTH -> Cortisol",
-    start:"start-adrenal",
-    middle:"mid-adrenal",
-    final:"final-adrenal",
-    action:"Cell homeostasis and function",
-    details:["CRH stimulates pituitary corticotrophs.","ACTH stimulates the adrenal gland.","Cortisol suppresses CRH and ACTH feedback."]
+    id:"oxytocin",
+    title:"Posterior Pituitary Puzzle 1",
+    code:"HP-1",
+    summary:"Reproductive smooth muscle and breast line.",
+    path:"Hypothalamus -> Oxytocin -> Posterior pituitary -> Uterus/Breast",
+    output:"Uterine contraction and lactation support",
+    entries:[
+      ["Hypothalamus","Map center that sends the posterior pituitary signal."],
+      ["Oxytocin","Posterior pituitary peptide connected to uterus and breast."],
+      ["Posterior Pituitary","Pituitary lobe that releases this peptide."],
+      ["Uterus","Target organ for contraction."],
+      ["Breast","Target organ for milk letdown."],
+      ["Lactation","Breast-related output connected to this line."]
+    ]
   },
   {
-    id:"thyroid",
-    title:"Thyroid Heat Route",
-    caseCode:"HG-2",
-    caseTitle:"Hormone Case HG-2",
-    badge:"Thyroid",
-    caseRows:[
-      ["Patient","Placeholder case note."],
-      ["Chart","Placeholder chart clue."],
-      ["Mission","Build the matching hormone map."]
-    ],
-    goal:"T3 and T4",
-    axis:"TRH / Somatostatin -> TSH -> T3, T4",
-    start:"start-thyroid",
-    middle:"mid-thyroid",
-    final:"final-thyroid",
-    action:"Thermogenesis and protein synthesis",
-    details:["TRH stimulates thyrotrophs.","Somatostatin suppresses thyrotroph signaling.","T3 and T4 suppress TRH and TSH feedback."]
-  },
-  {
-    id:"ovary",
-    title:"Ovary Cycle Route",
-    caseCode:"HG-3",
-    caseTitle:"Hormone Case HG-3",
-    badge:"Ovary",
-    caseRows:[
-      ["Patient","Placeholder case note."],
-      ["Chart","Placeholder chart clue."],
-      ["Mission","Build the matching hormone map."]
-    ],
-    goal:"Estradiol, progesterone, inhibin, follistatin",
-    axis:"GnRH -> LH/FSH -> ovarian hormones",
-    start:"start-gonadal",
-    middle:"mid-gonadal",
-    final:"final-ovary",
-    action:"Ovulation",
-    details:["GnRH stimulates gonadotrophs.","LH and FSH stimulate the ovary.","Ovarian hormones feed back to the hypothalamus and pituitary."]
-  },
-  {
-    id:"testis",
-    title:"Testis Signal Route",
-    caseCode:"HG-4",
-    caseTitle:"Hormone Case HG-4",
-    badge:"Testis",
-    caseRows:[
-      ["Patient","Placeholder case note."],
-      ["Chart","Placeholder chart clue."],
-      ["Mission","Build the matching hormone map."]
-    ],
-    goal:"Testosterone and inhibin",
-    axis:"GnRH -> LH/FSH -> testicular hormones",
-    start:"start-gonadal",
-    middle:"mid-gonadal",
-    final:"final-testis",
-    action:"Spermatogenesis",
-    details:["GnRH stimulates gonadotrophs.","LH and FSH stimulate the testis.","Testosterone and inhibin feed back to the hypothalamus and pituitary."]
-  },
-  {
-    id:"growth",
-    title:"Growth Route",
-    caseCode:"HG-5",
-    caseTitle:"Hormone Case HG-5",
-    badge:"Growth",
-    caseRows:[
-      ["Patient","Placeholder case note."],
-      ["Chart","Placeholder chart clue."],
-      ["Mission","Build the matching hormone map."]
-    ],
-    goal:"IGF-1",
-    axis:"GHRH / Somatostatin -> GH -> IGF-1",
-    start:"start-growth",
-    middle:"mid-growth",
-    final:"final-growth",
-    action:"Growth, anabolic metabolism, linear and organ growth",
-    details:["GHRH stimulates somatotrophs.","Somatostatin suppresses somatotroph signaling.","GH stimulates liver IGF-1 and supports bone growth through osteoblasts and chondrocytes."]
+    id:"adh",
+    title:"Posterior Pituitary Puzzle 2",
+    code:"HP-2",
+    summary:"Water-balance and pressure-support line.",
+    path:"Osmoreceptors -> ADH -> Posterior pituitary -> Kidneys/Blood pressure",
+    output:"Water retention and blood pressure support",
+    entries:[
+      ["Osmoreceptors","Sensors that monitor water concentration."],
+      ["ADH","Posterior pituitary hormone also called vasopressin."],
+      ["Posterior Pituitary","Pituitary lobe that releases ADH."],
+      ["Kidneys","Direct effector for water retention."],
+      ["Blood Pressure","Indirect effect supported by ADH."],
+      ["Vasopressin","Another name for ADH."]
+    ]
   },
   {
     id:"prolactin",
-    title:"Lactation Route",
-    caseCode:"HG-6",
-    caseTitle:"Hormone Case HG-6",
-    badge:"Lactation",
-    caseRows:[
-      ["Patient","Placeholder case note."],
-      ["Chart","Placeholder chart clue."],
-      ["Mission","Build the matching hormone map."]
-    ],
-    goal:"PRL",
-    axis:"Dopamine suppression -> PRL -> lactation",
-    start:"start-prl",
-    middle:"mid-prl",
-    final:"final-prl",
-    action:"Lactation",
-    details:["Dopamine suppresses lactotrophs.","Less dopamine allows PRL activity.","PRL targets the breast for lactation."]
+    title:"Anterior Pituitary Puzzle 1",
+    code:"HP-3",
+    summary:"Lactotroph-control line.",
+    path:"Dopamine -| Lactotroph -> PRL -> Breast",
+    output:"Lactation",
+    entries:[
+      ["Dopamine","Hypothalamus signal that inhibits lactotrophs."],
+      ["Anterior Pituitary","Pituitary lobe with lactotroph cells."],
+      ["Lactotroph","Pituitary cell that releases PRL."],
+      ["PRL","Peptide hormone released by lactotrophs."],
+      ["Breast","Target organ for PRL."],
+      ["Lactation","Final action for the PRL line."]
+    ]
+  },
+  {
+    id:"thyroid",
+    title:"Anterior Pituitary Puzzle 2",
+    code:"HP-4",
+    summary:"Metabolic heat-control line.",
+    path:"TRH/Somatostatin -> Thyrotroph -> TSH -> Thyroid -> T3/T4",
+    output:"Thyroid hormone production",
+    entries:[
+      ["TRH","Hypothalamic peptide that stimulates thyrotrophs."],
+      ["Somatostatin","Hypothalamic peptide that inhibits this line."],
+      ["Anterior Pituitary","Pituitary lobe with thyrotroph cells."],
+      ["Thyrotroph","Pituitary cell that releases TSH."],
+      ["TSH","Glycoprotein hormone that stimulates the thyroid."],
+      ["Thyroid","Target gland for TSH."],
+      ["T3 T4","Thyroid hormones at the end of this map line."]
+    ]
+  },
+  {
+    id:"acth",
+    title:"Anterior Pituitary Puzzle 3",
+    code:"HP-5",
+    summary:"Stress-adrenal line.",
+    path:"CRH -> Corticotroph -> ACTH -> Adrenal -> Cortisol/DHEA",
+    output:"Cortisol and adrenal androgen signaling",
+    entries:[
+      ["CRH","Hypothalamic peptide that stimulates corticotrophs."],
+      ["Anterior Pituitary","Pituitary lobe with corticotroph cells."],
+      ["Corticotroph","Pituitary cell that releases ACTH."],
+      ["ACTH","Peptide hormone that stimulates adrenal cortex."],
+      ["Adrenal","Target gland for ACTH."],
+      ["Cortisol","Steroid hormone on this stress line."],
+      ["DHEA","Adrenal androgen shown with adrenal zones."]
+    ]
+  },
+  {
+    id:"growth",
+    title:"Anterior Pituitary Puzzle 4",
+    code:"HP-6",
+    summary:"Growth and lower-right gland connection.",
+    path:"GHRH/Somatostatin -> Somatotroph -> GH -> Liver/IGF-1 and adrenal connection",
+    output:"Growth, IGF-1, and adrenal-line connection",
+    entries:[
+      ["GHRH","Hypothalamic peptide that stimulates somatotrophs."],
+      ["Somatostatin","Hypothalamic peptide that inhibits somatotrophs."],
+      ["Somatotroph","Pituitary cell that releases growth hormone."],
+      ["GH","Growth hormone abbreviation."],
+      ["Liver","Target organ that releases IGF-1."],
+      ["IGF 1","Peptide downstream of GH from liver."],
+      ["Adrenal","Gland also connected in the GH/lower-right map area."]
+    ]
+  },
+  {
+    id:"fsh",
+    title:"Anterior Pituitary Puzzle 5",
+    code:"HP-7",
+    summary:"Gonadal support-feedback line.",
+    path:"GnRH -> Gonadotroph -> FSH -> Ovary/Testis -> Inhibin",
+    output:"Follicle and Sertoli-line feedback",
+    entries:[
+      ["GnRH","Hypothalamic peptide that stimulates gonadotrophs."],
+      ["Gonadotroph","Pituitary cell that releases LH and FSH."],
+      ["FSH","Glycoprotein hormone on follicle/Sertoli line."],
+      ["Ovary","Female target organ on this line."],
+      ["Testis","Male target organ on this line."],
+      ["Inhibin","Feedback hormone shown from gonadal targets."]
+    ]
+  },
+  {
+    id:"lh",
+    title:"Anterior Pituitary Puzzle 6",
+    code:"HP-8",
+    summary:"Gonadal steroid line.",
+    path:"GnRH -> Gonadotroph -> LH -> Ovary/Testis -> Steroids",
+    output:"Estradiol, progesterone, and testosterone",
+    entries:[
+      ["GnRH","Hypothalamic peptide that stimulates gonadotrophs."],
+      ["Gonadotroph","Pituitary cell that releases LH and FSH."],
+      ["LH","Glycoprotein hormone on steroid-producing gonadal line."],
+      ["Ovary","Target organ connected to estrogen and progesterone."],
+      ["Testis","Target organ connected to testosterone."],
+      ["Estradiol","Estrogen label shown near the ovary."],
+      ["Progesterone","Steroid label shown near the ovary."],
+      ["Testosterone","Steroid label shown near the testis."]
+    ]
+  },
+  {
+    id:"raas",
+    title:"RAAS Puzzle",
+    code:"HP-9",
+    summary:"Kidney-liver-lung-adrenal cascade.",
+    path:"Low blood pressure -> Renin -> Angiotensinogen -> ACE -> Angiotensin II -> Aldosterone",
+    output:"Aldosterone from zona glomerulosa",
+    entries:[
+      ["Low Blood Pressure","Red trigger box that starts the RAAS line."],
+      ["Renin","Kidney release that begins the cascade."],
+      ["Angiotensinogen","Liver protein converted in the RAAS line."],
+      ["Angiotensin I","Intermediate before ACE conversion."],
+      ["ACE","Lung/vascular endothelial enzyme in the map."],
+      ["Angiotensin II","Product that stimulates adrenal cortex."],
+      ["Adrenal","Gland receiving the RAAS signal."],
+      ["Zona Glomerulosa","Adrenal cortex zone that produces aldosterone."],
+      ["Aldosterone","Steroid output at the end of the RAAS line."]
+    ]
   }
-];
+].map(puzzle => ({
+  ...puzzle,
+  entries:puzzle.entries.map((entry, index) => ({
+    id:`${puzzle.id}-${index}`,
+    term:entry[0],
+    clue:entry[1],
+    answer:normalize(entry[0])
+  }))
+}));
 
-const cards = [
-  {id:"start-adrenal",type:"start",name:"CRH",short:"CRH",copy:"Hypothalamus starter. Stimulates corticotrophs."},
-  {id:"mid-adrenal",type:"middle",name:"Corticotroph + ACTH",short:"ACTH",copy:"Pituitary bridge. ACTH stimulates adrenal gland."},
-  {id:"final-adrenal",type:"final",name:"Adrenal gland + Cortisol",short:"Cortisol",copy:"Final hormone: cortisol. Action: cell homeostasis and function."},
-  {id:"start-thyroid",type:"start",name:"TRH + Somatostatin",short:"TRH / SST",copy:"Hypothalamus controls. TRH stimulates; somatostatin suppresses."},
-  {id:"mid-thyroid",type:"middle",name:"Thyrotroph + TSH",short:"TSH",copy:"Pituitary bridge. TSH stimulates thyroid gland."},
-  {id:"final-thyroid",type:"final",name:"Thyroid gland + T3/T4",short:"T3 / T4",copy:"Final hormones: T3 and T4. Actions: thermogenesis and protein synthesis."},
-  {id:"start-gonadal",type:"start",name:"GnRH",short:"GnRH",copy:"Hypothalamus starter. Stimulates gonadotrophs."},
-  {id:"mid-gonadal",type:"middle",name:"Gonadotroph + LH/FSH",short:"LH / FSH",copy:"Pituitary bridge. LH and FSH stimulate ovary and testis."},
-  {id:"final-ovary",type:"final",name:"Ovary hormones",short:"Ovary",copy:"Estradiol, progesterone, inhibin, follistatin. Action: ovulation."},
-  {id:"final-testis",type:"final",name:"Testis hormones",short:"Testis",copy:"Testosterone and inhibin. Action: spermatogenesis."},
-  {id:"start-growth",type:"start",name:"GHRH + Somatostatin",short:"GHRH / SST",copy:"Hypothalamus controls. GHRH stimulates; somatostatin suppresses."},
-  {id:"mid-growth",type:"middle",name:"Somatotroph + GH",short:"GH",copy:"Pituitary bridge. GH stimulates liver and bone growth cells."},
-  {id:"final-growth",type:"final",name:"Liver + IGF-1",short:"IGF-1",copy:"Final hormone: IGF-1. Actions: growth and anabolic metabolism."},
-  {id:"start-prl",type:"start",name:"Dopamine",short:"Dopamine",copy:"Hypothalamus suppressor. Dopamine suppresses lactotrophs."},
-  {id:"mid-prl",type:"middle",name:"Lactotroph + PRL",short:"PRL",copy:"Pituitary bridge. PRL travels to the breast."},
-  {id:"final-prl",type:"final",name:"Breast + Lactation",short:"Lactation",copy:"Target/action card for lactation."}
-];
-
-const ladderSteps = [
-  {type:"start",label:"Signal Piece",slot:"Hypothalamus / Controller",hint:"Choose the hypothalamus signal that starts the case."},
-  {type:"middle",label:"Pituitary Piece",slot:"Pituitary / Trophic Hormone",hint:"Choose the pituitary bridge that comes next."}
-];
-const typeLabels = {start:"1 Hypothalamus",middle:"2 Pituitary",final:"3 Target"};
-let scene = "welcome";
-let currentRoute = null;
-let builtRoute = null;
-let slots = [null,null];
-let selectedId = "";
-let solved = new Set();
-let feedback = "Pick a hormone case to begin.";
+let scene = new URLSearchParams(window.location.search).get("preview") === "puzzle" ? "puzzle" : "welcome";
+let activePuzzleId = scene === "puzzle" ? puzzles[0].id : "";
+let solved = {};
+let feedback = "Choose a hormone puzzle.";
 let feedbackType = "";
-let order = shuffle(cards.map(card => card.id));
+let typedAnswer = "";
 
-function esc(text){
-  return String(text).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));
+function normalize(value){
+  return String(value).replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
 }
 
-function shuffle(list){
-  const copy = [...list];
-  for(let i = copy.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
+function esc(value){
+  return String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));
 }
 
-function cardById(id){
-  return cards.find(card => card.id === id);
+function currentPuzzle(){
+  return puzzles.find(puzzle => puzzle.id === activePuzzleId) || puzzles[0];
 }
 
-function routeExpected(route){
-  return [route.start, route.middle, route.final];
+function solvedSet(puzzleId){
+  if(!solved[puzzleId])solved[puzzleId] = new Set();
+  return solved[puzzleId];
 }
 
-function puzzleExpected(route){
-  return [route.start, route.middle];
+function activeIndex(puzzle){
+  return puzzle.entries.findIndex((entry, index) => !solvedSet(puzzle.id).has(index));
 }
 
-function activeSlotIndex(){
-  if(!currentRoute)return -1;
-  return slots.findIndex(value => !value);
+function isSolved(puzzle){
+  return activeIndex(puzzle) === -1;
 }
 
-function stepPrompt(index){
-  if(index < 0)return "Puzzle is ready to build.";
-  const step = ladderSteps[index];
-  return "Choose " + step.label + ".";
-}
-
-function enterGame(){
-  scene = "board";
-  feedback = "Pick a hormone case. Then build the map from the word banks.";
+function enterHall(){
+  scene = "hall";
+  feedback = "Choose one puzzle line from the hormone map.";
   feedbackType = "";
   render();
 }
 
-function drawMap(){
-  const available = routes.filter(route => !solved.has(route.id));
-  const pool = available.length ? available : routes;
-  currentRoute = pool[Math.floor(Math.random() * pool.length)];
-  builtRoute = null;
-  slots = [null,null];
-  selectedId = "";
-  feedback = "Case opened. Fill the Signal Bank and Pituitary Bank. The final output stays locked.";
+function openPuzzle(id){
+  activePuzzleId = id;
+  scene = "puzzle";
+  typedAnswer = "";
+  feedback = "Solve the crossword one clue at a time.";
   feedbackType = "";
-  order = shuffle(cards.map(card => card.id));
   render();
+  setTimeout(() => {
+    const input = document.getElementById("answerInput");
+    if(input && typeof input.focus === "function")input.focus();
+  }, 50);
 }
 
-function chooseRoute(routeId){
-  currentRoute = routes.find(route => route.id === routeId);
-  if(!currentRoute)return;
-  builtRoute = solved.has(currentRoute.id) ? currentRoute : null;
-  slots = builtRoute ? puzzleExpected(currentRoute) : [null,null];
-  selectedId = "";
-  feedback = builtRoute ? "Solved case reopened. The final output is showing." : currentRoute.caseCode + " opened. Build the map from the word banks.";
-  feedbackType = builtRoute ? "good" : "";
-  order = shuffle(cards.map(card => card.id));
-  render();
-}
-
-function placeCard(id){
-  if(!currentRoute){
-    feedback = "Pick a hormone case first.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  const card = cardById(id);
-  if(!card || card.type === "final"){
-    feedback = "The final hormone is locked. Build the first two map pieces to reveal it.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  const slotIndex = ladderSteps.findIndex(step => step.type === card.type);
-  if(slotIndex === -1)return;
-  if(slots[slotIndex] === id){
-    slots[slotIndex] = null;
-    selectedId = "";
-    builtRoute = null;
-    feedback = card.name + " returned to the word bank.";
-    feedbackType = "";
-    render();
-    return;
-  }
-  slots[slotIndex] = id;
-  selectedId = id;
-  builtRoute = null;
-  const missing = activeSlotIndex();
-  feedback = missing === -1 ? "Puzzle pieces placed. Tap Build Case Map to test it." : card.name + " placed. " + stepPrompt(missing);
+function backToHall(){
+  scene = "hall";
+  typedAnswer = "";
   feedbackType = "";
   render();
 }
 
-function clearSlot(index){
-  if(!currentRoute){
-    feedback = "Pick a hormone case first.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  slots[index] = null;
-  selectedId = "";
-  builtRoute = null;
-  feedback = "Puzzle slot " + (index + 1) + " cleared. " + stepPrompt(activeSlotIndex());
+function clearPuzzle(){
+  if(!activePuzzleId)return;
+  solved[activePuzzleId] = new Set();
+  typedAnswer = "";
+  feedback = "Puzzle cleared. Start again at step 1.";
   feedbackType = "";
   render();
 }
 
-function resetRound(){
-  builtRoute = null;
-  slots = [null,null];
-  selectedId = "";
-  feedback = currentRoute ? "Map cleared. Build it again from the word banks." : "Pick a hormone case to begin.";
-  feedbackType = "";
-  render();
-}
-
-function checkPath(){
-  if(!currentRoute){
-    feedback = "Pick a hormone case first.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  if(slots.some(value => !value)){
-    feedback = "Place one signal piece and one pituitary piece before building the case map.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  const expected = puzzleExpected(currentRoute);
-  const correct = expected.every((id, index) => slots[index] === id);
-  if(correct){
-    solved.add(currentRoute.id);
-    builtRoute = currentRoute;
-    feedback = "MAP SOLVED. Output revealed: " + currentRoute.goal + ".";
+function submitStep(){
+  const puzzle = currentPuzzle();
+  const index = activeIndex(puzzle);
+  if(index === -1){
+    feedback = "This puzzle is already complete. Choose another hormone puzzle.";
     feedbackType = "good";
+    render();
+    return;
+  }
+  const entry = puzzle.entries[index];
+  const given = normalize(typedAnswer || document.getElementById("answerInput")?.value || "");
+  if(given === entry.answer){
+    solvedSet(puzzle.id).add(index);
+    typedAnswer = "";
+    if(isSolved(puzzle)){
+      feedback = "Puzzle solved. Final output revealed: " + puzzle.output + ".";
+      feedbackType = "good";
+    }else{
+      feedback = "Correct. Next step unlocked.";
+      feedbackType = "good";
+    }
   }else{
-    const firstMiss = slots.findIndex((id, index) => id !== expected[index]);
-    builtRoute = null;
-    feedback = "Puzzle mismatch at slot " + (firstMiss + 1) + ". Recheck the signal piece and pituitary bridge.";
+    feedback = "Not yet. Stay on this step and try the map term again.";
     feedbackType = "bad";
   }
   render();
+  setTimeout(() => {
+    const input = document.getElementById("answerInput");
+    if(input && typeof input.focus === "function")input.focus();
+  }, 50);
 }
 
-function showAnswer(){
-  if(!currentRoute){
-    drawMap();
-    return;
+function handleAnswerInput(event){
+  typedAnswer = event.target.value;
+}
+
+function handleAnswerKey(event){
+  if(event.key === "Enter")submitStep();
+}
+
+function makeCrossword(entries){
+  const placements = [];
+  const grid = new Map();
+  const key = (r,c) => `${r},${c}`;
+  const canPlace = (word,row,col,dir) => {
+    for(let i = 0; i < word.length; i++){
+      const r = row + (dir === "down" ? i : 0);
+      const c = col + (dir === "across" ? i : 0);
+      const existing = grid.get(key(r,c));
+      if(existing && existing !== word[i])return false;
+    }
+    return true;
+  };
+  const scorePlacement = (word,row,col,dir) => {
+    let score = 0;
+    for(let i = 0; i < word.length; i++){
+      const r = row + (dir === "down" ? i : 0);
+      const c = col + (dir === "across" ? i : 0);
+      if(grid.get(key(r,c)) === word[i])score++;
+    }
+    return score;
+  };
+  const place = (entry,row,col,dir) => {
+    const word = entry.answer;
+    const cells = [];
+    for(let i = 0; i < word.length; i++){
+      const r = row + (dir === "down" ? i : 0);
+      const c = col + (dir === "across" ? i : 0);
+      grid.set(key(r,c), word[i]);
+      cells.push({r,c});
+    }
+    placements.push({entry,row,col,dir,cells});
+  };
+  place(entries[0], 0, 0, "across");
+  for(let entryIndex = 1; entryIndex < entries.length; entryIndex++){
+    const entry = entries[entryIndex];
+    const word = entry.answer;
+    let best = null;
+    for(const placement of placements){
+      placement.cells.forEach((cell, cellIndex) => {
+        const gridLetter = grid.get(key(cell.r, cell.c));
+        [...word].forEach((letter, letterIndex) => {
+          if(letter !== gridLetter)return;
+          ["across","down"].forEach(dir => {
+            const row = cell.r - (dir === "down" ? letterIndex : 0);
+            const col = cell.c - (dir === "across" ? letterIndex : 0);
+            if(!canPlace(word,row,col,dir))return;
+            const score = scorePlacement(word,row,col,dir);
+            if(!best || score > best.score)best = {row,col,dir,score};
+          });
+        });
+      });
+    }
+    if(!best){
+      const maxRow = Math.max(...placements.flatMap(item => item.cells.map(cell => cell.r)));
+      best = {row:maxRow + 2,col:0,dir:"across",score:0};
+    }
+    place(entry,best.row,best.col,best.dir);
   }
-  feedback = "Build the two-piece map first. The final hormone reveals only when the map checks correctly.";
-  feedbackType = "bad";
-  render();
-}
-
-function slotStatus(index){
-  if(!currentRoute || !slots[index])return "";
-  if(feedbackType !== "good" && feedbackType !== "bad")return "";
-  const expected = puzzleExpected(currentRoute);
-  return slots[index] === expected[index] ? "correct" : "wrong";
+  const minR = Math.min(...placements.flatMap(item => item.cells.map(cell => cell.r)));
+  const minC = Math.min(...placements.flatMap(item => item.cells.map(cell => cell.c)));
+  placements.forEach(placement => {
+    placement.row -= minR;
+    placement.col -= minC;
+    placement.cells.forEach(cell => {
+      cell.r -= minR;
+      cell.c -= minC;
+    });
+  });
+  const maxR = Math.max(...placements.flatMap(item => item.cells.map(cell => cell.r)));
+  const maxC = Math.max(...placements.flatMap(item => item.cells.map(cell => cell.c)));
+  const cells = new Map();
+  placements.forEach((placement, index) => {
+    placement.cells.forEach((cell, letterIndex) => {
+      const cellKey = key(cell.r, cell.c);
+      const rec = cells.get(cellKey) || {r:cell.r,c:cell.c,letter:placement.entry.answer[letterIndex],entries:[],starts:[]};
+      rec.entries.push(index);
+      if(letterIndex === 0)rec.starts.push(index + 1);
+      cells.set(cellKey, rec);
+    });
+  });
+  return {placements,cells,rows:maxR + 1,cols:maxC + 1};
 }
 
 function renderHero(){
@@ -1069,263 +798,151 @@ function renderHero(){
     <div class="hero-panel">
       <div class="eyebrow">Welcome to the endocrine arcade</div>
       <h1 class="game-font">Hormone Game</h1>
-      <p class="hero-copy">Open a hormone case, place the map pieces, and reveal the final hormone only when the puzzle is right.</p>
-      <button class="enter-btn" type="button" onclick="enterGame()">Enter the Hormone Arcade!</button>
+      <p class="hero-copy">Choose one hormone-map line, solve its crossword one step at a time, then reveal the final output.</p>
+      <button class="game-btn enter-btn" type="button" onclick="enterHall()">Enter the Hormone Puzzle Hall!</button>
     </div>
+  </section>`;
+}
+
+function renderHall(){
+  return `<section class="hall-hero">
+    <div class="hero-panel">
+      <div class="eyebrow">Choose your hormone puzzle</div>
+      <h1 class="game-font">Puzzle Hall</h1>
+      <p class="hero-copy">Each card is one line from the hormone diagram. Pick one, solve only its map terms, then come back for another.</p>
+    </div>
+  </section>
+  <section class="puzzle-grid">
+    ${puzzles.map((puzzle, index) => {
+      const done = solvedSet(puzzle.id).size;
+      const complete = done === puzzle.entries.length;
+      return `<button class="puzzle-card ${complete ? "solved" : ""}" type="button" onclick="openPuzzle('${esc(puzzle.id)}')">
+        <div>
+          <span class="puzzle-number">${index + 1}</span>
+          <h2 class="game-font">${esc(puzzle.title)}</h2>
+          <p>${esc(puzzle.summary)}</p>
+        </div>
+        <div class="puzzle-status">${done}/${puzzle.entries.length} crossword terms</div>
+      </button>`;
+    }).join("")}
   </section>`;
 }
 
 function renderToolbar(){
   return `<div class="toolbar">
     <div class="toolbar-left">
-      <button class="primary-btn" type="button" onclick="drawMap()">Pick a Hormone Case</button>
-      <button class="ghost-btn" type="button" onclick="checkPath()">Build Case Map</button>
-      <button class="danger-btn" type="button" onclick="resetRound()">Clear Map</button>
+      <button class="game-btn primary-btn" type="button" onclick="backToHall()">Choose Another Puzzle</button>
+      <button class="game-btn danger-btn" type="button" onclick="clearPuzzle()">Clear This Puzzle</button>
     </div>
     <div class="toolbar-right">
-      <button class="print-btn" type="button" onclick="printGamePack()">Print Game Pack</button>
-      <button class="print-btn" type="button" onclick="printMapCards()">Print Case Cards</button>
-      <button class="print-btn" type="button" onclick="printAnswerKey()">Print Answer Key</button>
+      <button class="game-btn print-btn" type="button" onclick="printGamePack()">Print Puzzle Pack</button>
+      <button class="game-btn print-btn" type="button" onclick="printAnswerKey()">Print Answer Key</button>
     </div>
   </div>`;
 }
 
-function renderMapCard(){
-  if(!currentRoute){
-    return `<section class="map-card empty">
+function renderPuzzleInfo(puzzle){
+  const solvedEntries = solvedSet(puzzle.id);
+  const current = activeIndex(puzzle);
+  const complete = current === -1;
+  const entry = complete ? null : puzzle.entries[current];
+  return `<section class="panel">
+    <div class="eyebrow">Hormone puzzle</div>
+    <h1 class="game-font puzzle-title">${esc(puzzle.title)}</h1>
+    <span class="map-line">${esc(puzzle.code)} / ${solvedEntries.size} of ${puzzle.entries.length}</span>
+    ${isSolved(puzzle) ? `<div class="mini-map">
+      ${puzzle.path.split("->").map(part => `<span>${esc(part.trim())}</span>`).join("")}
+    </div>` : `<div class="mini-map"><span>Path hidden until solved</span><span>${esc(puzzle.summary)}</span></div>`}
+    <div class="step-pills">
+      ${puzzle.entries.map((entryItem, index) => `<span class="step-pill ${index === current ? "active" : ""} ${solvedEntries.has(index) ? "solved" : ""}">${index + 1}</span>`).join("")}
+    </div>
+    <div class="clue-card">
+      ${complete ? `<h3>Crossword complete</h3>
+        <p>All terms from this map line are solved. The output is revealed below.</p>` : `<h3>Step ${current + 1}</h3>
+        <p>${esc(entry.clue)}</p>
+        <div class="answer-row">
+          <input class="answer-input" id="answerInput" type="text" value="${esc(typedAnswer)}" oninput="handleAnswerInput(event)" onkeydown="handleAnswerKey(event)" autocomplete="off" spellcheck="false" placeholder="Type the map term">
+          <button class="game-btn primary-btn" type="button" onclick="submitStep()">Submit Step</button>
+        </div>`}
+    </div>
+    <div class="feedback ${feedbackType}">${esc(feedback)}</div>
+    <div class="output-card ${complete ? "visible" : ""}">
+      <h3>Output Revealed</h3>
+      <p>${esc(puzzle.output)}</p>
+    </div>
+  </section>`;
+}
+
+function renderCrossword(puzzle){
+  const crossword = makeCrossword(puzzle.entries);
+  const solvedEntries = solvedSet(puzzle.id);
+  const current = activeIndex(puzzle);
+  return `<section class="crossword-shell">
+    <div class="crossword-head">
       <div>
-        <div class="eyebrow">Hormone case deck</div>
-        <h2 class="game-font">Pick a case</h2>
-        <p class="hero-copy" style="font-size:17px;margin-bottom:18px">Open a tiny case clue, then build its hormone map.</p>
-        <button class="primary-btn" type="button" onclick="drawMap()">Open Random Case</button>
+        <div class="panel-title">Crossword Board</div>
+        <h2 class="game-font">${esc(puzzle.code)} Map Terms</h2>
+        <p>Only this hormone-map line is in this crossword.</p>
       </div>
-    </section>`;
-  }
-  return `<section class="map-card">
-    <div class="eyebrow">Hormone case</div>
-    <h2 class="game-font">${esc(currentRoute.caseTitle)}</h2>
-    <span class="map-goal">Answer hidden</span>
-    <div class="case-chart">
-      ${currentRoute.caseRows.map(row => `<div class="case-row"><strong>${esc(row[0])}</strong><span>${esc(row[1])}</span></div>`).join("")}
+      <span class="map-line">${current === -1 ? "Solved" : "Step " + (current + 1)}</span>
     </div>
-    <div class="case-question">Build the signal + pituitary pieces. The final hormone stays hidden until the map is correct.</div>
-  </section>`;
-}
-
-function renderProgress(){
-  return `<div class="progress-strip">
-    ${routes.map(route => `<button class="progress-dot ${currentRoute && currentRoute.id === route.id ? "active" : ""} ${solved.has(route.id) ? "solved" : ""}" type="button" onclick="chooseRoute('${esc(route.id)}')">${esc(route.caseCode)}</button>`).join("")}
-  </div>`;
-}
-
-function renderSlots(){
-  const activeIndex = activeSlotIndex();
-  return `<section class="ladder-wrap">
-    <div class="ladder-head">
-      <div class="panel-title">Map Puzzle</div>
-      <span class="ladder-status">${activeIndex === -1 && currentRoute ? "Ready to build" : currentRoute ? "Slot " + (activeIndex + 1) : "Open a case"}</span>
-    </div>
-    <p class="ladder-note">Fill the two puzzle pieces. The output node reveals only after a correct build.</p>
-    <div class="slots">
-    ${slots.map((id, index) => {
-      const card = id ? cardById(id) : null;
-      const step = ladderSteps[index];
-      const active = currentRoute && activeIndex === index && !id;
-      return `<button class="slot ${id ? "filled" : ""} ${active ? "active" : ""} ${slotStatus(index)}" type="button" onclick="clearSlot(${index})">
-        <div class="slot-number">${index + 1}</div>
-        <div>
-          <div class="slot-kicker">${esc(step.label)}</div>
-          <div class="slot-label">${card ? esc(card.name) : esc(step.slot)}</div>
-          <div class="slot-copy">${card ? esc(card.copy) : esc(step.hint)}</div>
-        </div>
-      </button>`;
-    }).join("")}
-    </div>
-  </section>`;
-}
-
-function renderCardBank(){
-  if(!currentRoute){
-    return `<section class="choice-panel">
-      <div class="choice-head">
-        <div class="panel-title">Word Banks</div>
-        <span class="current-step">No case yet</span>
+    <div class="crossword-board-wrap">
+      <div class="crossword-board" style="grid-template-columns:repeat(${crossword.cols},28px)">
+        ${Array.from({length:crossword.rows * crossword.cols}, (_, rawIndex) => {
+          const r = Math.floor(rawIndex / crossword.cols);
+          const c = rawIndex % crossword.cols;
+          const cell = crossword.cells.get(`${r},${c}`);
+          if(!cell)return `<div class="cell empty" aria-hidden="true"></div>`;
+          const cellSolved = cell.entries.some(index => solvedEntries.has(index));
+          const cellActive = current !== -1 && cell.entries.includes(current);
+          const showLetter = cellSolved;
+          const number = cell.starts.length ? cell.starts[0] : "";
+          return `<div class="cell ${cellSolved ? "solved" : ""} ${cellActive ? "active" : ""}">
+            ${number ? `<span class="cell-number">${number}</span>` : ""}
+            <span class="cell-letter">${showLetter ? esc(cell.letter) : ""}</span>
+          </div>`;
+        }).join("")}
       </div>
-      <div class="choice-empty">Open a hormone case first. Then choose one signal piece and one pituitary piece.</div>
-    </section>`;
-  }
-  const groups = ladderSteps.map((step, index) => ({
-    step,
-    index,
-    ids: order.filter(id => cardById(id).type === step.type)
-  }));
-  return `<section class="choice-panel">
-    <div class="choice-head">
-      <div class="panel-title">Word Banks</div>
-      <span class="current-step">${slots.every(Boolean) ? "Ready to build" : "Choose pieces"}</span>
-    </div>
-    <p class="choice-note">Pick one card from each bank. The map updates as you build it.</p>
-    <div class="word-bank-grid">
-    ${groups.map(group => `<div class="word-bank">
-      <div class="word-bank-title">${esc(group.step.label)}</div>
-      ${group.ids.map(id => {
-        const card = cardById(id);
-        const used = slots[group.index] === id;
-        const selected = selectedId === id;
-        return `<button class="path-card ${used ? "used" : ""} ${selected ? "selected" : ""}" type="button" onclick="placeCard('${esc(id)}')">
-          <span class="card-type">${esc(typeLabels[card.type])}</span>
-          <h3>${esc(card.name)}</h3>
-          <p>${esc(card.copy)}</p>
-        </button>`;
-      }).join("")}
-    </div>`).join("")}
     </div>
   </section>`;
 }
 
-function routeStep(route, index){
-  if(!route)return null;
-  const card = cardById(routeExpected(route)[index]);
-  return card || null;
-}
-
-function renderVisualMap(){
-  const zones = ["Hypothalamus","Pituitary","Target"];
-  const emptyNames = ["Signal","Bridge","Locked"];
-  const emptyDetails = ["Choose from Signal Bank","Choose from Pituitary Bank","Final hormone appears after correct build"];
-  const outputVisible = currentRoute && builtRoute && builtRoute.id === currentRoute.id;
-  const nodeCards = [
-    slots[0] ? cardById(slots[0]) : null,
-    slots[1] ? cardById(slots[1]) : null,
-    outputVisible ? cardById(currentRoute.final) : null
-  ];
-  return `<section class="visual-map ${currentRoute ? "built" : ""} ${outputVisible ? "revealed" : "locked"}">
-    <div class="map-mission">
-      <strong>${currentRoute ? esc(currentRoute.badge + " Puzzle Map") : "Build the Map"}</strong>
-      <span>${outputVisible ? "Final output revealed." : "Place the first two pieces, then build the map."}</span>
-    </div>
-    <div class="map-track">
-      ${[0,1,2].map(index => {
-        const card = nodeCards[index];
-        const lockedOutput = index === 2 && !outputVisible;
-        return `<div class="map-node ${index === 2 ? "output-node" : ""}">
-          <div class="node-zone">${esc(zones[index])}</div>
-          <div class="node-name">${lockedOutput ? "???" : card ? esc(card.short) : esc(emptyNames[index])}</div>
-          <div class="node-detail">${lockedOutput ? "Output locked" : card ? esc(card.name) : esc(emptyDetails[index])}</div>
-        </div>${index < 2 ? `<div class="map-arrow">→</div>` : ""}`;
-      }).join("")}
-    </div>
-    <p class="visual-helper">${outputVisible ? esc("Output: " + currentRoute.goal + " · " + currentRoute.action) : "The answer is not shown until the map checks correctly."}</p>
-  </section>`;
-}
-
-function renderRouteTokens(){
-  return `<section>
-    <div class="panel-title">Route Tokens</div>
-    <div class="route-token-grid">
-      ${routes.map(route => {
-        const active = builtRoute && builtRoute.id === route.id;
-        const routeSolved = solved.has(route.id);
-        return `<button class="route-token ${active ? "active" : ""} ${routeSolved ? "solved" : ""}" type="button" onclick="chooseRoute('${esc(route.id)}')">
-          <span class="route-token-path"><span></span><span></span><span></span></span>
-          <span class="route-token-name">${esc(route.badge)}</span>
-        </button>`;
-      }).join("")}
-    </div>
-  </section>`;
-}
-
-function renderStudyMap(){
-  if(!currentRoute)return "";
-  return `<section class="study-map ${feedbackType === "good" ? "visible" : ""}">
-    <h3>Study map: ${esc(currentRoute.title)}</h3>
-    <div class="study-map-grid">
-      ${currentRoute.details.map(item => `<div>${esc(item)}</div>`).join("")}
-    </div>
-  </section>`;
-}
-
-function renderBoard(){
+function renderPuzzle(){
+  const puzzle = currentPuzzle();
   return `${renderToolbar()}
-  <div class="board-grid">
-    <div>
-      ${renderMapCard()}
-      ${renderProgress()}
-      <div class="feedback ${feedbackType}">${esc(feedback)}</div>
-      ${renderStudyMap()}
-    </div>
-    <section class="panel">
-      <div class="panel-title">Visual Hormone Map</div>
-      ${renderVisualMap()}
-      <div class="build-layout">
-        ${renderSlots()}
-        ${renderCardBank()}
-      </div>
-    </section>
+  <div class="puzzle-layout">
+    ${renderPuzzleInfo(puzzle)}
+    ${renderCrossword(puzzle)}
   </div>`;
 }
 
-function render(){
-  document.getElementById("app").innerHTML = scene === "welcome" ? renderHero() : renderBoard();
-}
-
-function printCard(title, label, body){
+function printCard(puzzle){
   return `<article class="print-card">
-    <h3>${esc(label)}</h3>
-    <h2>${esc(title)}</h2>
-    <p>${esc(body)}</p>
+    <h3>${esc(puzzle.code)}</h3>
+    <h2>${esc(puzzle.title)}</h2>
+    <p><strong>Map line:</strong> ${esc(puzzle.path)}</p>
+    <ul>${puzzle.entries.map((entry, index) => `<li>${index + 1}. ${esc(entry.clue)}</li>`).join("")}</ul>
   </article>`;
 }
 
-function printCaseCard(route){
-  return `<article class="print-card">
-    <h3>Hormone Case Card</h3>
-    <h2>${esc(route.caseTitle)}</h2>
-    <ul>
-      ${route.caseRows.map(row => `<li><strong>${esc(row[0])}:</strong> ${esc(row[1])}</li>`).join("")}
-    </ul>
-    <p><strong>Build the hormone map puzzle:</strong> choose the signal piece and pituitary piece. The final output stays hidden.</p>
-  </article>`;
-}
-
-function renderPrintMaps(){
+function renderPrintPack(){
   return `<section class="print-page">
-    <h1 class="print-title">Hormone Game - Case Cards</h1>
-    <p class="print-note">Pick one case card. Use the patient/chart clue to build the hormone map puzzle. These cards do not include answers.</p>
-    <div class="print-grid">
-      ${routes.map(route => printCaseCard(route)).join("")}
-    </div>
-  </section>`;
-}
-
-function renderPrintPathCards(){
-  return `<section class="print-page">
-    <h1 class="print-title">Hormone Game - Puzzle Piece Cards</h1>
-    <p class="print-note">Use these cards to build the signal and pituitary pieces. Final outputs stay on the answer key.</p>
-    <div class="print-grid">
-      ${cards.filter(card => card.type !== "final").map(card => printCard(card.name, typeLabels[card.type], card.copy)).join("")}
-    </div>
+    <h1 class="print-title">Hormone Game - Crossword Puzzle Pack</h1>
+    <p class="print-note">Each card uses only terms from one hormone-map line.</p>
+    <div class="print-grid">${puzzles.map(printCard).join("")}</div>
   </section>`;
 }
 
 function renderPrintKey(){
   return `<section class="print-page">
     <h1 class="print-title">Hormone Game - Answer Key</h1>
-    <p class="print-note">Low-ink case key from the provided anterior pituitary hormone map.</p>
     <table class="answer-table">
-      <thead><tr><th>Case</th><th>Card 1</th><th>Card 2</th><th>Card 3</th><th>Feedback</th></tr></thead>
-      <tbody>
-        ${routes.map(route => {
-          const expected = routeExpected(route).map(cardById);
-          return `<tr>
-            <td>${esc(route.caseCode + " - " + route.title)}</td>
-            <td>${esc(expected[0].name)}</td>
-            <td>${esc(expected[1].name)}</td>
-            <td>${esc(expected[2].name)}</td>
-            <td>${esc(route.details.join(" "))}</td>
-          </tr>`;
-        }).join("")}
-      </tbody>
+      <thead><tr><th>Puzzle</th><th>Terms in order</th><th>Output</th></tr></thead>
+      <tbody>${puzzles.map(puzzle => `<tr>
+        <td>${esc(puzzle.code + " - " + puzzle.title)}</td>
+        <td>${esc(puzzle.entries.map(entry => entry.term).join(" -> "))}</td>
+        <td>${esc(puzzle.output)}</td>
+      </tr>`).join("")}</tbody>
     </table>
   </section>`;
 }
@@ -1335,34 +952,28 @@ function doPrint(markup){
   setTimeout(() => window.print(), 80);
 }
 
-function printGamePack(){
-  doPrint(renderPrintMaps() + renderPrintPathCards() + renderPrintKey());
+function printGamePack(){doPrint(renderPrintPack())}
+function printAnswerKey(){doPrint(renderPrintKey())}
+
+function render(){
+  const root = document.getElementById("app");
+  if(scene === "welcome")root.innerHTML = renderHero();
+  else if(scene === "hall")root.innerHTML = renderHall();
+  else root.innerHTML = renderPuzzle();
 }
 
-function printMapCards(){
-  doPrint(renderPrintMaps());
-}
-
-function printAnswerKey(){
-  doPrint(renderPrintKey());
-}
-
-window.enterGame = enterGame;
-window.drawMap = drawMap;
-window.placeCard = placeCard;
-window.chooseRoute = chooseRoute;
-window.clearSlot = clearSlot;
-window.checkPath = checkPath;
-window.resetRound = resetRound;
-window.showAnswer = showAnswer;
+window.enterHall = enterHall;
+window.openPuzzle = openPuzzle;
+window.backToHall = backToHall;
+window.clearPuzzle = clearPuzzle;
+window.submitStep = submitStep;
+window.handleAnswerInput = handleAnswerInput;
+window.handleAnswerKey = handleAnswerKey;
 window.printGamePack = printGamePack;
-window.printMapCards = printMapCards;
 window.printAnswerKey = printAnswerKey;
-if(new URLSearchParams(window.location.search).get("preview") === "board"){
-  scene = "board";
-  currentRoute = routes[0];
-  builtRoute = null;
-  feedback = "Case opened. Build the map from the word banks.";
+
+if(scene === "puzzle"){
+  feedback = "Solve the crossword one clue at a time.";
 }
 render();
 </script>
