@@ -245,7 +245,10 @@ body.hormone-game .mls-audio-btn{
   font-weight:1000;
   color:var(--chem-dark);
   background:#fff;
+  cursor:pointer;
+  font-family:inherit;
 }
+.progress-dot.active{border-color:var(--chem);background:#e6f5ff;box-shadow:0 0 0 3px rgba(41,128,185,.13)}
 .progress-dot.solved{
   border-color:var(--good);
   background:#e7fbf1;
@@ -285,13 +288,13 @@ body.hormone-game .mls-audio-btn{
 .slots{
   display:grid;
   grid-template-columns:1fr;
-  gap:0;
+  gap:8px;
 }
 .slot{
-  min-height:118px;
-  padding:12px;
+  min-height:94px;
+  padding:10px;
   display:grid;
-  grid-template-columns:44px 1fr;
+  grid-template-columns:36px 1fr;
   align-content:start;
   align-items:start;
   gap:7px;
@@ -314,14 +317,14 @@ body.hormone-game .mls-audio-btn{
 .slot.correct{border-color:var(--good);background:#edfbf4}
 .slot.wrong{border-color:var(--bad);background:#fff1f3}
 .slot-number{
-  width:34px;
-  height:34px;
+  width:30px;
+  height:30px;
   border-radius:50%;
   display:grid;
   place-items:center;
   background:var(--chem);
   color:#fff;
-  font-size:15px;
+  font-size:14px;
   font-weight:1000;
   box-shadow:0 4px 0 rgba(15,71,112,.22);
 }
@@ -332,8 +335,8 @@ body.hormone-game .mls-audio-btn{
   letter-spacing:.1em;
   text-transform:uppercase;
 }
-.slot-label{font-size:20px;font-weight:1000;color:#10243a;line-height:1.05}
-.slot-copy{font-size:13px;line-height:1.3;color:#40536a;font-weight:800}
+.slot-label{font-size:17px;font-weight:1000;color:#10243a;line-height:1.05}
+.slot-copy{font-size:12px;line-height:1.25;color:#40536a;font-weight:800}
 .ladder-arrow{
   display:grid;
   place-items:center;
@@ -423,6 +426,14 @@ body.hormone-game .mls-audio-btn{
   background:#fff;
   box-shadow:0 12px 26px rgba(41,128,185,.14);
 }
+.visual-map.revealed .map-node.output-node{
+  border-color:var(--good);
+  background:#edfbf4;
+}
+.visual-map.locked .map-node.output-node{
+  background:
+    repeating-linear-gradient(-45deg,#f8fcff 0 12px,#eef8ff 12px 24px);
+}
 .node-zone{
   color:var(--chem-dark);
   font-size:12px;
@@ -511,6 +522,28 @@ body.hormone-game .mls-audio-btn{
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:9px;
 }
+.word-bank-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.word-bank{
+  display:grid;
+  gap:8px;
+}
+.word-bank-title{
+  color:var(--chem-dark);
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.word-bank .path-card{
+  min-height:74px;
+  padding:10px;
+}
+.word-bank .path-card h3{font-size:17px}
+.word-bank .path-card p{display:none}
 .path-card{
   min-height:124px;
   padding:12px;
@@ -519,7 +552,12 @@ body.hormone-game .mls-audio-btn{
   transition:.15s ease;
 }
 .path-card:hover{transform:translateY(-2px);border-color:var(--chem)}
-.path-card.used{opacity:.42}
+.path-card.used{opacity:.58}
+.word-bank .path-card.used{
+  opacity:1;
+  border-color:var(--good);
+  background:#edfbf4;
+}
 .path-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,189,79,.23)}
 .card-type{
   display:inline-flex;
@@ -666,6 +704,7 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
 @media(max-width:960px){
   .board-grid{grid-template-columns:1fr}
   .build-layout{grid-template-columns:1fr}
+  .word-bank-grid{grid-template-columns:1fr}
   .card-bank{grid-template-columns:repeat(2,minmax(0,1fr))}
   .map-track{grid-template-columns:1fr;gap:8px}
   .map-arrow{font-size:28px;transform:rotate(90deg)}
@@ -682,6 +721,7 @@ html[data-mls-theme="dark"] body.hormone-game .feedback{
   .toolbar-left,.toolbar-right{display:grid;grid-template-columns:1fr 1fr}
   .case-row{grid-template-columns:1fr;gap:3px}
   .slot{grid-template-columns:38px 1fr}
+  .slots{grid-template-columns:1fr}
   .slot-label{font-size:18px}
   .route-token-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .map-mission strong{font-size:19px}
@@ -838,15 +878,14 @@ const cards = [
 ];
 
 const ladderSteps = [
-  {type:"start",label:"Start Signal",slot:"Hypothalamus / Controller",hint:"Choose the hypothalamus signal card for rung 1."},
-  {type:"middle",label:"Pituitary Bridge",slot:"Pituitary / Trophic Hormone",hint:"Choose the pituitary bridge card for rung 2."},
-  {type:"final",label:"Target / Final",slot:"Target Organ / Final Hormone",hint:"Choose the target or final hormone/action card for rung 3."}
+  {type:"start",label:"Signal Piece",slot:"Hypothalamus / Controller",hint:"Choose the hypothalamus signal that starts the case."},
+  {type:"middle",label:"Pituitary Piece",slot:"Pituitary / Trophic Hormone",hint:"Choose the pituitary bridge that comes next."}
 ];
 const typeLabels = {start:"1 Hypothalamus",middle:"2 Pituitary",final:"3 Target"};
 let scene = "welcome";
 let currentRoute = null;
 let builtRoute = null;
-let slots = [null,null,null];
+let slots = [null,null];
 let selectedId = "";
 let solved = new Set();
 let feedback = "Pick a hormone case to begin.";
@@ -874,20 +913,24 @@ function routeExpected(route){
   return [route.start, route.middle, route.final];
 }
 
+function puzzleExpected(route){
+  return [route.start, route.middle];
+}
+
 function activeSlotIndex(){
   if(!currentRoute)return -1;
   return slots.findIndex(value => !value);
 }
 
 function stepPrompt(index){
-  if(index < 0)return "Ladder is full.";
+  if(index < 0)return "Puzzle is ready to build.";
   const step = ladderSteps[index];
-  return "Choose rung " + (index + 1) + ": " + step.label + ".";
+  return "Choose " + step.label + ".";
 }
 
 function enterGame(){
   scene = "board";
-  feedback = "Pick a hormone case. Then tap one route token to build the map.";
+  feedback = "Pick a hormone case. Then build the map from the word banks.";
   feedbackType = "";
   render();
 }
@@ -897,31 +940,23 @@ function drawMap(){
   const pool = available.length ? available : routes;
   currentRoute = pool[Math.floor(Math.random() * pool.length)];
   builtRoute = null;
-  slots = [null,null,null];
+  slots = [null,null];
   selectedId = "";
-  feedback = "Case opened. Tap a route token and the map will build itself.";
+  feedback = "Case opened. Fill the Signal Bank and Pituitary Bank. The final output stays locked.";
   feedbackType = "";
   order = shuffle(cards.map(card => card.id));
   render();
 }
 
 function chooseRoute(routeId){
-  if(!currentRoute){
-    feedback = "Pick a hormone case first.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  builtRoute = routes.find(route => route.id === routeId);
-  if(!builtRoute)return;
-  if(builtRoute.id === currentRoute.id){
-    solved.add(currentRoute.id);
-    feedback = "CASE SOLVED. This map matches the case.";
-    feedbackType = "good";
-  }else{
-    feedback = "Map built. Compare the shape with the case clue, or tap another route token.";
-    feedbackType = "";
-  }
+  currentRoute = routes.find(route => route.id === routeId);
+  if(!currentRoute)return;
+  builtRoute = solved.has(currentRoute.id) ? currentRoute : null;
+  slots = builtRoute ? puzzleExpected(currentRoute) : [null,null];
+  selectedId = "";
+  feedback = builtRoute ? "Solved case reopened. The final output is showing." : currentRoute.caseCode + " opened. Build the map from the word banks.";
+  feedbackType = builtRoute ? "good" : "";
+  order = shuffle(cards.map(card => card.id));
   render();
 }
 
@@ -932,35 +967,29 @@ function placeCard(id){
     render();
     return;
   }
-  const existing = slots.indexOf(id);
-  if(existing !== -1){
-    slots[existing] = null;
+  const card = cardById(id);
+  if(!card || card.type === "final"){
+    feedback = "The final hormone is locked. Build the first two map pieces to reveal it.";
+    feedbackType = "bad";
+    render();
+    return;
+  }
+  const slotIndex = ladderSteps.findIndex(step => step.type === card.type);
+  if(slotIndex === -1)return;
+  if(slots[slotIndex] === id){
+    slots[slotIndex] = null;
     selectedId = "";
-    feedback = "Card returned to the deck.";
+    builtRoute = null;
+    feedback = card.name + " returned to the word bank.";
     feedbackType = "";
     render();
     return;
   }
-  const openIndex = slots.findIndex(value => !value);
-  if(openIndex === -1){
-    selectedId = id;
-    feedback = "All 3 rungs are full. Tap Check Pathway, or tap a rung to clear and replace it.";
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  const card = cardById(id);
-  const step = ladderSteps[openIndex];
-  if(card.type !== step.type){
-    feedback = "That card belongs to a different rung. " + stepPrompt(openIndex);
-    feedbackType = "bad";
-    render();
-    return;
-  }
-  slots[openIndex] = id;
+  slots[slotIndex] = id;
   selectedId = id;
-  const nextIndex = activeSlotIndex();
-  feedback = nextIndex === -1 ? "Ladder filled. Tap Check Pathway." : "Rung " + (openIndex + 1) + " placed. " + stepPrompt(nextIndex);
+  builtRoute = null;
+  const missing = activeSlotIndex();
+  feedback = missing === -1 ? "Puzzle pieces placed. Tap Build Case Map to test it." : card.name + " placed. " + stepPrompt(missing);
   feedbackType = "";
   render();
 }
@@ -974,16 +1003,17 @@ function clearSlot(index){
   }
   slots[index] = null;
   selectedId = "";
-  feedback = "Rung " + (index + 1) + " cleared. " + stepPrompt(activeSlotIndex());
+  builtRoute = null;
+  feedback = "Puzzle slot " + (index + 1) + " cleared. " + stepPrompt(activeSlotIndex());
   feedbackType = "";
   render();
 }
 
 function resetRound(){
   builtRoute = null;
-  slots = [null,null,null];
+  slots = [null,null];
   selectedId = "";
-  feedback = currentRoute ? "Board cleared. Tap a route token to rebuild the map." : "Pick a hormone case to begin.";
+  feedback = currentRoute ? "Map cleared. Build it again from the word banks." : "Pick a hormone case to begin.";
   feedbackType = "";
   render();
 }
@@ -996,20 +1026,22 @@ function checkPath(){
     return;
   }
   if(slots.some(value => !value)){
-    feedback = "You need all 3 cards before checking.";
+    feedback = "Place one signal piece and one pituitary piece before building the case map.";
     feedbackType = "bad";
     render();
     return;
   }
-  const expected = routeExpected(currentRoute);
+  const expected = puzzleExpected(currentRoute);
   const correct = expected.every((id, index) => slots[index] === id);
   if(correct){
     solved.add(currentRoute.id);
-    feedback = "PATHWAY SOLVED. You reached " + currentRoute.goal + ".";
+    builtRoute = currentRoute;
+    feedback = "MAP SOLVED. Output revealed: " + currentRoute.goal + ".";
     feedbackType = "good";
   }else{
     const firstMiss = slots.findIndex((id, index) => id !== expected[index]);
-    feedback = "Ladder jam at slot " + (firstMiss + 1) + ". Check the order: hypothalamus, pituitary, target/final.";
+    builtRoute = null;
+    feedback = "Puzzle mismatch at slot " + (firstMiss + 1) + ". Recheck the signal piece and pituitary bridge.";
     feedbackType = "bad";
   }
   render();
@@ -1020,18 +1052,15 @@ function showAnswer(){
     drawMap();
     return;
   }
-  builtRoute = currentRoute;
-  solved.add(currentRoute.id);
-  slots = routeExpected(currentRoute);
-  feedback = "Case map revealed. Study the pathway shape, then pick another case.";
-  feedbackType = "good";
+  feedback = "Build the two-piece map first. The final hormone reveals only when the map checks correctly.";
+  feedbackType = "bad";
   render();
 }
 
 function slotStatus(index){
   if(!currentRoute || !slots[index])return "";
   if(feedbackType !== "good" && feedbackType !== "bad")return "";
-  const expected = routeExpected(currentRoute);
+  const expected = puzzleExpected(currentRoute);
   return slots[index] === expected[index] ? "correct" : "wrong";
 }
 
@@ -1040,7 +1069,7 @@ function renderHero(){
     <div class="hero-panel">
       <div class="eyebrow">Welcome to the endocrine arcade</div>
       <h1 class="game-font">Hormone Game</h1>
-      <p class="hero-copy">Open a hormone case, tap a route token, and watch the hormone map build itself.</p>
+      <p class="hero-copy">Open a hormone case, place the map pieces, and reveal the final hormone only when the puzzle is right.</p>
       <button class="enter-btn" type="button" onclick="enterGame()">Enter the Hormone Arcade!</button>
     </div>
   </section>`;
@@ -1050,7 +1079,7 @@ function renderToolbar(){
   return `<div class="toolbar">
     <div class="toolbar-left">
       <button class="primary-btn" type="button" onclick="drawMap()">Pick a Hormone Case</button>
-      <button class="ghost-btn" type="button" onclick="showAnswer()">Build Case Map</button>
+      <button class="ghost-btn" type="button" onclick="checkPath()">Build Case Map</button>
       <button class="danger-btn" type="button" onclick="resetRound()">Clear Map</button>
     </div>
     <div class="toolbar-right">
@@ -1079,13 +1108,13 @@ function renderMapCard(){
     <div class="case-chart">
       ${currentRoute.caseRows.map(row => `<div class="case-row"><strong>${esc(row[0])}</strong><span>${esc(row[1])}</span></div>`).join("")}
     </div>
-    <div class="case-question">Tap a route token. Watch the hormone map fill in.</div>
+    <div class="case-question">Build the signal + pituitary pieces. The final hormone stays hidden until the map is correct.</div>
   </section>`;
 }
 
 function renderProgress(){
   return `<div class="progress-strip">
-    ${routes.map(route => `<div class="progress-dot ${solved.has(route.id) ? "solved" : ""}">${esc(route.caseCode)}</div>`).join("")}
+    ${routes.map(route => `<button class="progress-dot ${currentRoute && currentRoute.id === route.id ? "active" : ""} ${solved.has(route.id) ? "solved" : ""}" type="button" onclick="chooseRoute('${esc(route.id)}')">${esc(route.caseCode)}</button>`).join("")}
   </div>`;
 }
 
@@ -1093,10 +1122,10 @@ function renderSlots(){
   const activeIndex = activeSlotIndex();
   return `<section class="ladder-wrap">
     <div class="ladder-head">
-      <div class="panel-title">Hormone Ladder</div>
-      <span class="ladder-status">${activeIndex === -1 && currentRoute ? "Ready to check" : currentRoute ? "Rung " + (activeIndex + 1) : "Open a case"}</span>
+      <div class="panel-title">Map Puzzle</div>
+      <span class="ladder-status">${activeIndex === -1 && currentRoute ? "Ready to build" : currentRoute ? "Slot " + (activeIndex + 1) : "Open a case"}</span>
     </div>
-    <p class="ladder-note">Build top to bottom. Tap a filled rung if you want to change it.</p>
+    <p class="ladder-note">Fill the two puzzle pieces. The output node reveals only after a correct build.</p>
     <div class="slots">
     ${slots.map((id, index) => {
       const card = id ? cardById(id) : null;
@@ -1109,7 +1138,7 @@ function renderSlots(){
           <div class="slot-label">${card ? esc(card.name) : esc(step.slot)}</div>
           <div class="slot-copy">${card ? esc(card.copy) : esc(step.hint)}</div>
         </div>
-      </button>${index < slots.length - 1 ? `<div class="ladder-arrow">↓</div>` : ""}`;
+      </button>`;
     }).join("")}
     </div>
   </section>`;
@@ -1119,41 +1148,37 @@ function renderCardBank(){
   if(!currentRoute){
     return `<section class="choice-panel">
       <div class="choice-head">
-        <div class="panel-title">Choice Cards</div>
+        <div class="panel-title">Word Banks</div>
         <span class="current-step">No case yet</span>
       </div>
-      <div class="choice-empty">Open a hormone case first. Then this area will only show the cards for the rung you are building.</div>
+      <div class="choice-empty">Open a hormone case first. Then choose one signal piece and one pituitary piece.</div>
     </section>`;
   }
-  const activeIndex = activeSlotIndex();
-  if(activeIndex === -1){
-    return `<section class="choice-panel">
-      <div class="choice-head">
-        <div class="panel-title">Choice Cards</div>
-        <span class="current-step">Ladder full</span>
-      </div>
-      <div class="choice-empty">The ladder has 3 cards. Tap Check Pathway, or tap a rung on the ladder to clear and replace it.</div>
-    </section>`;
-  }
-  const step = ladderSteps[activeIndex];
-  const visibleIds = order.filter(id => cardById(id).type === step.type);
+  const groups = ladderSteps.map((step, index) => ({
+    step,
+    index,
+    ids: order.filter(id => cardById(id).type === step.type)
+  }));
   return `<section class="choice-panel">
     <div class="choice-head">
-      <div class="panel-title">Choose Rung ${activeIndex + 1}</div>
-      <span class="current-step">${esc(step.label)}</span>
+      <div class="panel-title">Word Banks</div>
+      <span class="current-step">${slots.every(Boolean) ? "Ready to build" : "Choose pieces"}</span>
     </div>
-    <p class="choice-note">${esc(step.hint)} Only this rung's cards are shown right now.</p>
-    <div class="card-bank">
-    ${visibleIds.map(id => {
-      const card = cardById(id);
-      const used = slots.includes(id);
-      const selected = selectedId === id;
-      return `<button class="path-card ${used ? "used" : ""} ${selected ? "selected" : ""}" type="button" onclick="placeCard('${esc(id)}')">
-        <span class="card-type">${esc(typeLabels[card.type])}</span>
-        <h3>${esc(card.name)}</h3>
-        <p>${esc(card.copy)}</p>
-      </button>`;
-    }).join("")}
+    <p class="choice-note">Pick one card from each bank. The map updates as you build it.</p>
+    <div class="word-bank-grid">
+    ${groups.map(group => `<div class="word-bank">
+      <div class="word-bank-title">${esc(group.step.label)}</div>
+      ${group.ids.map(id => {
+        const card = cardById(id);
+        const used = slots[group.index] === id;
+        const selected = selectedId === id;
+        return `<button class="path-card ${used ? "used" : ""} ${selected ? "selected" : ""}" type="button" onclick="placeCard('${esc(id)}')">
+          <span class="card-type">${esc(typeLabels[card.type])}</span>
+          <h3>${esc(card.name)}</h3>
+          <p>${esc(card.copy)}</p>
+        </button>`;
+      }).join("")}
+    </div>`).join("")}
     </div>
   </section>`;
 }
@@ -1165,26 +1190,32 @@ function routeStep(route, index){
 }
 
 function renderVisualMap(){
-  const route = builtRoute;
   const zones = ["Hypothalamus","Pituitary","Target"];
-  const emptyNames = ["Start","Bridge","Finish"];
-  const emptyDetails = ["Brain signal","Trophic hormone","Organ / final effect"];
-  return `<section class="visual-map ${route ? "built" : ""}">
+  const emptyNames = ["Signal","Bridge","Locked"];
+  const emptyDetails = ["Choose from Signal Bank","Choose from Pituitary Bank","Final hormone appears after correct build"];
+  const outputVisible = currentRoute && builtRoute && builtRoute.id === currentRoute.id;
+  const nodeCards = [
+    slots[0] ? cardById(slots[0]) : null,
+    slots[1] ? cardById(slots[1]) : null,
+    outputVisible ? cardById(currentRoute.final) : null
+  ];
+  return `<section class="visual-map ${currentRoute ? "built" : ""} ${outputVisible ? "revealed" : "locked"}">
     <div class="map-mission">
-      <strong>${route ? esc(route.badge + " Map") : "Build the Map"}</strong>
-      <span>${route ? "Tap another route token to redraw instantly." : "Tap one route token below. The board fills itself."}</span>
+      <strong>${currentRoute ? esc(currentRoute.badge + " Puzzle Map") : "Build the Map"}</strong>
+      <span>${outputVisible ? "Final output revealed." : "Place the first two pieces, then build the map."}</span>
     </div>
     <div class="map-track">
       ${[0,1,2].map(index => {
-        const card = routeStep(route, index);
-        return `<div class="map-node">
+        const card = nodeCards[index];
+        const lockedOutput = index === 2 && !outputVisible;
+        return `<div class="map-node ${index === 2 ? "output-node" : ""}">
           <div class="node-zone">${esc(zones[index])}</div>
-          <div class="node-name">${card ? esc(card.short) : esc(emptyNames[index])}</div>
-          <div class="node-detail">${card ? esc(card.name) : esc(emptyDetails[index])}</div>
+          <div class="node-name">${lockedOutput ? "???" : card ? esc(card.short) : esc(emptyNames[index])}</div>
+          <div class="node-detail">${lockedOutput ? "Output locked" : card ? esc(card.name) : esc(emptyDetails[index])}</div>
         </div>${index < 2 ? `<div class="map-arrow">→</div>` : ""}`;
       }).join("")}
     </div>
-    <p class="visual-helper">${route ? esc(route.title + " · " + route.action) : "No sorting. No tiny deck. Just pick a map shape and see the pathway."}</p>
+    <p class="visual-helper">${outputVisible ? esc("Output: " + currentRoute.goal + " · " + currentRoute.action) : "The answer is not shown until the map checks correctly."}</p>
   </section>`;
 }
 
@@ -1207,7 +1238,7 @@ function renderRouteTokens(){
 function renderStudyMap(){
   if(!currentRoute)return "";
   return `<section class="study-map ${feedbackType === "good" ? "visible" : ""}">
-    <h3>Study ladder: ${esc(currentRoute.title)}</h3>
+    <h3>Study map: ${esc(currentRoute.title)}</h3>
     <div class="study-map-grid">
       ${currentRoute.details.map(item => `<div>${esc(item)}</div>`).join("")}
     </div>
@@ -1226,7 +1257,10 @@ function renderBoard(){
     <section class="panel">
       <div class="panel-title">Visual Hormone Map</div>
       ${renderVisualMap()}
-      ${renderRouteTokens()}
+      <div class="build-layout">
+        ${renderSlots()}
+        ${renderCardBank()}
+      </div>
     </section>
   </div>`;
 }
@@ -1250,14 +1284,14 @@ function printCaseCard(route){
     <ul>
       ${route.caseRows.map(row => `<li><strong>${esc(row[0])}:</strong> ${esc(row[1])}</li>`).join("")}
     </ul>
-    <p><strong>Build the hormone ladder:</strong> start signal -> pituitary bridge -> target/final. Answer hidden.</p>
+    <p><strong>Build the hormone map puzzle:</strong> choose the signal piece and pituitary piece. The final output stays hidden.</p>
   </article>`;
 }
 
 function renderPrintMaps(){
   return `<section class="print-page">
     <h1 class="print-title">Hormone Game - Case Cards</h1>
-    <p class="print-note">Pick one case card. Use the patient/chart clue to build the 3-card hormone ladder. These cards do not include answers.</p>
+    <p class="print-note">Pick one case card. Use the patient/chart clue to build the hormone map puzzle. These cards do not include answers.</p>
     <div class="print-grid">
       ${routes.map(route => printCaseCard(route)).join("")}
     </div>
@@ -1266,10 +1300,10 @@ function renderPrintMaps(){
 
 function renderPrintPathCards(){
   return `<section class="print-page">
-    <h1 class="print-title">Hormone Game - Pathway Cards</h1>
-    <p class="print-note">Use these cards to build hypothalamus, pituitary, and target/final routes.</p>
+    <h1 class="print-title">Hormone Game - Puzzle Piece Cards</h1>
+    <p class="print-note">Use these cards to build the signal and pituitary pieces. Final outputs stay on the answer key.</p>
     <div class="print-grid">
-      ${cards.map(card => printCard(card.name, typeLabels[card.type], card.copy)).join("")}
+      ${cards.filter(card => card.type !== "final").map(card => printCard(card.name, typeLabels[card.type], card.copy)).join("")}
     </div>
   </section>`;
 }
@@ -1328,7 +1362,7 @@ if(new URLSearchParams(window.location.search).get("preview") === "board"){
   scene = "board";
   currentRoute = routes[0];
   builtRoute = null;
-  feedback = "Case opened. Tap a route token and the map will build itself.";
+  feedback = "Case opened. Build the map from the word banks.";
 }
 render();
 </script>
