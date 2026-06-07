@@ -657,6 +657,9 @@ const systems = [
   }
 ];
 
+const systemDisplayOrder = ["ABO", "Rh", "Kell", "Duffy", "Kidd", "Lewis", "MNS", "P", "Lutheran"];
+systems.sort((a, b) => systemDisplayOrder.indexOf(a.name) - systemDisplayOrder.indexOf(b.name));
+
 const populations = ["Caucasian", "Black", "Asian", "Indian", "Hispanic", "Asian and Hispanic", "No significant difference"];
 const levels = ["High", "Low", "N/A"];
 const state = {};
