@@ -689,7 +689,26 @@
   .freq-row{
     display:grid;
     grid-template-columns:1fr auto;
+    align-items:end;
     gap:8px;
+  }
+  .gate-input-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
+    gap:8px;
+  }
+  .gate-input-label{
+    display:grid;
+    gap:5px;
+    color:#ffd5df;
+    font-size:11px;
+    font-weight:1000;
+    letter-spacing:.04em;
+  }
+  .gate-input-label span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .freq-input{
     min-height:46px;
@@ -700,6 +719,10 @@
     padding:10px 12px;
     font-size:18px;
     font-weight:900;
+  }
+  .gate-input-cell{
+    text-align:center;
+    padding:8px;
   }
   .token-bank-wrap.locked .system-grid{
     opacity:.5;
@@ -844,8 +867,10 @@
     .print-instruction-list{display:grid;grid-template-columns:repeat(2,1fr);gap:.08in .2in;margin:.12in 0 .16in;padding-left:.22in;font-size:13pt;font-weight:900;line-height:1.2}
     .print-instruction-list li{margin:0 0 .04in}
     .print-grid{display:grid;grid-template-columns:repeat(2,4in);gap:.18in;align-items:start}
-    .print-rapid-page{break-after:page}
-    .print-rapid-grid{grid-template-columns:repeat(2,4in);gap:.18in .2in}
+    .print-rapid-page,
+    .print-compact-page{break-after:page}
+    .print-rapid-grid,
+    .print-compact-grid{grid-template-columns:repeat(2,4in);gap:.18in .2in}
     body.print-single .print-page{page:bloodGroupSingle;padding:0}
     body.print-single .print-title, body.print-single .print-subtitle{display:none!important}
     body.print-single .print-grid{display:block}
@@ -872,35 +897,42 @@
     .print-clue-box h3{font-size:11pt;margin:0 0 .06in;color:#000!important;border:0;padding:0}
     .print-clue-box ul{margin:.03in 0 0;padding-left:.18in}
     .print-clue-box li{font-size:8.9pt;line-height:1.17;margin:.03in 0;color:#000!important}
+    .print-compact-page .print-card,
     .print-card.print-rapid-card{
       height:2.58in;
       padding:.12in;
       border-radius:.14in;
     }
+    .print-compact-page .print-card h2,
     .print-card.print-rapid-card h2{
       font-size:13pt;
       max-width:3.08in;
       margin-bottom:.04in;
     }
+    .print-compact-page .print-card .print-case-rule,
     .print-card.print-rapid-card .print-case-rule{
       font-size:7.4pt;
       line-height:1.05;
       margin-bottom:.04in;
       max-width:3.1in;
     }
+    .print-compact-page .print-card .print-clue-box,
     .print-card.print-rapid-card .print-clue-box{
       min-height:1.12in!important;
       padding:.055in;
     }
+    .print-compact-page .print-card .print-clue-box h3,
     .print-card.print-rapid-card .print-clue-box h3{
       font-size:9.2pt;
       margin-bottom:.03in;
     }
+    .print-compact-page .print-card .print-clue-box li,
     .print-card.print-rapid-card .print-clue-box li{
       font-size:7.4pt;
       line-height:1.08;
       margin:.015in 0;
     }
+    .print-compact-page .print-card .print-mystery-mark,
     .print-card.print-rapid-card .print-mystery-mark{
       width:.42in;
       height:.42in;
@@ -947,6 +979,7 @@
       font-size:10pt;
       font-weight:900;
     }
+    .print-compact-page .print-card .print-frequency-spot,
     .print-card.print-rapid-card .print-frequency-spot{
       left:.14in;
       right:.14in;
@@ -954,12 +987,78 @@
       font-size:8pt;
       padding-top:.045in;
     }
+    .print-compact-page .print-card .print-token-spot,
     .print-card.print-rapid-card .print-token-spot{
       left:.14in;
       right:.14in;
       bottom:.1in;
       min-height:.36in;
       font-size:8.6pt;
+      border-width:1.5px;
+    }
+    .print-card.print-rapid-pair-card{
+      height:5.72in;
+      padding:.1in;
+      display:grid;
+      grid-template-rows:1fr 1fr;
+      gap:.1in;
+    }
+    .print-rapid-mini{
+      border:1.5px solid #000;
+      border-radius:.1in;
+      padding:.08in;
+      position:relative;
+      overflow:hidden;
+      min-height:0;
+      background:#fff!important;
+      color:#000!important;
+    }
+    .print-rapid-mini .print-mystery-mark{
+      right:.08in;
+      top:.08in;
+      width:.38in;
+      height:.38in;
+      font-size:18pt;
+      border-width:1.5px;
+    }
+    .print-rapid-mini h2{
+      font-size:12.6pt;
+      line-height:1;
+      margin:0 0 .035in;
+      max-width:2.95in;
+    }
+    .print-rapid-mini .print-case-rule{
+      font-size:7.4pt;
+      line-height:1.05;
+      margin:0 0 .04in;
+      max-width:3in;
+    }
+    .print-rapid-mini .print-clue-box{
+      min-height:.9in!important;
+      padding:.05in;
+    }
+    .print-rapid-mini .print-clue-box h3{
+      font-size:8.8pt;
+      margin-bottom:.025in;
+    }
+    .print-rapid-mini .print-clue-box li{
+      font-size:7.2pt;
+      line-height:1.07;
+      margin:.01in 0;
+    }
+    .print-rapid-mini .print-frequency-spot{
+      left:.1in;
+      right:.1in;
+      bottom:.42in;
+      font-size:7.5pt;
+      padding-top:.035in;
+    }
+    .print-rapid-mini .print-token-spot{
+      left:.1in;
+      right:.1in;
+      bottom:.06in;
+      min-height:.27in;
+      font-size:7.8pt;
       border-width:1.5px;
     }
     .print-token-grid{display:grid;grid-template-columns:repeat(4,1.85in);gap:.18in}
@@ -989,6 +1088,16 @@
     .print-frequency-table .case-col{width:1.1in}
     .print-frequency-table .freq-col{width:2.4in}
     .print-frequency-table .token-col{width:2.2in}
+    .print-answer-cell{
+      display:inline-block;
+      border:1px solid #000;
+      padding:.035in .05in;
+      margin:.015in .025in .015in 0;
+      min-width:.52in;
+      text-align:center;
+      font-size:10pt;
+      line-height:1.05;
+    }
     body.print-cases .print-token-section,
     body.print-cases .print-frequency-section,
     body.print-single .print-token-section,
@@ -1039,6 +1148,7 @@
     text-shadow:none!important;
   }
   body.bb-theme.blood-group-game .freq-title,
+  body.bb-theme.blood-group-game .gate-input-label,
   body.bb-theme.blood-group-game .token-lock-message{
     color:#7a1430!important;
     text-shadow:none!important;
@@ -1101,6 +1211,7 @@
     color:#611428!important;
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .freq-title,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .gate-input-label,
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-lock-message{
     color:#fff8fb!important;
   }
@@ -1201,9 +1312,7 @@
     <button class="print-btn" onclick="printCaseCards('all')">Print All Case Cards</button>
     <button class="print-btn" onclick="printCaseCards('rapid')">Print Rapid Cards</button>
     <button class="print-btn" onclick="printTokens()">Print Token Bank</button>
-    <button class="print-btn" onclick="printFrequencySheet('blank')">Print Blank Freq Sheet</button>
     <button class="print-btn" onclick="printFrequencySheet('answer')">Print Answer Freq Sheet</button>
-    <button class="print-btn" onclick="printAntigenSheet('blank')">Print Blank Antigen Sheet</button>
     <button class="print-btn" onclick="printAntigenSheet('answer')">Print Answer Antigen Sheet</button>
     <button class="print-btn" onclick="printFullPack()">Export Whole Game</button>
   </div>
@@ -1433,6 +1542,87 @@ const UNUSUAL_CASE_DATA = [
 ];
 const UNUSUAL_TOKENS = UNUSUAL_CASE_DATA.map(item => item.system.toLowerCase());
 
+const USUAL_CASE_DATA = [
+  {
+    answer:'abo',
+    fields:[
+      ['A', '40'],
+      ['B', '20'],
+      ['O (H)', '45'],
+      ['AB', '05']
+    ]
+  },
+  {
+    answer:'rh',
+    fields:[
+      ['D', '85'],
+      ['C', '70'],
+      ['c', '80'],
+      ['E', '30'],
+      ['e', '98']
+    ]
+  },
+  {
+    answer:'kell',
+    fields:[
+      ['K', '9'],
+      ['k', '100'],
+      ['Kpa', '00'],
+      ['Kpb', '100'],
+      ['Jsa', '01'],
+      ['Jsb', '100']
+    ]
+  },
+  {
+    answer:'duffy',
+    fields:[
+      ['Fya', '60'],
+      ['Fyb', '75'],
+      ['Fy3/FY5', '100']
+    ]
+  },
+  {
+    answer:'kidd',
+    fields:[
+      ['Jka', '75'],
+      ['Jkb', '75'],
+      ['JK3', '100']
+    ]
+  },
+  {
+    answer:'mns',
+    fields:[
+      ['M', '85'],
+      ['N', '70'],
+      ['S', '50'],
+      ['s', '90'],
+      ['U', '100']
+    ]
+  },
+  {
+    answer:'p1pk / globoside',
+    fields:[
+      ['P1', '80'],
+      ['P2', '100'],
+      ['P', '100']
+    ]
+  },
+  {
+    answer:'lewis',
+    fields:[
+      ['Lea', '20'],
+      ['Leb', '70']
+    ]
+  },
+  {
+    answer:'lutheran',
+    fields:[
+      ['Lua', '05'],
+      ['Lub', '99']
+    ]
+  }
+];
+
 function escapeRegex(value){
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -1460,18 +1650,26 @@ function maskRapidClueAntigens(clue, antigens){
   return masked;
 }
 
-const MAIN_CASES = Array.from({length:9}, (_, index) => {
+function splitAntigenAnswerCells(value){
+  const text = String(value || '').trim();
+  const keepTogether = new Set(['xga related cd99', 'ge 1-4']);
+  if(keepTogether.has(text.toLowerCase())) return [text];
+  return text.split(/\s+/).filter(Boolean);
+}
+
+const MAIN_CASES = USUAL_CASE_DATA.map((item, index) => {
   const number = index + 1;
   const label = 'Case #' + number;
   return {
     id:'case-' + number,
     type:'main',
     label,
-    answer:USUAL_TOKENS[index] || USUAL_TOKENS[0],
+    answer:item.answer,
     gateType:'frequency',
-    gateAnswer:String(number),
+    gateAnswer:item.fields.map(field => field[1]),
+    gateFields:item.fields.map(field => ({label:field[0], answer:field[1]})),
     gateName:'frequency',
-    gatePlaceholder:'type exact number',
+    gatePlaceholder:'number',
     status:'placeholder',
     clues:[
       [
@@ -1499,9 +1697,10 @@ const RAPID_CASES = UNUSUAL_CASE_DATA.map((item, index) => {
     label,
     answer:item.system.toLowerCase(),
     gateType:'antigen',
-    gateAnswer:item.antigens,
+    gateAnswer:splitAntigenAnswerCells(item.antigens),
+    gateFields:splitAntigenAnswerCells(item.antigens).map((answer, cellIndex) => ({label:'antigen ' + (cellIndex + 1), answer})),
     gateName:'antigen',
-    gatePlaceholder:'type antigens',
+    gatePlaceholder:'antigen',
     status:'placeholder',
     clues:[
       [
@@ -1571,6 +1770,42 @@ function normalizeAnswer(text){
     .replace(/\s+/g, ' ');
 }
 
+function normalizeFrequencyValue(text){
+  const raw = String(text || '').replace(/%/g, '').trim();
+  if(!raw) return '';
+  const numberValue = Number(raw);
+  if(Number.isFinite(numberValue)) return String(numberValue);
+  return normalizeAnswer(raw);
+}
+
+function gateValuesMatch(card, entered, expected){
+  if(card && card.gateType === 'frequency'){
+    return normalizeFrequencyValue(entered) === normalizeFrequencyValue(expected);
+  }
+  return normalizeAnswer(entered) === normalizeAnswer(expected);
+}
+
+function getGateFields(card){
+  if(!card) return [];
+  if(Array.isArray(card.gateFields) && card.gateFields.length) return card.gateFields;
+  const values = Array.isArray(card.gateAnswer) ? card.gateAnswer : [card.gateAnswer || ''];
+  return values.map((answer, index) => ({
+    label:(card.gateName || 'answer') + ' ' + (index + 1),
+    answer:String(answer)
+  }));
+}
+
+function gateAnswerText(card){
+  return getGateFields(card).map(field => field.label + ': ' + field.answer).join(' / ');
+}
+
+function splitPastedGateValues(text){
+  return String(text || '')
+    .split(/[\s,;/]+/)
+    .map(part => part.trim())
+    .filter(Boolean);
+}
+
 function gateCopy(card){
   const isAntigen = card && card.gateType === 'antigen';
   return {
@@ -1578,7 +1813,7 @@ function gateCopy(card){
     accepted:isAntigen ? 'antigen accepted' : 'frequency accepted',
     unlocked:isAntigen ? 'antigen accepted. choose the matching token below.' : 'frequency accepted. choose the matching blood group token below.',
     copy:isAntigen ? 'enter the antigens from your sheet. wrong antigen = minus 1 minute.' : 'enter the exact frequency number from your sheet. wrong frequency = minus 1 minute.',
-    placeholder:isAntigen ? 'type antigens' : 'type exact number',
+    placeholder:isAntigen ? 'antigen' : 'number',
     locked:isAntigen ? 'enter the antigen first to unlock the token drawer.' : 'enter the exact frequency first to unlock the token drawer.',
     feedbackLocked:isAntigen ? 'read the clue, then enter the antigen to unlock tokens.' : 'read both clues, then enter the exact frequency to unlock tokens.',
     wrong:isAntigen ? 'wrong antigen. minus 1 minute. try again.' : 'wrong frequency. minus 1 minute. try again.'
@@ -1725,18 +1960,29 @@ function renderFrequencyGate(){
     gate.innerHTML = '<div class="freq-title">token drawer unlocked</div><p class="freq-copy">'+esc(copy.unlocked)+'</p>';
     return;
   }
+  const fields = getGateFields(card);
   gate.innerHTML = '<div class="freq-title">'+esc(copy.title)+'</div>'
     + '<p class="freq-copy">'+esc(copy.copy)+'</p>'
     + '<div class="freq-row">'
-    + '<input class="freq-input" id="freq-input" type="text" autocomplete="off" spellcheck="false" placeholder="'+esc(copy.placeholder)+'">'
+    + '<div class="gate-input-grid">'
+    + fields.map((field, index) => '<label class="gate-input-label"><span>'+esc(field.label)+'</span><input class="freq-input gate-input-cell" data-gate-index="'+index+'" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="'+esc(copy.placeholder)+'"></label>').join('')
+    + '</div>'
     + '<button class="primary" onclick="submitGateAnswer()">Unlock drawer</button>'
     + '</div>';
-  const input = document.getElementById('freq-input');
-  if(input){
+  const inputs = Array.from(document.querySelectorAll('.gate-input-cell'));
+  inputs.forEach((input, index) => {
     input.addEventListener('keydown', event => {
       if(event.key === 'Enter') submitGateAnswer();
     });
-  }
+    input.addEventListener('paste', event => {
+      const parts = splitPastedGateValues(event.clipboardData && event.clipboardData.getData('text'));
+      if(parts.length <= 1) return;
+      event.preventDefault();
+      parts.forEach((part, offset) => {
+        if(inputs[index + offset]) inputs[index + offset].value = part;
+      });
+    });
+  });
 }
 
 function renderSystems(){
@@ -1798,11 +2044,13 @@ function updateFeedback(text, type){
 function submitGateAnswer(){
   const card = currentCard();
   const state = currentState();
-  const input = document.getElementById('freq-input');
-  if(!card || !state || !input) return;
-  const answer = normalizeAnswer(input.value);
+  if(!card || !state) return;
+  const inputs = Array.from(document.querySelectorAll('.gate-input-cell'));
+  const fields = getGateFields(card);
+  if(!inputs.length || inputs.length < fields.length) return;
   const copy = gateCopy(card);
-  if(answer === normalizeAnswer(card.gateAnswer)){
+  const allCorrect = fields.every((field, index) => gateValuesMatch(card, inputs[index] ? inputs[index].value : '', field.answer));
+  if(allCorrect){
     state.gateUnlocked = true;
     state.running = true;
     renderFrequencyGate();
@@ -1935,7 +2183,7 @@ function readyCards(){
 function renderPrintInstructions(){
   return '<section class="print-instruction-section print-page">'
     + '<h1 class="print-title">Who&#39;s That Blood Group? - Game Instructions</h1>'
-    + '<p class="print-subtitle">Whole game export: instructions, case cards, frequency sheet, antigen sheet, and token bank.</p>'
+    + '<p class="print-subtitle">Whole game export: instructions, compact case cards, answer sheets, and token bank.</p>'
     + '<ol class="print-instruction-list">'
     + '<li>Choose a case.</li>'
     + '<li>The timer starts when the case opens.</li>'
@@ -1949,22 +2197,37 @@ function renderPrintInstructions(){
     + '</section>';
 }
 
-function printCaseCardHtml(card){
+function printCaseCardInnerHtml(card){
   const clueSets = card.clues || [];
   const copy = gateCopy(card);
   const clueClass = clueSets.length === 1 ? ' single' : '';
   const minutes = formatTime(caseDuration(card)).replace(/^0/, '');
-  const rapidClass = card.type === 'rapid' ? ' print-rapid-card' : '';
-  return '<article class="print-card'+rapidClass+'">'
-    + '<div class="print-mystery-mark">?</div>'
+  return '<div class="print-mystery-mark">?</div>'
     + '<h2>Who&#39;s That Blood Group?</h2>'
     + '<p class="print-case-rule">'+esc(card.label)+' / '+esc(minutes)+' / wrong '+esc(card.gateName)+' = -1 min / placeholder content only</p>'
     + '<div class="print-clue-columns'+clueClass+'">'
     + clueSets.map((clueSet, index) => '<section class="print-clue-box"><h3>Clue '+(index + 1)+'</h3><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul></section>').join('')
     + '</div>'
     + '<div class="print-frequency-spot">'+esc(copy.title)+': ____________________</div>'
-    + '<div class="print-token-spot">token: ____________________</div>'
+    + '<div class="print-token-spot">token: ____________________</div>';
+}
+
+function printCaseCardHtml(card){
+  const rapidClass = card.type === 'rapid' ? ' print-rapid-card' : '';
+  return '<article class="print-card'+rapidClass+'">'+printCaseCardInnerHtml(card)+'</article>';
+}
+
+function printRapidPairCardHtml(pair){
+  return '<article class="print-card print-rapid-pair-card">'
+    + pair.map(card => '<section class="print-rapid-mini">'+printCaseCardInnerHtml(card)+'</section>').join('')
     + '</article>';
+}
+
+function renderPrintAnswerCells(card, withAnswers){
+  return getGateFields(card).map(field => {
+    const value = withAnswers ? field.answer : '';
+    return '<span class="print-answer-cell">'+esc(field.label)+(withAnswers ? ': '+esc(value) : '')+'</span>';
+  }).join('');
 }
 
 function chunkPrintCards(items, size){
@@ -1975,35 +2238,43 @@ function chunkPrintCards(items, size){
   return chunks;
 }
 
-function renderCasePrintSection(cardsForPage, title, subtitle, sectionClass = ''){
-  const gridClass = sectionClass.includes('print-rapid-page') ? ' print-rapid-grid' : '';
+function renderCasePrintSection(cardsForPage, title, subtitle, sectionClass = '', renderer = printCaseCardHtml){
+  const gridClass = sectionClass.includes('print-rapid-page')
+    ? ' print-rapid-grid'
+    : sectionClass.includes('print-compact-page')
+      ? ' print-compact-grid'
+      : '';
   return '<section class="print-clue-section print-page'+sectionClass+'">'
     + '<h1 class="print-title">'+title+'</h1>'
     + '<p class="print-subtitle">'+subtitle+'</p>'
     + '<div class="print-grid'+gridClass+'">'
-    + cardsForPage.map(printCaseCardHtml).join('')
+    + cardsForPage.map(renderer).join('')
     + '</div>'
     + '</section>';
 }
 
-function renderPrintCases(printable){
+function renderPrintCases(printable, options = {}){
+  const sections = [];
   const mainCards = printable.filter(card => card.type !== 'rapid');
   const rapidCards = printable.filter(card => card.type === 'rapid');
-  const sections = [];
   if(mainCards.length){
-    sections.push(renderCasePrintSection(
-      mainCards,
-      'Who&#39;s That Blood Group? - Case Cards',
-      'One 4x6 card per case. Clue 1 and Clue 2 stay together.'
-    ));
-  }
-  if(rapidCards.length){
-    chunkPrintCards(rapidCards, 4).forEach((pageCards, index) => {
+    chunkPrintCards(mainCards, 2).forEach(pageCards => {
       sections.push(renderCasePrintSection(
         pageCards,
+        'Who&#39;s That Blood Group? - Case Cards',
+        'One 4x6 card per usual case. Clue 1 and Clue 2 stay together.'
+      ));
+    });
+  }
+  if(rapidCards.length){
+    const rapidPairs = chunkPrintCards(rapidCards, 2);
+    chunkPrintCards(rapidPairs, 2).forEach(pairPage => {
+      sections.push(renderCasePrintSection(
+        pairPage,
         'Who&#39;s That Blood Group? - Rapid Cards',
-        'Mini-case rapid rounds. Four cards per page.',
-        ' print-rapid-page'
+        'Two rapid rounds fit inside each 4x6 card area.',
+        ' print-rapid-page',
+        printRapidPairCardHtml
       ));
     });
   }
@@ -2030,11 +2301,11 @@ function renderPrintFrequencySheet(kind){
   const frequencyCards = cards.filter(card => card.gateType === 'frequency');
   return '<section class="print-frequency-section print-page">'
     + '<h1 class="print-title">Who&#39;s That Blood Group? - '+(withAnswers ? 'Frequency Answer Sheet' : 'Blank Frequency Sheet')+'</h1>'
-    + '<p class="print-subtitle">Use this page to check or record the exact frequency needed to unlock each case.</p>'
+    + '<p class="print-subtitle">Use this page to check the exact frequency cells needed to unlock each usual-suspect case.</p>'
     + '<table class="print-frequency-table">'
     + '<thead><tr><th class="case-col">Case</th><th class="freq-col">Exact frequency</th><th class="token-col">Notes / token check</th></tr></thead>'
     + '<tbody>'
-    + frequencyCards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+(withAnswers ? esc(card.gateAnswer) : '')+'</td><td>'+(withAnswers ? esc(card.answer) : '')+'</td></tr>').join('')
+    + frequencyCards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+renderPrintAnswerCells(card, withAnswers)+'</td><td>'+(withAnswers ? esc(card.answer) : '')+'</td></tr>').join('')
     + '</tbody></table>'
     + '</section>';
 }
@@ -2044,11 +2315,11 @@ function renderPrintAntigenSheet(kind){
   const antigenCards = cards.filter(card => card.gateType === 'antigen');
   return '<section class="print-frequency-section print-page">'
     + '<h1 class="print-title">Who&#39;s That Blood Group? - '+(withAnswers ? 'Antigen Answer Sheet' : 'Blank Antigen Sheet')+'</h1>'
-    + '<p class="print-subtitle">Rapid rounds unlock after the antigen entry is checked. Placeholder answers can be replaced later.</p>'
+    + '<p class="print-subtitle">Rapid rounds unlock after the antigen cells are checked. Placeholder answers can be replaced later.</p>'
     + '<table class="print-frequency-table">'
     + '<thead><tr><th class="case-col">Rapid</th><th class="freq-col">Antigen entry</th><th class="token-col">Token check</th></tr></thead>'
     + '<tbody>'
-    + antigenCards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+(withAnswers ? esc(card.gateAnswer) : '')+'</td><td>'+(withAnswers ? esc(card.answer) : '')+'</td></tr>').join('')
+    + antigenCards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+renderPrintAnswerCells(card, withAnswers)+'</td><td>'+(withAnswers ? esc(card.answer) : '')+'</td></tr>').join('')
     + '</tbody></table>'
     + '</section>';
 }
@@ -2058,12 +2329,17 @@ function resetPrintClasses(){
 }
 
 function printCaseCards(mode){
-  const printable = mode === 'current' && currentIndex !== null
+  let printable = mode === 'current' && currentIndex !== null
     ? [currentCard()]
     : mode === 'rapid'
       ? RAPID_CASES
       : readyCards();
-  document.getElementById('print-area').innerHTML = renderPrintCases(printable);
+  if(mode === 'current' && currentIndex !== null && currentCard() && currentCard().type === 'rapid'){
+    const rapidIndex = RAPID_CASES.findIndex(card => card.id === currentCard().id);
+    const pairStart = Math.max(0, Math.floor(rapidIndex / 2) * 2);
+    printable = RAPID_CASES.slice(pairStart, pairStart + 2);
+  }
+  document.getElementById('print-area').innerHTML = renderPrintCases(printable, {compact:mode !== 'current'});
   resetPrintClasses();
   document.body.classList.add(mode === 'current' ? 'print-single' : 'print-cases');
   setTimeout(() => window.print(), 80);
@@ -2091,7 +2367,7 @@ function printAntigenSheet(kind){
 }
 
 function printFullPack(){
-  document.getElementById('print-area').innerHTML = renderPrintInstructions() + renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
+  document.getElementById('print-area').innerHTML = renderPrintInstructions() + renderPrintCases(readyCards(), {compact:true}) + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('answer') + renderPrintTokens();
   resetPrintClasses();
   document.body.classList.add('print-full');
   setTimeout(() => window.print(), 80);
@@ -2139,10 +2415,10 @@ if(printPreviewMode){
     document.getElementById('print-area').innerHTML = renderPrintCases([cards[0]]);
     document.body.classList.add('print-single');
   }else if(printPreviewMode === 'cases'){
-    document.getElementById('print-area').innerHTML = renderPrintCases(readyCards());
+    document.getElementById('print-area').innerHTML = renderPrintCases(readyCards(), {compact:true});
     document.body.classList.add('print-cases');
   }else if(printPreviewMode === 'rapidCases'){
-    document.getElementById('print-area').innerHTML = renderPrintCases(RAPID_CASES);
+    document.getElementById('print-area').innerHTML = renderPrintCases(RAPID_CASES, {compact:true});
     document.body.classList.add('print-cases');
   }else if(printPreviewMode === 'tokens'){
     document.getElementById('print-area').innerHTML = renderPrintTokens();
@@ -2160,7 +2436,7 @@ if(printPreviewMode){
     document.getElementById('print-area').innerHTML = renderPrintAntigenSheet('answer');
     document.body.classList.add('print-freq');
   }else if(printPreviewMode === 'full'){
-    document.getElementById('print-area').innerHTML = renderPrintInstructions() + renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
+    document.getElementById('print-area').innerHTML = renderPrintInstructions() + renderPrintCases(readyCards(), {compact:true}) + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('answer') + renderPrintTokens();
     document.body.classList.add('print-full');
   }
 }
