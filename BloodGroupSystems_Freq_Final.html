@@ -411,18 +411,24 @@
     }
     .print-antigen-panel-grid{
       display:grid;
-      grid-template-columns:1.05fr 1fr 1.08fr;
-      gap:.12in;
-      align-items:start;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      grid-template-rows:repeat(3, 1fr);
+      gap:.1in;
+      align-items:stretch;
+      height:7.34in;
     }
     .print-antigen-panel{
-      display:grid;
-      gap:.075in;
+      display:contents;
     }
     .print-antigen-card{
       border:1.5px solid #000!important;
       break-inside:avoid;
       page-break-inside:avoid;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      min-width:0;
+      overflow:hidden;
     }
     .print-antigen-card-title{
       border-bottom:1.5px solid #000!important;
@@ -435,30 +441,36 @@
     }
     .print-antigen-table{
       width:100%;
+      max-width:100%;
+      min-width:0;
+      height:100%;
       border-collapse:collapse;
       table-layout:fixed;
       font-size:9.2pt;
       line-height:1.05;
+      flex:1;
     }
     .print-antigen-table th,
     .print-antigen-table td{
       border:1px solid #000!important;
-      padding:.04in .045in!important;
-      height:.42in;
+      padding:.03in .04in!important;
+      height:auto;
       min-height:0;
       text-align:center;
       vertical-align:middle;
       font-weight:900;
+      overflow:hidden;
+      overflow-wrap:anywhere;
     }
     .print-antigen-table th{
       font-size:7.2pt;
       text-transform:uppercase;
       letter-spacing:.025em;
     }
-    .print-antigen-table .antigen-col{width:.55in}
-    .print-antigen-table .freq-col{width:.48in}
-    .print-antigen-table .pop-col{width:1.15in}
-    .print-antigen-table .level-col{width:.5in}
+    .print-antigen-table .antigen-col{width:22%}
+    .print-antigen-table .freq-col{width:17%}
+    .print-antigen-table .pop-col{width:39%}
+    .print-antigen-table .level-col{width:22%}
   }
 
   @media (max-width:1100px){
@@ -1014,45 +1026,14 @@ function buildAnswers(){
   content.appendChild(wrap);
 }
 
-const antigramPrintPanels = [
-  [
-    { title:"Rh-hr", system:"Rh", antigens:["D","C","E","c","e","f","Cw","V"] },
-    { title:"Kell", system:"Kell", antigens:["K","k","Kpa","Kpb","Jsa","Jsb"] },
-    { title:"Duffy", system:"Duffy", antigens:["Fya","Fyb"] }
-  ],
-  [
-    { title:"Kidd", system:"Kidd", antigens:["Jka","Jkb"] },
-    { title:"Xg", system:"Xg", antigens:["Xga"] },
-    { title:"Lewis", system:"Lewis", antigens:["Lea","Leb"] },
-    { title:"MNS", system:"MNS", antigens:["S","s","M","N"] }
-  ],
-  [
-    { title:"P", system:"P", antigens:["P1"] },
-    { title:"Lutheran", system:"Lutheran", antigens:["Lua","Lub"] },
-    {
-      title:"Extra short-version items",
-      rows:[
-        { system:"ABO", antigen:"A", label:"ABO - A" },
-        { system:"ABO", antigen:"B", label:"ABO - B" },
-        { system:"ABO", antigen:"O (H)", label:"ABO - O (H)" },
-        { system:"ABO", antigen:"AB", label:"ABO - AB" },
-        { system:"MNS", antigen:"U", label:"MNS - U" },
-        { system:"P", antigen:"P2", label:"P - P2" },
-        { system:"P", antigen:"P", label:"P - P" },
-        { system:"Duffy", antigen:"Fy3/FY5", label:"Duffy - Fy3/FY5" },
-        { system:"Kidd", antigen:"JK3", label:"Kidd - JK3" }
-      ]
-    }
-  ]
+const antigenPrintPanels = [
+  ["ABO", "Rh", "Kell"],
+  ["Duffy", "Kidd", "Lewis"],
+  ["MNS", "P", "Lutheran"]
 ];
 
-function findAntigenRecord(systemName, antigenName){
-  const system = systems.find(item => item.name.toLowerCase() === systemName.toLowerCase() || item.symbol.toLowerCase() === systemName.toLowerCase());
-  if(!system) return null;
-  const exact = system.antigens.find(item => plainAntigen(item.antigen) === antigenName);
-  if(exact) return exact;
-  const needle = antigenName.toLowerCase();
-  return system.antigens.find(item => plainAntigen(item.antigen).toLowerCase() === needle) || null;
+function printSystemByName(systemName){
+  return systems.find(item => item.name.toLowerCase() === systemName.toLowerCase());
 }
 
 function printAnswerParts(record){
@@ -1065,28 +1046,26 @@ function printAnswerParts(record){
   };
 }
 
-function renderAntigenCard(group, showAnswers){
-  const rows = group.rows || group.antigens.map(antigen => ({ system:group.system, antigen, label:antigen }));
+function renderAntigenCard(system, showAnswers){
   const cellStyle = "background:#fff!important;color:#000!important;border:1px solid #000!important;";
   return `
     <section class="print-antigen-card">
-      <div class="print-antigen-card-title">${group.title}</div>
+      <div class="print-antigen-card-title">${system.name}</div>
       <table class="print-antigen-table" style="background:#fff!important;color:#000!important;border-collapse:collapse;">
         <thead>
           <tr>
             <th class="antigen-col" style="${cellStyle}">Antigen</th>
             <th class="freq-col" style="${cellStyle}">Freq</th>
-            <th class="pop-col" style="${cellStyle}">Population Difference</th>
-            <th class="level-col" style="${cellStyle}">High / Low</th>
+            <th class="pop-col" style="${cellStyle}">Pop Diff</th>
+            <th class="level-col" style="${cellStyle}">H/L</th>
           </tr>
         </thead>
         <tbody>
-          ${rows.map(row => {
-            const record = findAntigenRecord(row.system, row.antigen);
+          ${system.antigens.map(record => {
             const answer = showAnswers ? printAnswerParts(record) : { frequency:"", population:"", level:"" };
             return `
               <tr style="background:#fff!important;color:#000!important;">
-                <td style="${cellStyle}">${row.label || row.antigen}</td>
+                <td style="${cellStyle}">${plainAntigen(record.antigen)}</td>
                 <td style="${cellStyle}">${answer.frequency}</td>
                 <td style="${cellStyle}">${answer.population}</td>
                 <td style="${cellStyle}">${answer.level}</td>
@@ -1104,11 +1083,11 @@ function renderAntigenSheet(mode = "blank"){
   return `
     <section class="print-antigen-sheet">
       <h1 class="print-antigen-title">Antigen Short Version - ${showAnswers ? "Answer Sheet" : "Blank Sheet"}</h1>
-      <p class="print-antigen-subtitle">Follows beginner antigram order. High frequency = &gt;90%. Low frequency = &lt;9%.</p>
+      <p class="print-antigen-subtitle">Follows antigram system order with ABO added. Each table keeps the game antigens together. High frequency = &gt;90%. Low frequency = &lt;9%.</p>
       <div class="print-antigen-panel-grid">
-        ${antigramPrintPanels.map(panel => `
+        ${antigenPrintPanels.map(panel => `
           <div class="print-antigen-panel">
-            ${panel.map(group => renderAntigenCard(group, showAnswers)).join("")}
+            ${panel.map(systemName => printSystemByName(systemName)).filter(Boolean).map(system => renderAntigenCard(system, showAnswers)).join("")}
           </div>
         `).join("")}
       </div>

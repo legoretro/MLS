@@ -245,7 +245,11 @@
     border-color:var(--accent);
     box-shadow:inset 0 3px 0 var(--accent);
   }
-  .deck-card.done{border-color:rgba(61,220,132,.42)}
+  .deck-card.done{
+    background:linear-gradient(180deg, rgba(61,220,132,.24), rgba(28,93,57,.34));
+    border-color:var(--good);
+    box-shadow:inset 0 4px 0 var(--good), 0 14px 28px rgba(61,220,132,.12);
+  }
   .deck-card.locked{opacity:.7}
   .deck-label{font-size:24px;font-weight:1000;line-height:1.05}
   .deck-status{font-size:12px;color:var(--muted);font-weight:900;margin-top:12px;text-transform:uppercase;letter-spacing:.08em}
@@ -256,7 +260,8 @@
     font-size:13px;
     font-weight:900;
   }
-  .deck-card.done .deck-status{color:#bdf4d4}
+  .deck-card.done .deck-label,
+  .deck-card.done .deck-status{color:#d9ffe9}
   .deck-section + .deck-section{margin-top:18px}
   .deck-section-title{
     display:flex;
@@ -839,6 +844,8 @@
     .print-instruction-list{display:grid;grid-template-columns:repeat(2,1fr);gap:.08in .2in;margin:.12in 0 .16in;padding-left:.22in;font-size:13pt;font-weight:900;line-height:1.2}
     .print-instruction-list li{margin:0 0 .04in}
     .print-grid{display:grid;grid-template-columns:repeat(2,4in);gap:.18in;align-items:start}
+    .print-rapid-page{break-after:page}
+    .print-rapid-grid{grid-template-columns:repeat(2,4in);gap:.18in .2in}
     body.print-single .print-page{page:bloodGroupSingle;padding:0}
     body.print-single .print-title, body.print-single .print-subtitle{display:none!important}
     body.print-single .print-grid{display:block}
@@ -855,6 +862,7 @@
       overflow:hidden;
     }
     body.print-single .print-card{margin:0 auto .01in;break-after:page}
+    body.print-single .print-card.print-rapid-card{height:5.72in!important}
     .print-card h2{font-size:15.5pt;line-height:1;margin:0 0 .05in;color:#000!important;max-width:3in}
     .print-case-rule{font-size:8.5pt;line-height:1.15;margin:0 0 .06in;color:#000!important;font-weight:900;max-width:3.08in}
     .print-clue-columns{display:grid;grid-template-columns:1fr 1fr;gap:.09in;margin-top:.06in}
@@ -864,6 +872,42 @@
     .print-clue-box h3{font-size:11pt;margin:0 0 .06in;color:#000!important;border:0;padding:0}
     .print-clue-box ul{margin:.03in 0 0;padding-left:.18in}
     .print-clue-box li{font-size:8.9pt;line-height:1.17;margin:.03in 0;color:#000!important}
+    .print-card.print-rapid-card{
+      height:2.58in;
+      padding:.12in;
+      border-radius:.14in;
+    }
+    .print-card.print-rapid-card h2{
+      font-size:13pt;
+      max-width:3.08in;
+      margin-bottom:.04in;
+    }
+    .print-card.print-rapid-card .print-case-rule{
+      font-size:7.4pt;
+      line-height:1.05;
+      margin-bottom:.04in;
+      max-width:3.1in;
+    }
+    .print-card.print-rapid-card .print-clue-box{
+      min-height:1.12in!important;
+      padding:.055in;
+    }
+    .print-card.print-rapid-card .print-clue-box h3{
+      font-size:9.2pt;
+      margin-bottom:.03in;
+    }
+    .print-card.print-rapid-card .print-clue-box li{
+      font-size:7.4pt;
+      line-height:1.08;
+      margin:.015in 0;
+    }
+    .print-card.print-rapid-card .print-mystery-mark{
+      width:.42in;
+      height:.42in;
+      font-size:20pt;
+      right:.12in;
+      top:.12in;
+    }
     .print-mystery-mark{
       position:absolute;
       right:.16in;
@@ -902,6 +946,21 @@
       padding-top:.07in;
       font-size:10pt;
       font-weight:900;
+    }
+    .print-card.print-rapid-card .print-frequency-spot{
+      left:.14in;
+      right:.14in;
+      bottom:.58in;
+      font-size:8pt;
+      padding-top:.045in;
+    }
+    .print-card.print-rapid-card .print-token-spot{
+      left:.14in;
+      right:.14in;
+      bottom:.1in;
+      min-height:.36in;
+      font-size:8.6pt;
+      border-width:1.5px;
     }
     .print-token-grid{display:grid;grid-template-columns:repeat(4,1.85in);gap:.18in}
     .print-token{
@@ -1023,6 +1082,16 @@
   body.bb-theme.blood-group-game .token-bank-label{
     color:#c91643!important;
   }
+  body.bb-theme.blood-group-game .deck-card.done{
+    background:#eafff2!important;
+    border-color:#2b9a5f!important;
+    box-shadow:inset 0 5px 0 #2b9a5f, 0 14px 24px rgba(43,154,95,.14)!important;
+  }
+  body.bb-theme.blood-group-game .deck-card.done .deck-label,
+  body.bb-theme.blood-group-game .deck-card.done .deck-status,
+  body.bb-theme.blood-group-game .deck-card.done .deck-help{
+    color:#0b6a3a!important;
+  }
   body.bb-theme.blood-group-game .token-bank-wrap.locked .system-grid{
     opacity:1!important;
     filter:none!important;
@@ -1043,6 +1112,15 @@
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-bank-label{
     color:#ffd5df!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-card.done{
+    background:linear-gradient(180deg, rgba(61,220,132,.22), rgba(19,61,37,.54))!important;
+    border-color:#4fc985!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-card.done .deck-label,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-card.done .deck-status,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-card.done .deck-help{
+    color:#d9ffe9!important;
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .system-token{
     background:#252d44!important;
@@ -1121,6 +1199,7 @@
   <div class="print-controls">
     <button class="print-btn" onclick="printCaseCards('current')">Print Current 4x6</button>
     <button class="print-btn" onclick="printCaseCards('all')">Print All Case Cards</button>
+    <button class="print-btn" onclick="printCaseCards('rapid')">Print Rapid Cards</button>
     <button class="print-btn" onclick="printTokens()">Print Token Bank</button>
     <button class="print-btn" onclick="printFrequencySheet('blank')">Print Blank Freq Sheet</button>
     <button class="print-btn" onclick="printFrequencySheet('answer')">Print Answer Freq Sheet</button>
@@ -1354,6 +1433,33 @@ const UNUSUAL_CASE_DATA = [
 ];
 const UNUSUAL_TOKENS = UNUSUAL_CASE_DATA.map(item => item.system.toLowerCase());
 
+function escapeRegex(value){
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function maskRapidClueAntigens(clue, antigens){
+  const tokens = String(antigens).match(/[A-Za-z][A-Za-z0-9'-]*/g) || [];
+  const skipWords = new Set(['related']);
+  let masked = clue;
+  tokens
+    .filter(token => !skipWords.has(token.toLowerCase()))
+    .sort((a, b) => b.length - a.length)
+    .forEach(token => {
+      masked = masked.replace(new RegExp('\\b' + escapeRegex(token) + '\\b', 'gi'), 'an antigen');
+    });
+  masked = masked
+    .replace(/\bAnti-G2\b/gi, 'an antibody')
+    .replace(/\bD antigen\b/gi, 'an antigen')
+    .replace(/\bHTLA antigen\b/gi, 'HTLA')
+    .replace(/\ban antigen\s+high in\b/gi, 'an antigen is common in')
+    .replace(/\ban antigen\s+common in\b/gi, 'an antigen is common in')
+    .replace(/\ban antigen\s+more common in\b/gi, 'an antigen is common in')
+    .replace(/\ban antigen\s+related\b/gi, 'an antigen related')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return masked;
+}
+
 const MAIN_CASES = Array.from({length:9}, (_, index) => {
   const number = index + 1;
   const label = 'Case #' + number;
@@ -1399,7 +1505,7 @@ const RAPID_CASES = UNUSUAL_CASE_DATA.map((item, index) => {
     status:'placeholder',
     clues:[
       [
-        item.clue
+        maskRapidClueAntigens(item.clue, item.antigens)
       ]
     ]
   };
@@ -1848,7 +1954,8 @@ function printCaseCardHtml(card){
   const copy = gateCopy(card);
   const clueClass = clueSets.length === 1 ? ' single' : '';
   const minutes = formatTime(caseDuration(card)).replace(/^0/, '');
-  return '<article class="print-card">'
+  const rapidClass = card.type === 'rapid' ? ' print-rapid-card' : '';
+  return '<article class="print-card'+rapidClass+'">'
     + '<div class="print-mystery-mark">?</div>'
     + '<h2>Who&#39;s That Blood Group?</h2>'
     + '<p class="print-case-rule">'+esc(card.label)+' / '+esc(minutes)+' / wrong '+esc(card.gateName)+' = -1 min / placeholder content only</p>'
@@ -1860,14 +1967,47 @@ function printCaseCardHtml(card){
     + '</article>';
 }
 
-function renderPrintCases(printable){
-  return '<section class="print-clue-section print-page">'
-    + '<h1 class="print-title">Who&#39;s That Blood Group? - Case Cards</h1>'
-    + '<p class="print-subtitle">One 4x6 card per case. Clue 1 and Clue 2 stay together.</p>'
-    + '<div class="print-grid">'
-    + printable.map(printCaseCardHtml).join('')
+function chunkPrintCards(items, size){
+  const chunks = [];
+  for(let index = 0; index < items.length; index += size){
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+}
+
+function renderCasePrintSection(cardsForPage, title, subtitle, sectionClass = ''){
+  const gridClass = sectionClass.includes('print-rapid-page') ? ' print-rapid-grid' : '';
+  return '<section class="print-clue-section print-page'+sectionClass+'">'
+    + '<h1 class="print-title">'+title+'</h1>'
+    + '<p class="print-subtitle">'+subtitle+'</p>'
+    + '<div class="print-grid'+gridClass+'">'
+    + cardsForPage.map(printCaseCardHtml).join('')
     + '</div>'
     + '</section>';
+}
+
+function renderPrintCases(printable){
+  const mainCards = printable.filter(card => card.type !== 'rapid');
+  const rapidCards = printable.filter(card => card.type === 'rapid');
+  const sections = [];
+  if(mainCards.length){
+    sections.push(renderCasePrintSection(
+      mainCards,
+      'Who&#39;s That Blood Group? - Case Cards',
+      'One 4x6 card per case. Clue 1 and Clue 2 stay together.'
+    ));
+  }
+  if(rapidCards.length){
+    chunkPrintCards(rapidCards, 4).forEach((pageCards, index) => {
+      sections.push(renderCasePrintSection(
+        pageCards,
+        'Who&#39;s That Blood Group? - Rapid Cards',
+        'Mini-case rapid rounds. Four cards per page.',
+        ' print-rapid-page'
+      ));
+    });
+  }
+  return sections.join('');
 }
 
 function renderPrintTokens(){
@@ -1918,7 +2058,11 @@ function resetPrintClasses(){
 }
 
 function printCaseCards(mode){
-  const printable = mode === 'current' && currentIndex !== null ? [currentCard()] : readyCards();
+  const printable = mode === 'current' && currentIndex !== null
+    ? [currentCard()]
+    : mode === 'rapid'
+      ? RAPID_CASES
+      : readyCards();
   document.getElementById('print-area').innerHTML = renderPrintCases(printable);
   resetPrintClasses();
   document.body.classList.add(mode === 'current' ? 'print-single' : 'print-cases');
@@ -1996,6 +2140,9 @@ if(printPreviewMode){
     document.body.classList.add('print-single');
   }else if(printPreviewMode === 'cases'){
     document.getElementById('print-area').innerHTML = renderPrintCases(readyCards());
+    document.body.classList.add('print-cases');
+  }else if(printPreviewMode === 'rapidCases'){
+    document.getElementById('print-area').innerHTML = renderPrintCases(RAPID_CASES);
     document.body.classList.add('print-cases');
   }else if(printPreviewMode === 'tokens'){
     document.getElementById('print-area').innerHTML = renderPrintTokens();
