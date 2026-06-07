@@ -329,6 +329,170 @@
   .type1-structure .secretor-drop{ top:88px; }
   .type1-structure .lewis-drop{ top:164px; }
 
+  .p1pk-note-card{
+    margin-top:14px;
+    border:2px solid #f0b2c4;
+    border-radius:12px;
+    background:#fff8fb;
+    padding:10px;
+    color:#6c1732;
+    font-size:.82rem;
+    font-weight:900;
+    line-height:1.35;
+  }
+
+  .p1pk-map{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  .p1pk-path{
+    background:#fff;
+    border:2px solid #eadde2;
+    border-radius:14px;
+    padding:12px;
+    min-width:0;
+  }
+
+  .p1pk-path-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    color:#6c1732;
+    font-size:.82rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-bottom:10px;
+  }
+
+  .p1pk-path-title span{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:#d91d4c;
+    color:#fff;
+    flex-shrink:0;
+  }
+
+  .p1pk-chain-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    flex-wrap:wrap;
+    padding:8px;
+    border-radius:12px;
+    background:#fff9fb;
+    border:1px solid #f0d9df;
+    margin-bottom:10px;
+  }
+
+  .p1pk-chain-row::before{
+    content:"RBC";
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:48px;
+    height:26px;
+    border-radius:50%;
+    background:radial-gradient(circle at 36% 35%, #ff6d62 0 22%, #cc1b24 58%, #94131a 100%);
+    color:#fff;
+    font-size:.66rem;
+    font-weight:900;
+    letter-spacing:.08em;
+  }
+
+  .p1pk-mini-sugar{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:54px;
+    height:42px;
+    padding:6px 8px;
+    border:2px solid rgba(139,107,40,.65);
+    color:#121212;
+    font-size:.76rem;
+    font-weight:900;
+    line-height:1;
+  }
+
+  .p1pk-mini-sugar.glc{
+    background:#87c58c;
+    clip-path:polygon(50% 2%, 98% 96%, 2% 96%);
+    padding-top:14px;
+  }
+
+  .p1pk-mini-sugar.gal{
+    background:#41c7d5;
+    border-radius:50%;
+  }
+
+  .p1pk-mini-sugar.glcnac{
+    background:#ffe15d;
+    border-radius:9px;
+  }
+
+  .p1pk-small-drop{
+    min-width:90px;
+    min-height:44px !important;
+    border-radius:12px !important;
+  }
+
+  .p1pk-slot-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .p1pk-field{
+    display:grid;
+    gap:5px;
+    min-width:0;
+  }
+
+  .p1pk-field-label{
+    color:#6c1732;
+    font-size:.66rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+
+  .p1pk-slot,
+  .p1pk-label-slot{
+    position:relative;
+    min-height:44px !important;
+    border-radius:12px !important;
+    padding:7px 8px !important;
+  }
+
+  .p1pk-fork{
+    display:grid;
+    gap:10px;
+  }
+
+  .p1pk-branch{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    align-items:center;
+    gap:8px;
+    padding:8px;
+    border:1px solid #f0d9df;
+    border-radius:12px;
+    background:#fff9fb;
+  }
+
+  .p1pk-arrow{
+    color:#c91946;
+    font-weight:900;
+  }
+
   .blood-chain-structure .antigen-drop{
     left:calc(50% - 42px);
     top:14px;
@@ -680,6 +844,9 @@
     .layout{
       grid-template-columns:1fr;
     }
+    .p1pk-map{
+      grid-template-columns:1fr;
+    }
     .mechanism-layout,
     .mechanism-row{
       grid-template-columns:1fr;
@@ -727,6 +894,15 @@
       max-width:108px;
       font-size:.56rem;
     }
+
+    .p1pk-slot-grid{
+      grid-template-columns:1fr;
+    }
+
+    .p1pk-branch{
+      grid-template-columns:1fr;
+      text-align:center;
+    }
   }
 
   @media (max-width: 460px){
@@ -767,6 +943,7 @@
   <div class="structure-tabs" id="structureTabs">
     <button class="structure-tab active" data-structure-section="type2" type="button">ABH Type 2</button>
     <button class="structure-tab" data-structure-section="type1" type="button">Lewis / Secretor Type 1</button>
+    <button class="structure-tab" data-structure-section="p1pk" type="button">P1PK / GLOB</button>
   </div>
 </div>
 
@@ -918,6 +1095,107 @@
 </div>
 
 
+<div class="wrap section-block structure-section" data-structure-section="p1pk">
+  <header>
+    <div>
+      <h1>P1PK / GLOB Structures</h1>
+      <p>Draft: build P from Pk, then compare the H/P1 fork.</p>
+    </div>
+    <div class="badge">P1PK</div>
+  </header>
+
+  <div class="section-controls">
+    <button id="checkBtnP1PK" class="checkBtn">✔ Check Answers</button>
+    <button id="resetBtnP1PK" class="resetBtn">↺ Reset P1PK</button>
+    <button id="seeAnswersBtnP1PK" class="seeBtn">Show answers</button>
+    <div id="msgP1PK" class="score"></div>
+  </div>
+
+  <div class="layout">
+    <div class="bank">
+      <h2>P1PK Build Bank</h2>
+      <div class="hint">Tap or drag to build both routes.</div>
+      <div id="p1pkBuildWrap"></div>
+    </div>
+
+    <div class="main-card">
+      <div class="main-title">P1PK / GLOB Two-Way Draft</div>
+      <div class="main-body">
+        <div class="p1pk-map" aria-label="P1PK and GLOB two-way structure draft">
+          <section class="p1pk-path">
+            <div class="p1pk-path-title"><span>1</span> P antigen from Pk</div>
+            <div class="p1pk-chain-row" aria-label="Globoside chain">
+              <div class="p1pk-mini-sugar glc">Glc</div>
+              <div class="p1pk-mini-sugar gal">Gal</div>
+              <div class="p1pk-mini-sugar gal">Gal</div>
+              <div class="dropzone p1pk-small-drop" id="drop-p1pk-p-sugar"></div>
+            </div>
+            <div class="p1pk-slot-grid">
+              <div class="p1pk-field">
+                <div class="p1pk-field-label">Pk builder</div>
+                <div class="dropzone p1pk-slot" id="drop-p1pk-pk-gene"></div>
+              </div>
+              <div class="p1pk-field">
+                <div class="p1pk-field-label">Pk chromosome</div>
+                <div class="dropzone p1pk-slot" id="drop-p1pk-pk-chromosome"></div>
+              </div>
+              <div class="p1pk-field">
+                <div class="p1pk-field-label">P gene</div>
+                <div class="dropzone p1pk-slot" id="drop-p1pk-glob-gene"></div>
+              </div>
+              <div class="p1pk-field">
+                <div class="p1pk-field-label">P chromosome</div>
+                <div class="dropzone p1pk-slot" id="drop-p1pk-glob-chromosome"></div>
+              </div>
+              <div class="p1pk-field">
+                <div class="p1pk-field-label">Starting stage</div>
+                <div class="label-drop p1pk-label-slot" id="label-drop-p1pk-pk"></div>
+              </div>
+              <div class="p1pk-field">
+                <div class="p1pk-field-label">Final stage</div>
+                <div class="label-drop p1pk-label-slot" id="label-drop-p1pk-p"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="p1pk-path">
+            <div class="p1pk-path-title"><span>2</span> Paragloboside fork</div>
+            <div class="p1pk-chain-row" aria-label="Paragloboside chain">
+              <div class="p1pk-mini-sugar glc">Glc</div>
+              <div class="p1pk-mini-sugar gal">Gal</div>
+              <div class="p1pk-mini-sugar glcnac">GlcNAc</div>
+              <div class="p1pk-mini-sugar gal">Gal</div>
+            </div>
+            <div class="p1pk-fork">
+              <div class="p1pk-branch">
+                <div class="dropzone p1pk-slot" id="drop-p1pk-h-branch"></div>
+                <div class="p1pk-arrow">→</div>
+                <div class="label-drop p1pk-label-slot" id="label-drop-p1pk-h"></div>
+              </div>
+              <div class="p1pk-branch">
+                <div class="dropzone p1pk-slot" id="drop-p1pk-p1-branch"></div>
+                <div class="p1pk-arrow">→</div>
+                <div class="label-drop p1pk-label-slot" id="label-drop-p1pk-p1"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="p1pk-note-card">
+          Draft reference: Pk is built by P1PK/A4GALT on chromosome 22. P is made when GLOB/B3GALNT1 on chromosome 3 adds GalNAc to Pk. Paragloboside can also fork toward H with FUT1/Fuc or toward P1 with P1PK/Gal.
+        </div>
+      </div>
+    </div>
+
+    <div class="bank">
+      <h2>P1PK Label Bank</h2>
+      <div class="hint">Match the antigen stage.</div>
+      <div id="p1pkLabelWrap"></div>
+    </div>
+  </div>
+</div>
+
+
 <div class="wrap">
   <div id="answersPanel" class="answers-panel">
     <div class="answers-title">Reference</div>
@@ -1036,6 +1314,28 @@
         <div><strong>Lewis Label:</strong> Le(a-,b+)</div>
         <div><strong>Secretor:</strong> Yes</div>
         <div><strong>Agglutination:</strong> No</div>
+      </div>
+    </div>
+
+    <div class="answers-subtitle">P1PK / GLOB Draft</div>
+    <div class="answers-grid">
+      <div class="answer-card">
+        <h3>Pk base</h3>
+        <div><strong>Gene:</strong> P1PK / A4GALT</div>
+        <div><strong>Chromosome:</strong> 22</div>
+        <div><strong>Action:</strong> Adds Gal to make Pk.</div>
+      </div>
+      <div class="answer-card">
+        <h3>P antigen</h3>
+        <div><strong>Gene:</strong> GLOB / B3GALNT1</div>
+        <div><strong>Chromosome:</strong> 3</div>
+        <div><strong>Action:</strong> Adds GalNAc to Pk.</div>
+      </div>
+      <div class="answer-card">
+        <h3>Paragloboside fork</h3>
+        <div><strong>H route:</strong> FUT1 / Fuc</div>
+        <div><strong>P1 route:</strong> P1PK / Gal</div>
+        <div><strong>Draft idea:</strong> P1PK competes with FUT1 on available Gal.</div>
       </div>
     </div>
 
@@ -1893,6 +2193,464 @@ function resetType1(){
   renderType1LabelBankUsage("agglutination");
 }
 
+const P1PK_BUILD_CHIPS = [
+  "P1PK / A4GALT",
+  "GLOB / B3GALNT1",
+  "Chromosome 22",
+  "Chromosome 3",
+  "Galactose",
+  "GalNAc",
+  "FUT1 / Fuc"
+];
+
+const P1PK_LABEL_CHIPS = [
+  "Pk antigen",
+  "P antigen expressed",
+  "H antigen formed",
+  "P1 antigen formed"
+];
+
+const P1PK_ANSWERS = {
+  pkGene: "P1PK / A4GALT",
+  pkChromosome: "Chromosome 22",
+  globGene: "GLOB / B3GALNT1",
+  globChromosome: "Chromosome 3",
+  pSugar: "GalNAc",
+  hBranch: "FUT1 / Fuc",
+  p1Branch: "Galactose",
+  pkLabel: "Pk antigen",
+  pLabel: "P antigen expressed",
+  hLabel: "H antigen formed",
+  p1Label: "P1 antigen formed"
+};
+
+const p1pkState = {
+  pkGene: null,
+  pkChromosome: null,
+  globGene: null,
+  globChromosome: null,
+  pSugar: null,
+  hBranch: null,
+  p1Branch: null,
+  pkLabel: null,
+  pLabel: null,
+  hLabel: null,
+  p1Label: null
+};
+
+let selectedP1PKBuild = null;
+let selectedP1PKLabel = null;
+
+const P1PK_BUILD_KEYS = ["pkGene","pkChromosome","globGene","globChromosome","pSugar","hBranch","p1Branch"];
+const P1PK_LABEL_KEYS = ["pkLabel","pLabel","hLabel","p1Label"];
+
+function clearP1PKMarks(){
+  [
+    "drop-p1pk-pk-gene",
+    "drop-p1pk-pk-chromosome",
+    "drop-p1pk-glob-gene",
+    "drop-p1pk-glob-chromosome",
+    "drop-p1pk-p-sugar",
+    "drop-p1pk-h-branch",
+    "drop-p1pk-p1-branch",
+    "label-drop-p1pk-pk",
+    "label-drop-p1pk-p",
+    "label-drop-p1pk-h",
+    "label-drop-p1pk-p1"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove("correct","wrong");
+  });
+
+  const msg = document.getElementById("msgP1PK");
+  msg.textContent = "";
+  msg.className = "score";
+}
+
+function countP1PKBuildUses(value){
+  return P1PK_BUILD_KEYS.reduce((count, key) => {
+    return count + (p1pkState[key] === value ? 1 : 0);
+  }, 0);
+}
+
+function countP1PKLabelUses(value){
+  return P1PK_LABEL_KEYS.reduce((count, key) => {
+    return count + (p1pkState[key] === value ? 1 : 0);
+  }, 0);
+}
+
+function isValidP1PKBuildForSlot(stateKey, value){
+  if(stateKey === "pkGene") return value === "P1PK / A4GALT";
+  if(stateKey === "pkChromosome") return value === "Chromosome 22";
+  if(stateKey === "globGene") return value === "GLOB / B3GALNT1";
+  if(stateKey === "globChromosome") return value === "Chromosome 3";
+  if(stateKey === "pSugar") return value === "GalNAc";
+  if(stateKey === "hBranch") return value === "FUT1 / Fuc";
+  if(stateKey === "p1Branch") return value === "Galactose";
+  return false;
+}
+
+function clearP1PKTapSelections(){
+  selectedP1PKBuild = null;
+  selectedP1PKLabel = null;
+  renderP1PKBuildBankUsage();
+  renderP1PKLabelBankUsage();
+}
+
+function placeP1PKBuildValue(stateKey, value, fromKey = null){
+  if(!isValidP1PKBuildForSlot(stateKey, value)) return false;
+
+  const usedElsewhere = P1PK_BUILD_KEYS.some(key => {
+    return key !== stateKey && p1pkState[key] === value;
+  });
+
+  if(usedElsewhere && fromKey !== `p1pk-${stateKey}`) return false;
+
+  if(fromKey && fromKey.startsWith("p1pk-") && fromKey !== `p1pk-${stateKey}`){
+    const oldKey = fromKey.replace("p1pk-", "");
+    if(P1PK_BUILD_KEYS.includes(oldKey)){
+      p1pkState[oldKey] = null;
+      renderP1PKBuildDrop(oldKey);
+    }
+  }
+
+  p1pkState[stateKey] = value;
+  renderP1PKBuildDrop(stateKey);
+  clearP1PKMarks();
+  renderP1PKBuildBankUsage();
+  return true;
+}
+
+function placeP1PKLabelValue(stateKey, value, fromKey = null){
+  const usedElsewhere = P1PK_LABEL_KEYS.some(key => {
+    return key !== stateKey && p1pkState[key] === value;
+  });
+
+  if(usedElsewhere && fromKey !== `p1pk-label-${stateKey}`) return false;
+
+  if(fromKey && fromKey.startsWith("p1pk-label-") && fromKey !== `p1pk-label-${stateKey}`){
+    const oldKey = fromKey.replace("p1pk-label-", "");
+    if(P1PK_LABEL_KEYS.includes(oldKey)){
+      p1pkState[oldKey] = null;
+      renderP1PKLabelDrop(oldKey);
+    }
+  }
+
+  p1pkState[stateKey] = value;
+  renderP1PKLabelDrop(stateKey);
+  clearP1PKMarks();
+  renderP1PKLabelBankUsage();
+  return true;
+}
+
+function buildP1PKBuildBank(){
+  const wrap = document.getElementById("p1pkBuildWrap");
+  wrap.innerHTML = "";
+
+  P1PK_BUILD_CHIPS.forEach((value, index) => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `p1pk-build-${index}`;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("dragstart", e => {
+      if(countP1PKBuildUses(value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { type: "p1pk-build", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    chip.addEventListener("click", () => {
+      if(countP1PKBuildUses(value) >= 1) return;
+      selectedP1PKBuild = selectedP1PKBuild === value ? null : value;
+      selectedP1PKLabel = null;
+      renderP1PKBuildBankUsage();
+      renderP1PKLabelBankUsage();
+      clearP1PKMarks();
+    });
+
+    wrap.appendChild(chip);
+  });
+
+  renderP1PKBuildBankUsage();
+}
+
+function renderP1PKBuildBankUsage(){
+  document.querySelectorAll("#p1pkBuildWrap .chip").forEach(chip => {
+    chip.classList.toggle("used", countP1PKBuildUses(chip.textContent) >= 1);
+    chip.classList.toggle("selected", selectedP1PKBuild === chip.textContent);
+  });
+}
+
+function buildP1PKLabelBank(){
+  const wrap = document.getElementById("p1pkLabelWrap");
+  wrap.innerHTML = "";
+
+  P1PK_LABEL_CHIPS.forEach((value, index) => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.id = `p1pk-label-${index}`;
+    chip.draggable = true;
+    chip.textContent = value;
+
+    chip.addEventListener("dragstart", e => {
+      if(countP1PKLabelUses(value) >= 1){
+        e.preventDefault();
+        return;
+      }
+      dragItem = { type: "p1pk-label", value };
+      dragFrom = null;
+      chip.classList.add("dragging");
+    });
+
+    chip.addEventListener("dragend", () => {
+      chip.classList.remove("dragging");
+    });
+
+    chip.addEventListener("click", () => {
+      if(countP1PKLabelUses(value) >= 1) return;
+      selectedP1PKLabel = selectedP1PKLabel === value ? null : value;
+      selectedP1PKBuild = null;
+      renderP1PKLabelBankUsage();
+      renderP1PKBuildBankUsage();
+      clearP1PKMarks();
+    });
+
+    wrap.appendChild(chip);
+  });
+
+  renderP1PKLabelBankUsage();
+}
+
+function renderP1PKLabelBankUsage(){
+  document.querySelectorAll("#p1pkLabelWrap .chip").forEach(chip => {
+    chip.classList.toggle("used", countP1PKLabelUses(chip.textContent) >= 1);
+    chip.classList.toggle("selected", selectedP1PKLabel === chip.textContent);
+  });
+}
+
+function setupP1PKBuildDrop(slotId, stateKey){
+  const el = document.getElementById(slotId);
+  el.draggable = true;
+
+  el.addEventListener("dragover", e => {
+    if(dragItem && dragItem.type === "p1pk-build" && isValidP1PKBuildForSlot(stateKey, dragItem.value)){
+      e.preventDefault();
+      el.classList.add("drag-over");
+    }
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if(!dragItem || dragItem.type !== "p1pk-build") return;
+
+    placeP1PKBuildValue(stateKey, dragItem.value, dragFrom);
+    dragItem = null;
+    dragFrom = null;
+    clearP1PKTapSelections();
+  });
+
+  el.addEventListener("click", () => {
+    if(selectedP1PKBuild){
+      if(placeP1PKBuildValue(stateKey, selectedP1PKBuild)){
+        clearP1PKTapSelections();
+      }
+      return;
+    }
+    if(!p1pkState[stateKey]) return;
+    p1pkState[stateKey] = null;
+    renderP1PKBuildDrop(stateKey);
+    clearP1PKMarks();
+    renderP1PKBuildBankUsage();
+  });
+
+  el.addEventListener("dragstart", e => {
+    if(!p1pkState[stateKey]){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { type: "p1pk-build", value: p1pkState[stateKey] };
+    dragFrom = `p1pk-${stateKey}`;
+  });
+}
+
+function renderP1PKBuildDrop(stateKey){
+  const idMap = {
+    pkGene: "drop-p1pk-pk-gene",
+    pkChromosome: "drop-p1pk-pk-chromosome",
+    globGene: "drop-p1pk-glob-gene",
+    globChromosome: "drop-p1pk-glob-chromosome",
+    pSugar: "drop-p1pk-p-sugar",
+    hBranch: "drop-p1pk-h-branch",
+    p1Branch: "drop-p1pk-p1-branch"
+  };
+  const placeholders = {
+    pkGene: "— Pk gene here —",
+    pkChromosome: "— P1PK chromosome —",
+    globGene: "— GLOB gene here —",
+    globChromosome: "— GLOB chromosome —",
+    pSugar: "— P sugar here —",
+    hBranch: "— H route here —",
+    p1Branch: "— P1 route here —"
+  };
+  const el = document.getElementById(idMap[stateKey]);
+  el.classList.remove("correct","wrong","filled");
+
+  if(p1pkState[stateKey]){
+    el.textContent = p1pkState[stateKey];
+    el.classList.add("filled");
+  } else {
+    el.innerHTML = `<div class="placeholder">${placeholders[stateKey]}</div>`;
+  }
+}
+
+function setupP1PKLabelDrop(slotId, stateKey){
+  const el = document.getElementById(slotId);
+  el.draggable = true;
+
+  el.addEventListener("dragover", e => {
+    if(dragItem && dragItem.type === "p1pk-label"){
+      e.preventDefault();
+      el.classList.add("drag-over");
+    }
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if(!dragItem || dragItem.type !== "p1pk-label") return;
+
+    placeP1PKLabelValue(stateKey, dragItem.value, dragFrom);
+    dragItem = null;
+    dragFrom = null;
+    clearP1PKTapSelections();
+  });
+
+  el.addEventListener("click", () => {
+    if(selectedP1PKLabel){
+      if(placeP1PKLabelValue(stateKey, selectedP1PKLabel)){
+        clearP1PKTapSelections();
+      }
+      return;
+    }
+    if(!p1pkState[stateKey]) return;
+    p1pkState[stateKey] = null;
+    renderP1PKLabelDrop(stateKey);
+    clearP1PKMarks();
+    renderP1PKLabelBankUsage();
+  });
+
+  el.addEventListener("dragstart", e => {
+    if(!p1pkState[stateKey]){
+      e.preventDefault();
+      return;
+    }
+    dragItem = { type: "p1pk-label", value: p1pkState[stateKey] };
+    dragFrom = `p1pk-label-${stateKey}`;
+  });
+}
+
+function renderP1PKLabelDrop(stateKey){
+  const idMap = {
+    pkLabel: "label-drop-p1pk-pk",
+    pLabel: "label-drop-p1pk-p",
+    hLabel: "label-drop-p1pk-h",
+    p1Label: "label-drop-p1pk-p1"
+  };
+  const placeholders = {
+    pkLabel: "— Pk stage —",
+    pLabel: "— P final —",
+    hLabel: "— H final —",
+    p1Label: "— P1 final —"
+  };
+  const el = document.getElementById(idMap[stateKey]);
+  el.classList.remove("correct","wrong","filled");
+
+  if(p1pkState[stateKey]){
+    el.textContent = p1pkState[stateKey];
+    el.classList.add("filled");
+  } else {
+    el.innerHTML = `<div class="placeholder">${placeholders[stateKey]}</div>`;
+  }
+}
+
+function checkAnswersP1PK(){
+  const buildIds = {
+    pkGene: "drop-p1pk-pk-gene",
+    pkChromosome: "drop-p1pk-pk-chromosome",
+    globGene: "drop-p1pk-glob-gene",
+    globChromosome: "drop-p1pk-glob-chromosome",
+    pSugar: "drop-p1pk-p-sugar",
+    hBranch: "drop-p1pk-h-branch",
+    p1Branch: "drop-p1pk-p1-branch",
+    pkLabel: "label-drop-p1pk-pk",
+    pLabel: "label-drop-p1pk-p",
+    hLabel: "label-drop-p1pk-h",
+    p1Label: "label-drop-p1pk-p1"
+  };
+
+  let correct = 0;
+  const total = Object.keys(buildIds).length;
+
+  Object.entries(buildIds).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    el.classList.remove("correct","wrong");
+    if(p1pkState[key] === P1PK_ANSWERS[key]){
+      el.classList.add("correct");
+      correct++;
+    } else {
+      el.classList.add("wrong");
+    }
+  });
+
+  const msg = document.getElementById("msgP1PK");
+  msg.textContent = `${correct}/${total} correct`;
+  msg.className = `score ${correct === total ? "good" : "bad"}`;
+}
+
+function resetP1PK(){
+  [...P1PK_BUILD_KEYS, ...P1PK_LABEL_KEYS].forEach(key => {
+    p1pkState[key] = null;
+  });
+  selectedP1PKBuild = null;
+  selectedP1PKLabel = null;
+  P1PK_BUILD_KEYS.forEach(renderP1PKBuildDrop);
+  P1PK_LABEL_KEYS.forEach(renderP1PKLabelDrop);
+  clearP1PKMarks();
+  renderP1PKBuildBankUsage();
+  renderP1PKLabelBankUsage();
+}
+
+function showP1PKAnswer(){
+  Object.entries(P1PK_ANSWERS).forEach(([key, value]) => {
+    p1pkState[key] = value;
+  });
+  selectedP1PKBuild = null;
+  selectedP1PKLabel = null;
+  P1PK_BUILD_KEYS.forEach(renderP1PKBuildDrop);
+  P1PK_LABEL_KEYS.forEach(renderP1PKLabelDrop);
+  renderP1PKBuildBankUsage();
+  renderP1PKLabelBankUsage();
+  checkAnswersP1PK();
+}
+
 
 function showCurrentAnswer(){
   const ans = ANSWERS[currentTarget] || ANSWERS.bombay;
@@ -1946,6 +2704,11 @@ function setupStructureTabs(){
       });
     });
   });
+  const requestedSection = new URLSearchParams(window.location.search).get("structure");
+  if(requestedSection){
+    const requestedTab = document.querySelector(`.structure-tab[data-structure-section="${requestedSection}"]`);
+    if(requestedTab) requestedTab.click();
+  }
 }
 
 function resetAll(){
@@ -1990,8 +2753,26 @@ setupType1LabelDrop("label-drop-agglutination-type1", "agglutinationLabel", "typ
 document.getElementById("checkBtnType1").addEventListener("click", checkAnswersType1);
 document.getElementById("resetBtnType1").addEventListener("click", resetType1);
 document.getElementById("seeAnswersBtnType1").addEventListener("click", showType1Answer);
+
+buildP1PKBuildBank();
+buildP1PKLabelBank();
+setupP1PKBuildDrop("drop-p1pk-pk-gene", "pkGene");
+setupP1PKBuildDrop("drop-p1pk-pk-chromosome", "pkChromosome");
+setupP1PKBuildDrop("drop-p1pk-glob-gene", "globGene");
+setupP1PKBuildDrop("drop-p1pk-glob-chromosome", "globChromosome");
+setupP1PKBuildDrop("drop-p1pk-p-sugar", "pSugar");
+setupP1PKBuildDrop("drop-p1pk-h-branch", "hBranch");
+setupP1PKBuildDrop("drop-p1pk-p1-branch", "p1Branch");
+setupP1PKLabelDrop("label-drop-p1pk-pk", "pkLabel");
+setupP1PKLabelDrop("label-drop-p1pk-p", "pLabel");
+setupP1PKLabelDrop("label-drop-p1pk-h", "hLabel");
+setupP1PKLabelDrop("label-drop-p1pk-p1", "p1Label");
+document.getElementById("checkBtnP1PK").addEventListener("click", checkAnswersP1PK);
+document.getElementById("resetBtnP1PK").addEventListener("click", resetP1PK);
+document.getElementById("seeAnswersBtnP1PK").addEventListener("click", showP1PKAnswer);
 setupStructureTabs();
 resetType1();
+resetP1PK();
 resetAll();
 </script>
 </body>
