@@ -369,6 +369,81 @@
     text-align:left;
   }
 
+  .print-only{display:none}
+  @page antigenShortBlank{size:letter landscape;margin:.25in}
+  @media print{
+    body.print-blank-sheet{
+      background:#fff!important;
+      color:#000!important;
+      padding:0!important;
+      page:antigenShortBlank;
+    }
+    body.print-blank-sheet .site-header,
+    body.print-blank-sheet .wrap{
+      display:none!important;
+    }
+    body.print-blank-sheet .print-only{
+      display:block!important;
+      page:antigenShortBlank;
+      color:#000!important;
+      font-family:'Nunito', Arial, sans-serif!important;
+      padding:0!important;
+    }
+    body.print-blank-sheet .print-only *{
+      color:#000!important;
+      background:#fff!important;
+      box-shadow:none!important;
+      text-shadow:none!important;
+      filter:none!important;
+      opacity:1!important;
+    }
+    .print-antigen-title{
+      font-size:17pt;
+      line-height:1;
+      margin:0 0 .06in;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .print-antigen-subtitle{
+      font-size:8.5pt;
+      margin:0 0 .08in;
+      font-weight:800;
+    }
+    .print-antigen-table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      font-size:8.4pt;
+      line-height:1.05;
+    }
+    .print-antigen-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:.12in;
+      align-items:start;
+    }
+    .print-antigen-table th,
+    .print-antigen-table td{
+      border:1.4px solid #000!important;
+      padding:.022in .035in!important;
+      height:.145in;
+      min-height:0;
+      text-align:center;
+      vertical-align:middle;
+      font-weight:900;
+    }
+    .print-antigen-table th{
+      font-size:7.1pt;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+    .print-antigen-table .system-col{width:.72in}
+    .print-antigen-table .antigen-col{width:.62in}
+    .print-antigen-table .freq-col{width:.62in}
+    .print-antigen-table .pop-col{width:1.2in}
+    .print-antigen-table .level-col{width:.58in}
+  }
+
   @media (max-width:1100px){
     .activity-layout{ grid-template-columns:1fr; }
     .bank{ position:static; }
@@ -388,6 +463,32 @@
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css?v=bb-theme-8">
 <script src="interactive_music.js?v=bb-theme-8" defer></script>
+<style>
+  @media print{
+    html,
+    body.print-blank-sheet,
+    body.print-blank-sheet .print-only,
+    body.print-blank-sheet .print-antigen-sheet,
+    body.print-blank-sheet .print-antigen-grid,
+    body.print-blank-sheet .print-antigen-table,
+    body.print-blank-sheet .print-antigen-table thead,
+    body.print-blank-sheet .print-antigen-table tbody,
+    body.print-blank-sheet .print-antigen-table tr,
+    body.print-blank-sheet .print-antigen-table th,
+    body.print-blank-sheet .print-antigen-table td{
+      background:#fff!important;
+      color:#000!important;
+      box-shadow:none!important;
+      text-shadow:none!important;
+      filter:none!important;
+      opacity:1!important;
+    }
+    body.print-blank-sheet .print-antigen-table th,
+    body.print-blank-sheet .print-antigen-table td{
+      border-color:#000!important;
+    }
+  }
+</style>
 </head>
 <body class="mls-interactive bb-theme">
 <header class="site-header">
@@ -411,6 +512,7 @@
     <button class="checkBtn" id="checkBtn">Check Answers</button>
     <button class="resetBtn" id="resetBtn">Reset</button>
     <button class="answersBtn" id="answersBtn">Show answers</button>
+    <button class="answersBtn" id="printBlankBtn" type="button">Print Blank Sheet</button>
     <div class="score" id="scoreMsg"></div>
   </div>
 
@@ -438,6 +540,7 @@
     </aside>
   </div>
 </div>
+<section class="print-only" id="printArea"></section>
 
 <script>
 const systems = [
@@ -890,6 +993,59 @@ function buildAnswers(){
   content.appendChild(wrap);
 }
 
+function renderBlankSheet(){
+  const rows = systems.flatMap(system => system.antigens.map(item => ({
+    system:system.name,
+    antigen:plainAntigen(item.antigen)
+  })));
+  const splitAt = Math.ceil(rows.length / 2);
+  const chunks = [rows.slice(0, splitAt), rows.slice(splitAt)];
+  const cellStyle = "background:#fff!important;color:#000!important;border:1.4px solid #000!important;";
+  const renderTable = tableRows => `
+    <table class="print-antigen-table" style="background:#fff!important;color:#000!important;border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th class="system-col" style="${cellStyle}">Blood Group</th>
+          <th class="antigen-col" style="${cellStyle}">Antigen</th>
+          <th class="freq-col" style="${cellStyle}">Freq</th>
+          <th class="pop-col" style="${cellStyle}">Population Difference</th>
+          <th class="level-col" style="${cellStyle}">High / Low</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows.map(row => `
+          <tr style="background:#fff!important;color:#000!important;">
+            <td style="${cellStyle}">${row.system}</td>
+            <td style="${cellStyle}">${row.antigen}</td>
+            <td style="${cellStyle}"></td>
+            <td style="${cellStyle}"></td>
+            <td style="${cellStyle}"></td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+  return `
+    <section class="print-antigen-sheet">
+      <h1 class="print-antigen-title">Antigen Short Version - Blank Sheet</h1>
+      <p class="print-antigen-subtitle">High frequency = &gt;90%. Low frequency = &lt;9%. Fill frequency, population difference, and high/low.</p>
+      <div class="print-antigen-grid">
+        ${chunks.map(renderTable).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function printBlankSheet(){
+  document.getElementById("printArea").innerHTML = renderBlankSheet();
+  document.body.classList.add("print-blank-sheet");
+  setTimeout(() => window.print(), 80);
+}
+
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("print-blank-sheet");
+});
+
 document.getElementById("checkBtn").addEventListener("click", checkAnswers);
 document.getElementById("resetBtn").addEventListener("click", reset);
 function showAnswers(){
@@ -913,12 +1069,19 @@ function showAnswers(){
   checkAnswers();
 }
 document.getElementById("answersBtn").addEventListener("click", showAnswers);
+document.getElementById("printBlankBtn").addEventListener("click", printBlankSheet);
 
 buildBanks();
 buildSystemTabs();
 buildSystems();
 buildAnswers();
 reset();
+
+const pageParams = new URLSearchParams(window.location.search);
+if(pageParams.get("printPreview") === "blank"){
+  document.getElementById("printArea").innerHTML = renderBlankSheet();
+  document.body.classList.add("print-blank-sheet");
+}
 </script>
 </body>
 </html>

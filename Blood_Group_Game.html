@@ -154,6 +154,7 @@
   }
   .arena-enter:hover{transform:translateY(-2px) rotate(-1deg)}
   body:not(.arena-open) .print-controls,
+  body:not(.arena-open) .game-instructions,
   body:not(.arena-open) .deck-panel,
   body:not(.arena-open) .game{
     display:none;
@@ -166,6 +167,38 @@
   }
   body.case-selected .deck-panel{
     display:none;
+  }
+  body.case-selected .game-instructions{
+    display:none;
+  }
+  .game-instructions{
+    background:rgba(255,255,255,.78);
+    border:2px solid #f1a4b8;
+    border-radius:16px;
+    padding:14px 16px;
+    margin:0 0 16px;
+    color:#32141f;
+    box-shadow:var(--shadow);
+  }
+  .game-instructions h2{
+    margin:0 0 8px;
+    color:#7a1430;
+    font-size:16px;
+    font-weight:1000;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .game-instructions ol{
+    margin:0;
+    padding-left:20px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px 18px;
+  }
+  .game-instructions li{
+    font-size:14px;
+    font-weight:900;
+    line-height:1.25;
   }
   .deck-panel{
     background:rgba(21,24,35,.78);
@@ -803,6 +836,8 @@
     .print-page{break-after:page;padding:.15in}
     .print-title{font-size:18pt;line-height:1.1;margin:0 0 .12in;color:#000!important;font-weight:1000;letter-spacing:.02em}
     .print-subtitle{font-size:10pt;margin:-.1in 0 .18in;color:#000!important}
+    .print-instruction-list{display:grid;grid-template-columns:repeat(2,1fr);gap:.08in .2in;margin:.12in 0 .16in;padding-left:.22in;font-size:13pt;font-weight:900;line-height:1.2}
+    .print-instruction-list li{margin:0 0 .04in}
     .print-grid{display:grid;grid-template-columns:repeat(2,4in);gap:.18in;align-items:start}
     body.print-single .print-page{page:bloodGroupSingle;padding:0}
     body.print-single .print-title, body.print-single .print-subtitle{display:none!important}
@@ -920,6 +955,7 @@
     .arena-copy{font-size:17px}
     .arena-enter{font-size:20px;padding:18px 20px}
     .deck-grid{grid-template-columns:1fr 1fr}
+    .game-instructions ol{grid-template-columns:1fr}
     .clue-grid{grid-template-columns:1fr}
     .system-grid{grid-template-columns:1fr 1fr}
     .clock-stage{grid-template-columns:1fr;justify-items:center;text-align:center}
@@ -963,12 +999,25 @@
     text-transform:none!important;
   }
   body.bb-theme.blood-group-game .system-token{
-    color:#fff8fb!important;
+    background:#fff8fb!important;
+    border-color:#e991a8!important;
+    color:#611428!important;
+    text-shadow:none!important;
+  }
+  body.bb-theme.blood-group-game .system-token:hover,
+  body.bb-theme.blood-group-game .system-token.selected{
+    background:#ffe3ec!important;
+    border-color:#c91643!important;
+    color:#3d0d1b!important;
   }
   body.bb-theme.blood-group-game .system-token.correct{
+    background:#123c24!important;
+    border-color:#4fc985!important;
     color:#c9f7dd!important;
   }
   body.bb-theme.blood-group-game .system-token.wrong{
+    background:#421626!important;
+    border-color:#f78aa2!important;
     color:#ffd5da!important;
   }
   body.bb-theme.blood-group-game .token-bank-label{
@@ -979,7 +1028,8 @@
     filter:none!important;
   }
   body.bb-theme.blood-group-game .token-bank-wrap.locked .system-token{
-    color:#fff8fb!important;
+    background:#fff8fb!important;
+    color:#611428!important;
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .freq-title,
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-lock-message{
@@ -993,6 +1043,17 @@
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-bank-label{
     color:#ffd5df!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .system-token{
+    background:#252d44!important;
+    border-color:#74809f!important;
+    color:#fff8fb!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .system-token:hover,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .system-token.selected{
+    background:#2d3650!important;
+    border-color:#ef4f6d!important;
+    color:#fff!important;
   }
   @media print{
     html,
@@ -1065,8 +1126,22 @@
     <button class="print-btn" onclick="printFrequencySheet('answer')">Print Answer Freq Sheet</button>
     <button class="print-btn" onclick="printAntigenSheet('blank')">Print Blank Antigen Sheet</button>
     <button class="print-btn" onclick="printAntigenSheet('answer')">Print Answer Antigen Sheet</button>
-    <button class="print-btn" onclick="printFullPack()">Print Full Pack</button>
+    <button class="print-btn" onclick="printFullPack()">Export Whole Game</button>
   </div>
+
+  <section class="game-instructions">
+    <h2>Game instructions</h2>
+    <ol>
+      <li>Choose a case.</li>
+      <li>The timer starts when the case opens.</li>
+      <li>Main cases are 10 minutes.</li>
+      <li>Rapid rounds are 5 minutes.</li>
+      <li>Read the clues.</li>
+      <li>Type the exact frequency or antigen answer.</li>
+      <li>Wrong checkpoint answer removes 1 minute.</li>
+      <li>Unlock the drawer and choose the token.</li>
+    </ol>
+  </section>
 
   <section class="deck-panel">
     <div class="deck-head">
@@ -1074,7 +1149,7 @@
         <div class="deck-title">Choose your case</div>
         <div class="deck-note">Timer starts when you open a case. Placeholder clues stay ready for your final files.</div>
       </div>
-      <div class="timer-pill">10:00 each</div>
+      <div class="timer-pill">10:00 main / 5:00 rapid</div>
     </div>
     <div class="deck-sections" id="deck-grid"></div>
     <div class="deck-help" id="case-select-feedback"></div>
@@ -1175,7 +1250,109 @@ const USUAL_TOKENS = [
   'lutheran'
 ];
 
-const UNUSUAL_TOKENS = Array.from({length:20}, (_, index) => 'unusual token ' + (index + 1));
+const UNUSUAL_CASE_DATA = [
+  {
+    system:'Diego',
+    antigens:'Dia Dib Wra Wrb',
+    clue:'Clues: High Incidence Low Incidence Pair Clinically significant of HDN, *Dia high in S. American Indians'
+  },
+  {
+    system:'Cartwright',
+    antigens:'Yta Ytb',
+    clue:'Clues: High Incidence Low Incidence Pair Variable significant some HTRXN no HDN * Ytb common in Israelis'
+  },
+  {
+    system:'Xga',
+    antigens:'Xga related CD99',
+    clue:'Clues: Not clinically significant. X Linked more common in females Do not cause HDN or HTRXN'
+  },
+  {
+    system:'Scianna',
+    antigens:'Sc1 Sc2 Sc3',
+    clue:'Clues: Unknown clinical significance. Rare to make these antibodies Do not cause HTRXN or HDN.'
+  },
+  {
+    system:'Dombrock',
+    antigens:'Doa Dob Gya',
+    clue:'Clues: Poor Immunogens (IgGs) disappear quickly. Clinically significant some HTR, no HDFN. Resistant to enzymes, susceptible to DTT'
+  },
+  {
+    system:'Colton',
+    antigens:'Coa Cob Co3',
+    clue:'Clues: High Incidence Low Incidence Pair. Important for AQP1 watertransfer. Clinically significant for HTR and HDN. Enhanced by enzymes.'
+  },
+  {
+    system:'LW',
+    antigens:'Lwa Lwb',
+    clue:'Clues: Variable incidence (relationship to D antigen High/Low Incidence) Not clinically significant. Do not cause HDN or HTRXN, susceptible to DTT'
+  },
+  {
+    system:'ChidoRodgers',
+    antigens:'Ch1-6 Rg1-2',
+    clue:'Clues: Not clinically significant. Weird reactivity super variable. Do not cause HDN or HTRXN HTLA, neutralized by plasma, resistant to DTT'
+  },
+  {
+    system:'Gerbich',
+    antigens:'Ge 1-4',
+    clue:'Clues: High Incidence Low Incidence (Not antithetical pairs). GYPC & GYPD [(=) charge & wall integrity] Mild HDN/HTR. Anti-G2 most common.'
+  },
+  {
+    system:'Cromer',
+    antigens:'Cra Tca Tcb Tcc Dra',
+    clue:'Clues: High Incidence Low Incidence (more than one antithetical pair) Some HTR but no HDR because DAF (CD55) in placenta protects'
+  },
+  {
+    system:'Knops',
+    antigens:'Kna Knb McCa McCb Sla Vil',
+    clue:'Clues: Not clinically significant. Do not cause HDN or HTRXN HTLA antigen, weakly serologically expression, NOT neutralized by plasma. Destroyed by DTT'
+  },
+  {
+    system:'Indian',
+    antigens:'Ina Inb',
+    clue:'Clues: High Incidence Low Incidence Pair HTR but no clinical HDN Sensitive to enzymes'
+  },
+  {
+    system:'OK',
+    antigens:'Oka',
+    clue:'Clues: Not Immunogenic. Resistant to enzymes and chemicals. Receptor for Plasmodium falciparum, probable HDN/HTR'
+  },
+  {
+    system:'RAPH',
+    antigens:'MER2',
+    clue:'Clues: Poorly Immunogen and poorly expressed. Yes HTR evidence Abundant on platelets, & RBCs precursors more than mature RBCs'
+  },
+  {
+    system:'JMH',
+    antigens:'JMH',
+    clue:'Clues: Not clinically significant, DAT (+) HTLA antigen, elderly >50 years or older, NOT neutralized by plasma'
+  },
+  {
+    system:'Vel',
+    antigens:'Vel',
+    clue:'Clues: Variable expression, weak expression (Both IgG & IgM seen) Activates compliment, causes HTRXN & HDN, resistant to enzymes/chemicals'
+  },
+  {
+    system:'Jra',
+    antigens:'Jra',
+    clue:'Clues: No known clinically significant due to being rare Severe HDFN. Multi drug resistant in tumor cells.'
+  },
+  {
+    system:'SDA',
+    antigens:'Sda',
+    clue:'Clues: Not clinically significant. In saliva and meconium. High prevalence. Tamm-Horsfall glycoprotein in urine, neutralized by urine'
+  },
+  {
+    system:'AnWJ',
+    antigens:'AnWJ',
+    clue:'Clues: No known clinically significant due to being rare. Hemophilus influenza receptor and autoantibody'
+  },
+  {
+    system:'HLA',
+    antigens:'Bga Bgb Bgc',
+    clue:'Clues: Not clinically significant Resistant to enzymes/DTT, neutralized by platelets'
+  }
+];
+const UNUSUAL_TOKENS = UNUSUAL_CASE_DATA.map(item => item.system.toLowerCase());
 
 const MAIN_CASES = Array.from({length:9}, (_, index) => {
   const number = index + 1;
@@ -1207,24 +1384,22 @@ const MAIN_CASES = Array.from({length:9}, (_, index) => {
   };
 });
 
-const RAPID_CASES = Array.from({length:20}, (_, index) => {
+const RAPID_CASES = UNUSUAL_CASE_DATA.map((item, index) => {
   const number = index + 1;
   const label = 'Rapid #' + number;
   return {
     id:'rapid-' + number,
     type:'rapid',
     label,
-    answer:UNUSUAL_TOKENS[index],
+    answer:item.system.toLowerCase(),
     gateType:'antigen',
-    gateAnswer:'antigen ' + number,
+    gateAnswer:item.antigens,
     gateName:'antigen',
-    gatePlaceholder:'type antigen placeholder',
+    gatePlaceholder:'type antigens',
     status:'placeholder',
     clues:[
       [
-        'clues: PLACEHOLDER - why not on antigram and serology.',
-        'Rapid-round serology clue will go here.',
-        'Enter the antigen placeholder to unlock the unusual token drawer.'
+        item.clue
       ]
     ]
   };
@@ -1242,11 +1417,12 @@ const TOKEN_GROUPS = {
 };
 
 const START_SECONDS = 10 * 60;
+const RAPID_SECONDS = 5 * 60;
 const LOCK_SECONDS = 60;
-const caseStates = cards.map(() => ({
+const caseStates = cards.map(card => ({
   started:false,
   running:false,
-  seconds:START_SECONDS,
+  seconds:caseDuration(card),
   lockUntil:0,
   gateUnlocked:false,
   selected:'',
@@ -1277,8 +1453,16 @@ function formatTime(seconds){
   return mins + ':' + secs;
 }
 
+function caseDuration(card){
+  return card && card.type === 'rapid' ? RAPID_SECONDS : START_SECONDS;
+}
+
 function normalizeAnswer(text){
-  return String(text || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  return String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\/;,]+/g, ' ')
+    .replace(/\s+/g, ' ');
 }
 
 function gateCopy(card){
@@ -1287,8 +1471,8 @@ function gateCopy(card){
     title:isAntigen ? 'antigen checkpoint' : 'frequency checkpoint',
     accepted:isAntigen ? 'antigen accepted' : 'frequency accepted',
     unlocked:isAntigen ? 'antigen accepted. choose the matching token below.' : 'frequency accepted. choose the matching blood group token below.',
-    copy:isAntigen ? 'enter the antigen placeholder from your sheet. wrong antigen = minus 1 minute.' : 'enter the exact frequency number from your sheet. wrong frequency = minus 1 minute.',
-    placeholder:isAntigen ? 'type antigen placeholder' : 'type exact number',
+    copy:isAntigen ? 'enter the antigens from your sheet. wrong antigen = minus 1 minute.' : 'enter the exact frequency number from your sheet. wrong frequency = minus 1 minute.',
+    placeholder:isAntigen ? 'type antigens' : 'type exact number',
     locked:isAntigen ? 'enter the antigen first to unlock the token drawer.' : 'enter the exact frequency first to unlock the token drawer.',
     feedbackLocked:isAntigen ? 'read the clue, then enter the antigen to unlock tokens.' : 'read both clues, then enter the exact frequency to unlock tokens.',
     wrong:isAntigen ? 'wrong antigen. minus 1 minute. try again.' : 'wrong frequency. minus 1 minute. try again.'
@@ -1297,10 +1481,10 @@ function gateCopy(card){
 
 function syncLocks(){
   const now = Date.now();
-  caseStates.forEach(state => {
+  caseStates.forEach((state, index) => {
     if(state.lockUntil && state.lockUntil <= now){
       state.lockUntil = 0;
-      state.seconds = START_SECONDS;
+      state.seconds = caseDuration(cards[index]);
       state.running = false;
       state.gateUnlocked = false;
       state.selected = '';
@@ -1349,7 +1533,7 @@ function renderDeck(){
           state.solved ? 'done' : '',
           remainingLock ? 'locked' : ''
         ].filter(Boolean).join(' ');
-        let status = 'ready - start 10:00';
+        let status = 'ready - start ' + formatTime(caseDuration(card));
         if(remainingLock){
           status = 'locked ' + formatTime(remainingLock);
         }else if(state.solved){
@@ -1376,7 +1560,7 @@ function renderDeck(){
 function updateTimerDisplays(){
   const card = currentCard();
   const state = currentState();
-  const time = state ? formatTime(state.seconds) : formatTime(START_SECONDS);
+  const time = state ? formatTime(state.seconds) : formatTime(caseDuration(card));
   const small = document.getElementById('timer-display');
   const large = document.getElementById('timer-display-large');
   if(small) small.textContent = time;
@@ -1570,7 +1754,7 @@ function selectCard(index){
   currentIndex = index;
   state.started = true;
   state.running = !state.solved;
-  if(state.seconds <= 0) state.seconds = START_SECONDS;
+  if(state.seconds <= 0) state.seconds = caseDuration(cards[index]);
   deckMessage = '';
   document.body.classList.add('case-selected');
   renderAll();
@@ -1582,7 +1766,7 @@ function resetCurrentCard(){
   Object.assign(state, {
     started:true,
     running:true,
-    seconds:START_SECONDS,
+    seconds:caseDuration(currentCard()),
     lockUntil:0,
     gateUnlocked:false,
     selected:'',
@@ -1642,14 +1826,32 @@ function readyCards(){
   return cards;
 }
 
+function renderPrintInstructions(){
+  return '<section class="print-instruction-section print-page">'
+    + '<h1 class="print-title">Who&#39;s That Blood Group? - Game Instructions</h1>'
+    + '<p class="print-subtitle">Whole game export: instructions, case cards, frequency sheet, antigen sheet, and token bank.</p>'
+    + '<ol class="print-instruction-list">'
+    + '<li>Choose a case.</li>'
+    + '<li>The timer starts when the case opens.</li>'
+    + '<li>Main cases are 10 minutes.</li>'
+    + '<li>Rapid rounds are 5 minutes.</li>'
+    + '<li>Read the clues.</li>'
+    + '<li>Type the exact frequency or antigen answer.</li>'
+    + '<li>Wrong checkpoint answer removes 1 minute.</li>'
+    + '<li>Unlock the drawer and choose the token.</li>'
+    + '</ol>'
+    + '</section>';
+}
+
 function printCaseCardHtml(card){
   const clueSets = card.clues || [];
   const copy = gateCopy(card);
   const clueClass = clueSets.length === 1 ? ' single' : '';
+  const minutes = formatTime(caseDuration(card)).replace(/^0/, '');
   return '<article class="print-card">'
     + '<div class="print-mystery-mark">?</div>'
     + '<h2>Who&#39;s That Blood Group?</h2>'
-    + '<p class="print-case-rule">'+esc(card.label)+' / 10 min / wrong '+esc(card.gateName)+' = -1 min / placeholder content only</p>'
+    + '<p class="print-case-rule">'+esc(card.label)+' / '+esc(minutes)+' / wrong '+esc(card.gateName)+' = -1 min / placeholder content only</p>'
     + '<div class="print-clue-columns'+clueClass+'">'
     + clueSets.map((clueSet, index) => '<section class="print-clue-box"><h3>Clue '+(index + 1)+'</h3><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul></section>').join('')
     + '</div>'
@@ -1745,7 +1947,7 @@ function printAntigenSheet(kind){
 }
 
 function printFullPack(){
-  document.getElementById('print-area').innerHTML = renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
+  document.getElementById('print-area').innerHTML = renderPrintInstructions() + renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
   resetPrintClasses();
   document.body.classList.add('print-full');
   setTimeout(() => window.print(), 80);
@@ -1811,7 +2013,7 @@ if(printPreviewMode){
     document.getElementById('print-area').innerHTML = renderPrintAntigenSheet('answer');
     document.body.classList.add('print-freq');
   }else if(printPreviewMode === 'full'){
-    document.getElementById('print-area').innerHTML = renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
+    document.getElementById('print-area').innerHTML = renderPrintInstructions() + renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
     document.body.classList.add('print-full');
   }
 }
