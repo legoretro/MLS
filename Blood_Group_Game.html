@@ -195,6 +195,7 @@
     grid-template-columns:repeat(3,minmax(0,1fr));
     gap:12px;
   }
+  .deck-sections{display:grid;gap:16px}
   .deck-card{
     min-height:142px;
     border-radius:12px;
@@ -223,6 +224,27 @@
     font-weight:900;
   }
   .deck-card.done .deck-status{color:#bdf4d4}
+  .deck-section + .deck-section{margin-top:18px}
+  .deck-section-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:0 0 10px;
+    color:var(--accent);
+    font-size:13px;
+    font-weight:1000;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .deck-section-title::after{
+    content:"";
+    height:1px;
+    flex:1;
+    background:rgba(201,22,67,.28);
+  }
+  .deck-card.rapid{
+    min-height:112px;
+  }
   .case-bar{
     display:flex;
     align-items:center;
@@ -398,6 +420,123 @@
     letter-spacing:.02em;
     text-shadow:3px 3px 0 #7a1330, 0 0 16px rgba(0,0,0,.25);
   }
+  .clock-stage{
+    margin-top:14px;
+    min-height:160px;
+    border:2px solid var(--line);
+    border-radius:18px;
+    background:linear-gradient(135deg,rgba(255,245,248,.96),rgba(255,215,226,.92));
+    color:#32141f;
+    display:grid;
+    grid-template-columns:126px 1fr;
+    align-items:center;
+    gap:14px;
+    padding:14px;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.42), 0 12px 26px rgba(0,0,0,.2);
+    overflow:hidden;
+    position:relative;
+  }
+  .clock-stage::after{
+    content:"tick tick";
+    position:absolute;
+    right:14px;
+    top:12px;
+    color:rgba(122,20,48,.26);
+    font-size:12px;
+    font-weight:1000;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+  }
+  .clock-face{
+    width:116px;
+    height:116px;
+    border-radius:50%;
+    border:6px solid #7a1430;
+    background:
+      radial-gradient(circle at 50% 50%, #7a1430 0 5px, transparent 6px),
+      radial-gradient(circle at 50% 50%, #fff 0 58%, #ffe9ef 59% 100%);
+    position:relative;
+    box-shadow:0 8px 0 rgba(122,20,48,.18);
+  }
+  .clock-face::before,
+  .clock-face::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:6px;
+    border-radius:999px;
+    background:#c91643;
+    transform-origin:50% 100%;
+  }
+  .clock-face::before{height:36px;transform:translate(-50%,-100%) rotate(32deg)}
+  .clock-face::after{
+    height:46px;
+    background:#11141d;
+    animation:tickingHand 1s steps(12,end) infinite;
+  }
+  .clock-copy{
+    display:grid;
+    grid-template-columns:1fr 72px;
+    align-items:center;
+    gap:12px;
+  }
+  .clock-time{
+    font-size:42px;
+    line-height:1;
+    font-weight:1000;
+    letter-spacing:.02em;
+    color:#11141d;
+  }
+  .clock-label{
+    margin-top:4px;
+    font-size:13px;
+    font-weight:1000;
+    color:#7a1430;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .drop-mascot{
+    width:58px;
+    height:76px;
+    border-radius:56% 56% 60% 60%;
+    background:linear-gradient(135deg,#ff5b78,#c91643 72%);
+    transform:rotate(45deg);
+    position:relative;
+    box-shadow:7px 7px 0 rgba(122,20,48,.16);
+    animation:bloodBob 1.7s ease-in-out infinite;
+  }
+  .drop-mascot::before,
+  .drop-mascot::after{
+    content:"";
+    position:absolute;
+    background:#11141d;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    transform:rotate(-45deg);
+    top:28px;
+  }
+  .drop-mascot::before{left:22px}
+  .drop-mascot::after{left:38px}
+  .drop-smile{
+    position:absolute;
+    left:26px;
+    top:39px;
+    width:18px;
+    height:9px;
+    border-bottom:3px solid #11141d;
+    border-radius:0 0 999px 999px;
+    transform:rotate(-45deg);
+  }
+  @keyframes tickingHand{
+    from{transform:translate(-50%,-100%) rotate(0deg)}
+    to{transform:translate(-50%,-100%) rotate(360deg)}
+  }
+  @keyframes bloodBob{
+    0%,100%{translate:0 0}
+    50%{translate:0 -8px}
+  }
   .reveal-token{
     width:min(82%,340px);
     min-height:174px;
@@ -460,6 +599,7 @@
   .answer-sub{font-size:12px;color:#d4d8ec}
   .clue-area{padding:16px;display:grid;gap:14px}
   .clue-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .clue-grid.single{grid-template-columns:1fr}
   .clue-card{
     min-height:292px;
     border-radius:13px;
@@ -566,6 +706,69 @@
   .system-token.selected{background:rgba(201,22,67,.18);border-color:var(--accent);color:#ffd2dd}
   .system-token.correct{background:rgba(61,220,132,.18);border-color:var(--good);color:#c9f7dd}
   .system-token.wrong{background:rgba(240,100,116,.16);border-color:var(--bad);color:#ffd5da}
+  .token-bank-label{
+    grid-column:1/-1;
+    color:#c91643;
+    font-size:12px;
+    font-weight:1000;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    padding:4px 0 0;
+  }
+  .locked-drawer{
+    grid-column:1/-1;
+    min-height:164px;
+    border:2px dashed #7f8aa9;
+    border-radius:16px;
+    background:linear-gradient(180deg,#20283d,#151b2d);
+    color:#fff8fb;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:18px;
+    position:relative;
+    overflow:hidden;
+  }
+  .locked-drawer::before{
+    content:"";
+    position:absolute;
+    left:18px;
+    right:18px;
+    top:22px;
+    height:34px;
+    border-radius:12px;
+    border:2px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.05);
+  }
+  .locked-drawer::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:30px;
+    width:56px;
+    height:10px;
+    border-radius:999px;
+    background:#ffd5df;
+    transform:translateX(-50%);
+    opacity:.7;
+  }
+  .drawer-lock{
+    display:grid;
+    gap:6px;
+    position:relative;
+    z-index:1;
+  }
+  .drawer-lock strong{
+    font-size:28px;
+    font-weight:1000;
+    letter-spacing:.02em;
+    color:#fff;
+  }
+  .drawer-lock span{
+    color:#ffd5df;
+    font-size:14px;
+    font-weight:900;
+  }
   .token-secret{display:inline-block;filter:blur(7px);opacity:.55}
   .token-solved{
     position:absolute;
@@ -620,7 +823,9 @@
     .print-card h2{font-size:15.5pt;line-height:1;margin:0 0 .05in;color:#000!important;max-width:3in}
     .print-case-rule{font-size:8.5pt;line-height:1.15;margin:0 0 .06in;color:#000!important;font-weight:900;max-width:3.08in}
     .print-clue-columns{display:grid;grid-template-columns:1fr 1fr;gap:.09in;margin-top:.06in}
+    .print-clue-columns.single{grid-template-columns:1fr}
     .print-clue-box{border:1.5px solid #000;border-radius:.08in;padding:.08in;min-height:3.52in}
+    .print-clue-columns.single .print-clue-box{min-height:3.74in}
     .print-clue-box h3{font-size:11pt;margin:0 0 .06in;color:#000!important;border:0;padding:0}
     .print-clue-box ul{margin:.03in 0 0;padding-left:.18in}
     .print-clue-box li{font-size:8.9pt;line-height:1.17;margin:.03in 0;color:#000!important}
@@ -681,6 +886,7 @@
       padding:.08in;
     }
     .print-token.long{font-size:12pt}
+    .print-token-section-title{font-size:13pt;margin:.16in 0 .08in;color:#000!important;font-weight:1000;border-bottom:2px solid #000}
     .print-frequency-section{page:bloodGroupFreq;padding:.08in}
     .print-frequency-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13pt}
     .print-frequency-table th,
@@ -698,8 +904,8 @@
     body.print-freq .print-clue-section,
     body.print-freq .print-token-section{display:none!important}
     body.print-single .print-token-section{display:none!important}
-    body.print-full .print-clue-section + .print-frequency-section,
-    body.print-full .print-frequency-section + .print-token-section{break-before:page}
+    body.print-full .print-frequency-section,
+    body.print-full .print-token-section{break-before:page}
   }
   @media(max-width:980px){
     .deck-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -716,15 +922,30 @@
     .deck-grid{grid-template-columns:1fr 1fr}
     .clue-grid{grid-template-columns:1fr}
     .system-grid{grid-template-columns:1fr 1fr}
+    .clock-stage{grid-template-columns:1fr;justify-items:center;text-align:center}
+    .clock-copy{grid-template-columns:1fr;justify-items:center}
   }
 </style>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css?v=bb-theme-8">
 <script src="interactive_music.js?v=bb-theme-8" defer></script>
 <style>
+  body.bb-theme.blood-group-game .arena-kicker,
+  body.bb-theme.blood-group-game .arena-title,
+  body.bb-theme.blood-group-game .arena-tag,
+  body.bb-theme.blood-group-game .arena-copy{
+    color:#11141d!important;
+  }
+  body.bb-theme.blood-group-game .arena-title{
+    text-shadow:6px 7px 0 rgba(255,255,255,.68), 10px 11px 0 rgba(201,22,67,.18)!important;
+  }
+  body.bb-theme.blood-group-game .arena-tag,
+  body.bb-theme.blood-group-game .arena-copy{
+    text-shadow:none!important;
+  }
   body.bb-theme.blood-group-game .freq-title,
   body.bb-theme.blood-group-game .token-lock-message{
-    color:#c91643!important;
+    color:#7a1430!important;
     text-shadow:none!important;
   }
   body.bb-theme.blood-group-game .freq-copy,
@@ -733,12 +954,45 @@
   body.bb-theme.blood-group-game .deck-status{
     color:#611428!important;
   }
+  body.bb-theme.blood-group-game .system-token,
+  body.bb-theme.blood-group-game .token-bank-label,
+  body.bb-theme.blood-group-game .freq-input,
+  body.bb-theme.blood-group-game .locked-drawer,
+  body.bb-theme.blood-group-game .drawer-lock strong,
+  body.bb-theme.blood-group-game .drawer-lock span{
+    text-transform:none!important;
+  }
+  body.bb-theme.blood-group-game .system-token{
+    color:#fff8fb!important;
+  }
+  body.bb-theme.blood-group-game .system-token.correct{
+    color:#c9f7dd!important;
+  }
+  body.bb-theme.blood-group-game .system-token.wrong{
+    color:#ffd5da!important;
+  }
+  body.bb-theme.blood-group-game .token-bank-label{
+    color:#c91643!important;
+  }
   body.bb-theme.blood-group-game .token-bank-wrap.locked .system-grid{
-    opacity:.72!important;
+    opacity:1!important;
     filter:none!important;
   }
   body.bb-theme.blood-group-game .token-bank-wrap.locked .system-token{
-    color:#611428!important;
+    color:#fff8fb!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .freq-title,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-lock-message{
+    color:#fff8fb!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .freq-copy,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .panel-note,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-note,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-status{
+    color:#ffd5df!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-bank-label{
+    color:#ffd5df!important;
   }
   @media print{
     html,
@@ -788,7 +1042,7 @@
     <a class="back" href="index.html#interactive">Back to tools</a>
     <div class="titleblock">
       <h1><span class="funky-title">Who's That Blood Group?</span></h1>
-      <div class="subtitle">Gotta type them all. Choose a case, beat the timer, unlock the token bank.</div>
+      <div class="subtitle">Gotta type them all. Choose a case, beat the timer, unlock the token drawer.</div>
     </div>
     <div class="round-badge" id="card-badge">Step 1: Enter</div>
   </div>
@@ -809,6 +1063,8 @@
     <button class="print-btn" onclick="printTokens()">Print Token Bank</button>
     <button class="print-btn" onclick="printFrequencySheet('blank')">Print Blank Freq Sheet</button>
     <button class="print-btn" onclick="printFrequencySheet('answer')">Print Answer Freq Sheet</button>
+    <button class="print-btn" onclick="printAntigenSheet('blank')">Print Blank Antigen Sheet</button>
+    <button class="print-btn" onclick="printAntigenSheet('answer')">Print Answer Antigen Sheet</button>
     <button class="print-btn" onclick="printFullPack()">Print Full Pack</button>
   </div>
 
@@ -820,7 +1076,7 @@
       </div>
       <div class="timer-pill">10:00 each</div>
     </div>
-    <div class="deck-grid" id="deck-grid"></div>
+    <div class="deck-sections" id="deck-grid"></div>
     <div class="deck-help" id="case-select-feedback"></div>
   </section>
 
@@ -867,12 +1123,22 @@
             </div>
           </div>
         </div>
+        <div class="clock-stage" aria-live="polite">
+          <div class="clock-face" aria-hidden="true"></div>
+          <div class="clock-copy">
+            <div>
+              <div class="clock-time" id="timer-display-large">10:00</div>
+              <div class="clock-label" id="clock-label">10-minute case clock</div>
+            </div>
+            <div class="drop-mascot" aria-hidden="true"><span class="drop-smile"></span></div>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="panel">
       <div class="panel-head">
-        <div class="panel-title">Case clues + frequency gate</div>
+        <div class="panel-title" id="gate-panel-title">Case clues + unlock gate</div>
         <div class="panel-note" id="clue-note">Clue 1 + 2 required</div>
       </div>
       <div class="clue-area">
@@ -885,7 +1151,7 @@
 
         <div class="token-bank-wrap locked" id="token-bank-wrap">
           <div class="panel-title" style="margin-bottom:9px">Match the blood group token</div>
-          <p class="token-lock-message" id="token-lock-message">Enter the exact frequency first to unlock the token bank.</p>
+          <p class="token-lock-message" id="token-lock-message">Enter the exact frequency first to unlock the token drawer.</p>
           <div class="system-grid" id="system-grid"></div>
         </div>
 
@@ -897,33 +1163,39 @@
 <section class="print-only" id="print-area"></section>
 
 <script>
-const TOKEN_OPTIONS = [
-  'ABO',
-  'Rh',
-  'Kell',
-  'Duffy',
-  'Kidd',
-  'MNS',
-  'P1PK / Globoside',
-  'Lewis',
-  'Lutheran'
+const USUAL_TOKENS = [
+  'abo',
+  'rh',
+  'kell',
+  'duffy',
+  'kidd',
+  'mns',
+  'p1pk / globoside',
+  'lewis',
+  'lutheran'
 ];
 
-const cards = Array.from({length:9}, (_, index) => {
+const UNUSUAL_TOKENS = Array.from({length:20}, (_, index) => 'unusual token ' + (index + 1));
+
+const MAIN_CASES = Array.from({length:9}, (_, index) => {
   const number = index + 1;
   const label = 'Case #' + number;
   return {
     id:'case-' + number,
+    type:'main',
     label,
-    answer:TOKEN_OPTIONS[index] || TOKEN_OPTIONS[0],
-    frequencyAnswer:'FREQ-' + number,
+    answer:USUAL_TOKENS[index] || USUAL_TOKENS[0],
+    gateType:'frequency',
+    gateAnswer:String(number),
+    gateName:'frequency',
+    gatePlaceholder:'type exact number',
     status:'placeholder',
     clues:[
       [
         'PLACEHOLDER - ' + label + ' Clue 1.',
         'Exact frequencies, trends, and study-reference clues will go here.',
         'Antigen image/reference note will be added when you send it.',
-        'Use this clue with Clue 2 before unlocking the token bank.'
+        'Use this clue with Clue 2 before unlocking the token drawer.'
       ],
       [
         'PLACEHOLDER - ' + label + ' Clue 2.',
@@ -935,6 +1207,40 @@ const cards = Array.from({length:9}, (_, index) => {
   };
 });
 
+const RAPID_CASES = Array.from({length:20}, (_, index) => {
+  const number = index + 1;
+  const label = 'Rapid #' + number;
+  return {
+    id:'rapid-' + number,
+    type:'rapid',
+    label,
+    answer:UNUSUAL_TOKENS[index],
+    gateType:'antigen',
+    gateAnswer:'antigen ' + number,
+    gateName:'antigen',
+    gatePlaceholder:'type antigen placeholder',
+    status:'placeholder',
+    clues:[
+      [
+        'clues: PLACEHOLDER - why not on antigram and serology.',
+        'Rapid-round serology clue will go here.',
+        'Enter the antigen placeholder to unlock the unusual token drawer.'
+      ]
+    ]
+  };
+});
+
+const cards = [...MAIN_CASES, ...RAPID_CASES];
+const TOKEN_GROUPS = {
+  main:[
+    {label:'usual tokens', options:USUAL_TOKENS}
+  ],
+  rapid:[
+    {label:'usual tokens', options:USUAL_TOKENS},
+    {label:'unusual tokens', options:UNUSUAL_TOKENS}
+  ]
+};
+
 const START_SECONDS = 10 * 60;
 const LOCK_SECONDS = 60;
 const caseStates = cards.map(() => ({
@@ -942,10 +1248,10 @@ const caseStates = cards.map(() => ({
   running:false,
   seconds:START_SECONDS,
   lockUntil:0,
-  frequencyUnlocked:false,
+  gateUnlocked:false,
   selected:'',
   solved:false,
-  wrongFrequencyAttempts:0
+  wrongGateAttempts:0
 }));
 
 let currentIndex = null;
@@ -971,6 +1277,24 @@ function formatTime(seconds){
   return mins + ':' + secs;
 }
 
+function normalizeAnswer(text){
+  return String(text || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function gateCopy(card){
+  const isAntigen = card && card.gateType === 'antigen';
+  return {
+    title:isAntigen ? 'antigen checkpoint' : 'frequency checkpoint',
+    accepted:isAntigen ? 'antigen accepted' : 'frequency accepted',
+    unlocked:isAntigen ? 'antigen accepted. choose the matching token below.' : 'frequency accepted. choose the matching blood group token below.',
+    copy:isAntigen ? 'enter the antigen placeholder from your sheet. wrong antigen = minus 1 minute.' : 'enter the exact frequency number from your sheet. wrong frequency = minus 1 minute.',
+    placeholder:isAntigen ? 'type antigen placeholder' : 'type exact number',
+    locked:isAntigen ? 'enter the antigen first to unlock the token drawer.' : 'enter the exact frequency first to unlock the token drawer.',
+    feedbackLocked:isAntigen ? 'read the clue, then enter the antigen to unlock tokens.' : 'read both clues, then enter the exact frequency to unlock tokens.',
+    wrong:isAntigen ? 'wrong antigen. minus 1 minute. try again.' : 'wrong frequency. minus 1 minute. try again.'
+  };
+}
+
 function syncLocks(){
   const now = Date.now();
   caseStates.forEach(state => {
@@ -978,7 +1302,7 @@ function syncLocks(){
       state.lockUntil = 0;
       state.seconds = START_SECONDS;
       state.running = false;
-      state.frequencyUnlocked = false;
+      state.gateUnlocked = false;
       state.selected = '';
     }
   });
@@ -1010,32 +1334,55 @@ function backToCases(message){
 function renderDeck(){
   syncLocks();
   const grid = document.getElementById('deck-grid');
-  grid.innerHTML = cards.map((card, index) => {
-    const state = caseStates[index];
-    const remainingLock = lockRemaining(state);
-    const classes = [
-      'deck-card',
-      index === currentIndex ? 'active' : '',
-      state.solved ? 'done' : '',
-      remainingLock ? 'locked' : ''
-    ].filter(Boolean).join(' ');
-    let status = 'Ready - start 10:00';
-    if(remainingLock){
-      status = 'Locked ' + formatTime(remainingLock);
-    }else if(state.solved){
-      status = 'Solved - replay anytime';
-    }else if(state.started && index === currentIndex && state.running){
-      status = 'Timer ' + formatTime(state.seconds);
-    }else if(state.started){
-      status = 'In progress ' + formatTime(state.seconds);
-    }
-    return '<button class="'+classes+'" onclick="selectCard('+index+')">'
-      + '<div class="deck-label">'+esc(card.label)+'</div>'
-      + '<div class="deck-status">'+esc(status)+'</div>'
-      + '<div class="deck-status">Clue 1 + clue 2 in one room</div>'
-      + '</button>';
-  }).join('');
+  const renderSection = (title, cardType) => {
+    const items = cards.map((card, index) => ({card, index})).filter(item => item.card.type === cardType);
+    return '<section class="deck-section">'
+      + '<div class="deck-section-title">'+esc(title)+'</div>'
+      + '<div class="deck-grid">'
+      + items.map(({card, index}) => {
+        const state = caseStates[index];
+        const remainingLock = lockRemaining(state);
+        const classes = [
+          'deck-card',
+          card.type === 'rapid' ? 'rapid' : '',
+          index === currentIndex ? 'active' : '',
+          state.solved ? 'done' : '',
+          remainingLock ? 'locked' : ''
+        ].filter(Boolean).join(' ');
+        let status = 'ready - start 10:00';
+        if(remainingLock){
+          status = 'locked ' + formatTime(remainingLock);
+        }else if(state.solved){
+          status = 'solved - replay anytime';
+        }else if(state.started && index === currentIndex && state.running){
+          status = 'timer ' + formatTime(state.seconds);
+        }else if(state.started){
+          status = 'in progress ' + formatTime(state.seconds);
+        }
+        const clueLine = card.type === 'rapid' ? '1 rapid clue + antigen gate' : 'clue 1 + clue 2 + frequency gate';
+        return '<button class="'+classes+'" onclick="selectCard('+index+')">'
+          + '<div class="deck-label">'+esc(card.label)+'</div>'
+          + '<div class="deck-status">'+esc(status)+'</div>'
+          + '<div class="deck-status">'+esc(clueLine)+'</div>'
+          + '</button>';
+      }).join('')
+      + '</div>'
+      + '</section>';
+  };
+  grid.innerHTML = renderSection('main 9 cases', 'main') + renderSection('20 mini-case rapid rounds', 'rapid');
   document.getElementById('case-select-feedback').textContent = deckMessage;
+}
+
+function updateTimerDisplays(){
+  const card = currentCard();
+  const state = currentState();
+  const time = state ? formatTime(state.seconds) : formatTime(START_SECONDS);
+  const small = document.getElementById('timer-display');
+  const large = document.getElementById('timer-display-large');
+  if(small) small.textContent = time;
+  if(large) large.textContent = time;
+  const label = document.getElementById('clock-label');
+  if(label) label.textContent = card && card.type === 'rapid' ? 'rapid-round clock' : '10-minute case clock';
 }
 
 function renderMystery(){
@@ -1043,51 +1390,61 @@ function renderMystery(){
   const state = currentState();
   const solved = Boolean(state && state.solved);
   document.getElementById('case-title').textContent = card ? card.label : 'Mystery case';
-  document.getElementById('answer-secret').textContent = solved && card ? card.answer + ' token' : 'Hidden answer';
-  document.getElementById('answer-sub').textContent = solved ? 'Solved stamp added. Replace placeholder answer later if needed.' : 'Answer hidden until this case is completed';
+  document.getElementById('answer-secret').textContent = solved && card ? card.answer + ' token' : 'hidden answer';
+  document.getElementById('answer-sub').textContent = solved ? 'solved stamp added. replace placeholder answer later if needed.' : 'answer hidden until this case is completed';
   document.getElementById('mystery-card').classList.toggle('revealed', solved);
-  document.getElementById('reveal-note').textContent = solved ? 'Solved' : 'Mystery';
-  document.getElementById('timer-display').textContent = state ? formatTime(state.seconds) : formatTime(START_SECONDS);
+  document.getElementById('reveal-note').textContent = solved ? 'solved' : 'mystery';
+  updateTimerDisplays();
 }
 
 function renderClues(){
   const card = currentCard();
   if(!card) return;
+  const clueGrid = document.querySelector('.clue-grid');
+  const clueCount = (card.clues || []).length;
+  clueGrid.classList.toggle('single', clueCount === 1);
   for(let i = 1; i <= 2; i++){
     const el = document.getElementById('clue-'+i);
     const clueSet = card.clues && card.clues[i - 1];
+    if(!clueSet){
+      el.style.display = 'none';
+      continue;
+    }
+    el.style.display = '';
     el.className = 'clue-card';
     el.innerHTML = '<h2>'+esc(card.label)+' - Clue '+i+'</h2><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul>';
   }
-  document.getElementById('clue-note').textContent = 'Both visible';
+  document.getElementById('clue-note').textContent = clueCount === 1 ? '1 rapid clue' : 'both visible';
+  document.getElementById('gate-panel-title').textContent = card.type === 'rapid' ? 'rapid clue + antigen gate' : 'case clues + frequency gate';
 }
 
 function renderFrequencyGate(){
   const card = currentCard();
   const state = currentState();
   const gate = document.getElementById('frequency-gate');
+  const copy = gateCopy(card);
   if(!card || !state){
     gate.innerHTML = '';
     return;
   }
   if(state.solved){
-    gate.innerHTML = '<div class="freq-title">Frequency accepted</div><p class="freq-copy">This case is solved. Start another case or reset this one.</p>';
+    gate.innerHTML = '<div class="freq-title">'+esc(copy.accepted)+'</div><p class="freq-copy">this case is solved. start another case or reset this one.</p>';
     return;
   }
-  if(state.frequencyUnlocked){
-    gate.innerHTML = '<div class="freq-title">Token bank unlocked</div><p class="freq-copy">Frequency accepted. Choose the matching blood group token below.</p>';
+  if(state.gateUnlocked){
+    gate.innerHTML = '<div class="freq-title">token drawer unlocked</div><p class="freq-copy">'+esc(copy.unlocked)+'</p>';
     return;
   }
-  gate.innerHTML = '<div class="freq-title">Frequency checkpoint</div>'
-    + '<p class="freq-copy">Enter the exact frequency answer from your sheet. Wrong frequency = minus 1 minute.</p>'
+  gate.innerHTML = '<div class="freq-title">'+esc(copy.title)+'</div>'
+    + '<p class="freq-copy">'+esc(copy.copy)+'</p>'
     + '<div class="freq-row">'
-    + '<input class="freq-input" id="freq-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type exact frequency">'
-    + '<button class="primary" onclick="submitFrequency()">Unlock token bank</button>'
+    + '<input class="freq-input" id="freq-input" type="text" autocomplete="off" spellcheck="false" placeholder="'+esc(copy.placeholder)+'">'
+    + '<button class="primary" onclick="submitGateAnswer()">Unlock drawer</button>'
     + '</div>';
   const input = document.getElementById('freq-input');
   if(input){
     input.addEventListener('keydown', event => {
-      if(event.key === 'Enter') submitFrequency();
+      if(event.key === 'Enter') submitGateAnswer();
     });
   }
 }
@@ -1099,22 +1456,32 @@ function renderSystems(){
   const solved = state.solved;
   const grid = document.getElementById('system-grid');
   const wrap = document.getElementById('token-bank-wrap');
-  wrap.classList.toggle('locked', !state.frequencyUnlocked && !solved);
-  document.getElementById('token-lock-message').textContent = state.frequencyUnlocked || solved
-    ? 'Token bank is unlocked. Tokens stay available for every case.'
-    : 'Enter the exact frequency first to unlock the token bank.';
-  grid.innerHTML = TOKEN_OPTIONS.map(label => {
-    const isCorrect = solved && label === card.answer;
-    const cls = [
-      'system-token',
-      state.selected === label ? 'selected' : '',
-      isCorrect ? 'correct' : '',
-      state.selected === label && state.selected !== card.answer && state.frequencyUnlocked ? 'wrong' : ''
-    ].filter(Boolean).join(' ');
-    const tokenText = isCorrect
-      ? '<span class="token-secret">'+esc(label)+'</span><span class="token-solved">Solved</span>'
-      : esc(label);
-    return '<button class="'+cls+'" onclick=\'selectSystem('+JSON.stringify(label)+')\'>'+tokenText+'</button>';
+  const copy = gateCopy(card);
+  const locked = !state.gateUnlocked && !solved;
+  wrap.classList.toggle('locked', locked);
+  document.getElementById('token-lock-message').textContent = locked
+    ? copy.locked
+    : 'token drawer is unlocked. tokens stay available for every case.';
+  if(locked){
+    grid.innerHTML = '<div class="locked-drawer"><div class="drawer-lock"><strong>locked drawer</strong><span>'+esc(copy.locked)+'</span></div></div>';
+    return;
+  }
+  const groups = TOKEN_GROUPS[card.type] || TOKEN_GROUPS.main;
+  grid.innerHTML = groups.map(group => {
+    const tokens = group.options.map(label => {
+      const isCorrect = solved && label === card.answer;
+      const cls = [
+        'system-token',
+        state.selected === label ? 'selected' : '',
+        isCorrect ? 'correct' : '',
+        state.selected === label && state.selected !== card.answer && state.gateUnlocked ? 'wrong' : ''
+      ].filter(Boolean).join(' ');
+      const tokenText = isCorrect
+        ? '<span class="token-secret">'+esc(label)+'</span><span class="token-solved">solved</span>'
+        : esc(label);
+      return '<button class="'+cls+'" onclick=\'selectSystem('+JSON.stringify(label)+')\'>'+tokenText+'</button>';
+    }).join('');
+    return '<div class="token-bank-label">'+esc(group.label)+'</div>' + tokens;
   }).join('');
 }
 
@@ -1131,55 +1498,56 @@ function updateFeedback(text, type){
     fb.textContent = 'Choose a case to start the 10-minute timer.';
   }else if(state.solved){
     fb.textContent = 'Case solved. The token is revealed with a solved stamp.';
-  }else if(!state.frequencyUnlocked){
-    fb.textContent = 'Read both clues, then enter the exact frequency to unlock tokens.';
+  }else if(!state.gateUnlocked){
+    fb.textContent = gateCopy(card).feedbackLocked;
   }else{
-    fb.textContent = 'Token bank unlocked. Choose the matching blood group token.';
+    fb.textContent = 'token drawer unlocked. choose the matching token.';
   }
 }
 
-function submitFrequency(){
+function submitGateAnswer(){
   const card = currentCard();
   const state = currentState();
   const input = document.getElementById('freq-input');
   if(!card || !state || !input) return;
-  const answer = input.value.trim();
-  if(answer === card.frequencyAnswer){
-    state.frequencyUnlocked = true;
+  const answer = normalizeAnswer(input.value);
+  const copy = gateCopy(card);
+  if(answer === normalizeAnswer(card.gateAnswer)){
+    state.gateUnlocked = true;
     state.running = true;
     renderFrequencyGate();
     renderSystems();
-    updateFeedback('Frequency accepted. Token bank unlocked.', 'good');
+    updateFeedback(copy.accepted + '. token drawer unlocked.', 'good');
     return;
   }
-  state.wrongFrequencyAttempts += 1;
+  state.wrongGateAttempts += 1;
   state.seconds = Math.max(0, state.seconds - 60);
   if(state.seconds <= 0){
     lockCurrentCase(card.label + ' locked for 1 minute. Proceed to another case and come back when it unlocks.');
     return;
   }
   renderMystery();
-  updateFeedback('Wrong frequency. Minus 1 minute. Try again.', 'bad');
+  updateFeedback(copy.wrong, 'bad');
 }
 
 function selectSystem(system){
   const card = currentCard();
   const state = currentState();
   if(!card || !state) return;
-  if(!state.frequencyUnlocked && !state.solved){
+  if(!state.gateUnlocked && !state.solved){
     state.selected = system;
     renderSystems();
-    updateFeedback('Frequency checkpoint first. Enter the exact frequency to unlock the token bank.', 'bad');
+    updateFeedback(gateCopy(card).locked, 'bad');
     return;
   }
   state.selected = system;
-  if(system === card.answer){
+  if(normalizeAnswer(system) === normalizeAnswer(card.answer)){
     state.solved = true;
     state.running = false;
     document.getElementById('mystery-card').classList.add('revealed');
-    updateFeedback('Correct. Case solved and the token is revealed.', 'good');
+    updateFeedback('correct. case solved and the token is revealed.', 'good');
   }else{
-    updateFeedback('Not this token. The bank stays open; try another one.', 'bad');
+    updateFeedback('not this token. the drawer stays open; try another one.', 'bad');
   }
   renderDeck();
   renderMystery();
@@ -1216,10 +1584,10 @@ function resetCurrentCard(){
     running:true,
     seconds:START_SECONDS,
     lockUntil:0,
-    frequencyUnlocked:false,
+    gateUnlocked:false,
     selected:'',
     solved:false,
-    wrongFrequencyAttempts:0
+    wrongGateAttempts:0
   });
   renderAll();
 }
@@ -1229,7 +1597,7 @@ function lockCurrentCase(message){
   if(!state) return;
   state.running = false;
   state.seconds = 0;
-  state.frequencyUnlocked = false;
+  state.gateUnlocked = false;
   state.selected = '';
   state.lockUntil = Date.now() + LOCK_SECONDS * 1000;
   backToCases(message);
@@ -1250,7 +1618,7 @@ function tickTimer(){
     lockCurrentCase(card.label + ' locked for 1 minute. Proceed to another case and come back when it unlocks.');
     return;
   }
-  document.getElementById('timer-display').textContent = formatTime(state.seconds);
+  updateTimerDisplays();
   document.getElementById('card-badge').textContent = card.label + ' - ' + formatTime(state.seconds);
 }
 
@@ -1275,18 +1643,18 @@ function readyCards(){
 }
 
 function printCaseCardHtml(card){
-  const clueOne = (card.clues && card.clues[0]) || [];
-  const clueTwo = (card.clues && card.clues[1]) || [];
+  const clueSets = card.clues || [];
+  const copy = gateCopy(card);
+  const clueClass = clueSets.length === 1 ? ' single' : '';
   return '<article class="print-card">'
     + '<div class="print-mystery-mark">?</div>'
     + '<h2>Who&#39;s That Blood Group?</h2>'
-    + '<p class="print-case-rule">'+esc(card.label)+' / 10 min / wrong frequency = -1 min / placeholder content only</p>'
-    + '<div class="print-clue-columns">'
-    + '<section class="print-clue-box"><h3>Clue 1</h3><ul>'+clueOne.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul></section>'
-    + '<section class="print-clue-box"><h3>Clue 2</h3><ul>'+clueTwo.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul></section>'
+    + '<p class="print-case-rule">'+esc(card.label)+' / 10 min / wrong '+esc(card.gateName)+' = -1 min / placeholder content only</p>'
+    + '<div class="print-clue-columns'+clueClass+'">'
+    + clueSets.map((clueSet, index) => '<section class="print-clue-box"><h3>Clue '+(index + 1)+'</h3><ul>'+clueSet.map(item => '<li>'+esc(item)+'</li>').join('')+'</ul></section>').join('')
     + '</div>'
-    + '<div class="print-frequency-spot">Frequency checkpoint: ____________________</div>'
-    + '<div class="print-token-spot">Blood group token: ____________________</div>'
+    + '<div class="print-frequency-spot">'+esc(copy.title)+': ____________________</div>'
+    + '<div class="print-token-spot">token: ____________________</div>'
     + '</article>';
 }
 
@@ -1301,25 +1669,44 @@ function renderPrintCases(printable){
 }
 
 function renderPrintTokens(){
-  const tokenCopies = Array.from({length:2}).flatMap(() => TOKEN_OPTIONS);
   return '<section class="print-token-section print-page">'
     + '<h1 class="print-title">Blood Group Token Bank</h1>'
     + '<p class="print-subtitle">Shared token bank. Tokens are not consumed between cases.</p>'
+    + '<h2 class="print-token-section-title">usual tokens</h2>'
     + '<div class="print-token-grid">'
-    + tokenCopies.map(label => '<div class="print-token '+(label.length > 10 ? 'long' : '')+'">'+esc(label)+'</div>').join('')
+    + USUAL_TOKENS.map(label => '<div class="print-token '+(label.length > 10 ? 'long' : '')+'">'+esc(label)+'</div>').join('')
+    + '</div>'
+    + '<h2 class="print-token-section-title">unusual tokens</h2>'
+    + '<div class="print-token-grid">'
+    + UNUSUAL_TOKENS.map(label => '<div class="print-token '+(label.length > 10 ? 'long' : '')+'">'+esc(label)+'</div>').join('')
     + '</div>'
     + '</section>';
 }
 
 function renderPrintFrequencySheet(kind){
   const withAnswers = kind === 'answer';
+  const frequencyCards = cards.filter(card => card.gateType === 'frequency');
   return '<section class="print-frequency-section print-page">'
     + '<h1 class="print-title">Who&#39;s That Blood Group? - '+(withAnswers ? 'Frequency Answer Sheet' : 'Blank Frequency Sheet')+'</h1>'
     + '<p class="print-subtitle">Use this page to check or record the exact frequency needed to unlock each case.</p>'
     + '<table class="print-frequency-table">'
     + '<thead><tr><th class="case-col">Case</th><th class="freq-col">Exact frequency</th><th class="token-col">Notes / token check</th></tr></thead>'
     + '<tbody>'
-    + cards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+(withAnswers ? esc(card.frequencyAnswer) : '')+'</td><td></td></tr>').join('')
+    + frequencyCards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+(withAnswers ? esc(card.gateAnswer) : '')+'</td><td>'+(withAnswers ? esc(card.answer) : '')+'</td></tr>').join('')
+    + '</tbody></table>'
+    + '</section>';
+}
+
+function renderPrintAntigenSheet(kind){
+  const withAnswers = kind === 'answer';
+  const antigenCards = cards.filter(card => card.gateType === 'antigen');
+  return '<section class="print-frequency-section print-page">'
+    + '<h1 class="print-title">Who&#39;s That Blood Group? - '+(withAnswers ? 'Antigen Answer Sheet' : 'Blank Antigen Sheet')+'</h1>'
+    + '<p class="print-subtitle">Rapid rounds unlock after the antigen entry is checked. Placeholder answers can be replaced later.</p>'
+    + '<table class="print-frequency-table">'
+    + '<thead><tr><th class="case-col">Rapid</th><th class="freq-col">Antigen entry</th><th class="token-col">Token check</th></tr></thead>'
+    + '<tbody>'
+    + antigenCards.map(card => '<tr><td>'+esc(card.label)+'</td><td>'+(withAnswers ? esc(card.gateAnswer) : '')+'</td><td>'+(withAnswers ? esc(card.answer) : '')+'</td></tr>').join('')
     + '</tbody></table>'
     + '</section>';
 }
@@ -1350,8 +1737,15 @@ function printFrequencySheet(kind){
   setTimeout(() => window.print(), 80);
 }
 
+function printAntigenSheet(kind){
+  document.getElementById('print-area').innerHTML = renderPrintAntigenSheet(kind);
+  resetPrintClasses();
+  document.body.classList.add('print-freq');
+  setTimeout(() => window.print(), 80);
+}
+
 function printFullPack(){
-  document.getElementById('print-area').innerHTML = renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintTokens();
+  document.getElementById('print-area').innerHTML = renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
   resetPrintClasses();
   document.body.classList.add('print-full');
   setTimeout(() => window.print(), 80);
@@ -1360,12 +1754,14 @@ function printFullPack(){
 window.addEventListener('afterprint', resetPrintClasses);
 window.selectSystem = selectSystem;
 window.selectCard = selectCard;
-window.submitFrequency = submitFrequency;
+window.submitGateAnswer = submitGateAnswer;
+window.submitFrequency = submitGateAnswer;
 window.backToCases = backToCases;
 window.resetCurrentCard = resetCurrentCard;
 window.printCaseCards = printCaseCards;
 window.printTokens = printTokens;
 window.printFrequencySheet = printFrequencySheet;
+window.printAntigenSheet = printAntigenSheet;
 window.printFullPack = printFullPack;
 renderAll();
 setInterval(tickTimer, 1000);
@@ -1376,6 +1772,19 @@ if(previewMode === 'cases'){
 }else if(previewMode === 'case'){
   enterArena();
   selectCard(0);
+}else if(previewMode === 'rapid'){
+  enterArena();
+  selectCard(MAIN_CASES.length);
+}else if(previewMode === 'caseUnlocked'){
+  enterArena();
+  selectCard(0);
+  caseStates[0].gateUnlocked = true;
+  renderAll();
+}else if(previewMode === 'rapidUnlocked'){
+  enterArena();
+  selectCard(MAIN_CASES.length);
+  caseStates[MAIN_CASES.length].gateUnlocked = true;
+  renderAll();
 }
 const printPreviewMode = pageParams.get('printPreview');
 if(printPreviewMode){
@@ -1395,8 +1804,14 @@ if(printPreviewMode){
   }else if(printPreviewMode === 'freqAnswer'){
     document.getElementById('print-area').innerHTML = renderPrintFrequencySheet('answer');
     document.body.classList.add('print-freq');
+  }else if(printPreviewMode === 'antigenBlank'){
+    document.getElementById('print-area').innerHTML = renderPrintAntigenSheet('blank');
+    document.body.classList.add('print-freq');
+  }else if(printPreviewMode === 'antigenAnswer'){
+    document.getElementById('print-area').innerHTML = renderPrintAntigenSheet('answer');
+    document.body.classList.add('print-freq');
   }else if(printPreviewMode === 'full'){
-    document.getElementById('print-area').innerHTML = renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintTokens();
+    document.getElementById('print-area').innerHTML = renderPrintCases(readyCards()) + renderPrintFrequencySheet('blank') + renderPrintFrequencySheet('answer') + renderPrintAntigenSheet('blank') + renderPrintAntigenSheet('answer') + renderPrintTokens();
     document.body.classList.add('print-full');
   }
 }
