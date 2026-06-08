@@ -2196,7 +2196,7 @@ async function generateUAGroupedImagePDF(items, title, filename, options={}){
     doc.line(margin,margin+11,pageW-margin,margin+11);
   };
   const grouped=groupedUASections(items);
-  const orderedSections=UA_IMAGE_SECTIONS.filter(section=>grouped[section]?.length);
+  const orderedSections=uaSectionOptions(Object.keys(grouped)).filter(section=>grouped[section]?.length);
   let firstSection=true;
   for(const section of orderedSections){
     const sectionItems=uaSortItems(grouped[section]||[]);
@@ -3423,7 +3423,10 @@ function renderImageFlashcard(el){
   const item=items[idx];
   const imgs=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean);
   const features=item.key_features||[];
-  const showNotes=appState.subject!=='hematology'&&item.notes;
+  const isUAFlash=appState.subject==='urinalysis';
+  const flashCategory=isUAFlash?uaCategoryLabel(item):'';
+  const notesText=isUAFlash?stripUACategoryNote(item.notes):String(item.notes||'');
+  const showNotes=appState.subject!=='hematology'&&notesText;
 
   const frontContent=`
     <div style="padding:20px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
@@ -3438,9 +3441,10 @@ function renderImageFlashcard(el){
   const backContent=`
     <div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px">
       <div style="font-size:13px;color:var(--text);opacity:.5;margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Answer</div>
+      ${flashCategory?`<span class="tag tag-info" style="font-size:12px;margin-bottom:10px">${esc(flashCategory)}</span>`:''}
       <div style="font-size:34px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${features.length?'16px':'0'}">${item.name||'?'}</div>
       ${features.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px">${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}</div>`:''}
-      ${showNotes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;max-width:480px;line-height:1.6">${esc(item.notes)}</div>`:''}
+      ${showNotes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;max-width:480px;line-height:1.6">${esc(notesText)}</div>`:''}
     </div>`;
 
   const uaNav=appState.subject==='urinalysis';
@@ -3630,7 +3634,8 @@ const UA_IMAGE_SECTIONS=[
 ];
 const UA_CAT_META_RE=/^\s*\[\[UA_CATEGORY:([^\]]+)\]\]\s*\n?/i;
 function normalizeUASection(v){
-  const val=String(v||'').trim().toLowerCase();
+  const raw=String(v||'').trim();
+  const val=raw.toLowerCase();
   const found=UA_IMAGE_SECTIONS.find(section=>section.toLowerCase()===val);
   if(found)return found;
   if(val==='cells'||val==='cell'||val==='microscopic cells')return 'Cells';
@@ -3641,7 +3646,33 @@ function normalizeUASection(v){
   if(val==='macroscopic'||val==='color'||val==='clarity')return 'Macroscopic Color / Clarity';
   if(val==='strip'||val==='dipstick'||val==='reagent')return 'Reagent Strip';
   if(val==='normal'||val==='normal findings')return 'Microscopic Miscellaneous';
-  return '';
+  return raw;
+}
+function uaSectionOptions(extra=[]){
+  const options=[...UA_IMAGE_SECTIONS,...(window._uaCustomSections||[]),...extra]
+    .map(normalizeUASection)
+    .filter(Boolean);
+  const seen=new Set();
+  return options.filter(section=>{
+    const key=section.toLowerCase();
+    if(seen.has(key))return false;
+    seen.add(key);
+    return true;
+  });
+}
+function rememberUACustomSections(items=[]){
+  const builtIns=new Set(UA_IMAGE_SECTIONS.map(section=>section.toLowerCase()));
+  const custom=new Set(window._uaCustomSections||[]);
+  (items||[]).forEach(item=>{
+    const section=uaSectionKey(item);
+    if(section&&!builtIns.has(section.toLowerCase()))custom.add(section);
+  });
+  window._uaCustomSections=[...custom].sort((a,b)=>a.localeCompare(b));
+}
+function readUASectionFromControls(prefix){
+  const custom=document.getElementById(`${prefix}-custom-section`)?.value.trim();
+  const selected=document.getElementById(`${prefix}-section`)?.value;
+  return normalizeUASection(custom||selected)||'Needs Review';
 }
 function normalizeUACatType(v){
   const val=String(v||'').trim().toLowerCase();
@@ -3735,15 +3766,42 @@ function uaCategoryLabel(item){
   const cat=inferUACategory(item);
   return cat.section;
 }
+function uaSearchText(item){
+  return [
+    item?.name,
+    uaCategoryLabel(item),
+    ...(item?.key_features||[]),
+    stripUACategoryNote(item?.notes)
+  ].join(' ').toLowerCase();
+}
+function uaImageCardHTML(img){
+  return `
+    <div class="condition-card ua-item" data-name="${esc(uaSearchText(img))}" onclick="openUAImage('${img.id}')">
+      <div class="ua-single-img">${buildUAThumbs(img)}</div>
+      <div class="condition-body">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <span class="tag tag-info" style="font-size:10px">${esc(uaCategoryLabel(img))}</span>
+        </div>
+        <div class="condition-name">${esc(img.name||'')}</div>
+        ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).map(esc).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
+        ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
+        </div>`:''}
+      </div>
+    </div>`;
+}
 function uaCategoryControls(prefix,item={}){
   const cat=inferUACategory(item);
+  const options=uaSectionOptions([cat.section]);
   return `
     <div class="form-grid" style="grid-template-columns:1fr;gap:10px">
       <div class="form-group">
         <label>Chart Category</label>
         <select id="${prefix}-section">
-          ${UA_IMAGE_SECTIONS.map(v=>`<option value="${v}" ${cat.section===v?'selected':''}>${v}</option>`).join('')}
+          ${options.map(v=>`<option value="${v}" ${cat.section===v?'selected':''}>${v}</option>`).join('')}
         </select>
+        <input type="text" id="${prefix}-custom-section" value="" placeholder="+ New chart category name" style="margin-top:8px;font-size:13px">
       </div>
     </div>`;
 }
@@ -3808,6 +3866,8 @@ async function getUAItemsWithImages(items){
   return (items||[]).map(item=>({...item,images:window._uaImageCacheById[String(item.id)]||[]}));
 }
 function setUAImageSection(section){
+  window._uaSearchQuery='';
+  window._uaFilteredMeta=[];
   window._uaImageSection=normalizeUASection(section)||section;
   renderTab();
 }
@@ -3822,13 +3882,25 @@ async function renderUAImages(el){
     el.innerHTML=imageLoadRetryHTML('Urinalysis','invalidateUACaches();renderTab()');
     return;
   }
+  rememberUACustomSections(all);
+  window._uaAllMeta=all;
   const sectionGroups=groupedUASections(all);
-  const sectionOrder=UA_IMAGE_SECTIONS.filter(section=>sectionGroups[section]?.length);
+  const sectionOrder=uaSectionOptions(Object.keys(sectionGroups)).filter(section=>sectionGroups[section]?.length);
   const activeSection=sectionOrder.includes(window._uaImageSection)?window._uaImageSection:(sectionOrder[0]||UA_IMAGE_SECTIONS[0]);
   window._uaImageSection=activeSection;
   let activeItems=[];
+  const searchQuery=String(window._uaSearchQuery||'').trim();
+  let filteredMeta=[];
   try{
-    activeItems=await getUAItemsWithImages(sectionGroups[activeSection]||[]);
+    if(searchQuery){
+      const q=searchQuery.toLowerCase();
+      filteredMeta=uaSortItems(all.filter(item=>uaSearchText(item).includes(q)));
+      window._uaFilteredMeta=filteredMeta;
+      activeItems=await getUAItemsWithImages(filteredMeta);
+    }else{
+      window._uaFilteredMeta=[];
+      activeItems=await getUAItemsWithImages(sectionGroups[activeSection]||[]);
+    }
   }catch(e){
     el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaImageCacheById={};renderTab()');
     return;
@@ -3839,14 +3911,19 @@ async function renderUAImages(el){
       <button class="btn btn-primary btn-sm" onclick="startUAQuiz()">⚡ Image Quiz Mode</button>
       <button class="btn btn-ghost btn-sm" onclick="startUAFlashcard()">🃏 Flashcards</button>
       <button class="btn btn-ghost btn-sm" onclick="openUAExportModal()">📄 Export</button>
+      ${searchQuery?`<button class="btn btn-success btn-sm" onclick="exportUAFilteredPDF()">📄 Export Filtered (${filteredMeta.length})</button>`:''}
       ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddUAImageModal()">+ Add Image</button>`:''}
     </div>
     <div style="position:relative;margin-bottom:20px">
-      <input type="text" id="ua-search" placeholder="Search findings..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterUAItems(this.value)">
+      <input type="text" id="ua-search" value="${esc(searchQuery)}" placeholder="Search all UA findings by name, feature, or category..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterUAItems(this.value)">
       <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
     </div>
+    <div id="ua-search-status" style="font-size:12px;color:var(--text2);margin:-10px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span id="ua-search-status-text">${searchQuery?`Showing ${activeItems.length} all-category result${activeItems.length===1?'':'s'} for "${esc(searchQuery)}".`:'Search uses all UA categories, not just the selected tab.'}</span>
+      <span id="ua-filtered-export-inline">${searchQuery&&filteredMeta.length?`<button class="btn btn-success btn-xs" onclick="exportUAFilteredPDF()">Export Filtered</button>`:''}</span>
+    </div>
     <div class="ua-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
-      ${UA_IMAGE_SECTIONS.filter(section=>sectionGroups[section]?.length).map(section=>`
+      ${sectionOrder.map(section=>`
         <button class="btn ${activeSection===section?'btn-primary':'btn-ghost'} btn-sm" onclick="setUAImageSection('${jsAttr(section)}')" style="font-size:12px">
           ${esc(section)} <span style="opacity:.75">(${sectionGroups[section].length})</span>
         </button>`).join('')}
@@ -3854,49 +3931,76 @@ async function renderUAImages(el){
     ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
     <div id="ua-items-body">
       <div class="condition-grid">
-        ${activeItems.map(img=>`
-          <div class="condition-card ua-item" data-name="${esc([img.name,...(img.key_features||[])].join(' ').toLowerCase())}" onclick="openUAImage('${img.id}')">
-            <div class="ua-single-img">${buildUAThumbs(img)}</div>
-            <div class="condition-body">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-                <span class="tag tag-info" style="font-size:10px">${esc(uaCategoryLabel(img))}</span>
-              </div>
-              <div class="condition-name">${esc(img.name||'')}</div>
-              ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).map(esc).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
-              ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
-                <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
-                <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
-              </div>`:''}
-            </div>
-          </div>`).join('')}
+        ${activeItems.map(uaImageCardHTML).join('')}
       </div>
     </div>
     ${isAdmin?`<div class="mt-16">${adminUAImageControls()}</div>`:''}
   `;
 }
 
+function renderUAItemGrid(items,message=''){
+  const body=document.getElementById('ua-items-body');
+  if(!body)return;
+  body.innerHTML=`
+    ${message?`<div style="font-size:12px;color:var(--text2);margin-bottom:12px">${message}</div>`:''}
+    <div class="condition-grid">
+      ${(items||[]).map(uaImageCardHTML).join('')}
+    </div>
+    ${!(items||[]).length?'<div class="empty">No matching UA findings.</div>':''}`;
+}
 function filterUAItems(query){
-  const q=query.toLowerCase().trim();
-  document.querySelectorAll('.ua-item').forEach(card=>{
-    card.style.display=(!q||card.dataset.name.includes(q))?'':'none';
-  });
-  document.querySelectorAll('.ua-image-group').forEach(group=>{
-    const any=[...group.querySelectorAll('.ua-item')].some(card=>card.style.display!=='none');
-    group.style.display=any?'':'none';
-  });
+  const q=String(query||'').trim();
+  window._uaSearchQuery=q;
+  clearTimeout(window._uaSearchTimer);
+  window._uaSearchTimer=setTimeout(async()=>{
+    const status=document.getElementById('ua-search-status-text')||document.getElementById('ua-search-status');
+    const exportSlot=document.getElementById('ua-filtered-export-inline');
+    if(!q){
+      window._uaFilteredMeta=[];
+      renderTab();
+      return;
+    }
+    if(status)status.textContent='Please wait while I load all UA categories for this search...';
+    if(exportSlot)exportSlot.innerHTML='';
+    const body=document.getElementById('ua-items-body');
+    if(body)body.innerHTML=imageLoadingHTML();
+    try{
+      const all=uaSortItems(await getUAMetaItems());
+      rememberUACustomSections(all);
+      window._uaAllMeta=all;
+      const lower=q.toLowerCase();
+      const filtered=uaSortItems(all.filter(item=>uaSearchText(item).includes(lower)));
+      window._uaFilteredMeta=filtered;
+      const withImages=await getUAItemsWithImages(filtered);
+      if(status)status.textContent=`Showing ${withImages.length} all-category result${withImages.length===1?'':'s'} for "${q}".`;
+      if(exportSlot)exportSlot.innerHTML=filtered.length?'<button class="btn btn-success btn-xs" onclick="exportUAFilteredPDF()">Export Filtered</button>':'';
+      renderUAItemGrid(withImages);
+    }catch(e){
+      if(status)status.textContent='Search failed. Try again or refresh once.';
+      if(exportSlot)exportSlot.innerHTML='';
+      if(body)body.innerHTML=imageLoadRetryHTML('Urinalysis','filterUAItems(document.getElementById("ua-search")?.value||"")');
+    }
+  },220);
 }
 
 async function openUAExportModal(){
   const items=await getUAMetaItems();
   if(!items||!items.length){alert('No images to export.');return;}
   window._uaExportItems=uaSortItems(items);
+  rememberUACustomSections(window._uaExportItems);
   const groups=groupedUASections(window._uaExportItems);
-  const groupOrder=UA_IMAGE_SECTIONS.filter(section=>groups[section]?.length);
+  const groupOrder=uaSectionOptions(Object.keys(groups)).filter(section=>groups[section]?.length);
+  const filteredCount=(window._uaFilteredMeta||[]).length;
+  const filteredQuery=String(window._uaSearchQuery||'').trim();
   let html=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">Export UA Findings to PDF</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
+    ${filteredQuery?`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;font-size:13px">
+      <span><strong>Filtered search:</strong> ${esc(filteredQuery)} <span style="color:var(--text3)">(${filteredCount})</span></span>
+      <button class="btn btn-success btn-sm ml-auto" onclick="exportUAFilteredPDF()">Export Filtered Results</button>
+    </div>`:''}
     <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;cursor:pointer;font-size:13px">
       <input type="checkbox" id="ua-exp-features" checked style="width:16px;height:16px;flex-shrink:0">
       <span><strong>Include key features</strong> in the PDF</span>
@@ -3955,6 +4059,28 @@ async function generateUAPDF(){
     if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
   }finally{
     window._uaExportBusy=false;
+  }
+}
+
+async function exportUAFilteredPDF(){
+  const query=String(window._uaSearchQuery||'').trim();
+  const source=Array.isArray(window._uaFilteredMeta)?window._uaFilteredMeta:[];
+  if(!query||!source.length){alert('Search first, then export filtered results.');return;}
+  if(window._uaExportBusy)return;
+  window._uaExportBusy=true;
+  const btn=[...document.querySelectorAll('button')].find(b=>/Export Filtered/.test(b.textContent||''));
+  const originalText=btn?.textContent||'📄 Export Filtered';
+  if(btn){btn.textContent='Generating filtered PDF...';btn.disabled=true;}
+  try{
+    const ordered=await getUAItemsWithImages(uaSortItems(source));
+    const safe=query.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'search';
+    await generateUAGroupedImagePDF(ordered,`Urinalysis Findings - ${query}`,`urinalysis_filtered_${safe}.pdf`,{includeFeatures:true});
+  }catch(err){
+    alert('Filtered PDF failed: '+err.message);
+    if(btn){btn.textContent='📄 Export Filtered';btn.disabled=false;}
+  }finally{
+    window._uaExportBusy=false;
+    if(btn){btn.textContent=originalText;btn.disabled=false;}
   }
 }
 
@@ -4039,7 +4165,7 @@ async function saveUAEdit(id){
   if(!name){alert('Name is required.');return;}
   const featText=document.getElementById('uaedit-features')?.value||'';
   const notes=document.getElementById('uaedit-notes')?.value.trim()||'';
-  const section=document.getElementById('uaedit-section')?.value||'Needs Review';
+  const section=readUASectionFromControls('uaedit');
   const type=document.getElementById('uaedit-type')?.value||'Abnormal';
   const ph=document.getElementById('uaedit-ph')?.value||'Unspecified';
   const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
@@ -4151,7 +4277,7 @@ async function adminAddUAImage(){
   const name=document.getElementById('ua-name')?.value.trim();
   const featText=document.getElementById('ua-features')?.value||'';
   const notes=document.getElementById('ua-notes')?.value.trim();
-  const section=document.getElementById('uaadd-section')?.value||'Needs Review';
+  const section=readUASectionFromControls('uaadd');
   const type=document.getElementById('uaadd-type')?.value||'Abnormal';
   const ph=document.getElementById('uaadd-ph')?.value||'Unspecified';
   if(!name){alert('Name required.');return;}
@@ -4184,7 +4310,9 @@ async function processUABulkFiles(files){
     const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
     const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
     const guess=inferUACategory({name,key_features:[],notes:''});
-    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:composeUANotesWithCategory('',guess.section,guess.type,guess.ph),images:[dataUrl]});
+    const chosen=readUASectionFromControls('uaadd');
+    const chosenSection=chosen&&chosen!=='Needs Review'?chosen:guess.section;
+    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:composeUANotesWithCategory('',chosenSection,guess.type,guess.ph),images:[dataUrl]});
     if(!error)done++;
   }
   if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--success)">✓ Added ${done} of ${files.length} images. You can edit names/features by clicking each card.</div>`;
