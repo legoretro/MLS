@@ -2268,6 +2268,177 @@ async function generateUAGroupedImagePDF(items, title, filename, options={}){
   document.getElementById('condition-modal').classList.add('hidden');
 }
 
+async function generateUABlankPhotoTestPDF(entries, title, filename){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const margin=8;
+  const gap=4;
+  const cols=3;
+  const rows=3;
+  const headerH=15;
+  const footerH=7;
+  const cardW=(pageW-margin*2-gap*(cols-1))/cols;
+  const cardH=(pageH-margin*2-headerH-footerH-gap*(rows-1))/rows;
+  const imgH=Math.max(34,cardH-17);
+  const makePDFImage=(src)=>new Promise(res=>{
+    let done=false;
+    const finish=(val)=>{if(done)return;done=true;res(val);};
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        const maxW=760,maxH=520;
+        const nw=img.naturalWidth||4,nh=img.naturalHeight||3;
+        const scale=Math.min(maxW/nw,maxH/nh,1);
+        const w=Math.max(1,Math.round(nw*scale));
+        const h=Math.max(1,Math.round(nh*scale));
+        const cv=document.createElement('canvas');
+        cv.width=w;cv.height=h;
+        const ctx=cv.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+        ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
+        ctx.drawImage(img,0,0,w,h);
+        finish({src:cv.toDataURL('image/jpeg',0.76),fmt:'JPEG',w,h});
+      }catch(e){
+        finish({src,fmt:(src&&src.startsWith('data:image/png'))?'PNG':'JPEG',w:img.naturalWidth||4,h:img.naturalHeight||3});
+      }
+    };
+    img.onerror=()=>finish({src:null,fmt:'JPEG',w:4,h:3});
+    setTimeout(()=>finish({src:null,fmt:'JPEG',w:4,h:3}),5000);
+    if(src&&!src.startsWith('data:'))img.crossOrigin='anonymous';
+    img.src=src;
+  });
+  const drawTestHeader=()=>{
+    doc.setFillColor(255,255,255);
+    doc.rect(0,0,pageW,pageH,'F');
+    doc.setTextColor(15,15,15);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(15);
+    doc.text('Blank Photo Test - All UA Images',margin,margin+6);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(80,80,80);
+    doc.text('Randomized image-only practice. Write the finding name on the blank line. Answer key starts after the photo pages.',margin,margin+11);
+    doc.setDrawColor(25,25,25);
+    doc.setLineWidth(0.35);
+    doc.line(margin,margin+13,pageW-margin,margin+13);
+  };
+  drawTestHeader();
+  for(let idx=0;idx<entries.length;idx++){
+    if(idx>0&&idx%(cols*rows)===0){
+      doc.addPage();
+      drawTestHeader();
+    }
+    const entry=entries[idx];
+    const pos=idx%(cols*rows);
+    const col=pos%cols,row=Math.floor(pos/cols);
+    const x=margin+col*(cardW+gap);
+    const y=margin+headerH+row*(cardH+gap);
+    const imgX=x+2.5,imgY=y+8,imgW=cardW-5;
+    doc.setFillColor(255,255,255);
+    doc.setDrawColor(20,20,20);
+    doc.setLineWidth(0.35);
+    doc.rect(x,y,cardW,cardH,'S');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0,0,0);
+    doc.text(`#${idx+1}`,x+3,y+5.5);
+    doc.setFillColor(248,248,248);
+    doc.rect(imgX,imgY,imgW,imgH,'F');
+    if(entry.src){
+      try{
+        const pdfImg=await makePDFImage(entry.src);
+        if(pdfImg.src){
+          const ar=pdfImg.w/pdfImg.h,car=imgW/imgH;
+          let dw,dh;
+          if(ar>car){dw=imgW;dh=imgW/ar;}else{dh=imgH;dw=imgH*ar;}
+          const ox=imgX+(imgW-dw)/2,oy=imgY+(imgH-dh)/2;
+          doc.addImage(pdfImg.src,pdfImg.fmt,ox,oy,dw,dh,'','FAST');
+        }
+      }catch(e){}
+    }
+    const lineY=y+cardH-5;
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(0,0,0);
+    doc.text('Answer:',x+3,lineY);
+    doc.setDrawColor(0,0,0);
+    doc.setLineWidth(0.25);
+    doc.line(x+18,lineY+0.4,x+cardW-4,lineY+0.4);
+  }
+
+  doc.addPage();
+  doc.setFillColor(255,255,255);
+  doc.rect(0,0,pageW,pageH,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.setTextColor(0,0,0);
+  doc.text('Blank Photo Test - Answer Key',margin,margin+7);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.text(`${entries.length} randomized UA image${entries.length===1?'':'s'}`,pageW-margin,margin+7,{align:'right'});
+  doc.setDrawColor(0,0,0);
+  doc.setLineWidth(0.35);
+  doc.line(margin,margin+11,pageW-margin,margin+11);
+  const keyCols=2;
+  const keyGap=6;
+  const keyW=(pageW-margin*2-keyGap)/keyCols;
+  let keyCol=0;
+  let keyY=margin+17;
+  const bottom=pageH-margin-8;
+  for(let i=0;i<entries.length;i++){
+    const entry=entries[i];
+    const item=entry.item||{};
+    const features=(item.key_features||[]).filter(Boolean).join(' | ');
+    const firstLine=`${i+1}. ${item.name||'Unnamed finding'} (${uaCategoryLabel(item)})`;
+    const detail=features?`Features: ${features}`:'No key features yet';
+    const x=margin+keyCol*(keyW+keyGap);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.2);
+    doc.setTextColor(0,0,0);
+    const nameLines=doc.splitTextToSize(firstLine,keyW-2).slice(0,2);
+    const detailLines=doc.splitTextToSize(detail,keyW-2).slice(0,2);
+    const blockH=nameLines.length*4+detailLines.length*3.4+2.5;
+    if(keyY+blockH>bottom){
+      if(keyCol===0){
+        keyCol=1;
+        keyY=margin+17;
+      }else{
+        doc.addPage();
+        doc.setFillColor(255,255,255);
+        doc.rect(0,0,pageW,pageH,'F');
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(16);
+        doc.text('Blank Photo Test - Answer Key Continued',margin,margin+7);
+        doc.setDrawColor(0,0,0);
+        doc.line(margin,margin+11,pageW-margin,margin+11);
+        keyCol=0;
+        keyY=margin+17;
+      }
+    }
+    const drawX=margin+keyCol*(keyW+keyGap);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.2);
+    doc.text(nameLines,drawX,keyY);
+    keyY+=nameLines.length*4;
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.setTextColor(65,65,65);
+    doc.text(detailLines,drawX,keyY);
+    keyY+=detailLines.length*3.4+2.5;
+  }
+  const tot=doc.internal.getNumberOfPages();
+  for(let p=1;p<=tot;p++){
+    doc.setPage(p);
+    doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+    doc.text('MLS BOC Prep - '+title+' | Page '+p+' of '+tot,margin,pageH-4.5);
+    doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-4.5,{align:'right'});
+  }
+  doc.save(filename);
+  document.getElementById('condition-modal').classList.add('hidden');
+}
+
 async function seedIfEmpty(){
   return;
 }
@@ -3871,6 +4042,22 @@ function setUAImageSection(section){
   window._uaImageSection=normalizeUASection(section)||section;
   renderTab();
 }
+function clearUASearch(){
+  window._uaSearchQuery='';
+  window._uaFilteredMeta=[];
+  renderTab();
+}
+function uaSearchModeHTML(query,count=null,loading=false){
+  const countText=typeof count==='number'
+    ?`<strong>${count}</strong> all-category result${count===1?'':'s'}`
+    :'all UA images';
+  return `<div class="card-sm" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:color-mix(in srgb,var(--accent) 8%,var(--bg2));border-color:color-mix(in srgb,var(--accent) 28%,var(--border));margin-bottom:18px">
+    <span class="tag tag-info" style="font-size:11px">All categories search</span>
+    <span style="font-size:13px;color:var(--text);font-weight:600">${loading?'Please wait while I load all UA categories...':`Searching ${countText} for "${esc(query)}"`}</span>
+    <span style="font-size:12px;color:var(--text2)">Name, chart category, key features, and notes are included.</span>
+    <button class="btn btn-ghost btn-xs ml-auto" onclick="clearUASearch()">Clear search</button>
+  </div>`;
+}
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
   // Show skeleton immediately
@@ -3911,6 +4098,7 @@ async function renderUAImages(el){
       <button class="btn btn-primary btn-sm" onclick="startUAQuiz()">⚡ Image Quiz Mode</button>
       <button class="btn btn-ghost btn-sm" onclick="startUAFlashcard()">🃏 Flashcards</button>
       <button class="btn btn-ghost btn-sm" onclick="openUAExportModal()">📄 Export</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportUABlankPhotoTest()">Blank Photo Test</button>
       ${searchQuery?`<button class="btn btn-success btn-sm" onclick="exportUAFilteredPDF()">📄 Export Filtered (${filteredMeta.length})</button>`:''}
       ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddUAImageModal()">+ Add Image</button>`:''}
     </div>
@@ -3922,11 +4110,15 @@ async function renderUAImages(el){
       <span id="ua-search-status-text">${searchQuery?`Showing ${activeItems.length} all-category result${activeItems.length===1?'':'s'} for "${esc(searchQuery)}".`:'Search uses all UA categories, not just the selected tab.'}</span>
       <span id="ua-filtered-export-inline">${searchQuery&&filteredMeta.length?`<button class="btn btn-success btn-xs" onclick="exportUAFilteredPDF()">Export Filtered</button>`:''}</span>
     </div>
-    <div class="ua-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
-      ${sectionOrder.map(section=>`
-        <button class="btn ${activeSection===section?'btn-primary':'btn-ghost'} btn-sm" onclick="setUAImageSection('${jsAttr(section)}')" style="font-size:12px">
-          ${esc(section)} <span style="opacity:.75">(${sectionGroups[section].length})</span>
-        </button>`).join('')}
+    <div id="ua-filter-mode">
+      ${searchQuery
+        ?uaSearchModeHTML(searchQuery,activeItems.length,false)
+        :`<div class="ua-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+          ${sectionOrder.map(section=>`
+            <button class="btn ${activeSection===section?'btn-primary':'btn-ghost'} btn-sm" onclick="setUAImageSection('${jsAttr(section)}')" style="font-size:12px">
+              ${esc(section)} <span style="opacity:.75">(${sectionGroups[section].length})</span>
+            </button>`).join('')}
+        </div>`}
     </div>
     ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
     <div id="ua-items-body">
@@ -3962,6 +4154,8 @@ function filterUAItems(query){
     }
     if(status)status.textContent='Please wait while I load all UA categories for this search...';
     if(exportSlot)exportSlot.innerHTML='';
+    const filterMode=document.getElementById('ua-filter-mode');
+    if(filterMode)filterMode.innerHTML=uaSearchModeHTML(q,null,true);
     const body=document.getElementById('ua-items-body');
     if(body)body.innerHTML=imageLoadingHTML();
     try{
@@ -3974,6 +4168,7 @@ function filterUAItems(query){
       const withImages=await getUAItemsWithImages(filtered);
       if(status)status.textContent=`Showing ${withImages.length} all-category result${withImages.length===1?'':'s'} for "${q}".`;
       if(exportSlot)exportSlot.innerHTML=filtered.length?'<button class="btn btn-success btn-xs" onclick="exportUAFilteredPDF()">Export Filtered</button>':'';
+      if(filterMode)filterMode.innerHTML=uaSearchModeHTML(q,withImages.length,false);
       renderUAItemGrid(withImages);
     }catch(e){
       if(status)status.textContent='Search failed. Try again or refresh once.';
@@ -4001,6 +4196,13 @@ async function openUAExportModal(){
       <span><strong>Filtered search:</strong> ${esc(filteredQuery)} <span style="color:var(--text3)">(${filteredCount})</span></span>
       <button class="btn btn-success btn-sm ml-auto" onclick="exportUAFilteredPDF()">Export Filtered Results</button>
     </div>`:''}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;font-size:13px">
+      <div>
+        <strong>Blank Photo Test</strong>
+        <div style="color:var(--text2);font-size:12px;margin-top:2px">Randomizes every UA image from every section. Photo pages have numbers and blank answer lines; the answer key prints at the end.</div>
+      </div>
+      <button class="btn btn-primary btn-sm ml-auto" onclick="exportUABlankPhotoTest()">Export All-Images Test</button>
+    </div>
     <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;cursor:pointer;font-size:13px">
       <input type="checkbox" id="ua-exp-features" checked style="width:16px;height:16px;flex-shrink:0">
       <span><strong>Include key features</strong> in the PDF</span>
@@ -4083,6 +4285,42 @@ async function exportUAFilteredPDF(){
     if(btn){btn.textContent=originalText;btn.disabled=false;}
   }
 }
+
+async function exportUABlankPhotoTest(){
+  if(window._uaExportBusy)return;
+  window._uaExportBusy=true;
+  const btn=[...document.querySelectorAll('button')].find(b=>/Blank Photo Test|Export All-Images Test/.test(b.textContent||''));
+  const originalText=btn?.textContent||'Blank Photo Test';
+  if(btn){btn.textContent='Loading all UA images...';btn.disabled=true;}
+  try{
+    const allMeta=uaSortItems(await getUAMetaItems());
+    rememberUACustomSections(allMeta);
+    const allItems=await getUAItemsWithImages(allMeta);
+    const entries=[];
+    allItems.forEach(item=>{
+      imageEntryList(item.images).forEach((entry,imgIndex)=>{
+        const src=imageEntrySrc(entry);
+        if(src)entries.push({item,src,imgIndex});
+      });
+    });
+    if(!entries.length){alert('No UA images found to export.');return;}
+    await generateUABlankPhotoTestPDF(shuffle(entries),'UA Blank Photo Test','ua_blank_photo_test_all_images.pdf');
+  }catch(err){
+    alert('Blank photo test export failed: '+err.message);
+  }finally{
+    window._uaExportBusy=false;
+    if(btn){btn.textContent=originalText;btn.disabled=false;}
+  }
+}
+Object.assign(window,{
+  setUAImageSection,
+  clearUASearch,
+  filterUAItems,
+  openUAExportModal,
+  generateUAPDF,
+  exportUAFilteredPDF,
+  exportUABlankPhotoTest
+});
 
 function buildUAThumbs(img){
   const imgs=imageEntryList(img.images).filter(entry=>imageEntrySrc(entry));
