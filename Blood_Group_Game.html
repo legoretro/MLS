@@ -172,12 +172,12 @@
     display:none;
   }
   .game-instructions{
-    background:rgba(255,255,255,.78);
+    background:#fff8fb;
     border:2px solid #f1a4b8;
     border-radius:16px;
     padding:14px 16px;
     margin:0 0 16px;
-    color:#32141f;
+    color:#211419;
     box-shadow:var(--shadow);
   }
   .game-instructions h2{
@@ -196,6 +196,7 @@
     gap:6px 18px;
   }
   .game-instructions li{
+    color:#211419;
     font-size:14px;
     font-weight:900;
     line-height:1.25;
@@ -228,6 +229,10 @@
     grid-template-columns:repeat(3,minmax(0,1fr));
     gap:12px;
   }
+  .deck-grid.rapid-grid{
+    grid-template-columns:repeat(auto-fit,minmax(122px,1fr));
+    gap:10px;
+  }
   .deck-sections{display:grid;gap:16px}
   .deck-card{
     min-height:142px;
@@ -250,7 +255,13 @@
     border-color:var(--good);
     box-shadow:inset 0 4px 0 var(--good), 0 14px 28px rgba(61,220,132,.12);
   }
-  .deck-card.locked{opacity:.7}
+  .deck-card.locked{
+    opacity:1;
+    background:#d50000!important;
+    border-color:#ff4d4d!important;
+    color:#fff!important;
+    box-shadow:inset 0 0 0 3px rgba(255,255,255,.2), 0 8px 0 #7a0000!important;
+  }
   .deck-label{font-size:24px;font-weight:1000;line-height:1.05}
   .deck-status{font-size:12px;color:var(--muted);font-weight:900;margin-top:12px;text-transform:uppercase;letter-spacing:.08em}
   .deck-help{
@@ -262,6 +273,12 @@
   }
   .deck-card.done .deck-label,
   .deck-card.done .deck-status{color:#d9ffe9}
+  .deck-card.locked .deck-label,
+  .deck-card.locked .deck-status,
+  .deck-card.locked .deck-help{
+    color:#fff!important;
+    text-shadow:none!important;
+  }
   .deck-section + .deck-section{margin-top:18px}
   .deck-section-title{
     display:flex;
@@ -281,8 +298,15 @@
     background:rgba(201,22,67,.28);
   }
   .deck-card.rapid{
-    min-height:112px;
+    min-height:122px;
+    aspect-ratio:1/1;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
   }
+  .deck-card.rapid .deck-label{font-size:22px}
+  .deck-card.rapid .deck-status{font-size:10px;margin-top:8px}
   .case-bar{
     display:flex;
     align-items:center;
@@ -474,6 +498,35 @@
     overflow:hidden;
     position:relative;
   }
+  .clock-stage.penalty-pulse{
+    animation:clockPenaltyZoom .72s ease;
+  }
+  .clock-stage.penalty-pulse::before{
+    content:"-1 min";
+    position:absolute;
+    right:16px;
+    bottom:14px;
+    z-index:2;
+    border-radius:999px;
+    background:#d50000;
+    color:#fff;
+    padding:8px 13px;
+    font-size:17px;
+    font-weight:1000;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    animation:penaltyBadge .72s ease;
+    box-shadow:0 8px 18px rgba(122,0,0,.28);
+  }
+  .clock-stage.penalty-pulse .clock-face{
+    animation:clockFaceAlarm .72s ease;
+  }
+  .clock-stage.penalty-pulse .clock-time{
+    animation:clockTimeAlarm .72s ease;
+  }
+  .clock-stage.penalty-pulse .drop-mascot{
+    animation:mascotAlarm .72s ease;
+  }
   .clock-stage::after{
     content:"tick tick";
     position:absolute;
@@ -574,6 +627,35 @@
   @keyframes bloodBob{
     0%,100%{translate:0 0}
     50%{translate:0 -8px}
+  }
+  @keyframes clockPenaltyZoom{
+    0%,100%{transform:scale(1)}
+    22%{transform:scale(1.045);border-color:#d50000;box-shadow:0 0 0 6px rgba(213,0,0,.18), 0 16px 30px rgba(0,0,0,.22)}
+    48%{transform:scale(.985)}
+    72%{transform:scale(1.025)}
+  }
+  @keyframes clockFaceAlarm{
+    0%,100%{transform:rotate(0deg)}
+    20%{transform:rotate(-6deg)}
+    45%{transform:rotate(7deg)}
+    70%{transform:rotate(-3deg)}
+  }
+  @keyframes clockTimeAlarm{
+    0%,100%{transform:scale(1);color:#11141d}
+    25%{transform:scale(1.18);color:#d50000}
+    60%{transform:scale(.96)}
+  }
+  @keyframes penaltyBadge{
+    0%{opacity:0;transform:translateY(10px) scale(.82)}
+    28%{opacity:1;transform:translateY(0) scale(1.14)}
+    70%{opacity:1;transform:translateY(0) scale(1)}
+    100%{opacity:0;transform:translateY(-8px) scale(.96)}
+  }
+  @keyframes mascotAlarm{
+    0%,100%{transform:rotate(45deg) scale(1)}
+    24%{transform:rotate(35deg) scale(1.2)}
+    50%{transform:rotate(55deg) scale(.92)}
+    76%{transform:rotate(42deg) scale(1.12)}
   }
   .reveal-token{
     width:min(82%,340px);
@@ -1111,7 +1193,8 @@
     body.print-full .print-token-section{break-before:page}
   }
   @media(max-width:980px){
-    .deck-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .deck-grid.main-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .deck-grid.rapid-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
     .game{grid-template-columns:1fr}
     .flip-card{min-height:320px}
   }
@@ -1122,7 +1205,8 @@
     .arena-intro{min-height:520px}
     .arena-copy{font-size:17px}
     .arena-enter{font-size:20px;padding:18px 20px}
-    .deck-grid{grid-template-columns:1fr 1fr}
+    .deck-grid.main-grid{grid-template-columns:1fr}
+    .deck-grid.rapid-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     .game-instructions ol{grid-template-columns:1fr}
     .clue-grid{grid-template-columns:1fr}
     .system-grid{grid-template-columns:1fr 1fr}
@@ -1148,9 +1232,33 @@
     text-shadow:none!important;
   }
   body.bb-theme.blood-group-game .freq-title,
-  body.bb-theme.blood-group-game .gate-input-label,
-  body.bb-theme.blood-group-game .token-lock-message{
-    color:#7a1430!important;
+  body.bb-theme.blood-group-game .gate-input-label{
+    color:#211419!important;
+    text-shadow:none!important;
+  }
+  body.bb-theme.blood-group-game .token-lock-message,
+  body.bb-theme.blood-group-game .deck-panel .deck-title,
+  body.bb-theme.blood-group-game .deck-panel .deck-note,
+  body.bb-theme.blood-group-game .deck-help{
+    color:#211419!important;
+    text-shadow:none!important;
+  }
+  body.bb-theme.blood-group-game .game-instructions,
+  body.bb-theme.blood-group-game .deck-panel,
+  body.bb-theme.blood-group-game .panel,
+  body.bb-theme.blood-group-game .freq-gate,
+  body.bb-theme.blood-group-game .locked-drawer{
+    background:#fff8fb!important;
+    color:#211419!important;
+    border-color:#c91643!important;
+    text-shadow:none!important;
+  }
+  body.bb-theme.blood-group-game .game-instructions h2,
+  body.bb-theme.blood-group-game .game-instructions li,
+  body.bb-theme.blood-group-game .panel-title,
+  body.bb-theme.blood-group-game .drawer-lock strong,
+  body.bb-theme.blood-group-game .drawer-lock span{
+    color:#211419!important;
     text-shadow:none!important;
   }
   body.bb-theme.blood-group-game .freq-copy,
@@ -1158,6 +1266,32 @@
   body.bb-theme.blood-group-game .deck-note,
   body.bb-theme.blood-group-game .deck-status{
     color:#611428!important;
+  }
+  body.bb-theme.blood-group-game .freq-input{
+    background:#fff!important;
+    color:#11141d!important;
+    border-color:#7a1430!important;
+  }
+  body.bb-theme.blood-group-game .clock-stage{
+    background:linear-gradient(135deg,#fff7fa,#ffd7e2)!important;
+    color:#11141d!important;
+  }
+  body.bb-theme.blood-group-game .clock-time{
+    color:#11141d!important;
+    text-shadow:none!important;
+  }
+  body.bb-theme.blood-group-game .clock-label{
+    color:#7a1430!important;
+    text-shadow:none!important;
+  }
+  body.bb-theme.blood-group-game .deck-card.locked{
+    background:#d50000!important;
+    border-color:#ff4d4d!important;
+    color:#fff!important;
+  }
+  body.bb-theme.blood-group-game .deck-card.locked .deck-label,
+  body.bb-theme.blood-group-game .deck-card.locked .deck-status{
+    color:#fff!important;
   }
   body.bb-theme.blood-group-game .system-token,
   body.bb-theme.blood-group-game .token-bank-label,
@@ -1212,14 +1346,20 @@
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .freq-title,
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .gate-input-label,
-  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-lock-message{
-    color:#fff8fb!important;
-  }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .freq-copy,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .game-instructions h2,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .game-instructions li,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .drawer-lock strong,
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .drawer-lock span{
+    color:#211419!important;
+  }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .panel-note,
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-note,
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-status{
     color:#ffd5df!important;
+  }
+  html[data-mls-theme="dark"] body.bb-theme.blood-group-game .deck-card.locked .deck-status{
+    color:#fff!important;
   }
   html[data-mls-theme="dark"] body.bb-theme.blood-group-game .token-bank-label{
     color:#ffd5df!important;
@@ -1386,7 +1526,7 @@
             </div>
           </div>
         </div>
-        <div class="clock-stage" aria-live="polite">
+        <div class="clock-stage" id="clock-stage" aria-live="polite">
           <div class="clock-face" aria-hidden="true"></div>
           <div class="clock-copy">
             <div>
@@ -1863,7 +2003,7 @@ function renderDeck(){
     const items = cards.map((card, index) => ({card, index})).filter(item => item.card.type === cardType);
     return '<section class="deck-section">'
       + '<div class="deck-section-title">'+esc(title)+'</div>'
-      + '<div class="deck-grid">'
+      + '<div class="deck-grid '+(cardType === 'rapid' ? 'rapid-grid' : 'main-grid')+'">'
       + items.map(({card, index}) => {
         const state = caseStates[index];
         const remainingLock = lockRemaining(state);
@@ -1884,7 +2024,7 @@ function renderDeck(){
         }else if(state.started){
           status = 'in progress ' + formatTime(state.seconds);
         }
-        const clueLine = card.type === 'rapid' ? '1 rapid clue + antigen gate' : 'clue 1 + clue 2 + frequency gate';
+        const clueLine = 'click to solve BG';
         return '<button class="'+classes+'" onclick="selectCard('+index+')">'
           + '<div class="deck-label">'+esc(card.label)+'</div>'
           + '<div class="deck-status">'+esc(status)+'</div>'
@@ -1908,6 +2048,15 @@ function updateTimerDisplays(){
   if(large) large.textContent = time;
   const label = document.getElementById('clock-label');
   if(label) label.textContent = card && card.type === 'rapid' ? 'rapid-round clock' : '10-minute case clock';
+}
+
+function triggerPenaltyPulse(){
+  const stage = document.getElementById('clock-stage');
+  if(!stage) return;
+  stage.classList.remove('penalty-pulse');
+  void stage.offsetWidth;
+  stage.classList.add('penalty-pulse');
+  window.setTimeout(() => stage.classList.remove('penalty-pulse'), 760);
 }
 
 function renderMystery(){
@@ -2065,6 +2214,7 @@ function submitGateAnswer(){
     return;
   }
   renderMystery();
+  triggerPenaltyPulse();
   updateFeedback(copy.wrong, 'bad');
 }
 
