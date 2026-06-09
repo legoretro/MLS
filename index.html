@@ -2274,14 +2274,14 @@ async function generateUABlankPhotoTestPDF(entries, title, filename){
   const pageW=doc.internal.pageSize.getWidth();
   const pageH=doc.internal.pageSize.getHeight();
   const margin=8;
-  const gap=4;
-  const cols=3;
+  const gap=3;
+  const cols=4;
   const rows=3;
-  const headerH=15;
-  const footerH=7;
+  const headerH=11;
+  const footerH=6;
   const cardW=(pageW-margin*2-gap*(cols-1))/cols;
   const cardH=(pageH-margin*2-headerH-footerH-gap*(rows-1))/rows;
-  const imgH=Math.max(34,cardH-17);
+  const imgH=Math.max(30,cardH-15);
   const makePDFImage=(src)=>new Promise(res=>{
     let done=false;
     const finish=(val)=>{if(done)return;done=true;res(val);};
@@ -2316,13 +2316,9 @@ async function generateUABlankPhotoTestPDF(entries, title, filename){
     doc.setFont('helvetica','bold');
     doc.setFontSize(15);
     doc.text('Blank Photo Test - All UA Images',margin,margin+6);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(8);
-    doc.setTextColor(80,80,80);
-    doc.text('Randomized image-only practice. Write the finding name on the blank line. Answer key starts after the photo pages.',margin,margin+11);
     doc.setDrawColor(25,25,25);
     doc.setLineWidth(0.35);
-    doc.line(margin,margin+13,pageW-margin,margin+13);
+    doc.line(margin,margin+9,pageW-margin,margin+9);
   };
   drawTestHeader();
   for(let idx=0;idx<entries.length;idx++){
@@ -2335,7 +2331,7 @@ async function generateUABlankPhotoTestPDF(entries, title, filename){
     const col=pos%cols,row=Math.floor(pos/cols);
     const x=margin+col*(cardW+gap);
     const y=margin+headerH+row*(cardH+gap);
-    const imgX=x+2.5,imgY=y+8,imgW=cardW-5;
+    const imgX=x+2,imgY=y+7,imgW=cardW-4;
     doc.setFillColor(255,255,255);
     doc.setDrawColor(20,20,20);
     doc.setLineWidth(0.35);
@@ -2375,34 +2371,28 @@ async function generateUABlankPhotoTestPDF(entries, title, filename){
   doc.setFontSize(16);
   doc.setTextColor(0,0,0);
   doc.text('Blank Photo Test - Answer Key',margin,margin+7);
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(8);
-  doc.text(`${entries.length} randomized UA image${entries.length===1?'':'s'}`,pageW-margin,margin+7,{align:'right'});
   doc.setDrawColor(0,0,0);
   doc.setLineWidth(0.35);
   doc.line(margin,margin+11,pageW-margin,margin+11);
-  const keyCols=2;
-  const keyGap=6;
-  const keyW=(pageW-margin*2-keyGap)/keyCols;
+  const keyCols=4;
+  const keyGap=4;
+  const keyW=(pageW-margin*2-keyGap*(keyCols-1))/keyCols;
   let keyCol=0;
   let keyY=margin+17;
   const bottom=pageH-margin-8;
   for(let i=0;i<entries.length;i++){
     const entry=entries[i];
     const item=entry.item||{};
-    const features=(item.key_features||[]).filter(Boolean).join(' | ');
-    const firstLine=`${i+1}. ${item.name||'Unnamed finding'} (${uaCategoryLabel(item)})`;
-    const detail=features?`Features: ${features}`:'No key features yet';
+    const firstLine=`${i+1}. ${item.name||'Unnamed finding'}`;
     const x=margin+keyCol*(keyW+keyGap);
     doc.setFont('helvetica','bold');
     doc.setFontSize(8.2);
     doc.setTextColor(0,0,0);
-    const nameLines=doc.splitTextToSize(firstLine,keyW-2).slice(0,2);
-    const detailLines=doc.splitTextToSize(detail,keyW-2).slice(0,2);
-    const blockH=nameLines.length*4+detailLines.length*3.4+2.5;
+    const nameLines=doc.splitTextToSize(firstLine,keyW-2).slice(0,3);
+    const blockH=nameLines.length*3.8+2.2;
     if(keyY+blockH>bottom){
-      if(keyCol===0){
-        keyCol=1;
+      if(keyCol<keyCols-1){
+        keyCol+=1;
         keyY=margin+17;
       }else{
         doc.addPage();
@@ -2421,12 +2411,7 @@ async function generateUABlankPhotoTestPDF(entries, title, filename){
     doc.setFont('helvetica','bold');
     doc.setFontSize(8.2);
     doc.text(nameLines,drawX,keyY);
-    keyY+=nameLines.length*4;
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(7);
-    doc.setTextColor(65,65,65);
-    doc.text(detailLines,drawX,keyY);
-    keyY+=detailLines.length*3.4+2.5;
+    keyY+=nameLines.length*3.8+2.2;
   }
   const tot=doc.internal.getNumberOfPages();
   for(let p=1;p<=tot;p++){
