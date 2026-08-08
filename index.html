@@ -1202,6 +1202,7 @@ const ADMIN_PW_HASH = 'd936608baaacc6b762c14b0c356026fba3b84e77d5b22e86f2fc29d3d
 const SB_URL = 'https://rbdvjwipedbxfbedjgoa.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
 const HUB_URL = 'https://legoretro.github.io/Hubs/';
+const DEFAULT_QUESTION_EXPLANATION = 'Refer to the assigned question book for explanation.';
 
 // Real ASCP BOC weights from guideline (% of 100)
 const BOC_WEIGHTS = {
@@ -2639,7 +2640,7 @@ const HOME_SUBJECT_DETAILS={
   blood_bank:'Questions, images, case studies',
   clinical_chemistry:'Questions, formulas, ranges, flowcharts',
   hematology:'Questions, images, morphology, cases',
-  microbiology:'Questions, images, cases, organism ID',
+  microbiology:'Images, cases, organism ID',
   urinalysis:'Questions, images, case studies',
   lab_operations:'Questions, QC, statistics, safety',
   immunology:'Questions, serology, cases',
@@ -9199,9 +9200,9 @@ function adminQuizControls(){
         <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV Upload
           <input type="file" accept=".csv" style="display:none" onchange="adminBulkQ(event)">
         </label>
-        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['question','option_a','option_b','option_c','option_d','correct_answer','explanation'],['Sample question?','Choice A','Choice B','Choice C','Choice D','a','Explanation here']],'quiz_template.csv')">Download Template</button>
+        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['question','option_a','option_b','option_c','option_d','correct_answer','explanation'],['Sample question?','Choice A','Choice B','Choice C','Choice D','a',DEFAULT_QUESTION_EXPLANATION]],'quiz_template.csv')">Download Template</button>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d), explanation. Para/Myco can also include a subject column.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d), explanation. Leave explanation blank to use the assigned-book note. Para/Myco can also include a subject column.</div>
     </div>`;
 }
 
@@ -9215,7 +9216,7 @@ async function adminAddQ(){
   const ans=document.getElementById('adm-ans')?.value;
   const exp=document.getElementById('adm-exp')?.value.trim();
   if(!q||!a||!b||!c||!d){alert('Fill in all fields.');return;}
-  const {error}=await sb.from('mlsboc_questions').insert({subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:exp||''});
+  const {error}=await sb.from('mlsboc_questions').insert({subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:exp||DEFAULT_QUESTION_EXPLANATION});
   if(error)alert('Error: '+error.message);
   else renderTab();
 }
@@ -10922,7 +10923,7 @@ function normalizeQuizCSVRow(row){
     option_b:String(csvField(row,['option_b','b','choice_b','answer_b'],2)||'').trim(),
     option_c:String(csvField(row,['option_c','c','choice_c','answer_c'],3)||'').trim(),
     option_d:String(csvField(row,['option_d','d','choice_d','answer_d'],4)||'').trim(),
-    explanation:String(csvField(row,['explanation','rationale','notes'],6)||'').trim()
+    explanation:String(csvField(row,['explanation','rationale','notes'],6)||'').trim()||DEFAULT_QUESTION_EXPLANATION
   };
   const raw=String(csvField(row,['correct_answer','correct','answer','key'],5)||'').toLowerCase().trim();
   const cleaned=raw.replace(/^option[_\s-]*/,'').replace(/^choice[_\s-]*/,'').replace(/^answer[_\s-]*/,'');
