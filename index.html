@@ -953,6 +953,56 @@ body:not(.light-mode) .bbq-question{color:var(--text);background:rgba(20,23,32,.
   box-shadow:0 12px 28px rgba(22,34,74,.14);
 }
 body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
+.question-media-zoom{
+  display:block;
+  width:100%;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:zoom-in;
+}
+.question-media-zoom:focus-visible img{outline:3px solid var(--accent);outline-offset:4px}
+.media-zoom-modal{
+  position:fixed;
+  inset:0;
+  z-index:1400;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(8,12,24,.78);
+  backdrop-filter:blur(8px);
+}
+.media-zoom-dialog{
+  width:min(96vw,1180px);
+  max-height:94vh;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:stretch;
+}
+.media-zoom-actions{display:flex;justify-content:flex-end;gap:8px}
+.media-zoom-dialog img{
+  max-width:100%;
+  max-height:84vh;
+  object-fit:contain;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.36);
+  border-radius:18px;
+  padding:10px;
+  box-shadow:0 24px 70px rgba(0,0,0,.38);
+}
+.quiz-source-note{
+  background:color-mix(in srgb,var(--accent) 9%,var(--bg2));
+  border:1px solid color-mix(in srgb,var(--accent) 26%,var(--border));
+  border-radius:var(--r);
+  color:var(--text2);
+  font-size:12px;
+  line-height:1.55;
+  padding:10px 12px;
+  margin:12px 0 14px;
+}
+.quiz-mini-note{font-family:var(--mono);font-size:11px;color:var(--text3);white-space:nowrap}
 .bbq-options{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -1059,6 +1109,7 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
   .bbq-body{padding:18px 12px}
   .bbq-question{font-size:18px;padding:14px}
   .bbq-opt{min-height:72px;font-size:15px;padding:16px}
+  .quiz-mini-note{display:none}
   .quiz-audio-dock{right:10px;top:auto;bottom:12px}
   .quiz-audio-note{display:none}
   .bbq-overlay::before{
@@ -1220,7 +1271,6 @@ const ADMIN_PW_HASH = 'd936608baaacc6b762c14b0c356026fba3b84e77d5b22e86f2fc29d3d
 const SB_URL = 'https://rbdvjwipedbxfbedjgoa.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
 const HUB_URL = 'https://legoretro.github.io/Hubs/';
-const DEFAULT_QUESTION_EXPLANATION = 'Refer to the assigned question book for explanation.';
 
 // Real ASCP BOC weights from guideline (% of 100)
 const BOC_WEIGHTS = {
@@ -1456,7 +1506,7 @@ let isAdmin = false;
 let sessionUserId = null;
 let appState = {
   view:'home', subject:null, subjectTab:'quiz',
-  quizQ:[], quizIdx:0, quizAns:[], quizStarted:false, quizDone:false,
+  quizQ:[], quizPool:[], quizIdx:0, quizAns:[], quizStarted:false, quizDone:false,
   allQ:[], allIdx:0, allAns:[], allStarted:false, allDone:false,
   allTimer:null, allSeconds:0,
   attempts:[],
@@ -2453,67 +2503,67 @@ async function seedIfEmptyLegacyUnused(){
     if(data&&data.length>0)return;
     const samples={
       hematology:[
-        {question:"Which cell is the precursor to platelets?",option_a:"Megakaryocyte",option_b:"Proerythroblast",option_c:"Myeloblast",option_d:"Lymphoblast",correct_answer:"a",explanation:"Megakaryocytes fragment their cytoplasm to produce platelets."},
-        {question:"A patient has MCV 115 fL and hypersegmented neutrophils. Most likely deficiency?",option_a:"Iron",option_b:"Vitamin B12 or Folate",option_c:"Copper",option_d:"Zinc",correct_answer:"b",explanation:"Megaloblastic anemia indicates B12 or folate deficiency."},
-        {question:"Normal adult hemoglobin is primarily:",option_a:"HbF",option_b:"HbA2",option_c:"HbA",option_d:"HbH",correct_answer:"c",explanation:"HbA (alpha2beta2) comprises ~96% of adult hemoglobin."},
-        {question:"What stain identifies reticulocytes?",option_a:"Wright-Giemsa",option_b:"Prussian blue",option_c:"New methylene blue",option_d:"PAS",correct_answer:"c",explanation:"New methylene blue is a supravital stain for reticulocyte RNA."},
-        {question:"In DIC, which finding is expected?",option_a:"Elevated fibrinogen, decreased D-dimer",option_b:"Decreased fibrinogen, elevated D-dimer",option_c:"Normal PT, decreased aPTT",option_d:"Thrombocytosis",correct_answer:"b",explanation:"DIC causes consumption of fibrinogen with massive D-dimer elevation."}
+        {question:"Which cell is the precursor to platelets?",option_a:"Megakaryocyte",option_b:"Proerythroblast",option_c:"Myeloblast",option_d:"Lymphoblast",correct_answer:"a"},
+        {question:"A patient has MCV 115 fL and hypersegmented neutrophils. Most likely deficiency?",option_a:"Iron",option_b:"Vitamin B12 or Folate",option_c:"Copper",option_d:"Zinc",correct_answer:"b"},
+        {question:"Normal adult hemoglobin is primarily:",option_a:"HbF",option_b:"HbA2",option_c:"HbA",option_d:"HbH",correct_answer:"c"},
+        {question:"What stain identifies reticulocytes?",option_a:"Wright-Giemsa",option_b:"Prussian blue",option_c:"New methylene blue",option_d:"PAS",correct_answer:"c"},
+        {question:"In DIC, which finding is expected?",option_a:"Elevated fibrinogen, decreased D-dimer",option_b:"Decreased fibrinogen, elevated D-dimer",option_c:"Normal PT, decreased aPTT",option_d:"Thrombocytosis",correct_answer:"b"}
       ],
       microbiology:[
-        {question:"Gram-positive cocci in clusters producing coagulase:",option_a:"Streptococcus pyogenes",option_b:"Staphylococcus aureus",option_c:"Enterococcus faecalis",option_d:"S. epidermidis",correct_answer:"b",explanation:"S. aureus is coagulase-positive, distinguishing it from CoNS."},
-        {question:"Organism producing green metallic sheen on EMB agar:",option_a:"Klebsiella pneumoniae",option_b:"Pseudomonas aeruginosa",option_c:"Escherichia coli",option_d:"Proteus mirabilis",correct_answer:"c",explanation:"E. coli produces a green metallic sheen on EMB from strong acid production."},
-        {question:"CAMP test positive organism:",option_a:"Listeria monocytogenes",option_b:"Streptococcus agalactiae",option_c:"Enterococcus faecalis",option_d:"Clostridium perfringens",correct_answer:"b",explanation:"Group B Strep (S. agalactiae) is CAMP test positive."},
-        {question:"Oxidase positive non-fermenter producing grape-like odor:",option_a:"Acinetobacter baumannii",option_b:"Burkholderia cepacia",option_c:"Pseudomonas aeruginosa",option_d:"Stenotrophomonas maltophilia",correct_answer:"c",explanation:"P. aeruginosa is oxidase positive, non-fermenting, with a fruity grape odor."},
-        {question:"Which media is selective for Salmonella and Shigella?",option_a:"TCBS",option_b:"CNA",option_c:"HE agar",option_d:"CHOC",correct_answer:"c",explanation:"Hektoen Enteric (HE) agar is selective for Salmonella and Shigella."}
+        {question:"Gram-positive cocci in clusters producing coagulase:",option_a:"Streptococcus pyogenes",option_b:"Staphylococcus aureus",option_c:"Enterococcus faecalis",option_d:"S. epidermidis",correct_answer:"b"},
+        {question:"Organism producing green metallic sheen on EMB agar:",option_a:"Klebsiella pneumoniae",option_b:"Pseudomonas aeruginosa",option_c:"Escherichia coli",option_d:"Proteus mirabilis",correct_answer:"c"},
+        {question:"CAMP test positive organism:",option_a:"Listeria monocytogenes",option_b:"Streptococcus agalactiae",option_c:"Enterococcus faecalis",option_d:"Clostridium perfringens",correct_answer:"b"},
+        {question:"Oxidase positive non-fermenter producing grape-like odor:",option_a:"Acinetobacter baumannii",option_b:"Burkholderia cepacia",option_c:"Pseudomonas aeruginosa",option_d:"Stenotrophomonas maltophilia",correct_answer:"c"},
+        {question:"Which media is selective for Salmonella and Shigella?",option_a:"TCBS",option_b:"CNA",option_c:"HE agar",option_d:"CHOC",correct_answer:"c"}
       ],
       clinical_chemistry:[
-        {question:"Which enzyme is most specific for myocardial infarction?",option_a:"ALT",option_b:"LDH",option_c:"CK-MB",option_d:"AST",correct_answer:"c",explanation:"CK-MB and troponin are most specific for cardiac muscle damage."},
-        {question:"Jaundice with elevated indirect bilirubin suggests:",option_a:"Biliary obstruction",option_b:"Hemolysis",option_c:"Hepatocellular disease",option_d:"Cholestasis",correct_answer:"b",explanation:"Pre-hepatic jaundice from hemolysis elevates unconjugated (indirect) bilirubin."},
-        {question:"Reference range for fasting glucose (mg/dL):",option_a:"40-60",option_b:"74-100",option_c:"110-140",option_d:"150-200",correct_answer:"b",explanation:"Normal fasting glucose is 74-100 mg/dL per ASCP BOC reference ranges."},
-        {question:"Pseudohyponatremia is associated with:",option_a:"SIADH",option_b:"Hyperlipidemia or hyperproteinemia",option_c:"Diabetes insipidus",option_d:"Addison's disease",correct_answer:"b",explanation:"Pseudohyponatremia occurs with hyperlipidemia or hyperproteinemia causing falsely low sodium."},
-        {question:"Which lipoprotein is known as bad cholesterol?",option_a:"HDL",option_b:"VLDL",option_c:"LDL",option_d:"Chylomicron",correct_answer:"c",explanation:"LDL is associated with atherosclerosis risk."}
+        {question:"Which enzyme is most specific for myocardial infarction?",option_a:"ALT",option_b:"LDH",option_c:"CK-MB",option_d:"AST",correct_answer:"c"},
+        {question:"Jaundice with elevated indirect bilirubin suggests:",option_a:"Biliary obstruction",option_b:"Hemolysis",option_c:"Hepatocellular disease",option_d:"Cholestasis",correct_answer:"b"},
+        {question:"Reference range for fasting glucose (mg/dL):",option_a:"40-60",option_b:"74-100",option_c:"110-140",option_d:"150-200",correct_answer:"b"},
+        {question:"Pseudohyponatremia is associated with:",option_a:"SIADH",option_b:"Hyperlipidemia or hyperproteinemia",option_c:"Diabetes insipidus",option_d:"Addison's disease",correct_answer:"b"},
+        {question:"Which lipoprotein is known as bad cholesterol?",option_a:"HDL",option_b:"VLDL",option_c:"LDL",option_d:"Chylomicron",correct_answer:"c"}
       ],
       blood_bank:[
-        {question:"ABO discrepancy: forward types as B, reverse types as O. Most likely cause?",option_a:"Acquired B phenomenon",option_b:"Weak subgroup of A",option_c:"Cold autoantibody",option_d:"Polyagglutination",correct_answer:"a",explanation:"Acquired B phenomenon occurs in group A patients."},
-        {question:"Rh null phenotype individuals may develop:",option_a:"Anti-D only",option_b:"Anti-Rh17 (anti-total Rh)",option_c:"Anti-C only",option_d:"Anti-e only",correct_answer:"b",explanation:"Rh null individuals lack all Rh antigens and can make anti-Rh17."},
-        {question:"Coombs crossmatch is incompatible when:",option_a:"No agglutination at IS phase",option_b:"Agglutination at AHG phase",option_c:"Rouleaux is present",option_d:"All phases negative",correct_answer:"b",explanation:"Agglutination at AHG phase indicates antibody coating donor cells."},
-        {question:"Which blood product is indicated for multiple factor deficiencies?",option_a:"Packed RBCs",option_b:"Fresh frozen plasma",option_c:"Cryoprecipitate",option_d:"Platelets",correct_answer:"b",explanation:"FFP contains all clotting factors."},
-        {question:"The Kleihauer-Betke test is used to:",option_a:"Detect fetal hemoglobin in maternal blood",option_b:"Identify weak D",option_c:"Screen for antibodies",option_d:"Confirm ABO typing",correct_answer:"a",explanation:"KB stain differentiates fetal RBCs from adult RBCs for fetal bleed quantitation."}
+        {question:"ABO discrepancy: forward types as B, reverse types as O. Most likely cause?",option_a:"Acquired B phenomenon",option_b:"Weak subgroup of A",option_c:"Cold autoantibody",option_d:"Polyagglutination",correct_answer:"a"},
+        {question:"Rh null phenotype individuals may develop:",option_a:"Anti-D only",option_b:"Anti-Rh17 (anti-total Rh)",option_c:"Anti-C only",option_d:"Anti-e only",correct_answer:"b"},
+        {question:"Coombs crossmatch is incompatible when:",option_a:"No agglutination at IS phase",option_b:"Agglutination at AHG phase",option_c:"Rouleaux is present",option_d:"All phases negative",correct_answer:"b"},
+        {question:"Which blood product is indicated for multiple factor deficiencies?",option_a:"Packed RBCs",option_b:"Fresh frozen plasma",option_c:"Cryoprecipitate",option_d:"Platelets",correct_answer:"b"},
+        {question:"The Kleihauer-Betke test is used to:",option_a:"Detect fetal hemoglobin in maternal blood",option_b:"Identify weak D",option_c:"Screen for antibodies",option_d:"Confirm ABO typing",correct_answer:"a"}
       ],
       immunology:[
-        {question:"First immunoglobulin produced in primary immune response:",option_a:"IgG",option_b:"IgA",option_c:"IgM",option_d:"IgE",correct_answer:"c",explanation:"IgM is the first antibody produced and is pentameric."},
-        {question:"ANA pattern associated with drug-induced lupus:",option_a:"Centromere",option_b:"Peripheral/rim",option_c:"Nucleolar",option_d:"Homogeneous",correct_answer:"d",explanation:"Drug-induced lupus typically shows a homogeneous ANA pattern against histones."},
-        {question:"HLA type associated with celiac disease:",option_a:"HLA-B27",option_b:"HLA-DR4",option_c:"HLA-DQ2/DQ8",option_d:"HLA-A3",correct_answer:"c",explanation:"HLA-DQ2 and DQ8 are strongly associated with celiac disease."},
-        {question:"Complement pathway activated by immune complexes:",option_a:"Alternative",option_b:"Lectin",option_c:"Classical",option_d:"Terminal",correct_answer:"c",explanation:"The classical complement pathway is activated by antigen-antibody complexes via C1q."},
-        {question:"Cell type responsible for antibody production:",option_a:"T helper cell",option_b:"Cytotoxic T cell",option_c:"Plasma cell",option_d:"NK cell",correct_answer:"c",explanation:"Plasma cells (differentiated B cells) secrete antibodies."}
+        {question:"First immunoglobulin produced in primary immune response:",option_a:"IgG",option_b:"IgA",option_c:"IgM",option_d:"IgE",correct_answer:"c"},
+        {question:"ANA pattern associated with drug-induced lupus:",option_a:"Centromere",option_b:"Peripheral/rim",option_c:"Nucleolar",option_d:"Homogeneous",correct_answer:"d"},
+        {question:"HLA type associated with celiac disease:",option_a:"HLA-B27",option_b:"HLA-DR4",option_c:"HLA-DQ2/DQ8",option_d:"HLA-A3",correct_answer:"c"},
+        {question:"Complement pathway activated by immune complexes:",option_a:"Alternative",option_b:"Lectin",option_c:"Classical",option_d:"Terminal",correct_answer:"c"},
+        {question:"Cell type responsible for antibody production:",option_a:"T helper cell",option_b:"Cytotoxic T cell",option_c:"Plasma cell",option_d:"NK cell",correct_answer:"c"}
       ],
       urinalysis:[
-        {question:"Bilirubin in urine indicates:",option_a:"Normal finding",option_b:"Conjugated hyperbilirubinemia",option_c:"Only hemolysis",option_d:"Kidney disease",correct_answer:"b",explanation:"Only conjugated (direct) bilirubin is water-soluble and appears in urine."},
-        {question:"Oval fat bodies in urine are associated with:",option_a:"UTI",option_b:"Nephrotic syndrome",option_c:"Glomerulonephritis",option_d:"Renal tubular acidosis",correct_answer:"b",explanation:"Oval fat bodies are lipid-laden renal tubular cells seen in nephrotic syndrome."},
-        {question:"Which cast indicates severe chronic renal damage?",option_a:"Hyaline cast",option_b:"Granular cast",option_c:"Waxy cast",option_d:"RBC cast",correct_answer:"c",explanation:"Waxy casts indicate very slow urine flow and severe chronic renal disease."},
-        {question:"Specific gravity 1.001 suggests:",option_a:"Concentrated urine",option_b:"Diabetes mellitus",option_c:"Diabetes insipidus or overhydration",option_d:"Renal failure",correct_answer:"c",explanation:"Very low SG suggests dilute urine, as in DI or excess fluid intake."},
-        {question:"Hexagonal crystals in urine are pathognomonic for:",option_a:"Gout",option_b:"Cystinuria",option_c:"Oxalosis",option_d:"RTA",correct_answer:"b",explanation:"Hexagonal cystine crystals are pathognomonic for cystinuria."}
+        {question:"Bilirubin in urine indicates:",option_a:"Normal finding",option_b:"Conjugated hyperbilirubinemia",option_c:"Only hemolysis",option_d:"Kidney disease",correct_answer:"b"},
+        {question:"Oval fat bodies in urine are associated with:",option_a:"UTI",option_b:"Nephrotic syndrome",option_c:"Glomerulonephritis",option_d:"Renal tubular acidosis",correct_answer:"b"},
+        {question:"Which cast indicates severe chronic renal damage?",option_a:"Hyaline cast",option_b:"Granular cast",option_c:"Waxy cast",option_d:"RBC cast",correct_answer:"c"},
+        {question:"Specific gravity 1.001 suggests:",option_a:"Concentrated urine",option_b:"Diabetes mellitus",option_c:"Diabetes insipidus or overhydration",option_d:"Renal failure",correct_answer:"c"},
+        {question:"Hexagonal crystals in urine are pathognomonic for:",option_a:"Gout",option_b:"Cystinuria",option_c:"Oxalosis",option_d:"RTA",correct_answer:"b"}
       ],
       parasitology:[
-        {question:"Malaria species causing most severe disease:",option_a:"P. vivax",option_b:"P. ovale",option_c:"P. falciparum",option_d:"P. malariae",correct_answer:"c",explanation:"P. falciparum causes cerebral malaria and highest mortality."},
-        {question:"Giardia lamblia cysts have how many nuclei?",option_a:"1",option_b:"2",option_c:"4",option_d:"8",correct_answer:"c",explanation:"Giardia cysts contain 4 nuclei and are the infective stage."},
-        {question:"Eggs with terminal spine are diagnostic for:",option_a:"S. mansoni",option_b:"S. haematobium",option_c:"S. japonicum",option_d:"Fasciolopsis buski",correct_answer:"b",explanation:"S. haematobium eggs have a terminal spine and are found in urine."},
-        {question:"Pinworm diagnosis is best made by:",option_a:"Stool O&P",option_b:"Scotch tape prep",option_c:"Blood smear",option_d:"Serology",correct_answer:"b",explanation:"Scotch tape prep applied perianally in early morning detects E. vermicularis eggs."},
-        {question:"Spaghetti and meatballs on KOH prep indicates:",option_a:"Tinea corporis",option_b:"Malassezia furfur",option_c:"Candidiasis",option_d:"Dermatophytosis",correct_answer:"b",explanation:"Malassezia furfur shows hyphae and round yeast cells on KOH prep."}
+        {question:"Malaria species causing most severe disease:",option_a:"P. vivax",option_b:"P. ovale",option_c:"P. falciparum",option_d:"P. malariae",correct_answer:"c"},
+        {question:"Giardia lamblia cysts have how many nuclei?",option_a:"1",option_b:"2",option_c:"4",option_d:"8",correct_answer:"c"},
+        {question:"Eggs with terminal spine are diagnostic for:",option_a:"S. mansoni",option_b:"S. haematobium",option_c:"S. japonicum",option_d:"Fasciolopsis buski",correct_answer:"b"},
+        {question:"Pinworm diagnosis is best made by:",option_a:"Stool O&P",option_b:"Scotch tape prep",option_c:"Blood smear",option_d:"Serology",correct_answer:"b"},
+        {question:"Spaghetti and meatballs on KOH prep indicates:",option_a:"Tinea corporis",option_b:"Malassezia furfur",option_c:"Candidiasis",option_d:"Dermatophytosis",correct_answer:"b"}
       ],
       mycology:[
-        {question:"Mold with septate hyphae branching at 45 degrees:",option_a:"Mucor spp.",option_b:"Aspergillus spp.",option_c:"Rhizopus spp.",option_d:"Cunninghamella",correct_answer:"b",explanation:"Aspergillus has septate hyphae with 45-degree dichotomous branching."},
-        {question:"Cryptococcus neoformans is identified by:",option_a:"Germ tube formation",option_b:"Urease positive, India ink capsule",option_c:"Dimorphism at 37C",option_d:"Angular hyphae on KOH",correct_answer:"b",explanation:"Cryptococcus is urease positive and forms a polysaccharide capsule visible with India ink."},
-        {question:"Candida albicans is differentiated from other Candida by:",option_a:"Inability to ferment glucose",option_b:"Germ tube formation",option_c:"Growth at 25C only",option_d:"Lack of pseudohyphae",correct_answer:"b",explanation:"C. albicans produces germ tubes in serum at 37C within 2-3 hours."},
-        {question:"Thermal dimorphism means:",option_a:"Grows only at body temp",option_b:"Mold in environment, yeast in host",option_c:"Changes color with temperature",option_d:"Sporulates at higher temps",correct_answer:"b",explanation:"Thermally dimorphic fungi are molds in environment and yeasts at 37C in host."},
-        {question:"Which stain is used for Pneumocystis jirovecii?",option_a:"Gram stain",option_b:"India ink",option_c:"GMS (Gomori methenamine silver)",option_d:"PAS",correct_answer:"c",explanation:"GMS stains the cyst wall of Pneumocystis jirovecii black."}
+        {question:"Mold with septate hyphae branching at 45 degrees:",option_a:"Mucor spp.",option_b:"Aspergillus spp.",option_c:"Rhizopus spp.",option_d:"Cunninghamella",correct_answer:"b"},
+        {question:"Cryptococcus neoformans is identified by:",option_a:"Germ tube formation",option_b:"Urease positive, India ink capsule",option_c:"Dimorphism at 37C",option_d:"Angular hyphae on KOH",correct_answer:"b"},
+        {question:"Candida albicans is differentiated from other Candida by:",option_a:"Inability to ferment glucose",option_b:"Germ tube formation",option_c:"Growth at 25C only",option_d:"Lack of pseudohyphae",correct_answer:"b"},
+        {question:"Thermal dimorphism means:",option_a:"Grows only at body temp",option_b:"Mold in environment, yeast in host",option_c:"Changes color with temperature",option_d:"Sporulates at higher temps",correct_answer:"b"},
+        {question:"Which stain is used for Pneumocystis jirovecii?",option_a:"Gram stain",option_b:"India ink",option_c:"GMS (Gomori methenamine silver)",option_d:"PAS",correct_answer:"c"}
       ],
       lab_operations:[
-        {question:"Which Westgard rule indicates a systematic error?",option_a:"1-2s",option_b:"1-3s",option_c:"2-2s",option_d:"R-4s",correct_answer:"c",explanation:"The 2-2s rule (two consecutive values >2SD in same direction) indicates systematic error."},
-        {question:"Levey-Jennings chart is used for:",option_a:"Patient result trending",option_b:"QC data plotting",option_c:"Reagent expiration tracking",option_d:"Instrument maintenance",correct_answer:"b",explanation:"Levey-Jennings charts plot QC data to detect shifts, trends, and random errors."},
-        {question:"CLIA requires proficiency testing for waived tests:",option_a:"Monthly",option_b:"Quarterly",option_c:"Annually",option_d:"Not required",correct_answer:"d",explanation:"CLIA waived tests do not require proficiency testing, only moderate and high complexity."},
-        {question:"Coefficient of variation (CV) measures:",option_a:"Systematic error",option_b:"Imprecision relative to the mean",option_c:"Sensitivity of a test",option_d:"Analytical range",correct_answer:"b",explanation:"CV = (SD/mean) x 100. It expresses imprecision as a percentage of the mean."},
-        {question:"Standard deviation index (SDI) in proficiency testing:",option_a:">2 is acceptable",option_b:"Should be close to 0",option_c:"Is calculated monthly",option_d:"Replaces Westgard rules",correct_answer:"b",explanation:"SDI measures how far a lab's PT result is from the peer mean; values close to 0 are ideal."}
+        {question:"Which Westgard rule indicates a systematic error?",option_a:"1-2s",option_b:"1-3s",option_c:"2-2s",option_d:"R-4s",correct_answer:"c"},
+        {question:"Levey-Jennings chart is used for:",option_a:"Patient result trending",option_b:"QC data plotting",option_c:"Reagent expiration tracking",option_d:"Instrument maintenance",correct_answer:"b"},
+        {question:"CLIA requires proficiency testing for waived tests:",option_a:"Monthly",option_b:"Quarterly",option_c:"Annually",option_d:"Not required",correct_answer:"d"},
+        {question:"Coefficient of variation (CV) measures:",option_a:"Systematic error",option_b:"Imprecision relative to the mean",option_c:"Sensitivity of a test",option_d:"Analytical range",correct_answer:"b"},
+        {question:"Standard deviation index (SDI) in proficiency testing:",option_a:">2 is acceptable",option_b:"Should be close to 0",option_c:"Is calculated monthly",option_d:"Replaces Westgard rules",correct_answer:"b"}
       ]
     };
     for(const [subject,qs] of Object.entries(samples)){
@@ -3245,6 +3295,7 @@ async function renderQuizTab(el){
         <div class="card">
           <div class="section-title" style="font-size:15px">Subject Quiz</div>
           <p class="text-muted mt-8" style="font-size:13px">${count||0} questions available. Practice only — results not saved.</p>
+          <div class="quiz-source-note">Refer to Medical Laboratory Science Review, Fifth Edition (Robert R. Harr) or the source listed on the Resources page for the book discussion.</div>
           <div class="divider"></div>
           <div class="form-group">
             <label>Number of questions</label>
@@ -3271,6 +3322,8 @@ async function renderQuizTab(el){
       <div class="bbq-header">
         <button class="btn btn-ghost btn-sm" onclick="switchTab('quiz')">✕ Exit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="replaceCurrentQuizQuestion()" ${answered?'disabled title="Answered questions stay in your results."':'title="Swap this for another question from this subject."'}>↻ Replace</button>
+        <span class="quiz-mini-note">seen ${quizSeenCount(q)}x</span>
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
       </div>
       <div class="bbq-body">
@@ -3286,7 +3339,6 @@ async function renderQuizTab(el){
         ${answered?`
           <div style="text-align:center;margin-bottom:16px">
             <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:8px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
-            ${q.explanation?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:500px;margin:0 auto">${q.explanation}</div>`:''}
           </div>
           <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
             ${appState.quizIdx>0?`<button class="btn btn-ghost" onclick="qPrev()">← Prev</button>`:''}
@@ -3327,13 +3379,54 @@ function normalizeQuizSubjectKey(raw){
   return quizSubjectKeys().includes(normalized)?normalized:null;
 }
 
+function numericQuestionMeta(q,fields,patterns){
+  for(const field of fields){
+    const value=Number(q?.[field]);
+    if(Number.isFinite(value)&&value>0)return value;
+  }
+  const text=String(q?.explanation||q?.source_note||q?.notes||'');
+  for(const pattern of patterns){
+    const match=text.match(pattern);
+    if(match){
+      const value=Number(match[1]);
+      if(Number.isFinite(value)&&value>0)return value;
+    }
+  }
+  return null;
+}
+function quizContinuousNumber(q){
+  return numericQuestionMeta(q,['continuous_question','continuous_q','continuous_number','question_number_global','global_question_number'],[/continuous question\s*(\d+)/i,/continuous q(?:uestion)?\s*#?\s*(\d+)/i]);
+}
+function quizBookQuestionNumber(q){
+  return numericQuestionMeta(q,['book_question','book_question_number','source_question','source_question_number'],[/book question\s*(\d+)/i,/source question\s*(\d+)/i]);
+}
+function quizSectionSortValue(q){
+  const explicit=Number(q?.section_sort||q?.section_number||q?.book_section_sort);
+  if(Number.isFinite(explicit))return explicit;
+  const text=String(q?.explanation||q?.source_note||q?.notes||'');
+  const match=text.match(/section\s+(\d+(?:\.\d+)?)/i);
+  return match?Number(match[1]):9999;
+}
+function quizBookOrderNumber(q,i){
+  return quizContinuousNumber(q)||quizBookQuestionNumber(q)||i+1;
+}
+function sortQuestionsForAdmin(questions){
+  return [...questions].sort((a,b)=>{
+    const ca=quizContinuousNumber(a),cb=quizContinuousNumber(b);
+    if(ca!=null||cb!=null)return (ca??999999)-(cb??999999);
+    const sa=quizSectionSortValue(a),sbv=quizSectionSortValue(b);
+    if(sa!==sbv)return sa-sbv;
+    const ba=quizBookQuestionNumber(a),bb=quizBookQuestionNumber(b);
+    if(ba!=null||bb!=null)return (ba??999999)-(bb??999999);
+    return String(a.created_at||'').localeCompare(String(b.created_at||''));
+  });
+}
 async function loadCurrentQuizQuestions(){
   const keys=quizSubjectKeys();
   const results=await Promise.all(keys.map(key=>
     sb.from('mlsboc_questions').select('*').eq('subject',key)
   ));
-  return results.flatMap((res,idx)=>(res.data||[]).map(q=>({...q,_subject:q.subject||keys[idx]})))
-    .sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+  return sortQuestionsForAdmin(results.flatMap((res,idx)=>(res.data||[]).map(q=>({...q,_subject:q.subject||keys[idx]}))));
 }
 
 function renderQuizQuestionBank(questions){
@@ -3342,7 +3435,7 @@ function renderQuizQuestionBank(questions){
       <div class="flex-center gap-8 mb-12 flex-wrap">
         <div>
           <div class="section-title" style="font-size:15px">Question Bank</div>
-          <p class="text-muted mt-4" style="font-size:12px">Questions saved for this BOC/Prep section appear here.</p>
+          <p class="text-muted mt-4" style="font-size:12px">Admin/QC view stays in book order. Quizzes and exams still shuffle separately.</p>
         </div>
         <span class="tag tag-info ml-auto">${questions.length} total</span>
       </div>
@@ -3369,7 +3462,8 @@ function renderQuizQuestionRow(q,i){
   return `
     <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
       <div class="flex-center gap-8 mb-8 flex-wrap">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">Q${i+1}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">Q${quizBookOrderNumber(q,i)}</span>
+        ${quizBookQuestionNumber(q)?`<span class="tag tag-info">Book Q${quizBookQuestionNumber(q)}</span>`:''}
         ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
         ${isAdmin?`<button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>`:''}
@@ -3381,7 +3475,6 @@ function renderQuizQuestionRow(q,i){
             <b style="color:${l===correct?'var(--success)':'var(--text)'}">${l.toUpperCase()}.</b> ${esc(q['option_'+l]||'')}
           </div>`).join('')}
       </div>
-      ${q.explanation?`<div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.45"><b>Explanation:</b> ${esc(q.explanation)}</div>`:''}
       ${correctText?`<div style="font-size:11px;color:var(--success);margin-top:6px;font-family:var(--mono)">Correct: ${esc(correctText)}</div>`:''}
     </div>
   `;
@@ -3408,12 +3501,56 @@ async function startSubjectQuiz(){
     data=res.data||[];
   }
   if(!data||!data.length){alert('No questions found.');return;}
-  window._kqOpts={};appState.quizQ=shuffle(data).slice(0,cnt);
+  window._kqOpts={};
+  appState.quizPool=data;
+  appState.quizQ=pickQuizQuestions(data,cnt);
   appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;
   renderTab();
 }
 
-function answerQ(opt){appState.quizAns[appState.quizIdx]=opt;renderTab();}
+const QUIZ_SEEN_KEY='mlsboc_quiz_seen_counts';
+function quizQuestionKey(q){return q?.id||`${q?.subject||appState.subject||'subject'}:${cleanQuestionText(q||'').slice(0,120)}`;}
+function quizSeenCounts(){
+  try{return JSON.parse(localStorage.getItem(QUIZ_SEEN_KEY)||'{}')||{};}catch{return {};}
+}
+function saveQuizSeenCounts(counts){
+  try{localStorage.setItem(QUIZ_SEEN_KEY,JSON.stringify(counts||{}));}catch(e){}
+}
+function quizSeenCount(q){
+  const key=quizQuestionKey(q);
+  return Number(quizSeenCounts()[key]||0);
+}
+function noteQuizSeen(q){
+  const key=quizQuestionKey(q);
+  if(!key)return;
+  const counts=quizSeenCounts();
+  counts[key]=Number(counts[key]||0)+1;
+  saveQuizSeenCounts(counts);
+}
+function pickQuizQuestions(data,cnt){
+  return shuffle(data||[])
+    .sort((a,b)=>quizSeenCount(a)-quizSeenCount(b))
+    .slice(0,cnt);
+}
+function answerQ(opt){
+  if(!appState.quizAns[appState.quizIdx])noteQuizSeen(appState.quizQ[appState.quizIdx]);
+  appState.quizAns[appState.quizIdx]=opt;renderTab();
+}
+function replaceCurrentQuizQuestion(){
+  if(!appState.quizStarted||appState.quizDone||!appState.quizQ.length)return;
+  if(appState.quizAns[appState.quizIdx]){alert('This question is already answered. Replace before answering so your score stays clean.');return;}
+  const idx=appState.quizIdx;
+  const currentKey=quizQuestionKey(appState.quizQ[idx]);
+  const used=new Set(appState.quizQ.map((q,i)=>i===idx?null:quizQuestionKey(q)).filter(Boolean));
+  const candidates=(appState.quizPool||[]).filter(q=>{
+    const key=quizQuestionKey(q);
+    return key&&key!==currentKey&&!used.has(key);
+  });
+  if(!candidates.length){alert('No unused replacement questions are available for this quiz.');return;}
+  appState.quizQ[idx]=pickQuizQuestions(candidates,1)[0];
+  appState.quizAns[idx]=null;
+  renderTab();
+}
 function qNext(){appState.quizIdx++;renderTab();}
 function qPrev(){appState.quizIdx--;renderTab();}
 
@@ -3460,7 +3597,7 @@ function renderQuizResults(el,isAll){
       <div class="stat-card"><div class="stat-num text-danger">${qs.length-correct}</div><div class="stat-label">Missed</div></div>
       ${isAll?`<div class="stat-card"><div class="stat-num" style="color:var(--accent);font-size:16px">${timeStr}</div><div class="stat-label">Time</div></div>`:''}
     </div>
-    ${isAll?`<div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">⚠ Results are not saved. Export a PDF now to keep a record of this attempt.</div>`:''}
+    <div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">Results are not saved. Export a PDF now if you want to keep this attempt. Refer to the assigned book/source for the book discussion.</div>
     ${isAll&&weakSubjects.length?`
       <div class="card-sm mb-16" style="border-left:3px solid var(--danger)">
         <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📌 Suggested Focus Areas</div>
@@ -3481,7 +3618,7 @@ function renderQuizResults(el,isAll){
       </div>`:''}
     <div class="flex gap-8 mb-16 flex-wrap">
       ${isAll?`<button class="btn btn-primary" onclick="startAllExam()">Retake Exam</button>`:`<button class="btn btn-primary" onclick="switchTab('quiz')">New Quiz</button>`}
-      ${isAll&&missed.length?`<button class="btn btn-warn" onclick="exportResultsPDF()">📄 Export Missed Questions PDF</button>`:''}
+      <button class="btn btn-warn" onclick="exportResultsPDF(${isAll?'true':'false'})">📄 Export Results PDF</button>
       ${isAll?`<button class="btn btn-ghost btn-sm" onclick="exportFromResults()">📊 Export CSV</button>`:''}
     </div>
     ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
@@ -3491,18 +3628,18 @@ function renderQuizResults(el,isAll){
         ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:6px 0">${renderDataTable(q.table_data,{small:true})}</div>`:''}
         <div class="missed-wrong">Your answer: ${given?esc(q['option_'+given]):'(unanswered)'}</div>
         <div class="missed-a">Correct: ${esc(q['option_'+q.correct_answer])}</div>
-        ${q.explanation?`<div style="font-size:12px;color:var(--text2);margin-top:6px">${esc(q.explanation)}</div>`:''}
       </div>`).join('')}
   `;
 }
 
-function exportResultsPDF(){
-  const qs=appState.allQ,ans=appState.allAns;
-  let correct=0,missed=[];
-  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;else missed.push({q,given:ans[i]});});
+function exportResultsPDF(isAll=false){
+  const qs=isAll?appState.allQ:appState.quizQ;
+  const ans=isAll?appState.allAns:appState.quizAns;
+  if(!qs||!qs.length){alert('No quiz results to export yet.');return;}
+  let correct=0;
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;});
   const pct=Math.round(correct/qs.length*100);
-  const timeStr=fmtTime(appState.allSeconds);
-  if(!missed.length){alert('No missed questions — perfect score!');return;}
+  const timeStr=isAll?fmtTime(appState.allSeconds):'';
   try{
     const {jsPDF}=window.jspdf;
     const doc=new jsPDF({unit:'mm',format:'a4'});
@@ -3514,50 +3651,38 @@ function exportResultsPDF(){
       doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
       doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.5;});
     };
-    // Header
     doc.setFillColor(30,30,30);doc.rect(margin,y,cW,14,'F');
     doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text('MLS BOC Prep — Practice Exam Results',margin+4,y+9);y+=18;
-    // Score summary box
-    doc.setFillColor(245,245,245);doc.rect(margin,y,cW,18,'F');doc.setDrawColor(200,200,200);doc.rect(margin,y,cW,18,'S');
+    doc.text(isAll?'MLS BOC Prep - Practice Exam Results':'MLS BOC Prep - Subject Quiz Results',margin+4,y+9);y+=18;
+    doc.setFillColor(245,245,245);doc.rect(margin,y,cW,20,'F');doc.setDrawColor(200,200,200);doc.rect(margin,y,cW,20,'S');
     doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
     doc.text(`Score: ${correct}/${qs.length} (${pct}%)`,margin+4,y+7);
     doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
-    doc.text(`Time: ${timeStr}   |   Date: ${new Date().toLocaleDateString()}`,margin+4,y+13);
-    doc.text(`Missed: ${missed.length} of ${qs.length} questions`,margin+cW/2,y+13);
-    y+=22;
-    // Section header
-    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(20,20,80);
-    doc.text('Questions to Review',margin,y);y+=6;
-    doc.setDrawColor(20,20,80);doc.setLineWidth(0.5);doc.line(margin,y,pageW-margin,y);y+=6;
-    // Missed questions
-    missed.forEach(({q,given},mi)=>{
-      checkPage(36);
-      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(100,100,140);
-      doc.text((q.subject||'').replace(/_/g,' ').toUpperCase()+' · Q'+(mi+1),margin,y);y+=5;
-      writeText(cleanQuestionText(q.question),{size:10,bold:true,color:[20,20,20]});
-      const opts=['a','b','c','d'];
-      opts.forEach(l=>{
-        const opt=q['option_'+l];if(!opt)return;
-        const isCorrect=l===q.correct_answer,isGiven=l===given;
-        doc.setFontSize(9);doc.setFont('helvetica',isCorrect?'bold':'normal');
-        doc.setTextColor(...(isCorrect?[20,120,60]:isGiven?[180,40,40]:[50,50,50]));
-        checkPage(5);doc.text(l.toUpperCase()+'. '+opt+(isCorrect?' ✓':isGiven?' ✗':''),margin+4,y);y+=5;
-      });
-      if(q.explanation){
-        y+=1;doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
-        doc.splitTextToSize('Note: '+q.explanation,cW-6).forEach(l=>{checkPage(5);doc.text(l,margin+4,y);y+=4.5;});
-      }
-      y+=6;
+    doc.text(`Missed: ${qs.length-correct}   |   Date: ${new Date().toLocaleDateString()}`,margin+4,y+13);
+    if(isAll)doc.text(`Time: ${timeStr}`,margin+cW-4,y+13,{align:'right'});
+    y+=25;
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+    doc.text('Refer to the assigned book/source for the book discussion.',margin,y);y+=8;
+    qs.forEach((q,i)=>{
+      checkPage(30);
+      const given=ans[i];
+      const ok=given===q.correct_answer;
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...(ok?[20,120,60]:[180,40,40]));
+      doc.text(`${i+1}. ${ok?'Correct':'Missed'}${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}`,margin,y);y+=5;
+      writeText(cleanQuestionText(q),{size:9.5,bold:true,color:[20,20,20]});
+      doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(70,70,70);
+      checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
+      doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
+      checkPage(7);doc.text(`Correct: ${String(q['option_'+q.correct_answer]||'')}`,margin+4,y);y+=8;
     });
-    // Footer on each page
     const tot=doc.internal.getNumberOfPages();
     for(let p=1;p<=tot;p++){
       doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
-      doc.text('MLS BOC Prep — Practice Exam · Items to Improve · Page '+p+' of '+tot,margin,pageH-8);
+      doc.text('MLS BOC Prep - Quiz Results - Page '+p+' of '+tot,margin,pageH-8);
       doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
     }
-    doc.save('boc_exam_missed_'+new Date().toISOString().slice(0,10)+'.pdf');
+    const subject=(isAll?'exam':(appState.subject||'quiz')).replace(/[^a-z0-9_-]+/gi,'_');
+    doc.save('boc_'+subject+'_results_'+new Date().toISOString().slice(0,10)+'.pdf');
   }catch(err){alert('PDF export failed: '+err.message);}
 }
 
@@ -5858,8 +5983,7 @@ function renderHemeCaseQuestion(caseId,q,qi,selState){
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
-        </div>
-        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+        </div>`:''}
     </div>
   `;
 }
@@ -5983,9 +6107,6 @@ function hemeCaseQuestionEditor(i,q){
     <div class="form-group"><label>Correct Answer</label>
       <select id="hc-qc-${i}">${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
     </div>
-    <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
-      <input type="text" id="hc-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
-    </div>
   </div>`;
 }
 
@@ -6016,8 +6137,7 @@ async function saveHemeCase(caseId){
     const question=document.getElementById('hc-qq-'+i)?.value.trim()||'';if(!question)continue;
     const options=['a','b','c','d'].map(l=>document.getElementById('hc-qo-'+i+'-'+l)?.value.trim()||'');
     const correct=document.getElementById('hc-qc-'+i)?.value||'a';
-    const explanation=document.getElementById('hc-qe-'+i)?.value.trim()||'';
-    questions.push({question,options,correct,explanation});
+    questions.push({question,options,correct});
   }
   const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images:[]};
   let error;
@@ -6468,8 +6588,7 @@ function renderSubjectCaseQuestion(caseId,q,qi,selState,answerKey){
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
-        </div>
-        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+        </div>`:''}
     </div>
   `;
 }
@@ -6854,9 +6973,6 @@ function scQuestionEditor(i,q){
     <div class="form-group"><label>Correct Answer</label>
       <select id="sc-qc-${i}">${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
     </div>
-    <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
-      <input type="text" id="sc-qe-${i}" value="${esc(q.explanation||'')}">
-    </div>
   </div>`;
 }
 
@@ -6891,8 +7007,7 @@ async function saveSubjectCase(){
     const question=document.getElementById('sc-qq-'+i)?.value.trim()||'';if(!question)continue;
     const options=['a','b','c','d'].map(l=>document.getElementById('sc-qo-'+i+'-'+l)?.value.trim()||'');
     const correct=document.getElementById('sc-qc-'+i)?.value||'a';
-    const explanation=document.getElementById('sc-qe-'+i)?.value.trim()||'';
-    questions.push({question,options,correct,explanation});
+    questions.push({question,options,correct});
   }
   const payload={title,scenario:scenario||'',table_data,questions,is_draft:isDraft,images:[]};
   let error;
@@ -7677,8 +7792,7 @@ function renderMicroCaseQuestion(caseId,q,qi,selState){
       ${checked&&reveal?`
         <div class="case-feedback ${chosen===q.correct?'correct':'wrong'}" style="margin-top:8px;font-size:13px">
           ${chosen===q.correct?'✓ Correct!':`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
-        </div>
-        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+        </div>`:''}
     </div>
   `;
 }
@@ -7817,7 +7931,7 @@ async function importMicroCasesCSV(event){
         question,
         options,
         correct:microCorrectLetter(csvField(row,['correct','correct_answer','answer','key'],11),options),
-        explanation:microImportText(csvField(row,['explanation','rationale','notes'],12))
+        explanation:''
       });
     }
   });
@@ -7908,9 +8022,6 @@ function mcQuestionEditor(i,q){
     <div class="form-group"><label>Correct Answer</label>
       <select id="mc-qc-${i}">${['a','b','c','d','e'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select>
     </div>
-    <div class="form-group" style="margin-bottom:0"><label>Explanation (optional)</label>
-      <input type="text" id="mc-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
-    </div>
   </div>`;
 }
 function addMCQuestion(){
@@ -7940,8 +8051,7 @@ async function saveMicroCase(caseId){
     const question=document.getElementById('mc-qq-'+i)?.value.trim()||'';if(!question)continue;
     const options=['a','b','c','d','e'].map(l=>document.getElementById('mc-qo-'+i+'-'+l)?.value.trim()||'');
     const correct=document.getElementById('mc-qc-'+i)?.value||'a';
-    const explanation=document.getElementById('mc-qe-'+i)?.value.trim()||'';
-    questions.push({question,options,correct,explanation});
+    questions.push({question,options,correct});
   }
   const payload={title,scenario:scenario||'',table_data,questions,group_label,is_draft:isDraft,images:[]};
   let error;
@@ -8290,8 +8400,7 @@ function renderBBQuestion(caseId,q,qi,selState){
           ${chosen===q.correct
             ?'✓ Correct!'
             :`✗ Incorrect — Correct: ${(q.correct||'a').toUpperCase()}. ${(q.options||[])[correctIdx]||''}`}
-        </div>
-        ${q.explanation?`<div class="explanation" style="margin-top:8px;font-size:13px">${q.explanation}</div>`:''}`:''}
+        </div>`:''}
     </div>
   `;
 }
@@ -8521,10 +8630,6 @@ function bbQuestionEditor(i,q){
         ${['a','b','c','d'].map(l=>`<option value="${l}" ${(q.correct||'a')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}
       </select>
     </div>
-    <div class="form-group" style="margin-bottom:0">
-      <label>Explanation (optional)</label>
-      <input type="text" id="bb-qe-${i}" value="${esc(q.explanation||'')}" placeholder="Why this answer is correct">
-    </div>
   </div>`;
 }
 
@@ -8567,8 +8672,7 @@ async function saveBBCase(caseId){
     if(!question)continue;
     const options=['a','b','c','d'].map(l=>document.getElementById('bb-qo-'+i+'-'+l)?.value.trim()||'');
     const correct=document.getElementById('bb-qc-'+i)?.value||'a';
-    const explanation=document.getElementById('bb-qe-'+i)?.value.trim()||'';
-    questions.push({question,options,correct,explanation});
+    questions.push({question,options,correct});
   }
 
   const images=(window._bbEditorImages||[]).filter(Boolean);
@@ -8767,7 +8871,7 @@ async function openFormulaEditor(id,type){
         <label>Steps (optional — each step shown in sequence)</label>
         ${steps.map((s,i)=>`<input type="text" id="fm-step-${i}" value="${esc(s||'')}" placeholder="Step ${i+1} (leave blank to skip)" style="margin-bottom:6px;font-family:var(--mono)">`).join('')}
       </div>
-      <div class="form-group"><label>Notes / Explanation (optional)</label><textarea id="fm-notes" style="min-height:60px">${f.notes||''}</textarea></div>
+      <div class="form-group"><label>Notes (optional)</label><textarea id="fm-notes" style="min-height:60px">${f.notes||''}</textarea></div>
     `}
     <div class="flex gap-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
@@ -9040,7 +9144,7 @@ async function renderAllStart(v){
     </div>
     <div class="card" style="max-width:560px;margin-bottom:24px">
       <p style="font-size:13px;color:var(--text2);line-height:1.8">100-question mixed exam following ASCP BOC subject weighting. Timer runs but no time limit.</p>
-      <p style="font-size:12px;color:var(--text3);margin-top:4px">⚠ Results are not saved. Export your missed questions as a PDF before leaving.</p>
+      <p style="font-size:12px;color:var(--text3);margin-top:4px">Results are not saved. Export your results PDF before leaving. Refer to the assigned book/source for the book discussion.</p>
       <div class="divider"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
         ${Object.entries(BOC_WEIGHTS).map(([s,w])=>`
@@ -9126,7 +9230,6 @@ function renderAllExam(v){
         ${answered?`
           <div style="text-align:center;margin-bottom:16px">
             <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:8px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
-            ${q.explanation?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;text-align:left;max-width:500px;margin:0 auto">${q.explanation}</div>`:''}
           </div>
           <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
             ${appState.allIdx>0?`<button class="btn btn-ghost" onclick="allPrev()">← Prev</button>`:''}
@@ -9139,7 +9242,10 @@ function renderAllExam(v){
   `;
 }
 
-function answerAll(opt){appState.allAns[appState.allIdx]=opt;renderView();}
+function answerAll(opt){
+  if(!appState.allAns[appState.allIdx])noteQuizSeen(appState.allQ[appState.allIdx]);
+  appState.allAns[appState.allIdx]=opt;renderView();
+}
 function allNext(){appState.allIdx++;renderView();}
 function allPrev(){appState.allIdx--;renderView();}
 
@@ -9213,15 +9319,14 @@ function adminQuizControls(){
       <div class="form-group"><label>Correct Answer</label>
         <select id="adm-ans"><option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option></select>
       </div>
-      <div class="form-group"><label>Explanation (optional)</label><textarea id="adm-exp"></textarea></div>
       <div class="flex gap-8 flex-wrap">
         <button class="btn btn-primary" onclick="adminAddQ()">Add Question</button>
         <label class="btn btn-ghost" style="cursor:pointer">Bulk CSV Upload
           <input type="file" accept=".csv" style="display:none" onchange="adminBulkQ(event)">
         </label>
-        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['question','option_a','option_b','option_c','option_d','correct_answer','explanation'],['Sample question?','Choice A','Choice B','Choice C','Choice D','a',DEFAULT_QUESTION_EXPLANATION]],'quiz_template.csv')">Download Template</button>
+        <button class="btn btn-ghost btn-sm" onclick="dlCSV([['question','option_a','option_b','option_c','option_d','correct_answer'],['Sample question?','Choice A','Choice B','Choice C','Choice D','a']],'quiz_template.csv')">Download Template</button>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d), explanation. Leave explanation blank to use the assigned-book note. Para/Myco can also include a subject column.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: question, option_a, option_b, option_c, option_d, correct_answer (a/b/c/d). Para/Myco can also include a subject column.</div>
     </div>`;
 }
 
@@ -9233,9 +9338,8 @@ async function adminAddQ(){
   const c=document.getElementById('adm-c')?.value.trim();
   const d=document.getElementById('adm-d')?.value.trim();
   const ans=document.getElementById('adm-ans')?.value;
-  const exp=document.getElementById('adm-exp')?.value.trim();
   if(!q||!a||!b||!c||!d){alert('Fill in all fields.');return;}
-  const {error}=await sb.from('mlsboc_questions').insert({subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:exp||DEFAULT_QUESTION_EXPLANATION});
+  const {error}=await sb.from('mlsboc_questions').insert({subject,question:q,option_a:a,option_b:b,option_c:c,option_d:d,correct_answer:ans,explanation:''});
   if(error)alert('Error: '+error.message);
   else renderTab();
 }
@@ -9760,10 +9864,6 @@ async function generateCasePDF(){
           const correctIdx=letters.indexOf(q.correct||'a');
           const correctText=(q.options||[])[correctIdx]||q[q.correct]||'';
           writeText(`Q${globalQ}. ${(q.correct||'').toUpperCase()}. ${correctText}`,{size:10,bold:true,color:[20,120,60]});
-          if(q.explanation){
-            doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
-            doc.splitTextToSize(q.explanation,contentW-16).forEach(line=>{checkPage();doc.text(line,margin+12,y);y+=4;});
-          }
           y+=3;globalQ++;
         });
         y+=4;
@@ -10776,21 +10876,70 @@ function escNL(s){return esc(s).replace(/\n/g,'<br>');}
 function questionMediaUrls(qOrText){
   const text=typeof qOrText==='string'?qOrText:(qOrText?.question||'');
   const urls=[];let match;
+  const addUrl=(value)=>{
+    if(!value)return;
+    if(Array.isArray(value)){value.forEach(addUrl);return;}
+    if(typeof value==='object'){
+      addUrl(value.url||value.src||value.image_url||value.imageUrl||value.data_url||value.data);
+      return;
+    }
+    const raw=String(value||'').trim();
+    if(!raw)return;
+    if(raw.startsWith('[')||raw.startsWith('{')){
+      try{addUrl(JSON.parse(raw));return;}catch(e){}
+    }
+    urls.push(raw);
+  };
   const re=/\[\[media:([^\]]+)\]\]/g;
-  while((match=re.exec(text)))urls.push(match[1].trim());
-  return urls;
+  while((match=re.exec(text)))addUrl(match[1]);
+  if(typeof qOrText==='object'&&qOrText){
+    ['media_url','media_urls','image_url','image_urls','question_image_url','question_media_url','images'].forEach(field=>addUrl(qOrText[field]));
+  }
+  return [...new Set(urls.filter(Boolean))];
+}
+function hasInsertedQuestionMedia(qOrText){
+  return questionMediaUrls(qOrText).length>0;
+}
+function looksLikeRepeatedLabValueLine(line){
+  const t=String(line||'').trim();
+  if(!t)return false;
+  if(/^[-—–]+$/.test(t))return true;
+  const analyte=/^(?:WBC|RBC|HGB|HCT|MCV|MCHC?|RDW|PLT|MPV|RETIC|NE|LY|MO|EO|BA|NRBC|PT|PTT|APTT|INR|FIB(?:RINOGEN)?|D[- ]?DIMER|GLU(?:COSE)?|BUN|CREAT(?:ININE)?|NA|K|CL|CO2|CA|MG|PHOS|AST|ALT|ALP|BILI(?:RUBIN)?|ALB(?:UMIN)?|TP|LDH|CK|CRP|ESR)\b/i;
+  if(analyte.test(t)&&(/[=:]/.test(t)||/\d/.test(t)))return true;
+  if(/\b(?:fL|pg|g\/dL|mg\/dL|mmol\/L|x\s*10|%|cells?|\/uL|\/L)\b/i.test(t)&&(/[=:]/.test(t)||/\d/.test(t)))return true;
+  return false;
+}
+function removeRepeatedLabValuesWhenMedia(text,qOrText){
+  if(!hasInsertedQuestionMedia(qOrText))return text;
+  const lines=String(text||'').split(/\n/);
+  const kept=lines.filter(line=>!looksLikeRepeatedLabValueLine(line));
+  return kept.join('\n').replace(/\n{3,}/g,'\n\n').trim();
 }
 function cleanQuestionText(qOrText){
   const text=typeof qOrText==='string'?qOrText:(qOrText?.question||'');
-  return String(text||'')
+  const cleaned=String(text||'')
     .replace(/\[\[media:[^\]]+\]\]\s*/g,'')
     .replace(/\[IMAGE\/RESULT PLACEHOLDER[^\]]+\]\s*/g,'')
     .trim();
+  return removeRepeatedLabValuesWhenMedia(cleaned,qOrText);
 }
 function renderQuestionMedia(qOrText){
   const urls=questionMediaUrls(qOrText);
   if(!urls.length)return '';
-  return `<div class="question-media">${urls.map((url,i)=>`<img src="${esc(url)}" alt="Question visual ${i+1}" loading="lazy">`).join('')}</div>`;
+  return `<div class="question-media">${urls.map((url,i)=>`<button class="question-media-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" title="Zoom image"><img src="${esc(url)}" alt="Question visual ${i+1}" loading="lazy"></button>`).join('')}</div>`;
+}
+function openQuestionMediaZoom(url){
+  closeQuestionMediaZoom();
+  const modal=document.createElement('div');
+  modal.id='question-media-zoom-modal';
+  modal.className='media-zoom-modal';
+  modal.innerHTML=`<div class="media-zoom-dialog" role="dialog" aria-modal="true" aria-label="Question image zoom"><div class="media-zoom-actions"><button class="btn btn-ghost" onclick="closeQuestionMediaZoom()">Close</button></div><img src="${esc(url)}" alt="Zoomed question visual"></div>`;
+  modal.addEventListener('click',e=>{if(e.target===modal)closeQuestionMediaZoom();});
+  document.body.appendChild(modal);
+}
+function closeQuestionMediaZoom(){
+  const modal=document.getElementById('question-media-zoom-modal');
+  if(modal)modal.remove();
 }
 function renderQuestionWithMedia(qOrText){
   return `${escNL(cleanQuestionText(qOrText))}${renderQuestionMedia(qOrText)}`;
@@ -10964,7 +11113,7 @@ function normalizeQuizCSVRow(row){
     option_b:String(csvField(row,['option_b','b','choice_b','answer_b'],2)||'').trim(),
     option_c:String(csvField(row,['option_c','c','choice_c','answer_c'],3)||'').trim(),
     option_d:String(csvField(row,['option_d','d','choice_d','answer_d'],4)||'').trim(),
-    explanation:String(csvField(row,['explanation','rationale','notes'],6)||'').trim()||DEFAULT_QUESTION_EXPLANATION
+    explanation:''
   };
   const raw=String(csvField(row,['correct_answer','correct','answer','key'],5)||'').toLowerCase().trim();
   const cleaned=raw.replace(/^option[_\s-]*/,'').replace(/^choice[_\s-]*/,'').replace(/^answer[_\s-]*/,'');
@@ -11095,7 +11244,7 @@ function closeImgViewer(){
   if(v)v.style.display='none';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgViewer();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgViewer();closeQuestionMediaZoom();}});
 </script>
 <div id="img-viewer" style="display:none" onclick="closeImgViewer()">
   <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
