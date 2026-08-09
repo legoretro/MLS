@@ -935,6 +935,24 @@ body:not(.light-mode) .bbq-context{background:rgba(20,23,32,.90);border-color:rg
   box-shadow:0 16px 34px rgba(22,34,74,.13);
 }
 body:not(.light-mode) .bbq-question{color:var(--text);background:rgba(20,23,32,.88);border-color:rgba(255,255,255,.12)}
+.question-media{
+  display:grid;
+  gap:10px;
+  margin:16px auto 0;
+  max-width:min(100%,760px);
+}
+.question-media img{
+  display:block;
+  width:100%;
+  max-height:440px;
+  object-fit:contain;
+  background:#fff;
+  border:1px solid rgba(32,42,68,.22);
+  border-radius:12px;
+  padding:8px;
+  box-shadow:0 12px 28px rgba(22,34,74,.14);
+}
+body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
 .bbq-options{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -1259,6 +1277,7 @@ const RESOURCES=[
   {title:'ASCP/ASCPi MLS Content Guideline',meta:'XYZ',note:'ASCP reference placeholder'},
   {title:'ASCP BOC Study Guide / Content Outline',meta:'XYZ',note:'ASCP reference placeholder'},
   {title:'Success! In Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman; Janelle M. Chiasera',note:'Textbook reference'},
+  {title:'Medical Laboratory Science Review, Fifth Edition',meta:'Robert R. Harr',note:'Textbook question source reference'},
   {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, procedure notes, and laboratory manuals used for definitions, tables, and interpretive rules.',note:'Add book-level citations here as you finalize them'},
   {title:'Calculations and Reference Ranges Sources',meta:'XYZ',note:'Citation source placeholder for Calculation / RR tab formulas and values'}
 ];
@@ -3255,7 +3274,7 @@ async function renderQuizTab(el){
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
       </div>
       <div class="bbq-body">
-        <div class="bbq-question">${escNL(q.question)}</div>
+        <div class="bbq-question">${renderQuestionWithMedia(q)}</div>
         <div class="bbq-options">
           ${opts.map((opt,oi)=>`
             <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
@@ -3355,7 +3374,7 @@ function renderQuizQuestionRow(q,i){
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
         ${isAdmin?`<button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>`:''}
       </div>
-      <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:8px">${escNL(q.question)}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:8px">${renderQuestionWithMedia(q)}</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;font-size:12px;color:var(--text2)">
         ${['a','b','c','d'].map(l=>`
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 9px">
@@ -3468,7 +3487,7 @@ function renderQuizResults(el,isAll){
     ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
     ${missed.map(({q,given})=>`
       <div class="missed-item">
-        <div class="missed-q">${escNL(q.question)}</div>
+        <div class="missed-q">${renderQuestionWithMedia(q)}</div>
         ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:6px 0">${renderDataTable(q.table_data,{small:true})}</div>`:''}
         <div class="missed-wrong">Your answer: ${given?esc(q['option_'+given]):'(unanswered)'}</div>
         <div class="missed-a">Correct: ${esc(q['option_'+q.correct_answer])}</div>
@@ -3516,7 +3535,7 @@ function exportResultsPDF(){
       checkPage(36);
       doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(100,100,140);
       doc.text((q.subject||'').replace(/_/g,' ').toUpperCase()+' · Q'+(mi+1),margin,y);y+=5;
-      writeText(q.question,{size:10,bold:true,color:[20,20,20]});
+      writeText(cleanQuestionText(q.question),{size:10,bold:true,color:[20,20,20]});
       const opts=['a','b','c','d'];
       opts.forEach(l=>{
         const opt=q['option_'+l];if(!opt)return;
@@ -9095,7 +9114,7 @@ function renderAllExam(v){
         <div class="timer ml-auto" id="all-timer" style="font-size:12px">${fmtTime(appState.allSeconds)}</div>
       </div>
       <div class="bbq-body">
-        <div class="bbq-question">${escNL(q.question)}</div>
+        <div class="bbq-question">${renderQuestionWithMedia(q)}</div>
         <div class="bbq-options">
           ${opts.map((opt,oi)=>`
             <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
@@ -10754,6 +10773,28 @@ function jsAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"
 function isLocalInteractiveUrl(url){return !!String(url||'').match(/^[^/:?#]+\.html(?:[?#].*)?$/);}
 // escNL: same as esc but preserves newlines as <br> tags — used for question/scenario text
 function escNL(s){return esc(s).replace(/\n/g,'<br>');} 
+function questionMediaUrls(qOrText){
+  const text=typeof qOrText==='string'?qOrText:(qOrText?.question||'');
+  const urls=[];let match;
+  const re=/\[\[media:([^\]]+)\]\]/g;
+  while((match=re.exec(text)))urls.push(match[1].trim());
+  return urls;
+}
+function cleanQuestionText(qOrText){
+  const text=typeof qOrText==='string'?qOrText:(qOrText?.question||'');
+  return String(text||'')
+    .replace(/\[\[media:[^\]]+\]\]\s*/g,'')
+    .replace(/\[IMAGE\/RESULT PLACEHOLDER[^\]]+\]\s*/g,'')
+    .trim();
+}
+function renderQuestionMedia(qOrText){
+  const urls=questionMediaUrls(qOrText);
+  if(!urls.length)return '';
+  return `<div class="question-media">${urls.map((url,i)=>`<img src="${esc(url)}" alt="Question visual ${i+1}" loading="lazy">`).join('')}</div>`;
+}
+function renderQuestionWithMedia(qOrText){
+  return `${escNL(cleanQuestionText(qOrText))}${renderQuestionMedia(qOrText)}`;
+}
 function csvEsc(s){s=String(s||'');if(s.includes(',')||s.includes('"')||s.includes('\n'))s='"'+s.replace(/"/g,'""')+'"';return s;}
 function dlCSV(rows,filename){
   const csv=rows.map(r=>r.map(csvEsc).join(',')).join('\n');
