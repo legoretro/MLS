@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess: MLS Edition</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2fb;--card:#ffffff;--ink:#141827;--muted:#5b6384;--line:#c7d0e7;
+  --purple:#6b4fd8;--purple2:#3f2aa0;--green:#16875a;--red:#c92f49;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 10%,#fff 0,#eef2fb 36%,#e3e8f5 100%);font-family:var(--sans);color:var(--ink)}
+button{font:inherit}
+.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.back,.ghost{border:2px solid var(--line);background:#fff;color:#343a56;border-radius:14px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #d9dfee}
+.brand{font-weight:900;font-size:22px;letter-spacing:-.02em}.brand span{color:var(--purple)}
+.status{margin-left:auto;font-family:var(--mono);color:var(--muted);font-size:13px}
+.screen{max-width:1180px;margin:0 auto;padding:28px 18px 46px}
+.hero{min-height:500px;border:3px solid var(--purple);border-radius:22px;background:linear-gradient(135deg,#ffffff 0%,#ede8ff 52%,#baacf8 100%);display:grid;place-items:center;text-align:center;overflow:hidden;position:relative;box-shadow:0 24px 58px rgba(40,45,90,.16)}
+.hero:before,.hero:after{content:'';position:absolute;border:18px solid rgba(63,42,160,.12);border-radius:48% 52% 44% 56%;width:260px;height:210px;transform:rotate(-18deg)}
+.hero:before{left:-120px;top:115px}.hero:after{right:-100px;bottom:70px;transform:rotate(18deg)}
+.kicker{font-family:var(--mono);font-size:14px;font-weight:900;letter-spacing:.28em;text-transform:uppercase;color:#3f2aa0;margin-bottom:14px}
+h1{font-size:clamp(56px,10vw,132px);line-height:.88;margin:0 0 18px;color:#141827;text-shadow:8px 8px 0 rgba(107,79,216,.16);letter-spacing:-.06em}
+.hero p{font-size:clamp(18px,2.6vw,28px);max-width:780px;margin:0 auto 34px;color:#29314d;font-weight:800;line-height:1.25}
+.primary{border:0;border-radius:22px;background:var(--purple);color:#fff;padding:20px 34px;font-size:clamp(20px,3vw,31px);font-weight:900;cursor:pointer;box-shadow:0 12px 0 var(--purple2);transform:translateY(0);transition:.16s}
+.primary:hover{transform:translateY(-2px);box-shadow:0 14px 0 var(--purple2)}
+.section-title{font-family:var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--purple2);font-weight:900;margin:0 0 14px}
+.subject-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.subject-card,.panel{background:rgba(255,255,255,.86);border:2px solid var(--line);border-radius:20px;box-shadow:0 14px 34px rgba(30,40,80,.10)}
+.subject-card{padding:22px;text-align:left;cursor:pointer;min-height:142px;display:flex;flex-direction:column;justify-content:space-between;transition:.16s}
+.subject-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 20px 42px rgba(80,60,170,.18)}
+.subject-card b{font-size:24px}.subject-card span{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:800}
+.game{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;align-items:start}
+.panel{padding:22px}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.score div{border:1px solid var(--line);border-radius:16px;padding:15px;background:#f7f8fc;text-align:center}
+.score b{display:block;font-size:28px}.score span{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase}
+.question-card{background:#fff;border:3px solid var(--purple);border-radius:24px;padding:28px;box-shadow:0 22px 54px rgba(50,55,100,.13)}
+.q-kicker{font-family:var(--mono);font-size:13px;font-weight:900;color:var(--purple2);letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+.question{font-size:clamp(24px,3vw,40px);line-height:1.12;font-weight:900;letter-spacing:-.025em;margin-bottom:20px}
+.image-wrap{border:1px solid var(--line);border-radius:16px;background:#fff;padding:10px;margin:0 0 18px;text-align:center}
+.image-wrap img{max-width:100%;max-height:340px;object-fit:contain;cursor:zoom-in}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.answer{border:0;border-radius:18px;padding:18px;text-align:left;font-weight:900;font-size:18px;color:#fff;cursor:pointer;box-shadow:inset 0 -5px rgba(0,0,0,.15);min-height:82px}
+.answer:nth-child(1){background:#ef4055}.answer:nth-child(2){background:#2c8ee8}.answer:nth-child(3){background:#f2aa26}.answer:nth-child(4){background:#40d483;color:#0f2c1d}
+.answer.correct{outline:5px solid #178651;background:#178651;color:#fff}.answer.wrong{outline:5px solid #c92f49;filter:saturate(.55)}
+.reveal{margin-top:14px;border-radius:16px;padding:16px;font-size:18px;font-weight:900}
+.reveal.good{background:#e9f8f0;color:#147148;border:2px solid #70c99b}.reveal.bad{background:#fff0f2;color:#a82438;border:2px solid #ef9aaa}
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.hidden{display:none!important}
+.loading{padding:40px;text-align:center;font-size:24px;font-weight:900;color:var(--purple2)}
+@media(max-width:900px){.subject-grid,.game,.answers{grid-template-columns:1fr}.status{margin-left:0}.hero{min-height:430px}.panel{padding:18px}.question-card{padding:20px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <button class="back" onclick="location.href='index.html'">← Interactive Tools</button>
+  <div class="brand">Guess: <span>MLS Edition</span></div>
+  <div class="status" id="status">choose a subject</div>
+</div>
+<main class="screen" id="app"></main>
+<script>
+const SB_URL='https://rbdvjwipedbxfbedjgoa.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const SUBJECTS=[
+  {label:'All Subjects',keys:null,color:'#6b4fd8'},
+  {label:'Blood Bank',keys:['blood_bank'],color:'#b22222'},
+  {label:'Hematology/Hemostasis',keys:['hematology'],color:'#c23a4a'},
+  {label:'Clinical Chemistry',keys:['clinical_chemistry'],color:'#2980b9'},
+  {label:'Microbiology',keys:['microbiology'],color:'#2fa66a'},
+  {label:'Urinalysis',keys:['urinalysis'],color:'#c8a800'},
+  {label:'Immunology',keys:['immunology'],color:'#7c4dff'},
+  {label:'Lab Operations',keys:['lab_operations'],color:'#6671d8'},
+  {label:'Parasitology / Mycology',keys:['parasitology','mycology'],color:'#2fa66a'}
+];
+let state={mode:'intro',subject:null,bank:[],q:null,answered:null,correct:0,total:0};
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5);}
+function optionsFor(q){return ['a','b','c','d'].map(k=>({key:k,text:q['option_'+k]})).filter(o=>o.text);}
+function correctKey(q){return String(q.correct_answer||q.correct||'a').trim().toLowerCase().slice(0,1)||'a';}
+function setStatus(t){document.getElementById('status').textContent=t;}
+function renderIntro(){
+  setStatus('ready');
+  app.innerHTML=`<section class="hero">
+    <div style="position:relative;z-index:1;padding:24px">
+      <div class="kicker">welcome to the all-subject arena</div>
+      <h1>Guess: MLS Edition</h1>
+      <p>Select a subject, read the clue question, and choose the answer before the reveal.</p>
+      <button class="primary" onclick="renderSubjects()">Choose Your Subject!</button>
+    </div>
+  </section>`;
+}
+function renderSubjects(){
+  state.mode='subjects';
+  setStatus('pick a subject');
+  app.innerHTML=`<div class="section-title">select your subject</div>
+  <div class="subject-grid">
+    ${SUBJECTS.map((s,i)=>`<button class="subject-card" style="border-top:6px solid ${s.color}" onclick="loadSubject(${i})">
+      <b>${esc(s.label)}</b><span>${s.keys?esc(s.keys.join(' + ').replaceAll('_',' ')):'full study bank'}</span>
+    </button>`).join('')}
+  </div>`;
+}
+async function loadSubject(i){
+  const subj=SUBJECTS[i];
+  state.subject=subj;
+  setStatus('loading questions...');
+  app.innerHTML='<div class="loading">Please wait while I load the study bank...</div>';
+  let q=sb.from('mlsboc_questions').select('*').limit(2000);
+  if(subj.keys) q=subj.keys.length>1?q.in('subject',subj.keys):q.eq('subject',subj.keys[0]);
+  const {data,error}=await q;
+  if(error){app.innerHTML='<div class="loading">Could not load questions.</div>';return;}
+  state.bank=shuffle((data||[]).filter(x=>x.question&&optionsFor(x).length>=2));
+  state.correct=0;state.total=0;nextQuestion();
+}
+function nextQuestion(){
+  state.answered=null;
+  if(!state.bank.length){renderSubjects();return;}
+  state.q=state.bank.shift();
+  renderGame();
+}
+function renderGame(){
+  const q=state.q, opts=optionsFor(q), ck=correctKey(q);
+  setStatus(`${state.subject.label} · ${state.total} played`);
+  app.innerHTML=`<div class="game">
+    <aside class="panel">
+      <div class="section-title">subject</div>
+      <h2 style="margin:0;font-size:30px;line-height:1.05">${esc(state.subject.label)}</h2>
+      <div class="score">
+        <div><b>${state.correct}</b><span>correct</span></div>
+        <div><b>${state.total}</b><span>played</span></div>
+      </div>
+      <div class="actions">
+        <button class="ghost" onclick="nextQuestion()">New clue</button>
+        <button class="ghost" onclick="renderSubjects()">Change subject</button>
+      </div>
+    </aside>
+    <section class="question-card">
+      <div class="q-kicker">guess the answer</div>
+      <div class="question">${esc(q.question)}</div>
+      ${q.image_url?`<div class="image-wrap"><img src="${esc(q.image_url)}" alt="" onclick="window.open('${esc(q.image_url)}','_blank')"></div>`:''}
+      <div class="answers">
+        ${opts.map(o=>`<button class="answer" data-k="${o.key}" onclick="chooseAnswer('${o.key}')">${esc(o.text)}</button>`).join('')}
+      </div>
+      <div id="reveal"></div>
+    </section>
+  </div>`;
+}
+function chooseAnswer(k){
+  if(state.answered)return;
+  state.answered=k;
+  state.total++;
+  const q=state.q, ck=correctKey(q), right=k===ck;
+  if(right)state.correct++;
+  document.querySelectorAll('.answer').forEach(btn=>{
+    const bk=btn.dataset.k;
+    if(bk===ck)btn.classList.add('correct');
+    else if(bk===k)btn.classList.add('wrong');
+  });
+  const correctText=(q['option_'+ck]||'');
+  document.getElementById('reveal').innerHTML=`<div class="reveal ${right?'good':'bad'}">${right?'Correct!':'Not this one.'} Answer: ${esc(correctText)}</div>
+    <div class="actions"><button class="primary" style="font-size:18px;padding:13px 20px;border-radius:16px" onclick="nextQuestion()">Next Guess</button></div>`;
+  setStatus(`${state.subject.label} · ${state.correct}/${state.total}`);
+}
+renderIntro();
+</script>
+</body>
+</html>
