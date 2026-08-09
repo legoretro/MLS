@@ -2827,7 +2827,7 @@ async function renderHome(v){
   }).join('');
 
   const practiceCards=[
-    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'📝',title:'Practice Exam',desc:'Timed all-subject BOC-style mock exam across the full study bank.',metaId:'cnt-all',meta:'Practice Exam · 100 questions',onclick:'goAll()'}),
+    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'📝',title:'Practice Exam',desc:'Timed. 100 questions. ASCP-style subject percentages.*',metaId:'cnt-all',meta:'Mock Exam · Weighted Mix',onclick:'goAll()'}),
     homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'∑',title:'Calculations / Reference Ranges',desc:'Formula review and blank memorization exports.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
@@ -9187,7 +9187,7 @@ async function renderAllStart(v){
       <div class="section-title">Practice Exam — All Subjects</div>
     </div>
     <div class="card" style="max-width:560px;margin-bottom:24px">
-      <p style="font-size:13px;color:var(--text2);line-height:1.8">100-question mixed exam following ASCP BOC subject weighting. Timer runs but no time limit.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8">Timed 100-question mock exam using ASCP-style subject percentages.</p>
       <p style="font-size:12px;color:var(--text3);margin-top:4px">Results are not saved. Export your results PDF before leaving. Refer to the assigned book/source for the book discussion.</p>
       <div class="divider"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
