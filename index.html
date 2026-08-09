@@ -133,12 +133,26 @@ select option{background:var(--bg3)}
 .home-utility-icon{width:40px;height:40px;border-radius:13px;background:color-mix(in srgb,var(--accent) 9%,var(--bg3));display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:20px;flex-shrink:0}
 .home-utility-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.2}
 .home-utility-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.35}
-.home-practice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.home-practice-card{position:relative;overflow:hidden;min-height:152px;border:0;border-radius:20px;padding:20px;text-align:left;color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 18px 36px rgba(18,35,74,.16);background:linear-gradient(135deg,var(--practice-color),color-mix(in srgb,var(--practice-color) 74%,#0f172a));transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+.home-practice-grid{display:grid;grid-template-columns:minmax(0,2.25fr) minmax(260px,.85fr);gap:16px;align-items:stretch}
+.home-practice-card{position:relative;overflow:hidden;min-height:168px;border:0;border-radius:20px;padding:20px;text-align:left;color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 18px 36px rgba(18,35,74,.16);background:linear-gradient(135deg,var(--practice-color),color-mix(in srgb,var(--practice-color) 74%,#0f172a));transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
 .home-practice-card::before{content:'';position:absolute;inset:-30% -10% auto auto;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.18)}
 .home-practice-card::after{content:'';position:absolute;inset:auto 18px 18px auto;width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22)}
 .home-practice-card:hover{transform:translateY(-2px);box-shadow:0 23px 46px rgba(18,35,74,.22);filter:saturate(1.05)}
-.home-practice-card.featured{grid-column:span 2}
+.home-practice-card.featured{grid-column:auto}
+.home-practice-card.exam-feature{min-height:270px;padding:30px 34px;background:linear-gradient(135deg,#5630d8 0%,#7354e6 48%,#3f279d 100%);box-shadow:0 24px 54px rgba(82,48,190,.28)}
+.home-practice-card.exam-feature::before{inset:-34% -9% auto auto;width:300px;height:300px;background:rgba(255,255,255,.20)}
+.home-practice-card.exam-feature::after{width:92px;height:92px;border-radius:26px;right:28px;bottom:28px;background:rgba(255,255,255,.18)}
+.home-practice-card.exam-feature .home-practice-icon{width:62px;height:62px;border-radius:20px;font-size:31px;margin-bottom:26px}
+.home-practice-card.exam-feature .home-practice-title{font-size:36px;max-width:600px;margin-bottom:12px}
+.home-practice-card.exam-feature .home-practice-sub{font-size:16px;line-height:1.42;max-width:720px}
+.home-practice-card.exam-feature .home-practice-meta{font-size:15px;margin-top:28px;color:rgba(255,255,255,.86)}
+.home-practice-card.reference-compact{min-height:190px;padding:20px;background:linear-gradient(135deg,#2f7dd1 0%,#2369b4 100%);box-shadow:0 15px 30px rgba(35,105,180,.18)}
+.home-practice-card.reference-compact::before{width:170px;height:170px}
+.home-practice-card.reference-compact::after{width:58px;height:58px;border-radius:16px}
+.home-practice-card.reference-compact .home-practice-icon{width:44px;height:44px;font-size:22px;margin-bottom:14px}
+.home-practice-card.reference-compact .home-practice-title{font-size:20px;max-width:320px}
+.home-practice-card.reference-compact .home-practice-sub{font-size:12px;max-width:330px}
+.home-practice-card.reference-compact .home-practice-meta{font-size:11px}
 .home-practice-icon{position:relative;z-index:1;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.26);font-size:23px;font-weight:900;margin-bottom:18px}
 .home-practice-title{position:relative;z-index:1;font-size:22px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:8px;max-width:420px}
 .home-practice-sub{position:relative;z-index:1;font-size:13px;line-height:1.4;color:rgba(255,255,255,.83);max-width:520px}
@@ -180,7 +194,7 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 @keyframes hub-preview-slide-mobile{0%{transform:translateX(0)}100%{transform:translateX(-1452px)}}
 @media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(126px,42vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-practice-grid{grid-template-columns:1fr}.home-practice-card.featured{grid-column:auto}.home-hubs-preview{min-height:145px}}
-@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-hero-mark{width:min(72px,20vw);border-radius:10px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:130px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview{min-height:150px;padding:12px}.home-hubs-preview-track{position:absolute;left:12px;top:12px;display:flex;grid-template-columns:none;gap:10px;animation:hub-preview-slide-mobile 18s linear infinite}.home-hubs-card:hover .home-hubs-preview-track{animation-duration:11s}.home-hub-tile{width:232px;height:126px;min-height:126px}.home-hub-tile-title{font-size:12px}.home-hub-tile-sub{display:none}.home-hub-feature-list{gap:4px;margin-top:6px}.home-hub-feature-list span{font-size:8px;padding:3px 5px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
+@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-hero-mark{width:min(72px,20vw);border-radius:10px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:130px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-practice-card.exam-feature{min-height:226px;padding:22px}.home-practice-card.exam-feature .home-practice-title{font-size:31px}.home-practice-card.exam-feature .home-practice-sub{font-size:14px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview{min-height:150px;padding:12px}.home-hubs-preview-track{position:absolute;left:12px;top:12px;display:flex;grid-template-columns:none;gap:10px;animation:hub-preview-slide-mobile 18s linear infinite}.home-hubs-card:hover .home-hubs-preview-track{animation-duration:11s}.home-hub-tile{width:232px;height:126px;min-height:126px}.home-hub-tile-title{font-size:12px}.home-hub-tile-sub{display:none}.home-hub-feature-list{gap:4px;margin-top:6px}.home-hub-feature-list span{font-size:8px;padding:3px 5px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
 @media(prefers-reduced-motion:reduce){.home-hubs-preview-track{animation:none!important}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
@@ -1296,7 +1310,7 @@ const BOC_WEIGHT_LABELS = {
 const SUBJECTS = [
   {key:'blood_bank',name:'Blood Bank',icon:'🏥'},
   {key:'clinical_chemistry',name:'Clinical Chemistry',icon:'⚗️'},
-  {key:'hematology',name:'Hematology',icon:'🩸'},
+  {key:'hematology',name:'Hematology/Hemostasis',icon:'🩸'},
   {key:'microbiology',name:'Microbiology',icon:'🦠'},
   {key:'para_myco',name:'Parasitology / Mycology',icon:'🍄🪱',_combined:['parasitology','mycology']},
   {key:'urinalysis',name:'Urinalysis',icon:'🧪'},
@@ -2787,7 +2801,8 @@ function homeSubjectCardHtml(cfg){
 }
 
 function homePracticeCardHtml(cfg){
-  return '<button class="home-practice-card '+(cfg.featured?'featured':'')+'" style="--practice-color:'+cfg.color+'" onclick="'+cfg.onclick+'">'
+  const classes=['home-practice-card',cfg.featured?'featured':'',cfg.className||''].filter(Boolean).join(' ');
+  return '<button class="'+classes+'" style="--practice-color:'+cfg.color+'" onclick="'+cfg.onclick+'">'
     + '<div><div class="home-practice-icon">'+cfg.icon+'</div><div class="home-practice-title">'+cfg.title+'</div><div class="home-practice-sub">'+cfg.desc+'</div></div>'
     + '<div class="home-practice-meta" id="'+cfg.metaId+'">'+cfg.meta+'</div>'
     + '</button>';
@@ -2812,8 +2827,8 @@ async function renderHome(v){
   }).join('');
 
   const practiceCards=[
-    homePracticeCardHtml({featured:true,color:'#6d5bd8',icon:'📝',title:'Practice Exam',desc:'Timed all-subject BOC-style practice across the full study bank.',metaId:'cnt-all',meta:'Practice Exam · 100 questions',onclick:'goAll()'}),
-    homePracticeCardHtml({color:'#2f7dd1',icon:'∑',title:'Calculations / Reference Ranges',desc:'Formula review, reference ranges, and blank memorization exports.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
+    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'📝',title:'Practice Exam',desc:'Timed all-subject BOC-style mock exam across the full study bank.',metaId:'cnt-all',meta:'Practice Exam · 100 questions',onclick:'goAll()'}),
+    homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'∑',title:'Calculations / Reference Ranges',desc:'Formula review and blank memorization exports.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
   v.innerHTML = '<div class="home-dashboard">'
@@ -2824,12 +2839,12 @@ async function renderHome(v){
     + homeMascotScene()
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div><div class="home-section-sub">Start with a subject, then practice or review images.</div></div></div>'
-    + '<div class="home-subject-grid">' + cards + '</div>'
-    + '</section>'
-    + '<section class="home-section">'
     + '<div class="home-section-head"><div><div class="home-section-title">Exam Practice</div><div class="home-section-sub">Timed exams, formulas, and ranges live here instead of mixed into subjects.</div></div></div>'
     + '<div class="home-practice-grid">' + practiceCards + '</div>'
+    + '</section>'
+    + '<section class="home-section">'
+    + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div><div class="home-section-sub">Start with a subject, then practice or review images.</div></div></div>'
+    + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
     + '<div class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}">'
@@ -3321,8 +3336,8 @@ async function renderQuizTab(el){
     <div class="bbq-overlay">
       <div class="bbq-header">
         <button class="btn btn-ghost btn-sm" onclick="switchTab('quiz')">✕ Exit</button>
+        <button class="btn btn-ghost btn-sm" style="white-space:nowrap" onclick="replaceCurrentQuizQuestion()" ${answered?'disabled title="Answered questions stay in your results."':'title="Swap this for another question from this subject."'}>↻ Replace current question with another</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <button class="btn btn-ghost btn-sm" onclick="replaceCurrentQuizQuestion()" ${answered?'disabled title="Answered questions stay in your results."':'title="Swap this for another question from this subject."'}>↻ Replace</button>
         <span class="quiz-mini-note">seen ${quizSeenCount(q)}x</span>
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
       </div>
