@@ -6487,7 +6487,6 @@ async function renderMycologyCases(el){
 // ─── SHARED SUBJECT CASE RENDERER ─────────────────────────────────────────────
 async function renderSubjectCases(el, cfg){
   const qmKey=cfg.quizModeKey;
-  if(appState[qmKey]&&!isAdmin)appState[qmKey]=false;
   if(appState[qmKey]){renderSubjectCaseQuiz(el,cfg);return;}
   const {data}=await sb.from(cfg.dbTable).select('*').order('created_at');
   const cases=(data||[]).map(withTableData);
@@ -6502,7 +6501,7 @@ async function renderSubjectCases(el, cfg){
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
         <button class="btn btn-ghost btn-sm" onclick="openSubjectExportModal('${cfg.dbTable}','${cfg.tableField}','${cfg.tableLabel}','${cfg.exportTitle}')">📄 Export</button>
-        ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+        ${allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
@@ -6632,7 +6631,6 @@ function resetSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId])delete appS
 
 // ─── SUBJECT CASE QUIZ MODE ────────────────────────────────────────────────────
 async function startSubjectCaseQuiz(qmKey,dbTable,tableField){
-  if(!isAdmin){alert('Quiz mode is available in Admin mode only for case activities.');return;}
   const {data}=await sb.from(dbTable).select('*').order('created_at');
   const cases=(data||[]).map(withTableData);
   const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
@@ -7058,13 +7056,15 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
   }
   window._subjectExportCases=cases;
   window._subjectExportMeta={tableField,tableLabel,exportTitle};
+  const hasQuestions=cases.some(c=>(c.questions||[]).some(q=>q.question));
   let html=`
     <div class="flex-center gap-8 mb-16">
       <div style="font-size:16px;font-weight:600">Export ${exportTitle}</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select cases to include.</div>
-      ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answers not available in regular view. Exports include cases and options only.</div>`:''}
+      ${hasQuestions&&caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Admin export includes an answer key page after the case pages.</div>`:''}
+      ${hasQuestions&&!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answer-key export is Admin only. Regular exports include cases and options only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=false)">Deselect All</button>
@@ -7079,7 +7079,7 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
   html+=`
     <div style="display:flex;gap:8px;margin-top:20px">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
-      <button class="btn btn-primary" onclick="generateSubjectCasePDFFromModal()">📄 Generate PDF</button>
+      <button class="btn btn-primary" onclick="generateSubjectCasePDFFromModal()">📄 ${hasQuestions&&caseAnswersAvailable()?'Generate PDF + Answer Key':'Generate PDF'}</button>
     </div>`;
   document.getElementById('condition-modal-body').innerHTML=html;
 }
@@ -7101,6 +7101,8 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
     let y=margin;let first=true;
+    const hasAnyQuestions=selected.some(c=>(c.questions||[]).length>0);
+    const includeAnswerKey=hasAnyQuestions&&caseAnswersAvailable();
     const checkPage=(n=10)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
     const writeText=(text,opts={})=>{
       const {size=11,bold=false,color=[30,30,30],indent=0}=opts;
@@ -7149,8 +7151,37 @@ function generateSubjectCasePDF(data,tableField,tableLabel,exportTitle){
         });
       }
     });
+    if(includeAnswerKey){
+      doc.addPage();y=margin;
+      doc.setFillColor(40,40,40);doc.rect(margin,y,cW,12,'F');
+      doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+      doc.text('ANSWER KEY',(pageW/2),y+8.5,{align:'center'});y+=16;
+
+      let globalQ=1;
+      const letters=['a','b','c','d','e'];
+      selected.forEach((c,ci)=>{
+        const qs=c.questions||[];
+        if(!qs.length)return;
+        checkPage(16);
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(40,40,40);
+        doc.text(`Case ${ci+1}: ${c.title||'Untitled'}`,margin,y);y+=7;
+        qs.forEach(q=>{
+          checkPage(14);
+          const correctLetter=String(q.correct||'').toLowerCase();
+          const correctIdx=letters.indexOf(correctLetter);
+          const correctText=(q.options||[])[correctIdx]||'';
+          writeText(`Q${globalQ}. ${correctLetter.toUpperCase()}. ${correctText}`,{size:10,bold:true,color:[20,120,60]});
+          y+=3;globalQ++;
+        });
+      });
+    }
     const tot=doc.internal.getNumberOfPages();
-    for(let p=1;p<=tot;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text('MLS BOC Prep — '+exportTitle+' · Page '+p+' of '+tot,margin,pageH-8);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});}
+    for(let p=1;p<=tot;p++){
+      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+      const label=p===tot&&includeAnswerKey?'Answer Key':`Page ${p} of ${includeAnswerKey?tot-1:tot}`;
+      doc.text('MLS BOC Prep — '+exportTitle+' · '+label,margin,pageH-8);
+      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
+    }
     doc.save(exportTitle.replace(/\s+/g,'_').toLowerCase()+'_cases.pdf');
     document.getElementById('condition-modal').classList.add('hidden');
   }catch(err){alert('PDF export failed: '+err.message);}
@@ -8072,7 +8103,6 @@ async function deleteMicroCase(id){
 
 // ─── BLOOD BANK CASES (MC question system) ────────────────────────────────────
 async function renderBloodBankCases(el){
-  if(appState.bbQuizMode&&!isAdmin)appState.bbQuizMode=false;
   if(appState.bbQuizMode){renderBBQuiz(el);return;}
   const {data:_bbRaw}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
   const data=(_bbRaw||[]).map(withTableData);
@@ -8089,7 +8119,7 @@ async function renderBloodBankCases(el){
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
         <button class="btn btn-ghost btn-sm" onclick="openExportModal('bb')">📄 Export</button>
-        ${isAdmin&&allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
+        ${allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
@@ -8100,7 +8130,6 @@ async function renderBloodBankCases(el){
 
 // ─── BLOOD BANK QUIZ MODE ─────────────────────────────────────────────────────
 async function startBBQuiz(){
-  if(!isAdmin){alert('Quiz mode is available in Admin mode only for case activities.');return;}
   const {data:_bq1}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
   const data=(_bq1||[]).map(withTableData);
   const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
@@ -9691,6 +9720,7 @@ async function openExportModal(sourceKeys){
   }
 
   _exportCases=sources;
+  const hasQuestions=sources.some(src=>(src.data||[]).some(c=>(c.questions||[]).some(q=>q.question)));
 
   let html=`
     <div class="flex-center gap-8 mb-16">
@@ -9698,7 +9728,8 @@ async function openExportModal(sourceKeys){
       ${closeBtn}
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Select cases to include — all go into one PDF.</div>
-      ${!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answers not available in regular view. Exports will include cases and options only.</div>`:''}
+      ${hasQuestions&&caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Admin export includes an answer key page after the case pages.</div>`:''}
+      ${hasQuestions&&!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answer-key export is Admin only. Regular exports include cases and options only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(false)">Deselect All</button>
@@ -9719,7 +9750,7 @@ async function openExportModal(sourceKeys){
   html+=`
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
-      <button class="btn btn-primary" onclick="generateCasePDF()">📄 Generate PDF</button>
+      <button class="btn btn-primary" onclick="generateCasePDF()">📄 ${hasQuestions&&caseAnswersAvailable()?'Generate PDF + Answer Key':'Generate PDF'}</button>
     </div>`;
 
   modalBody.innerHTML=html;
