@@ -2057,7 +2057,7 @@ window.__appInit = async function(){
     const _t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('to'),ms));
     localStorage.setItem('mlsboc_seeded','disabled');
     await Promise.race([
-      Promise.all([loadIconCache(),loadFolderIconCache(),loadClassIconCache()]),
+      Promise.all([loadIconCache(),loadFolderIconCache()]),
       _t(5000)
     ]).catch(()=>{});
     // Restore last navigation position
@@ -2071,11 +2071,6 @@ window.__appInit = async function(){
           appState.subjectTab=nav.subjectTab||'quiz';
         }else if(nav.view==='formulas'){
           appState.view='formulas';
-        }else if(nav.view==='class'&&nav.classSubject){
-          appState.view='class';appState.classView='subject';
-          appState.classSubject=nav.classSubject;
-        }else if(nav.view==='class'){
-          appState.view='class';appState.classView=null;
         }
         // 'all' exam and quiz mid-session intentionally not restored
       }
@@ -2701,15 +2696,25 @@ async function checkAdmin(){
   const hashHex=Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   if(hashHex===ADMIN_PW_HASH){
     isAdmin=true;
+    await loadClassIconCache();
     document.getElementById('admin-bar-el').classList.remove('hidden');
     refreshQuizMediaAdminUi();
     closeAdminModal();renderView();
   }else{document.getElementById('admin-err').textContent='Wrong password.';}
 }
-function exitAdmin(){isAdmin=false;document.getElementById('admin-bar-el').classList.add('hidden');renderView();}
+function exitAdmin(){
+  isAdmin=false;
+  if(appState.view==='class'){
+    appState.view='home';appState.classView=null;appState.classSubject=null;appState.classSet=null;
+  }
+  document.getElementById('admin-bar-el').classList.add('hidden');renderView();
+}
 
 // ─── ROUTING ──────────────────────────────────────────────────────────────────
 function renderView(){
+  if(appState.view==='class'&&!isAdmin){
+    appState.view='home';appState.classView=null;appState.classSubject=null;appState.classSet=null;
+  }
   // Persist navigation state so refresh restores position
   try{sessionStorage.setItem('mlsboc_nav',JSON.stringify({
     view:appState.view,
@@ -2933,6 +2938,20 @@ async function renderHome(v){
     homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'',title:'Calculations / Reference Ranges',desc:'Formula sheets and conventional-unit ranges for quick review.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
+  const classMaterialSection=isAdmin
+    ? '<div class="mt-24">'
+      + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
+      + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
+      + '<div class="class-material-grid" id="class-material-grid">'
+      + CLASS_SUBJECTS.map(s=>{
+          const uploadBtn='<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleClassIconFile(event,\''+s.key+'\')" onclick="event.stopPropagation()"></label>';
+          return '<div style="position:relative">'
+            + renderClassMaterialCard(s,'ccnt-'+s.key,'csicon-'+s.key)
+            + uploadBtn + '</div>';
+        }).join('')
+      + '</div></div>'
+    : '';
+
   v.innerHTML = '<div class="home-dashboard">'
     + '<section class="home-hero">'
     + '<div><div class="home-kicker">Student Created • For Studying Purposes Only</div>'
@@ -2962,20 +2981,7 @@ async function renderHome(v){
     + '<section class="home-section"><div class="home-utility-grid" style="grid-template-columns:1fr">'
     + '<button class="home-utility-card" onclick="goResources()"><div class="home-utility-icon">📚</div><div style="min-width:0;flex:1"><div class="home-utility-title">Resources</div><div class="home-utility-sub">Citation starter list for study materials</div></div><div class="home-subject-arrow">›</div></button>'
     + '</div></section>'
-    + '<div class="mt-24">'
-    + '<div class="flex-center gap-12 mb-4"><div class="section-title" style="font-size:16px">Class Material</div></div>'
-    + '<div class="section-sub" style="margin-bottom:14px">Subject-specific question sets, quizzes &amp; flashcards</div>'
-    + '<div class="class-material-grid" id="class-material-grid">'
-    + CLASS_SUBJECTS.map(s=>{
-        const uploadBtn = isAdmin
-          ? '<label style="position:absolute;bottom:4px;right:4px;background:#000b;color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;z-index:10" onclick="event.stopPropagation()">📷<input type="file" accept="image/*" style="display:none" onchange="handleClassIconFile(event,\''+s.key+'\')" onclick="event.stopPropagation()"></label>'
-          : '';
-        return '<div style="position:relative">'
-          + renderClassMaterialCard(s,'ccnt-'+s.key,'csicon-'+s.key)
-          + uploadBtn + '</div>';
-      }).join('')
-    + '</div>'
-    + '</div>'
+    + classMaterialSection
     + '<div class="mt-24" id="attempts-home"></div>'
     + '</div>';
 
@@ -2996,15 +3002,17 @@ async function renderHome(v){
     const el=document.getElementById('cnt-formulas');
     if(el)el.textContent=((count||0)+CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges';
   }).catch(()=>{});
-  CLASS_SUBJECTS.forEach(async s=>{
-    let count=0;
-    try{
-      const res=await sb.from('mlsboc_class_sets').select('id',{count:'exact',head:true}).eq('subject',s.key);
-      count=res.count||0;
-    }catch(e){}
-    const el=document.getElementById('ccnt-'+s.key);
-    if(el)el.textContent=count+' sets';
-  });
+  if(isAdmin){
+    CLASS_SUBJECTS.forEach(async s=>{
+      let count=0;
+      try{
+        const res=await sb.from('mlsboc_class_sets').select('id',{count:'exact',head:true}).eq('subject',s.key);
+        count=res.count||0;
+      }catch(e){}
+      const el=document.getElementById('ccnt-'+s.key);
+      if(el)el.textContent=count+' sets';
+    });
+  }
   loadAttemptsHome();
   loadInteractiveLinks();
 }
@@ -3336,7 +3344,7 @@ function goFormulas(){appState.view='formulas';renderView();}
 function goHome(){appState.view='home';clearInterval(appState.allTimer);if(location.hash)history.replaceState(null,'',location.pathname+location.search);renderView();}
 function goInteractive(){appState.view='interactive';history.replaceState(null,'',location.pathname+location.search+'#interactive');renderView();}
 function goResources(){appState.view='resources';renderView();}
-function goClass(){appState.view='class';appState.classView=null;appState.classSubject=null;appState.classSet=null;renderView();}
+function goClass(){if(!isAdmin)return;appState.view='class';appState.classView=null;appState.classSubject=null;appState.classSet=null;renderView();}
 
 function renderSubjectView(v){
   const s=SUBJECTS.find(x=>x.key===appState.subject);
@@ -10274,11 +10282,13 @@ async function generateCasePDF(){
 
 // ─── CLASS MATERIAL ──────────────────────────────────────────────────────────
 function goClassSubject(key){
+  if(!isAdmin)return;
   appState.view='class';appState.classView='subject';appState.classSubject=key;
   appState.classSet=null;renderView();
 }
 
 async function renderClassView(v){
+  if(!isAdmin){goHome();return;}
   if(appState.classView==='quiz')    {renderClassQuiz(v);return;}
   if(appState.classView==='flashcard'){renderClassFlashcard(v);return;}
   if(appState.classView==='set')     {await renderClassSetView(v);return;}
