@@ -174,8 +174,9 @@ select option{background:var(--bg3)}
 .exam-sim-stat-row strong{font-weight:700}
 .exam-sim-finalize{display:block;width:100%;border:0;background:#123f70;color:#fff;border-radius:3px;padding:11px 12px;font-size:15px;font-weight:600;text-decoration:underline;cursor:pointer;margin:18px 0 20px}
 .exam-sim-finalize:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed;text-decoration:none}
-.exam-sim-mastered{width:100%;border:1px solid #b8c4d6;background:#f8fafc;color:#1f2a44;border-radius:4px;padding:10px 10px;font-size:12px;font-weight:700;line-height:1.3;cursor:pointer;margin-bottom:18px;text-align:center}
-.exam-sim-mastered:disabled{color:#94a3b8;background:#f1f5f9;cursor:not-allowed}
+.exam-sim-mastered{width:100%;border:1px solid #e0bd45;background:#fff1a8;color:#4f3f08;border-radius:6px;padding:11px 10px;font-size:12px;font-weight:800;line-height:1.3;cursor:pointer;margin-bottom:18px;text-align:center;box-shadow:0 5px 14px rgba(177,133,0,.14);transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.exam-sim-mastered:hover:not(:disabled){background:#ffe985;border-color:#cfa71d;transform:translateY(-1px)}
+.exam-sim-mastered:disabled{color:#9a8d63;background:#f8f1d2;border-color:#e4d8a8;box-shadow:none;cursor:not-allowed}
 .exam-sim-list-title{font-size:14px;color:#111827;margin:10px 0 8px}
 .exam-sim-question-list{display:flex;flex-direction:column;gap:0;max-height:360px;overflow:auto;padding-right:4px}
 .exam-sim-list-item{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;align-items:start;border:0;background:transparent;text-align:left;color:#1593a5;font-size:12px;line-height:1.35;padding:5px 3px;cursor:pointer}
@@ -1388,15 +1389,15 @@ const SB_URL = 'https://rbdvjwipedbxfbedjgoa.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiZHZqd2lwZWRieGZiZWRqZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjY5MzAsImV4cCI6MjA5MTYwMjkzMH0.cVUMRdER6h799WBspLVaCABbxkQ2Wi4GOOc5s5EghJQ';
 const HUB_URL = 'https://legoretro.github.io/Hubs/';
 
-// Real ASCP BOC weights from guideline (% of 100)
+// Full 100-question blueprint. Each quota stays within the published BOC range.
 const BOC_WEIGHTS = {
-  blood_bank: 19.5,       // 17-22%
-  clinical_chemistry: 19.5, // 17-22%
-  hematology: 19.5,       // 17-22%
-  microbiology: 19.5,     // 17-22%
-  urinalysis: 7.5,        // 5-10%
-  immunology: 7.5,        // 5-10%
-  lab_operations: 7.5     // 5-10%
+  blood_bank: 20,          // 17-22%
+  clinical_chemistry: 20,  // 17-22%
+  hematology: 20,          // 17-22%
+  microbiology: 20,        // 17-22%
+  urinalysis: 7,           // 5-10%
+  immunology: 7,           // 5-10%
+  lab_operations: 6        // 5-10%
 };
 
 const BOC_WEIGHT_LABELS = {
@@ -2934,7 +2935,7 @@ async function renderHome(v){
   }).join('');
 
   const practiceCards=[
-    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'Timed · 100 questions · weighted by subject %',metaId:'cnt-all',meta:'100 Questions · Weighted Mix',onclick:'goAll()'}),
+    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'Timed · weighted by subject % · built from loaded question banks',metaId:'cnt-all',meta:'Calculating available weighted mix...',onclick:'goAll()'}),
     homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'',title:'Calculations / Reference Ranges',desc:'Formula sheets and conventional-unit ranges for quick review.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
@@ -2985,6 +2986,7 @@ async function renderHome(v){
     + '<div class="mt-24" id="attempts-home"></div>'
     + '</div>';
 
+  refreshHomePracticeExamCount();
   SUBJECTS.filter(s=>!s._hidden).forEach(async s=>{
     if(s._combined){
       // Count questions from both combined subjects
@@ -3452,6 +3454,7 @@ async function renderQuizTab(el){
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
       </div>
       <div class="bbq-body">
+        ${quizSourceLabel(q)?`<div style="text-align:center;color:var(--text2);font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:10px">${esc(quizSourceLabel(q))}</div>`:''}
         <div class="bbq-question">${renderQuestionWithMedia(q)}</div>
         <div class="bbq-options">
           ${opts.map((opt,oi)=>`
@@ -3525,6 +3528,22 @@ function quizContinuousNumber(q){
 function quizBookQuestionNumber(q){
   return numericQuestionMeta(q,['book_question','book_question_number','source_question','source_question_number'],[/book question\s*(\d+)/i,/source question\s*(\d+)/i]);
 }
+function quizSourceSection(q){
+  for(const field of ['book_section','source_section','section_number','book_section_number']){
+    const value=String(q?.[field]||'').trim();
+    if(/^\d+(?:\.\d+)?$/.test(value))return value;
+  }
+  const text=String(q?.explanation||q?.source_note||q?.notes||'');
+  const match=text.match(/section\s+(\d+(?:\.\d+)?)/i);
+  return match?match[1]:'';
+}
+function quizSourceLabel(q){
+  const section=quizSourceSection(q);
+  const bookQuestion=quizBookQuestionNumber(q);
+  if(section&&bookQuestion)return `Section ${section} · Book Q${bookQuestion}`;
+  if(section)return `Section ${section}`;
+  return bookQuestion?`Book Q${bookQuestion}`:'';
+}
 function quizSectionSortValue(q){
   const explicit=Number(q?.section_sort||q?.section_number||q?.book_section_sort);
   if(Number.isFinite(explicit))return explicit;
@@ -3584,11 +3603,12 @@ function renderHiddenQuestionBankNote(){
 function renderQuizQuestionRow(q,i){
   const correct=q.correct_answer||'a';
   const correctText=q['option_'+correct]||'';
+  const sourceLabel=quizSourceLabel(q);
   return `
     <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
       <div class="flex-center gap-8 mb-8 flex-wrap">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">Q${quizBookOrderNumber(q,i)}</span>
-        ${quizBookQuestionNumber(q)?`<span class="tag tag-info">Book Q${quizBookQuestionNumber(q)}</span>`:''}
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">#${quizBookOrderNumber(q,i)}</span>
+        ${sourceLabel?`<span class="tag tag-info">${esc(sourceLabel)}</span>`:''}
         ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
         ${isAdmin?`<button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>`:''}
@@ -3783,6 +3803,7 @@ function renderQuizResults(el,isAll){
     ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
     ${missed.map(({q,given})=>`
       <div class="missed-item">
+        ${quizSourceLabel(q)?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text3);margin-bottom:5px">${esc(quizSourceLabel(q))}</div>`:''}
         <div class="missed-q">${renderQuestionWithMedia(q)}</div>
         ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:6px 0">${renderDataTable(q.table_data,{small:true})}</div>`:''}
         <div class="missed-wrong">Your answer: ${given?esc(q['option_'+given]):'(unanswered)'}</div>
@@ -3852,8 +3873,9 @@ function exportResultsPDF(isAll=false){
       checkPage(30);
       const given=ans[i];
       const ok=given===q.correct_answer;
+      const sourceLabel=quizSourceLabel(q);
       doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...(ok?[20,120,60]:[180,40,40]));
-      doc.text(`${i+1}. ${ok?'Correct':'Missed'}${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}`,margin,y);y+=5;
+      doc.text(`${i+1}. ${ok?'Correct':'Missed'}${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,margin,y);y+=5;
       writeText(cleanQuestionText(q),{size:9.5,bold:true,color:[20,20,20]});
       doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(70,70,70);
       checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
@@ -9413,7 +9435,42 @@ async function renderAllView(v){
   renderAllExam(v);
 }
 
+async function fetchPracticeExamPoolCount(key){
+  if(key==='microbiology'){
+    const counts=await Promise.all(['microbiology','parasitology','mycology'].map(subject=>
+      sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',subject)
+    ));
+    return counts.reduce((sum,result)=>sum+(result.count||0),0);
+  }
+  const {count}=await sb.from('mlsboc_questions').select('id',{count:'exact',head:true}).eq('subject',key);
+  return count||0;
+}
+async function fetchPracticeExamAvailability(){
+  const entries=await Promise.all(Object.keys(BOC_WEIGHTS).map(async key=>[key,await fetchPracticeExamPoolCount(key)]));
+  return Object.fromEntries(entries);
+}
+function practiceExamPlannedCount(key,available){
+  return Math.min(Number(available?.[key]||0),Number(BOC_WEIGHTS[key]||0));
+}
+function practiceExamPlannedTotal(available){
+  return Object.keys(BOC_WEIGHTS).reduce((sum,key)=>sum+practiceExamPlannedCount(key,available),0);
+}
+async function refreshHomePracticeExamCount(){
+  const el=document.getElementById('cnt-all');
+  if(!el)return;
+  try{
+    const available=await fetchPracticeExamAvailability();
+    const total=practiceExamPlannedTotal(available);
+    if(document.getElementById('cnt-all'))document.getElementById('cnt-all').textContent=total+' Questions · Weighted Mix';
+  }catch(e){
+    if(document.getElementById('cnt-all'))document.getElementById('cnt-all').textContent='Weighted Mix';
+  }
+}
+
 async function renderAllStart(v){
+  const available=await fetchPracticeExamAvailability().catch(()=>({}));
+  if(appState.view!=='all'||appState.allStarted)return;
+  const plannedTotal=practiceExamPlannedTotal(available);
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
@@ -9421,7 +9478,7 @@ async function renderAllStart(v){
     </div>
     <div class="exam-sim-start">
       <h2>Practice Exam Simulator</h2>
-      <p><strong>100 timed questions weighted by subject %.</strong></p>
+      <p><strong>${plannedTotal} timed questions weighted by subject %.</strong></p>
       <p>Answer in order. Feedback stays hidden during the exam, and back review unlocks only after all questions are answered.</p>
       <p>Results are not saved. Export your report before starting another exam.</p>
       <div class="divider"></div>
@@ -9429,10 +9486,10 @@ async function renderAllStart(v){
         ${Object.entries(BOC_WEIGHTS).map(([s,w])=>`
           <div class="exam-sim-weight-row">
             <strong>${subjectDisplayName(s)}${s==='microbiology'?' (incl. parasitology & mycology)':''}</strong>
-            <span>${bocWeightLabel(s)}</span>
+            <span>${bocWeightLabel(s)} · ${practiceExamPlannedCount(s,available)} Q</span>
           </div>`).join('')}
       </div>
-      <button class="btn btn-primary" onclick="startAllExam()">Start Practice Exam Simulator</button>
+      <button class="btn btn-primary" onclick="startAllExam()" ${plannedTotal?'':'disabled'}>Start ${plannedTotal}-Question Practice Exam</button>
     </div>
   `;
 }
@@ -9457,33 +9514,21 @@ function addUniquePracticeQuestion(target,q,used){
   return true;
 }
 async function startAllExam(){
-  const total=100;
   const weightedKeys=Object.keys(BOC_WEIGHTS);
   const pools={};
   await Promise.all(weightedKeys.map(async key=>{pools[key]=await fetchPracticeExamPool(key);}));
   const selected=[];
   const used=new Set();
   weightedKeys.forEach(key=>{
-    const count=Math.round(total*(BOC_WEIGHTS[key]||0)/100);
+    const count=Math.min(Number(BOC_WEIGHTS[key]||0),(pools[key]||[]).length);
     pickQuizQuestions(pools[key]||[],count).forEach(q=>addUniquePracticeQuestion(selected,q,used));
   });
   const allAvailable=weightedKeys.flatMap(key=>pools[key]||[]);
-  pickQuizQuestions(allAvailable,total).forEach(q=>{
-    if(selected.length<total)addUniquePracticeQuestion(selected,q,used);
-  });
   if(!selected.length){alert('No questions available. Add questions to subject banks first.');return;}
-  if(selected.length<total&&allAvailable.length){
-    const repeatPool=pickQuizQuestions(allAvailable,total);
-    let i=0;
-    while(selected.length<total&&repeatPool.length){
-      selected.push({...repeatPool[i%repeatPool.length],_practiceRepeat:true});
-      i++;
-    }
-  }
 
   window._kqOpts={};
   appState.allPool=allAvailable;
-  appState.allQ=shuffle(selected).slice(0,total);
+  appState.allQ=shuffle(selected);
   appState.allIdx=0;
   appState.allAns=Array(appState.allQ.length).fill(null);
   appState.allPending=null;
@@ -9509,6 +9554,8 @@ function fmtExamElapsed(seconds){
 function allExamTopicPath(q){
   const parts=[];
   if(q&&q.subject)parts.push(subjectDisplayName(q.subject));
+  const sourceLabel=quizSourceLabel(q);
+  if(sourceLabel)parts.push(sourceLabel);
   const raw=q&&(q.topic_path||q.topicPath||q.topic||q.category||'');
   String(raw||'').split(/[>\/|]+/).map(p=>p.trim()).filter(Boolean).forEach(p=>parts.push(p));
   return parts.filter((p,i,a)=>a.indexOf(p)===i).join(' → ');
@@ -9621,13 +9668,15 @@ function replaceCurrentAllQuestion(){
   if(!appState.allStarted||appState.allDone||appState.allReviewUnlocked||!appState.allQ.length)return;
   if(appState.allAns[appState.allIdx]){alert('This question is already answered. Replace before answering so the exam stays clean.');return;}
   const idx=appState.allIdx;
-  const currentKey=quizQuestionKey(appState.allQ[idx]);
+  const current=appState.allQ[idx];
+  const currentKey=quizQuestionKey(current);
+  const currentSubject=current?.subject||'';
   const used=new Set(appState.allQ.map((q,i)=>i===idx?null:quizQuestionKey(q)).filter(Boolean));
   const candidates=(appState.allPool||[]).filter(q=>{
     const key=quizQuestionKey(q);
-    return key&&key!==currentKey&&!used.has(key);
+    return q?.subject===currentSubject&&key&&key!==currentKey&&!used.has(key);
   });
-  if(!candidates.length){alert('No unused replacement questions are available for this simulator attempt.');return;}
+  if(!candidates.length){alert('No unused replacement questions are available for '+subjectDisplayName(currentSubject)+'.');return;}
   appState.allQ[idx]=pickQuizQuestions(candidates,1)[0];
   appState.allAns[idx]=null;
   appState.allPending=null;
