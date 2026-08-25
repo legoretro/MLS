@@ -2935,7 +2935,7 @@ async function renderHome(v){
   }).join('');
 
   const practiceCards=[
-    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'Timed · weighted by subject % · built from loaded question banks',metaId:'cnt-all',meta:'Calculating available weighted mix...',onclick:'goAll()'}),
+    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'Questions from the Subject Card banks, based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr.<br>Uses BOC-style subject weighting. Practice only.',metaId:'cnt-all',meta:'Calculating BOC-style practice mix...',onclick:'goAll()'}),
     homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'',title:'Calculations / Reference Ranges',desc:'Formula sheets and conventional-unit ranges for quick review.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
@@ -9461,9 +9461,9 @@ async function refreshHomePracticeExamCount(){
   try{
     const available=await fetchPracticeExamAvailability();
     const total=practiceExamPlannedTotal(available);
-    if(document.getElementById('cnt-all'))document.getElementById('cnt-all').textContent=total+' Questions · Weighted Mix';
+    if(document.getElementById('cnt-all'))document.getElementById('cnt-all').textContent=total+' Questions · BOC-Style Practice Mix';
   }catch(e){
-    if(document.getElementById('cnt-all'))document.getElementById('cnt-all').textContent='Weighted Mix';
+    if(document.getElementById('cnt-all'))document.getElementById('cnt-all').textContent='BOC-Style Practice Mix';
   }
 }
 
@@ -9478,7 +9478,8 @@ async function renderAllStart(v){
     </div>
     <div class="exam-sim-start">
       <h2>Practice Exam Simulator</h2>
-      <p><strong>${plannedTotal} timed questions weighted by subject %.</strong></p>
+      <p><strong>${plannedTotal} timed practice questions drawn from the loaded Subject Card question banks.</strong></p>
+      <p>Questions are based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr. The subject mix mimics BOC-style weighting for practice only and is not an official BOC exam.</p>
       <p>Answer in order. Feedback stays hidden during the exam, and back review unlocks only after all questions are answered.</p>
       <p>Results are not saved. Export your report before starting another exam.</p>
       <div class="divider"></div>
