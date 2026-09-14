@@ -319,6 +319,10 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-unit{font-size:11px;color:var(--text3);margin-left:4px;font-weight:600}
 
 /* Quiz */
+.admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
+.admin-quiz-explanation-label{color:var(--danger);font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.admin-quiz-explanation-text{color:var(--danger);font-size:12px;line-height:1.55;white-space:pre-wrap}
+.admin-quiz-explanation.missing .admin-quiz-explanation-text{font-style:italic;opacity:.82}
 .quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
 /* ── Progress bar — liquid glass fill ──────────────────────────────────── */
 .progress-bar{
@@ -3648,7 +3652,7 @@ function renderQuizQuestionBank(questions){
       <div class="flex-center gap-8 mb-12 flex-wrap">
         <div>
           <div class="section-title" style="font-size:15px">Question Bank</div>
-          <p class="text-muted mt-4" style="font-size:12px">Admin/QC view stays in book order. Quizzes and exams still shuffle separately.</p>
+          <p class="text-muted mt-4" style="font-size:12px">Admin/QC view stays in book order. Explanations are shown in red. Quizzes and exams still shuffle separately.</p>
         </div>
         <span class="tag tag-info ml-auto">${questions.length} total</span>
       </div>
@@ -3673,7 +3677,8 @@ function renderQuizQuestionRow(q,i){
   const correct=q.correct_answer||'a';
   const correctText=q['option_'+correct]||'';
   const sourceLabel=quizSourceLabel(q);
-  const hasExplanation=!!quizBookExplanation(q);
+  const explanation=quizBookExplanation(q);
+  const hasExplanation=!!explanation;
   return `
     <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
       <div class="flex-center gap-8 mb-8 flex-wrap">
@@ -3695,6 +3700,12 @@ function renderQuizQuestionRow(q,i){
           </div>`).join('')}
       </div>
       ${correctText?`<div style="font-size:11px;color:var(--success);margin-top:6px;font-family:var(--mono)">Correct: ${esc(correctText)}</div>`:''}
+      ${isAdmin?`
+        <div class="admin-quiz-explanation${hasExplanation?'':' missing'}">
+          <div class="admin-quiz-explanation-label">Explanation</div>
+          <div class="admin-quiz-explanation-text">${hasExplanation?escNL(explanation):'No explanation added yet. Use Edit to add one.'}</div>
+        </div>
+      `:''}
     </div>
   `;
 }
