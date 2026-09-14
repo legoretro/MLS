@@ -3554,14 +3554,21 @@ function quizSourceLabel(q){
   if(section)return `Section ${section}`;
   return bookQuestion?`Book Q${bookQuestion}`:'';
 }
-function quizBookExplanation(q){
+function quizExplanationParts(q){
   const raw=String(q?.explanation||'').trim();
-  if(!raw)return '';
+  if(!raw)return {raw:'',text:'',sourceSuffix:''};
   const marker='\n\nSource:';
   const markerIndex=raw.indexOf(marker);
   const text=(markerIndex>=0?raw.slice(0,markerIndex):raw).trim();
-  if(/^Refer to\s+.+?\s+for explanation\./i.test(text))return '';
-  return text;
+  const sourceSuffix=markerIndex>=0?raw.slice(markerIndex):'';
+  return {
+    raw,
+    text:/^Refer to\s+.+?\s+for explanation\./i.test(text)?'':text,
+    sourceSuffix
+  };
+}
+function quizBookExplanation(q){
+  return quizExplanationParts(q).text;
 }
 function quizSectionSortValue(q){
   const explicit=Number(q?.section_sort||q?.section_number||q?.book_section_sort);
@@ -3623,6 +3630,7 @@ function renderQuizQuestionRow(q,i){
   const correct=q.correct_answer||'a';
   const correctText=q['option_'+correct]||'';
   const sourceLabel=quizSourceLabel(q);
+  const hasExplanation=!!quizBookExplanation(q);
   return `
     <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
       <div class="flex-center gap-8 mb-8 flex-wrap">
@@ -3630,6 +3638,7 @@ function renderQuizQuestionRow(q,i){
         ${sourceLabel?`<span class="tag tag-info">${esc(sourceLabel)}</span>`:''}
         ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
+        <span class="tag ${hasExplanation?'tag-success':'tag-warn'}">${hasExplanation?'Explanation added':'Explanation missing'}</span>
         ${isAdmin?`<div class="flex gap-6 ml-auto">
           <button class="btn btn-ghost btn-xs" onclick="openQuizQuestionEditor('${q.id}')">Edit</button>
           <button class="btn btn-danger btn-xs" onclick="deleteQuizQuestion('${q.id}')">Delete</button>
@@ -3659,18 +3668,25 @@ async function openQuizQuestionEditor(id){
     body.innerHTML=`<div class="modal-title">Question Editor</div><div class="text-danger mb-16">Could not load this question.</div><button class="btn btn-ghost" onclick="closeQuizQuestionEditor()">Close</button>`;
     return;
   }
-  window._quizQuestionEdit={id:q.id,media:questionMediaUrls(q)};
+  const explanationParts=quizExplanationParts(q);
+  window._quizQuestionEdit={
+    id:q.id,
+    media:questionMediaUrls(q),
+    originalExplanation:explanationParts.text,
+    originalExplanationRaw:explanationParts.raw,
+    explanationSourceSuffix:explanationParts.sourceSuffix
+  };
   const sourceLabel=quizSourceLabel(q)||'Book source retained';
   body.innerHTML=`
     <div class="flex-center gap-8 mb-16">
       <div>
-        <div class="modal-title" style="margin-bottom:5px">Edit Question & Answer</div>
+        <div class="modal-title" style="margin-bottom:5px">Edit Question, Answer & Explanation</div>
         <div style="font-size:12px;color:var(--text2)">${esc(subjectLabel(q.subject))} · ${esc(sourceLabel)}</div>
       </div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="closeQuizQuestionEditor()">✕</button>
     </div>
     <div class="card-sm mb-16" style="font-size:12px;color:var(--text2);line-height:1.55">
-      Book section, book question number, subject, explanation, and source information remain unchanged.
+      Book section, book question number, subject, and source information remain unchanged.
     </div>
     <div class="form-group"><label>Question</label><textarea id="edit-quiz-question" rows="6">${esc(cleanQuestionText(q))}</textarea></div>
     <div class="form-group">
@@ -3684,6 +3700,11 @@ async function openQuizQuestionEditor(id){
       <select id="edit-quiz-correct">
         ${['a','b','c','d'].map(letter=>`<option value="${letter}" ${q.correct_answer===letter?'selected':''}>${letter.toUpperCase()}</option>`).join('')}
       </select>
+    </div>
+    <div class="form-group">
+      <label>Explanation</label>
+      <textarea id="edit-quiz-explanation" rows="8" placeholder="Add the book explanation for this answer.">${esc(explanationParts.text)}</textarea>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px">The saved book source stays attached automatically.</div>
     </div>
     <div id="edit-quiz-error" class="text-danger text-sm mb-8"></div>
     <div class="flex gap-8 flex-wrap">
@@ -3777,6 +3798,7 @@ async function saveQuizQuestionEdit(){
   const options={};
   ['a','b','c','d'].forEach(letter=>{options[letter]=document.getElementById('edit-quiz-'+letter)?.value.trim()||'';});
   const correct=document.getElementById('edit-quiz-correct')?.value;
+  const explanation=document.getElementById('edit-quiz-explanation')?.value.trim()||'';
   const errorEl=document.getElementById('edit-quiz-error');
   if(!question||Object.values(options).some(value=>!value)||!['a','b','c','d'].includes(correct)){
     if(errorEl)errorEl.textContent='Question, all four answer choices, and the correct answer are required.';
@@ -3784,13 +3806,22 @@ async function saveQuizQuestionEdit(){
   }
   const media=(window._quizQuestionEdit.media||[]).filter(Boolean);
   const fullQuestion=`${media.map(url=>`[[media:${url}]]`).join('\n')}${media.length?'\n':''}${question}`;
+  const editState=window._quizQuestionEdit;
+  const explanationRaw=explanation===editState.originalExplanation
+    ? editState.originalExplanationRaw
+    : explanation
+      ? explanation+(editState.explanationSourceSuffix||'')
+      : editState.explanationSourceSuffix
+        ? 'Refer to the assigned book for explanation.'+editState.explanationSourceSuffix
+        : '';
   const payload={
     question:fullQuestion,
     option_a:options.a,
     option_b:options.b,
     option_c:options.c,
     option_d:options.d,
-    correct_answer:correct
+    correct_answer:correct,
+    explanation:explanationRaw
   };
   const saveBtn=document.getElementById('edit-quiz-save');
   if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving...';}
