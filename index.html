@@ -204,6 +204,7 @@ select option{background:var(--bg3)}
 .exam-sim-start{max-width:860px;margin:44px auto;padding:30px;border:1px solid #cbd5e1;background:#fff;border-radius:4px;color:#111827;font-family:Arial,Helvetica,sans-serif}
 .exam-sim-start h2{font-size:28px;margin:0 0 10px;color:#111827}
 .exam-sim-start p{font-size:15px;line-height:1.55;color:#374151;margin:8px 0}
+.exam-sim-coverage-note{background:#fff3b8;border:1px solid #e7c85c;border-left:4px solid #d4a900;border-radius:6px;padding:10px 12px;color:#5f4b00!important;font-weight:700}
 .exam-sim-weight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 18px;margin:18px 0}
 .exam-sim-weight-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e5e7eb;padding:6px 0;font-size:13px;color:#1f2937}
 .exam-sim-weight-row span:last-child{margin-left:auto;color:#4b5563}
@@ -9663,6 +9664,7 @@ async function renderAllStart(v){
       <h2>Practice Exam Simulator</h2>
       <p><strong>${plannedTotal} timed practice questions drawn from the loaded Subject Card question banks.</strong></p>
       <p>Questions are based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr. The subject mix mimics BOC-style weighting for practice only and is not an official BOC exam.</p>
+      <p class="exam-sim-coverage-note">Coverage note: Book Sections 9–10 were not added to this practice exam.</p>
       <p>Answer in order. Feedback stays hidden during the exam, and back review unlocks only after all questions are answered.</p>
       <p>Results are not saved. Export your report before starting another exam.</p>
       <div class="divider"></div>
