@@ -225,6 +225,8 @@ select option{background:var(--bg3)}
 .home-hubs-card::before{content:'';position:absolute;inset:-40% -12% auto auto;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.17);pointer-events:none}
 .home-hubs-card::after{content:'';position:absolute;inset:auto 24px 22px auto;width:82px;height:82px;border-radius:22px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);pointer-events:none}
 .home-hubs-card:hover{transform:translateY(-2px);box-shadow:0 28px 58px rgba(203,63,114,.32);filter:saturate(1.04)}
+.home-hubs-card.is-admin-locked{cursor:default;opacity:.72;filter:saturate(.75)}
+.home-hubs-card.is-admin-locked:hover{transform:none;box-shadow:0 22px 46px rgba(203,63,114,.24);filter:saturate(.75)}
 .home-hubs-label{position:relative;z-index:1;font-size:12px;color:rgba(255,255,255,.86);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
 .home-hubs-title{position:relative;z-index:1;font-size:25px;font-weight:750;color:#fff;letter-spacing:-.02em;margin-bottom:7px}
 .home-hubs-copy{position:relative;z-index:1;font-size:14px;color:rgba(255,255,255,.86);max-width:520px;line-height:1.45;margin-bottom:16px}
@@ -273,6 +275,9 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .interactive-tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:104px;text-align:left;width:100%;position:relative;overflow:visible}
 .interactive-tool-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--tool-color,var(--accent));opacity:.9}
 .interactive-tool-card:hover,.interactive-tool-card:focus-within{border-color:color-mix(in srgb,var(--tool-color,var(--accent)) 55%,var(--border));background:var(--bg3);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.12);z-index:20}
+.interactive-tool-card.is-hidden{opacity:.62;border-style:dashed}
+.interactive-publication-badge{display:inline-flex;margin-top:5px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;background:#3ddc8422;color:var(--success);border:1px solid #3ddc8444}
+.interactive-publication-badge.hidden-state{background:#f5a62322;color:var(--warn);border-color:#f5a62344}
 .interactive-tool-bubble{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,var(--tool-color,var(--accent)),color-mix(in srgb,var(--tool-color,var(--accent)) 64%,#fff));color:#fff;font-family:var(--mono);font-size:15px;font-weight:800;letter-spacing:.2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.16)}
 .interactive-tool-thumb{width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border)}
 .interactive-tool-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.25}
@@ -2961,6 +2966,10 @@ async function renderHome(v){
         }).join('')
       + '</div></div>'
     : '';
+  const hubsCardAttrs=isAdmin
+    ? 'class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}"'
+    : 'class="home-hubs-card is-admin-locked" aria-disabled="true"';
+  const hubsButtonText=isAdmin?'Enter Specialized Hubs <span>›</span>':'Specialized Hubs';
 
   v.innerHTML = '<div class="home-dashboard">'
     + '<section class="home-hero">'
@@ -2978,8 +2987,8 @@ async function renderHome(v){
     + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}">'
-    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Specialized Hubs</div><div class="home-hubs-copy">Open the existing hub space for Blood Bank maps and simulations, Microbiology flow builders, Urinalysis renal tools, Chemistry organ maps, and Hematology tables.</div><div class="home-hubs-button">Enter Specialized Hubs <span>›</span></div></div>'
+    + '<div '+hubsCardAttrs+'>'
+    + '<div><div class="home-hubs-label">Specialized Hubs</div><div class="home-hubs-title">Specialized Hubs</div><div class="home-hubs-copy">Open the existing hub space for Blood Bank maps and simulations, Microbiology flow builders, Urinalysis renal tools, Chemistry organ maps, and Hematology tables.</div><div class="home-hubs-button">'+hubsButtonText+'</div></div>'
     + '<div class="home-hubs-preview" aria-hidden="true"><div class="home-hubs-preview-track">'
     + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><img class="home-hub-shot" src="'+item.img+'" alt=""><div class="home-hub-tile-dot">'+item.code+'</div><div class="home-hub-tile-caption"><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div><div class="home-hub-feature-list">'+item.features.map(feature=>'<span>'+feature+'</span>').join('')+'</div></div></div>').join('')
     + '</div></div></div></section>'
@@ -3069,21 +3078,24 @@ function renderInteractiveLinkCard(lnk){
   const url = lnk.url || '#';
   const action = isLocalInteractiveUrl(url) ? "window.location.href='" + jsAttr(url) + "'" : "window.open('" + jsAttr(url) + "','_blank')";
   const color = lnk.color || 'var(--accent)';
+  const published=lnk._published!==false;
   const media = lnk.image_url && !lnk.force_icon
     ? '<img class="interactive-tool-thumb" src="'+esc(lnk.image_url)+'" alt="">'
     : '<div class="interactive-tool-bubble" style="--tool-color:'+color+'">'+esc(lnk.icon||'GO')+'</div>';
-  return '<div class="interactive-tool-card" tabindex="0" style="--tool-color:'+color+'" onclick="'+action+'">'
+  return '<div class="interactive-tool-card'+(published?'':' is-hidden')+'" tabindex="0" style="--tool-color:'+color+'" onclick="'+action+'">'
     + media
     + '<div style="flex:1;min-width:0">'
     + '<div class="interactive-tool-topic">'+esc(lnk.topic || (lnk._builtin?'Interactive':'Saved Link'))+'</div>'
     + '<div class="interactive-tool-title">'+esc(lnk.title)+'</div>'
     + (lnk.description ? '<div class="interactive-tool-desc">'+esc(lnk.description)+'</div>' : '')
+    + (isAdmin?'<div class="interactive-publication-badge'+(published?'':' hidden-state')+'">'+(published?'Published':'Hidden')+'</div>':'')
     + '</div>'
     + '<div class="interactive-tool-arrow">›</div>'
     + renderInteractivePreview(lnk)
-    + (isAdmin && !lnk._builtin ? '<div style="display:flex;gap:6px;position:absolute;right:8px;bottom:8px" onclick="event.stopPropagation()">'
-      + '<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">Edit</button>'
-      + '<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">Remove</button>'
+    + (isAdmin ? '<div style="display:flex;gap:6px;position:absolute;right:8px;bottom:8px" onclick="event.stopPropagation()">'
+      + '<button onclick="setInteractiveLinkPublished(\''+(lnk._statusId||'')+'\',\''+jsAttr(lnk.url)+'\','+(published?'false':'true')+')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:'+(published?'var(--warn)':'var(--success)')+';cursor:pointer">'+(published?'Hide':'Publish')+'</button>'
+      + (!lnk._builtin?'<button onclick="editInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer">Edit</button>':'')
+      + (!lnk._builtin?'<button onclick="removeInteractiveLink(\''+lnk.id+'\')" style="padding:5px 8px;font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--danger);cursor:pointer">Remove</button>':'')
       + '</div>' : '')
     + '</div>';
 }
@@ -3121,8 +3133,16 @@ async function loadInteractiveLinks(){
   const grid = document.getElementById('interactive-links-grid');
   const adminDiv = document.getElementById('interactive-admin');
   const builtinUrls = new Set(BUILT_IN_INTERACTIVE_LINKS.map(l=>normalizeInteractiveUrl(l.url)));
-  const customLinks = (links||[]).filter(l=>!builtinUrls.has(normalizeInteractiveUrl(l.url))).map(inferInteractiveLinkMeta);
-  const allLinks = [...BUILT_IN_INTERACTIVE_LINKS.map(l=>({...l,_builtin:true})), ...customLinks.map(l=>({...l,_builtin:false}))];
+  const statusByUrl=new Map();
+  (links||[]).forEach(link=>statusByUrl.set(normalizeInteractiveUrl(link.url),link));
+  const builtinLinks=BUILT_IN_INTERACTIVE_LINKS.map(link=>{
+    const status=statusByUrl.get(normalizeInteractiveUrl(link.url));
+    return {...link,_builtin:true,_statusId:status?.id||'',_published:status?interactiveLinkPublished(status):true};
+  });
+  const customLinks = (links||[])
+    .filter(link=>!builtinUrls.has(normalizeInteractiveUrl(link.url)))
+    .map(link=>({...inferInteractiveLinkMeta(link),_builtin:false,_statusId:link.id,_published:interactiveLinkPublished(link)}));
+  const allLinks = [...builtinLinks,...customLinks].filter(link=>isAdmin||link._published);
 
   if(grid){
     if(!allLinks.length){
@@ -3138,6 +3158,7 @@ async function loadInteractiveLinks(){
       + '<div class="form-group"><label>Title</label><input type="text" id="il-title" placeholder="e.g. Blood Cell Identifier"></div>'
       + '<div class="form-group"><label>URL</label><input type="text" id="il-url" placeholder="https://..."></div>'
       + '<div class="form-group" style="margin-bottom:12px"><label>Description (optional)</label><input type="text" id="il-desc" placeholder="Short note about this tool"></div>'
+      + '<div class="form-group" style="margin-bottom:12px"><label>Publication</label><select id="il-publication"><option value="-1" selected>Hidden</option><option value="0">Published</option></select></div>'
       + '<div class="form-group" style="margin-bottom:12px"><label>Image (drag & drop or click)</label>'
       + '<div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px" id="il-img-dz" ondrop="handleILImgDrop(event)" ondragover="event.preventDefault();this.style.borderColor=\'var(--accent)\'" ondragleave="this.style.borderColor=\'var(--border2)\'" onclick="document.getElementById(\'il-img-file\').click()">📷 Drop image or click'
       + '<input type="file" id="il-img-file" accept="image/*" style="display:none" onchange="handleILImgFile(event)">'
@@ -3204,6 +3225,10 @@ function normalizeInteractiveUrl(url){
   return (file||raw).toLowerCase();
 }
 
+function interactiveLinkPublished(link){
+  return Number(link?.sort_order||0)>=0;
+}
+
 function inferInteractiveLinkMeta(link){
   const l={...link};
   const text=(String(l.title||'')+' '+String(l.url||'')).toLowerCase();
@@ -3228,9 +3253,10 @@ async function addInteractiveLink(){
   const title = document.getElementById('il-title')?.value.trim();
   const url   = document.getElementById('il-url')?.value.trim();
   const desc  = document.getElementById('il-desc')?.value.trim();
+  const sort_order=Number(document.getElementById('il-publication')?.value)===0?0:-1;
   if(!title || !url){ alert('Title and URL are required.'); return; }
   const image_url = document.getElementById('il-img-data')?.value || '';
-  const {error} = await sb.from('mlsboc_interactive_links').insert({title, url, description:desc||'', image_url});
+  const {error} = await sb.from('mlsboc_interactive_links').insert({title, url, description:desc||'', image_url,sort_order});
   if(error){alert('Error: '+error.message);return;}
   document.getElementById('il-title').value='';
   document.getElementById('il-url').value='';
@@ -3251,6 +3277,7 @@ async function editInteractiveLink(id){
     <div class="form-group"><label>Title</label><input type="text" id="eil-title" value="${esc(lnk.title||'')}"></div>
     <div class="form-group"><label>URL</label><input type="text" id="eil-url" value="${esc(lnk.url||'')}"></div>
     <div class="form-group"><label>Description</label><input type="text" id="eil-desc" value="${esc(lnk.description||'')}"></div>
+    <div class="form-group"><label>Publication</label><select id="eil-publication"><option value="-1" ${interactiveLinkPublished(lnk)?'':'selected'}>Hidden</option><option value="0" ${interactiveLinkPublished(lnk)?'selected':''}>Published</option></select></div>
     <div class="form-group">
       <label>Image (drag & drop or click to change)</label>
       <div style="border:1px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--text3);cursor:pointer;min-height:80px;display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column"
@@ -3304,11 +3331,27 @@ async function saveInteractiveLink(id){
   const title=document.getElementById('eil-title')?.value.trim();
   const url=document.getElementById('eil-url')?.value.trim();
   const desc=document.getElementById('eil-desc')?.value.trim();
+  const sort_order=Number(document.getElementById('eil-publication')?.value)===0?0:-1;
   const image_url=document.getElementById('eil-img-data')?.value||'';
   if(!title||!url){alert('Title and URL required.');return;}
-  const {error}=await sb.from('mlsboc_interactive_links').update({title,url,description:desc||'',image_url}).eq('id',id);
+  const {error}=await sb.from('mlsboc_interactive_links').update({title,url,description:desc||'',image_url,sort_order}).eq('id',id);
   if(error){alert('Save failed: '+error.message);return;}
   document.getElementById('condition-modal').classList.add('hidden');
+  loadInteractiveLinks();
+}
+
+async function setInteractiveLinkPublished(id,url,published){
+  if(!isAdmin)return;
+  const sort_order=published?0:-1;
+  let error=null;
+  if(id){
+    ({error}=await sb.from('mlsboc_interactive_links').update({sort_order}).eq('id',id));
+  }else{
+    const builtin=BUILT_IN_INTERACTIVE_LINKS.find(link=>normalizeInteractiveUrl(link.url)===normalizeInteractiveUrl(url));
+    if(!builtin){alert('Could not find this interactive tool.');return;}
+    ({error}=await sb.from('mlsboc_interactive_links').insert({title:builtin.title,url:builtin.url,description:builtin.description||'',image_url:builtin.image_url||'',sort_order}));
+  }
+  if(error){alert((published?'Publish':'Hide')+' failed: '+error.message);return;}
   loadInteractiveLinks();
 }
 
@@ -9697,7 +9740,7 @@ async function renderAllStart(v){
       <p>Questions are based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr. The subject mix mimics BOC-style weighting for practice only and is not an official BOC exam.</p>
       <p class="exam-sim-coverage-note">Coverage note: Book Sections 9–10 were not added to this practice exam.</p>
       <p>Answer in order. Feedback stays hidden during the exam, and back review unlocks only after all questions are answered.</p>
-      <p>Results are not saved. Export your report before starting another exam.</p>
+      <p class="exam-sim-coverage-note">Results are not saved. Export your report before starting another exam.</p>
       <div class="divider"></div>
       <div class="exam-sim-weight-grid">
         ${Object.entries(BOC_WEIGHTS).map(([s,w])=>`
