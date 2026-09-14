@@ -3051,7 +3051,7 @@ function renderResourcesView(v){
       `).join('')}
     </div>
     <div class="card-sm mt-16" style="font-size:12px;color:var(--text2);line-height:1.6">
-      Question explanations are intentionally not reproduced in the study bank; use the assigned textbook or course source for explanation text.
+      Book explanations are added to loaded question banks section by section and appear only after missed questions.
     </div>
   `;
 }
@@ -3467,6 +3467,7 @@ async function renderQuizTab(el){
         ${answered?`
           <div style="text-align:center;margin-bottom:16px">
             <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:8px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
+            ${answered!==q.correct_answer&&quizBookExplanation(q)?`<div class="explanation" style="text-align:left;max-width:760px;margin:14px auto 0;white-space:pre-wrap">${escNL(quizBookExplanation(q))}</div>`:''}
           </div>
           <div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
             ${appState.quizIdx>0?`<button class="btn btn-ghost" onclick="qPrev()">← Prev</button>`:''}
@@ -3543,6 +3544,15 @@ function quizSourceLabel(q){
   if(section&&bookQuestion)return `Section ${section} · Book Q${bookQuestion}`;
   if(section)return `Section ${section}`;
   return bookQuestion?`Book Q${bookQuestion}`:'';
+}
+function quizBookExplanation(q){
+  const raw=String(q?.explanation||'').trim();
+  if(!raw)return '';
+  const marker='\n\nSource:';
+  const markerIndex=raw.indexOf(marker);
+  const text=(markerIndex>=0?raw.slice(0,markerIndex):raw).trim();
+  if(/^Refer to\s+.+?\s+for explanation\./i.test(text))return '';
+  return text;
 }
 function quizSectionSortValue(q){
   const explicit=Number(q?.section_sort||q?.section_number||q?.book_section_sort);
@@ -3775,7 +3785,7 @@ function renderQuizResults(el,isAll){
       <div class="stat-card"><div class="stat-num text-danger">${qs.length-correct}</div><div class="stat-label">Missed</div></div>
       ${isAll?`<div class="stat-card"><div class="stat-num" style="color:var(--accent);font-size:16px">${timeStr}</div><div class="stat-label">Time</div></div>`:''}
     </div>
-    <div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">Results are not saved. Export a PDF now if you want to keep this attempt. Refer to the assigned book/source for the book discussion.</div>
+    <div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">Results are not saved. Export a PDF now if you want to keep this attempt. Available book explanations appear only with missed questions.</div>
     ${isAll?renderPracticeExamSubjectReport(subjStats,qs.length):''}
     ${isAll&&weakSubjects.length?`
       <div class="card-sm mb-16" style="border-left:3px solid var(--danger)">
@@ -3808,6 +3818,7 @@ function renderQuizResults(el,isAll){
         ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:6px 0">${renderDataTable(q.table_data,{small:true})}</div>`:''}
         <div class="missed-wrong">Your answer: ${given?esc(q['option_'+given]):'(unanswered)'}</div>
         <div class="missed-a">Correct: ${esc(q['option_'+q.correct_answer])}</div>
+        ${quizBookExplanation(q)?`<div class="explanation" style="white-space:pre-wrap">${escNL(quizBookExplanation(q))}</div>`:''}
       </div>`).join('')}
   `;
 }
@@ -3881,6 +3892,10 @@ function exportResultsPDF(isAll=false){
       checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
       doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
       checkPage(7);doc.text(`Correct: ${String(q['option_'+q.correct_answer]||'')}`,margin+4,y);y+=8;
+      if(!ok&&quizBookExplanation(q)){
+        writeText(`Explanation: ${quizBookExplanation(q)}`,{size:8.5,color:[70,70,90],indent:4});
+        y+=3;
+      }
     });
     const tot=doc.internal.getNumberOfPages();
     for(let p=1;p<=tot;p++){
