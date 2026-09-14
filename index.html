@@ -1341,6 +1341,13 @@ body.light-mode .option-letter{color:var(--text3) !important}
   </div>
 </div>
 
+<!-- ADMIN QUESTION EDITOR -->
+<div id="question-edit-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeQuizQuestionEditor()">
+  <div class="modal" style="max-width:760px">
+    <div id="question-edit-modal-body"></div>
+  </div>
+</div>
+
 <!-- MAIN APP -->
 <div id="main-app">
   <div id="admin-bar-el" class="admin-bar hidden">
@@ -2705,6 +2712,7 @@ async function checkAdmin(){
 }
 function exitAdmin(){
   isAdmin=false;
+  closeQuizQuestionEditor();
   if(appState.view==='class'){
     appState.view='home';appState.classView=null;appState.classSubject=null;appState.classSet=null;
   }
@@ -3621,7 +3629,10 @@ function renderQuizQuestionRow(q,i){
         ${sourceLabel?`<span class="tag tag-info">${esc(sourceLabel)}</span>`:''}
         ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
-        ${isAdmin?`<button class="btn btn-danger btn-xs ml-auto" onclick="deleteQuizQuestion('${q.id}')">Delete</button>`:''}
+        ${isAdmin?`<div class="flex gap-6 ml-auto">
+          <button class="btn btn-ghost btn-xs" onclick="openQuizQuestionEditor('${q.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteQuizQuestion('${q.id}')">Delete</button>
+        </div>`:''}
       </div>
       <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:8px">${renderQuestionWithMedia(q)}</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;font-size:12px;color:var(--text2)">
@@ -3633,6 +3644,163 @@ function renderQuizQuestionRow(q,i){
       ${correctText?`<div style="font-size:11px;color:var(--success);margin-top:6px;font-family:var(--mono)">Correct: ${esc(correctText)}</div>`:''}
     </div>
   `;
+}
+
+async function openQuizQuestionEditor(id){
+  if(!isAdmin)return;
+  const modal=document.getElementById('question-edit-modal');
+  const body=document.getElementById('question-edit-modal-body');
+  if(!modal||!body)return;
+  modal.classList.remove('hidden');
+  body.innerHTML='<div class="empty" style="padding:24px">Loading question...</div>';
+  const {data:q,error}=await sb.from('mlsboc_questions').select('*').eq('id',id).single();
+  if(error||!q){
+    body.innerHTML=`<div class="modal-title">Question Editor</div><div class="text-danger mb-16">Could not load this question.</div><button class="btn btn-ghost" onclick="closeQuizQuestionEditor()">Close</button>`;
+    return;
+  }
+  window._quizQuestionEdit={id:q.id,media:questionMediaUrls(q)};
+  const sourceLabel=quizSourceLabel(q)||'Book source retained';
+  body.innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div>
+        <div class="modal-title" style="margin-bottom:5px">Edit Question & Answer</div>
+        <div style="font-size:12px;color:var(--text2)">${esc(subjectLabel(q.subject))} · ${esc(sourceLabel)}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="closeQuizQuestionEditor()">✕</button>
+    </div>
+    <div class="card-sm mb-16" style="font-size:12px;color:var(--text2);line-height:1.55">
+      Book section, book question number, subject, explanation, and source information remain unchanged.
+    </div>
+    <div class="form-group"><label>Question</label><textarea id="edit-quiz-question" rows="6">${esc(cleanQuestionText(q))}</textarea></div>
+    <div class="form-group">
+      <label>Images or structures</label>
+      <div id="edit-quiz-media"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+      ${['a','b','c','d'].map(letter=>`<div class="form-group"><label>Option ${letter.toUpperCase()}</label><textarea id="edit-quiz-${letter}" rows="2">${esc(q['option_'+letter]||'')}</textarea></div>`).join('')}
+    </div>
+    <div class="form-group"><label>Correct Answer</label>
+      <select id="edit-quiz-correct">
+        ${['a','b','c','d'].map(letter=>`<option value="${letter}" ${q.correct_answer===letter?'selected':''}>${letter.toUpperCase()}</option>`).join('')}
+      </select>
+    </div>
+    <div id="edit-quiz-error" class="text-danger text-sm mb-8"></div>
+    <div class="flex gap-8 flex-wrap">
+      <button class="btn btn-ghost" onclick="closeQuizQuestionEditor()">Cancel</button>
+      <button class="btn btn-primary ml-auto" id="edit-quiz-save" onclick="saveQuizQuestionEdit()">Save Changes</button>
+    </div>`;
+  refreshQuizQuestionMediaEditor();
+}
+
+function closeQuizQuestionEditor(){
+  document.getElementById('question-edit-modal')?.classList.add('hidden');
+  window._quizQuestionEdit=null;
+}
+
+function refreshQuizQuestionMediaEditor(){
+  const el=document.getElementById('edit-quiz-media');
+  if(!el)return;
+  const media=(window._quizQuestionEdit?.media||[]).filter(Boolean);
+  el.innerHTML=`
+    ${media.length?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px">
+      ${media.map((url,i)=>`<div style="position:relative;border:1px solid var(--border);border-radius:var(--r);padding:6px;background:var(--bg3);min-height:110px;display:flex;align-items:center;justify-content:center">
+        <img src="${esc(url)}" alt="Question visual ${i+1}" style="width:100%;height:120px;object-fit:contain;background:#fff;border-radius:4px">
+        <button class="btn btn-danger btn-xs" type="button" onclick="removeQuizQuestionMedia(${i})" style="position:absolute;top:5px;right:5px">Remove</button>
+      </div>`).join('')}
+    </div>`:'<div style="font-size:12px;color:var(--text3);margin-bottom:10px">No image or structure attached.</div>'}
+    <div class="drop-zone" style="padding:16px;min-height:72px" onclick="document.getElementById('edit-quiz-media-file').click()" ondrop="handleQuizQuestionMediaDrop(event)" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+      <div style="font-size:20px;margin-bottom:3px">📷</div>
+      <div>${media.length?'Add or replace with another image/structure':'Drop an image/structure here or click to upload'}</div>
+      <input type="file" id="edit-quiz-media-file" accept="image/*" multiple style="display:none" onchange="handleQuizQuestionMediaFile(event)">
+    </div>`;
+}
+
+function removeQuizQuestionMedia(index){
+  if(!window._quizQuestionEdit)return;
+  window._quizQuestionEdit.media=(window._quizQuestionEdit.media||[]).filter((_,i)=>i!==index);
+  refreshQuizQuestionMediaEditor();
+}
+
+async function addQuizQuestionMediaFiles(files){
+  if(!window._quizQuestionEdit)return;
+  const selected=Array.from(files||[]).filter(file=>file.type&&file.type.startsWith('image/'));
+  if(!selected.length)return;
+  const media=(window._quizQuestionEdit.media||[]).filter(Boolean);
+  for(const file of selected.slice(0,4-media.length)){
+    try{media.push(await compressQuestionImageFile(file));}
+    catch(err){alert('Image upload failed: '+err.message);}
+  }
+  window._quizQuestionEdit.media=media.slice(0,4);
+  refreshQuizQuestionMediaEditor();
+}
+
+function compressQuestionImageFile(file,max=1800){
+  return new Promise((resolve,reject)=>{
+    if(!file||!file.type.startsWith('image/')){reject(new Error('Choose an image file.'));return;}
+    const reader=new FileReader();
+    reader.onload=event=>{
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+          if(w>max||h>max){const scale=Math.min(max/w,max/h);w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));}
+          const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+          ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,0,0,w,h);
+          const format=file.type==='image/png'?'image/png':'image/jpeg';
+          resolve(canvas.toDataURL(format,0.9));
+        }catch(err){reject(err);}
+      };
+      img.onerror=()=>reject(new Error('Could not read image.'));
+      img.src=event.target.result;
+    };
+    reader.onerror=()=>reject(new Error('Could not read image.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleQuizQuestionMediaFile(event){
+  addQuizQuestionMediaFiles(event.target.files);
+  event.target.value='';
+}
+
+function handleQuizQuestionMediaDrop(event){
+  event.preventDefault();event.currentTarget.classList.remove('dragover');
+  addQuizQuestionMediaFiles(event.dataTransfer.files);
+}
+
+async function saveQuizQuestionEdit(){
+  if(!isAdmin||!window._quizQuestionEdit)return;
+  const question=document.getElementById('edit-quiz-question')?.value.trim();
+  const options={};
+  ['a','b','c','d'].forEach(letter=>{options[letter]=document.getElementById('edit-quiz-'+letter)?.value.trim()||'';});
+  const correct=document.getElementById('edit-quiz-correct')?.value;
+  const errorEl=document.getElementById('edit-quiz-error');
+  if(!question||Object.values(options).some(value=>!value)||!['a','b','c','d'].includes(correct)){
+    if(errorEl)errorEl.textContent='Question, all four answer choices, and the correct answer are required.';
+    return;
+  }
+  const media=(window._quizQuestionEdit.media||[]).filter(Boolean);
+  const fullQuestion=`${media.map(url=>`[[media:${url}]]`).join('\n')}${media.length?'\n':''}${question}`;
+  const payload={
+    question:fullQuestion,
+    option_a:options.a,
+    option_b:options.b,
+    option_c:options.c,
+    option_d:options.d,
+    correct_answer:correct
+  };
+  const saveBtn=document.getElementById('edit-quiz-save');
+  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving...';}
+  const {error}=await sb.from('mlsboc_questions').update(payload).eq('id',window._quizQuestionEdit.id);
+  if(error){
+    if(errorEl)errorEl.textContent='Save failed: '+error.message;
+    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save Changes';}
+    return;
+  }
+  closeQuizQuestionEditor();
+  renderTab();
 }
 
 async function deleteQuizQuestion(id){
