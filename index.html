@@ -953,6 +953,49 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .modal-overlay{position:fixed;inset:0;background:#000a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:20px}
+.modal.study-outline-modal{max-width:920px;padding:0;overflow:hidden}
+.study-outline-modal-body{max-height:88vh;overflow-y:auto}
+.study-window-head{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;gap:16px;padding:22px 24px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.study-window-number{display:inline-flex;align-items:center;justify-content:center;min-width:54px;height:32px;padding:0 10px;border-radius:999px;background:color-mix(in srgb,var(--study-accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--study-accent) 36%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:12px;font-weight:700}
+.study-window-title{font-size:20px;font-weight:700;line-height:1.25;color:var(--text)}
+.study-window-sub{margin-top:5px;color:var(--text2);font-size:12px;line-height:1.5}
+.study-window-content{padding:22px 24px 26px;display:grid;gap:16px}
+.study-window-panel{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
+.study-window-panel h3{margin:0 0 9px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+.study-window-panel p{margin:0;color:var(--text2);font-size:13px;line-height:1.65}
+.study-topic-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.study-topic{padding:5px 9px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:11px}
+.study-video-slot{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1.5px dashed color-mix(in srgb,var(--study-accent) 45%,var(--border));border-radius:var(--r2);background:var(--bg2);color:var(--text2);font-size:13px;line-height:1.55;overflow:hidden}
+.study-video-slot iframe{width:100%;height:100%;border:0;border-radius:calc(var(--r2) - 3px)}
+.study-outline-shell{--study-accent:var(--accent);max-width:1080px;margin:0 auto}
+.study-outline-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 22px;margin-bottom:16px;border-radius:var(--r2);border:1px solid color-mix(in srgb,var(--study-accent) 34%,var(--border));background:linear-gradient(135deg,color-mix(in srgb,var(--study-accent) 12%,var(--bg2)),var(--bg2))}
+.study-outline-kicker{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--study-accent);margin-bottom:6px}
+.study-outline-hero h2{margin:0 0 7px;font-size:20px;color:var(--text)}
+.study-outline-hero p{margin:0;max-width:720px;color:var(--text2);font-size:13px;line-height:1.55}
+.study-embed-note{flex:0 0 auto;padding:7px 10px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:10px;white-space:nowrap}
+.study-outline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.study-chapter-card{appearance:none;width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:17px 18px;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.study-chapter-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--study-accent) 65%,var(--border));box-shadow:0 10px 24px #00000012}
+.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:48px;height:34px;padding:0 9px;border-radius:10px;background:color-mix(in srgb,var(--study-accent) 13%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:12px;font-weight:800}
+.study-chapter-title{font-size:13px;font-weight:700;line-height:1.35;color:var(--text)}
+.study-chapter-topics{margin-top:4px;font-size:11px;color:var(--text3);line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.study-chapter-open{color:var(--study-accent);font-size:20px}
+.study-bibliography{margin-top:16px;border:1px solid var(--border);border-radius:var(--r2);background:var(--bg2);overflow:hidden}
+.study-bibliography summary{cursor:pointer;padding:15px 18px;font-size:13px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;justify-content:space-between}
+.study-bibliography summary::-webkit-details-marker{display:none}
+.study-bibliography summary::after{content:'+';color:var(--study-accent);font-size:19px;font-weight:500}
+.study-bibliography[open] summary::after{content:'−'}
+.study-bibliography-body{padding:0 18px 18px;border-top:1px solid var(--border)}
+.study-bibliography-note{margin:14px 0 10px;padding:10px 12px;border-radius:10px;background:var(--bg3);color:var(--text2);font-size:11px;line-height:1.55}
+.study-bibliography ol{margin:0;padding-left:20px;color:var(--text2)}
+.study-bibliography li{padding:5px 0;font-size:11px;line-height:1.55}
+@media(max-width:720px){
+  .study-outline-grid{grid-template-columns:1fr}
+  .study-outline-hero{display:block}
+  .study-embed-note{display:inline-flex;margin-top:13px}
+  .study-window-head,.study-window-content{padding-left:17px;padding-right:17px}
+  .modal.study-outline-modal{max-height:94vh}
+}
 .hidden{display:none!important}
 .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .breadcrumb-sep{color:var(--text3)}
@@ -1438,6 +1481,59 @@ const SUBJECTS = [
   {key:'lab_operations',name:'Lab Operations',icon:'📊'}
 ];
 const PARA_MYCO_KEYS=['parasitology','mycology'];
+
+// Study outlines are intentionally limited to Clinical Chemistry and Immunology.
+// Video entries use external embed URLs, so no video files are stored in this project.
+const STUDY_OUTLINES={
+  clinical_chemistry:{
+    title:'Clinical Chemistry',
+    accent:'#2f7dd1',
+    sourceLabel:'Medical Laboratory Science Review, Fifth Edition — Clinical Chemistry outline',
+    chapters:[
+      {number:'6.1',title:'Instrumentation',topics:['Spectrophotometry','Electrochemistry','Chromatography','Mass spectrometry','Automation'],reading:['Laboratory instrumentation and analytical principles','Spectrophotometry and optical methods','Electrochemical methods and ion-selective electrodes','Chromatography and mass spectrometry'],summary:'',videoUrl:''},
+      {number:'6.2',title:'Blood Gases, pH, and Electrolytes',topics:['Acid–base balance','Blood gases','Electrolytes','Osmolality','Anion gap'],reading:['Blood gas measurement and acid–base interpretation','Electrolytes and osmolality','Ion-selective electrode methods'],summary:'',videoUrl:''},
+      {number:'6.3',title:'Glucose, Hemoglobin, Iron, and Bilirubin',topics:['Glucose testing','Diabetes','Hemoglobin derivatives','Iron studies','Bilirubin'],reading:['Carbohydrates and diabetes mellitus','Hemoglobin and iron metabolism','Heme catabolism and bilirubin'],summary:'',videoUrl:''},
+      {number:'6.4',title:'Creatinine, Uric Acid, BUN, and Ammonia',topics:['Renal function','Nitrogen metabolites','Creatinine','Uric acid','Ammonia'],reading:['Nonprotein nitrogen compounds','Renal function testing','Creatinine, urea, uric acid, and ammonia methods'],summary:'',videoUrl:''},
+      {number:'6.5',title:'Proteins, Electrophoresis, and Lipids',topics:['Plasma proteins','Electrophoresis','Lipoproteins','Dyslipidemia'],reading:['Plasma proteins and immunochemical measurement','Serum protein electrophoresis','Lipids, lipoproteins, and cardiovascular risk'],summary:'',videoUrl:''},
+      {number:'6.6',title:'Enzymes and Cardiac Markers',topics:['Enzyme kinetics','Liver enzymes','Cardiac biomarkers','Isoenzymes'],reading:['Clinical enzymology','Enzymes in liver and muscle disease','Cardiac biomarkers and acute coronary syndromes'],summary:'',videoUrl:''},
+      {number:'6.7',title:'Clinical Endocrinology',topics:['Pituitary','Thyroid','Adrenal','Gonadal hormones','Calcium regulation'],reading:['Hormones and endocrine function','Pituitary, thyroid, and adrenal testing','Reproductive endocrinology','Parathyroid hormone and calcium metabolism'],summary:'',videoUrl:''},
+      {number:'6.8',title:'Toxicology and Therapeutic Drug Monitoring',topics:['Pharmacokinetics','TDM','Drugs of abuse','Toxic alcohols','Poisoning'],reading:['Therapeutic drug monitoring','Clinical toxicology','Drugs of abuse testing','Pharmacokinetics and specimen timing'],summary:'',videoUrl:''},
+      {number:'6.9',title:'Tumor Markers',topics:['Tumor-associated antigens','Screening limits','Monitoring therapy'],reading:['Cancer biology and tumor markers','Clinical use and limitations of tumor-associated markers'],summary:'',videoUrl:''},
+      {number:'6.10',title:'Clinical Chemistry Problem-Solving',topics:['Calculations','Interferences','Method evaluation','Pattern recognition'],reading:['Analytical interferences and method evaluation','Clinical chemistry calculations','Integrated case interpretation'],summary:'',videoUrl:''}
+    ],
+    bibliography:[
+      'Bishop ML, Fody EP, Schoeff LE. Clinical Chemistry: Principles, Procedures, and Correlations. 7th ed. Lippincott Williams & Wilkins; 2013.',
+      'Burtis CA, Ashwood ER, Burns DE. Tietz Fundamentals of Clinical Chemistry. 7th ed. Saunders; 2015.',
+      'Burtis CA, Ashwood ER, Burns DE. Tietz Textbook of Clinical Chemistry and Molecular Diagnostics. 5th ed. Saunders; 2012.',
+      'McPherson RA, Pincus MR. Henry’s Clinical Diagnosis and Management by Laboratory Methods. 23rd ed. Elsevier; 2017.'
+    ]
+  },
+  immunology:{
+    title:'Immunology',
+    accent:'#7b61ff',
+    sourceLabel:'Medical Laboratory Science Review, Fifth Edition — Immunology outline',
+    chapters:[
+      {number:'3.1',title:'Basic Principles of Immunology',topics:['Innate immunity','Adaptive immunity','Cells and organs','Antigens','Cytokines'],reading:['Cells and organs of the immune system','Innate and adaptive immune responses','Antigens, antibodies, cytokines, and immune regulation'],summary:'',videoUrl:''},
+      {number:'3.2',title:'Immunologic Procedures',topics:['Agglutination','Precipitation','Immunoassay','Immunofluorescence','Flow cytometry'],reading:['Antigen–antibody reactions','Serologic methods and immunoassays','Immunofluorescence and flow cytometry','Assay quality and interpretation'],summary:'',videoUrl:''},
+      {number:'3.3',title:'Infectious Diseases',topics:['Serologic diagnosis','Viral markers','Bacterial antibodies','Congenital infections'],reading:['Serologic diagnosis of infectious disease','Viral hepatitis and HIV testing','Syphilis and other microbial serology'],summary:'',videoUrl:''},
+      {number:'3.4',title:'Autoimmune Diseases',topics:['ANA patterns','Autoantibodies','Systemic disease','Organ-specific disease'],reading:['Mechanisms of autoimmunity','Systemic autoimmune diseases','Organ-specific autoimmunity','Autoantibody testing and interpretation'],summary:'',videoUrl:''},
+      {number:'3.5',title:'Hypersensitivity',topics:['Types I–IV','Allergy testing','Immune complex disease'],reading:['Immediate hypersensitivity and allergy','Antibody-mediated and immune-complex reactions','Delayed-type hypersensitivity'],summary:'',videoUrl:''},
+      {number:'3.6',title:'Immunoglobulins, Complement, and Cellular Testing',topics:['Immunoglobulin classes','Complement pathways','Lymphocyte subsets','Immunodeficiency'],reading:['Immunoglobulin structure and function','Complement pathways and testing','Cellular immune testing','Primary and secondary immunodeficiencies'],summary:'',videoUrl:''},
+      {number:'3.7',title:'Tumor Testing and Transplantation',topics:['Tumor immunology','HLA','Transplant matching','Rejection'],reading:['Tumor immunology and laboratory markers','Major histocompatibility complex and HLA testing','Transplant immunology and rejection'],summary:'',videoUrl:''},
+      {number:'3.8',title:'Immunology Problem-Solving',topics:['Serology patterns','Method selection','Result correlation','Troubleshooting'],reading:['Integrated serology interpretation','Method selection and troubleshooting','Clinical immunology case studies'],summary:'',videoUrl:''}
+    ],
+    bibliography:[
+      'Chapel H, Haeney M, Misbah S, et al. Essentials of Clinical Immunology. 6th ed. Wiley Blackwell; 2014.',
+      'Detrick B, Hamilton RG, Schmitz J. Manual of Molecular and Clinical Laboratory Immunology. 8th ed. ASM Press; 2017.',
+      'Kindt TJ, Osborne BA, Goldsby RA. Kuby Immunology. 6th ed. WH Freeman; 2006.',
+      'Mahon C, Tice D. Clinical Laboratory Immunology. Prentice-Hall; 2006.',
+      'Nakamura R, Burek L, Cook L, et al. Clinical Diagnostic Immunology: Protocols in Quality Assurance and Standardization. Blackwell Publishing; 1998.',
+      'Playfair H, Chain BM. Immunology at a Glance. 10th ed. Blackwell Publishing; 2012.',
+      'Geha R, Notarangelo L. Case Studies in Immunology: A Clinical Companion. 7th ed. Garland Science; 2016.',
+      'Stevens CD. Clinical Immunology and Serology: A Laboratory Perspective. F.A. Davis; 2016.'
+    ]
+  }
+};
 const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Guess: MLS Edition',url:'Guess_MLS_Edition.html',description:'Pick a subject, read the clue, and guess the answer',topic:'All Subjects',icon:'MLS',color:'#6b4fd8'},
   {title:"Who's That Blood Group?",url:'Blood_Group_Game.html',description:'Timed blood group cases plus rapid antigen-gated mini rounds',topic:'Blood Bank',icon:'BG',color:'#b22222',preview_url:'assets/interactive-previews/blood_group_game.png?v=20260606-4'},
@@ -2847,12 +2943,12 @@ function getSubjectIcon(key,fallback){
 
 const HOME_SUBJECT_DETAILS={
   blood_bank:'Questions, images, case studies',
-  clinical_chemistry:'Questions, formulas, ranges, flowcharts',
+  clinical_chemistry:'Questions, study outline, formulas, ranges',
   hematology:'Questions, images, morphology, cases',
   microbiology:'Images, cases, organism ID',
   urinalysis:'Questions, images, case studies',
   lab_operations:'Questions, QC, statistics, safety',
-  immunology:'Questions, serology, cases',
+  immunology:'Questions, study outline, serology',
   para_myco:'Questions, images, organism recognition'
 };
 
@@ -3422,8 +3518,10 @@ function renderSubjectView(v){
     ${appState.subject==='para_myco'?'<div style="font-size:11px;color:var(--accent);margin-bottom:12px;font-style:italic">* Per ASCP BOC 2025, Parasitology &amp; Mycology are subcategories of Microbiology.</div>':''}
     <div class="tabs">
       <button class="tab ${appState.subjectTab==='quiz'?'active':''}" data-tab="quiz" onclick="switchTab('quiz')">Quiz</button>
-      <button class="tab ${appState.subjectTab==='images'?'active':''}" data-tab="images" onclick="switchTab('images')">Learn by Images</button>
-      <button class="tab ${appState.subjectTab==='cases'?'active':''}" data-tab="cases" onclick="switchTab('cases')">Cases</button>
+      ${STUDY_OUTLINES[appState.subject]
+        ?`<button class="tab ${appState.subjectTab==='outline'?'active':''}" data-tab="outline" onclick="switchTab('outline')">Study Outline</button>`
+        :`<button class="tab ${appState.subjectTab==='images'?'active':''}" data-tab="images" onclick="switchTab('images')">Learn by Images</button>
+          <button class="tab ${appState.subjectTab==='cases'?'active':''}" data-tab="cases" onclick="switchTab('cases')">Cases</button>`}
     </div>
     <div id="tab-content"></div>
   `;
@@ -3462,10 +3560,133 @@ function switchTab(tab){
 async function renderTab(){
   const el=document.getElementById('tab-content');if(!el)return;
   if(appState.subjectTab==='quiz')await renderQuizTab(el);
+  else if(appState.subjectTab==='outline')renderStudyOutlineTab(el);
   else if(appState.subjectTab==='images')await renderImagesTab(el);
   else if(appState.subjectTab==='cases')await renderCasesTab(el);
   requestAnimationFrame(syncQuizShell);
 }
+
+function renderStudyOutlineTab(el){
+  const subjectKey=appState.subject;
+  const outline=STUDY_OUTLINES[subjectKey];
+  if(!outline){el.innerHTML='<div class="empty">No study outline is available for this subject.</div>';return;}
+  const cards=outline.chapters.map((chapter,index)=>`
+    <button class="study-chapter-card" type="button" onclick="openStudyOutlineChapter('${subjectKey}',${index})">
+      <span class="study-chapter-number">${esc(chapter.number)}</span>
+      <span>
+        <span class="study-chapter-title">${esc(chapter.title)}</span>
+        <span class="study-chapter-topics">${chapter.topics.map(esc).join(' · ')}</span>
+      </span>
+      <span class="study-chapter-open" aria-hidden="true">›</span>
+    </button>`).join('');
+  const bibliography=outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('');
+  el.innerHTML=`
+    <div class="study-outline-shell" style="--study-accent:${outline.accent}">
+      <section class="study-outline-hero">
+        <div>
+          <div class="study-outline-kicker">Study Outline</div>
+          <h2>${esc(outline.title)}</h2>
+          <p>Select a section to open its study window. Each window is ready for a quick summary, an external video embed, and a focused reading guide.</p>
+        </div>
+        <div class="study-embed-note">External video embeds · no video files stored</div>
+      </section>
+      <div class="study-outline-grid">${cards}</div>
+      <details class="study-bibliography">
+        <summary>Source bibliography (${outline.bibliography.length} books)</summary>
+        <div class="study-bibliography-body">
+          <div class="study-bibliography-note">These are the books listed in the supplied ${esc(outline.title)} bibliography. That bibliography does not include chapter or page numbers. The study windows list the chapter-title keywords to use now; exact chapter and page mappings can be added after the matching editions are uploaded.</div>
+          <ol>${bibliography}</ol>
+        </div>
+      </details>
+    </div>`;
+}
+
+function externalStudyVideoEmbedUrl(url){
+  const value=String(url||'').trim();
+  if(!value)return '';
+  try{
+    const parsed=new URL(value);
+    const host=parsed.hostname.replace(/^www\./,'').toLowerCase();
+    if(host==='youtu.be'){
+      const id=parsed.pathname.split('/').filter(Boolean)[0];
+      return id?`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:'';
+    }
+    if(host==='youtube.com'||host==='m.youtube.com'){
+      const id=parsed.searchParams.get('v')||(parsed.pathname.match(/^\/embed\/([^/]+)/)||[])[1];
+      return id?`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:'';
+    }
+    if(host==='vimeo.com'||host==='player.vimeo.com'){
+      const id=parsed.pathname.split('/').filter(Boolean).find(part=>/^\d+$/.test(part));
+      return id?`https://player.vimeo.com/video/${id}`:'';
+    }
+  }catch(e){}
+  return '';
+}
+
+function studyVideoEmbedHtml(url){
+  const embedUrl=externalStudyVideoEmbedUrl(url);
+  if(embedUrl)return `<div class="study-video-slot" style="padding:0"><iframe src="${esc(embedUrl)}" title="Study video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+  return '<div class="study-video-slot"><div><strong>External video space</strong><br>Add a YouTube or Vimeo link later and it will play here without storing the video on this site or your computer.</div></div>';
+}
+
+function openStudyOutlineChapter(subjectKey,index){
+  const outline=STUDY_OUTLINES[subjectKey];
+  const chapter=outline?.chapters?.[index];
+  if(!outline||!chapter)return;
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!dialog||!body)return;
+  dialog.classList.add('study-outline-modal');
+  dialog.style.setProperty('--study-accent',outline.accent);
+  const summary=chapter.summary
+    ?`<p>${escNL(chapter.summary)}</p>`
+    :'<p>This section is ready for the quick summary. The outline and reading targets are in place so the summary can be added without changing the layout.</p>';
+  body.innerHTML=`
+    <div class="study-outline-modal-body">
+      <header class="study-window-head">
+        <span class="study-window-number">${esc(chapter.number)}</span>
+        <div style="min-width:0;flex:1">
+          <div class="study-window-title">${esc(chapter.title)}</div>
+          <div class="study-window-sub">${esc(outline.sourceLabel)}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow()" aria-label="Close study window">✕</button>
+      </header>
+      <div class="study-window-content">
+        <section class="study-window-panel">
+          <h3>What to study</h3>
+          <p>Use these topics to organize notes, practice questions, and future summaries.</p>
+          <div class="study-topic-list">${chapter.topics.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
+        </section>
+        <section class="study-window-panel">
+          <h3>Quick summary</h3>
+          ${summary}
+        </section>
+        <section class="study-window-panel">
+          <h3>Video</h3>
+          ${studyVideoEmbedHtml(chapter.videoUrl)}
+        </section>
+        <section class="study-window-panel">
+          <h3>Reading guide</h3>
+          <p>In the listed bibliography editions, use the table of contents or index to find chapters with these titles or closely matching headings.</p>
+          <div class="study-topic-list">${chapter.reading.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
+        </section>
+      </div>
+    </div>`;
+  modal.onclick=e=>{if(e.target===modal)closeStudyOutlineWindow();};
+  modal.classList.remove('hidden');
+}
+
+function closeStudyOutlineWindow(){
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  if(dialog){dialog.classList.remove('study-outline-modal');dialog.style.removeProperty('--study-accent');}
+  if(modal){modal.classList.add('hidden');modal.onclick=null;}
+}
+
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&document.querySelector('#condition-modal .study-outline-modal'))closeStudyOutlineWindow();
+});
 
 // ─── QUIZ TAB ─────────────────────────────────────────────────────────────────
 async function renderQuizTab(el){
