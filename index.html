@@ -970,27 +970,43 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .study-outline-shell{--study-accent:var(--accent);max-width:1080px;margin:0 auto}
 .study-outline-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 22px;margin-bottom:16px;border-radius:var(--r2);border:1px solid color-mix(in srgb,var(--study-accent) 34%,var(--border));background:linear-gradient(135deg,color-mix(in srgb,var(--study-accent) 12%,var(--bg2)),var(--bg2))}
 .study-outline-kicker{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--study-accent);margin-bottom:6px}
-.study-outline-hero h2{margin:0 0 7px;font-size:20px;color:var(--text)}
-.study-outline-hero p{margin:0;max-width:720px;color:var(--text2);font-size:13px;line-height:1.55}
+.study-outline-hero h2{margin:0 0 8px;font-size:26px;color:var(--text)}
+.study-outline-hero p{margin:0;max-width:720px;color:var(--text2);font-size:17px;line-height:1.55}
 .study-embed-note{flex:0 0 auto;padding:7px 10px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:10px;white-space:nowrap}
 .study-outline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.study-chapter-card{appearance:none;width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:17px 18px;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.study-chapter-card{appearance:none;width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:21px 20px;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .study-chapter-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--study-accent) 65%,var(--border));box-shadow:0 10px 24px #00000012}
-.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:48px;height:34px;padding:0 9px;border-radius:10px;background:color-mix(in srgb,var(--study-accent) 13%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:12px;font-weight:800}
-.study-chapter-title{font-size:13px;font-weight:700;line-height:1.35;color:var(--text)}
-.study-chapter-topics{margin-top:4px;font-size:11px;color:var(--text3);line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:48px;height:34px;padding:0 9px;border-radius:10px;background:color-mix(in srgb,var(--study-accent) 13%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:14px;font-weight:800}
+.study-chapter-title{font-size:16px;font-weight:700;line-height:1.35;color:var(--text)}
+.study-chapter-topics{margin-top:6px;font-size:13px;color:var(--text3);line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .study-chapter-open{color:var(--study-accent);font-size:20px}
 .study-bibliography{margin-top:16px;border:1px solid var(--border);border-radius:var(--r2);background:var(--bg2);overflow:hidden}
-.study-bibliography summary{cursor:pointer;padding:15px 18px;font-size:13px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;justify-content:space-between}
+.study-bibliography summary{cursor:pointer;padding:17px 19px;font-size:15px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;justify-content:space-between}
 .study-bibliography summary::-webkit-details-marker{display:none}
 .study-bibliography summary::after{content:'+';color:var(--study-accent);font-size:19px;font-weight:500}
 .study-bibliography[open] summary::after{content:'−'}
 .study-bibliography-body{padding:0 18px 18px;border-top:1px solid var(--border)}
 .study-bibliography-note{margin:14px 0 10px;padding:10px 12px;border-radius:10px;background:var(--bg3);color:var(--text2);font-size:11px;line-height:1.55}
 .study-bibliography ol{margin:0;padding-left:20px;color:var(--text2)}
-.study-bibliography li{padding:5px 0;font-size:11px;line-height:1.55}
+.study-bibliography li{padding:7px 0;font-size:13px;line-height:1.6}
+.study-ascp-card{appearance:none;width:100%;display:flex;align-items:center;gap:18px;margin:0 0 14px;padding:22px 24px;text-align:left;border:1px solid #c79000;border-radius:var(--r2);background:linear-gradient(135deg,#ffe36d,#f4c842);color:#27210b;cursor:pointer;box-shadow:0 8px 22px #b7861822;transition:transform .16s ease,box-shadow .16s ease}
+.study-ascp-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px #b7861833}
+.study-ascp-mark{display:flex;align-items:center;justify-content:center;min-width:68px;height:42px;border-radius:12px;background:#ffffff99;border:1px solid #8b690044;font-size:13px;font-weight:900;letter-spacing:.06em}
+.study-ascp-title{font-size:19px;font-weight:800;line-height:1.25}
+.study-ascp-sub{margin-top:5px;font-size:13px;font-weight:650;color:#5b4710}
+.study-ascp-open{margin-left:auto;font-size:25px;font-weight:700}
+.ascp-outline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ascp-section-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:17px 18px}
+.ascp-section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.ascp-section-number{color:#c89400;font-family:var(--mono);font-size:13px;font-weight:900}
+.ascp-section-title{font-size:16px;font-weight:750;color:var(--text)}
+.ascp-section-card ul{margin:0;padding-left:20px;color:var(--text2)}
+.ascp-section-card li{padding:4px 0;font-size:13px;line-height:1.5}
+.study-empty-area{min-height:74px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
+.study-video-slot.is-empty{min-height:220px;color:transparent}
+.study-specifics-area{min-height:94px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
 @media(max-width:720px){
-  .study-outline-grid{grid-template-columns:1fr}
+  .study-outline-grid,.ascp-outline-grid{grid-template-columns:1fr}
   .study-outline-hero{display:block}
   .study-embed-note{display:inline-flex;margin-top:13px}
   .study-window-head,.study-window-content{padding-left:17px;padding-right:17px}
@@ -1489,6 +1505,16 @@ const STUDY_OUTLINES={
     title:'Clinical Chemistry',
     accent:'#2f7dd1',
     sourceLabel:'Medical Laboratory Science Review, Fifth Edition — Clinical Chemistry outline',
+    ascp:{
+      percent:'17–22%',
+      sourceLabel:'ASCP MLS/MLS(ASCPi) Examination Content Guideline · Revised September 25, 2025',
+      sections:[
+        {number:'I',title:'General Chemistry',items:['Carbohydrates — theory, physiology, procedures, interpretation, and disease correlation','Lipids — lipoproteins, phospholipids, triglycerides, cholesterol, and apolipoproteins','Heme derivatives — hemoglobin, bilirubin, urobilinogen, myoglobin, and porphyrins']},
+        {number:'II',title:'Proteins and Enzymes',items:['Enzymes — LD, CK, AST/ALT, GGT, lipase, amylase, alkaline phosphatase, and ACE','Proteins and other nitrogen-containing compounds','Amino acids, urea, uric acid, creatinine, ammonia, tumor markers, and cardiac markers','Procedures, clearances, interpretation, and disease correlation']},
+        {number:'III',title:'Acid-Base, Blood Gases, and Electrolytes',items:['Acid-base determinations and blood gases','Henderson-Hasselbalch equation, pH, hydrogen ions, and oxygen/carbon dioxide transport','Electrolytes, calcium, magnesium, phosphorus, iron, TIBC, and trace elements','Osmolality and anion gap calculations']},
+        {number:'IV',title:'Special Chemistry',items:['Endocrinology','Vitamins and nutrition','Therapeutic drug monitoring','Toxicology']}
+      ]
+    },
     chapters:[
       {number:'6.1',title:'Instrumentation',topics:['Spectrophotometry','Electrochemistry','Chromatography','Mass spectrometry','Automation'],reading:['Laboratory instrumentation and analytical principles','Spectrophotometry and optical methods','Electrochemical methods and ion-selective electrodes','Chromatography and mass spectrometry'],summary:'',videoUrl:''},
       {number:'6.2',title:'Blood Gases, pH, and Electrolytes',topics:['Acid–base balance','Blood gases','Electrolytes','Osmolality','Anion gap'],reading:['Blood gas measurement and acid–base interpretation','Electrolytes and osmolality','Ion-selective electrode methods'],summary:'',videoUrl:''},
@@ -1512,6 +1538,18 @@ const STUDY_OUTLINES={
     title:'Immunology',
     accent:'#7b61ff',
     sourceLabel:'Medical Laboratory Science Review, Fifth Edition — Immunology outline',
+    ascp:{
+      percent:'5–10%',
+      sourceLabel:'ASCP MLS/MLS(ASCPi) Examination Content Guideline · Revised September 25, 2025',
+      sections:[
+        {number:'I',title:'Principles of Immunology',items:['Immune system physiology — primary and secondary responses; B cells, T cells, and macrophages; genetics','Immunoglobulins — classes, subclasses, structure, and properties','Antigen-antibody interactions — principles and testing methods','Complement — classical and alternative pathways and biologic properties']},
+        {number:'II',title:'Diseases of the Immune System',items:['Autoimmunity — systemic and organ-specific','Hypersensitivity — types I, II, III, and IV','Immunoproliferative diseases — monoclonal gammopathies','Immunodeficiency — hereditary and acquired']},
+        {number:'III',title:'Transplantation',items:['Graft-versus-host disease','HLA typing','Tumor immunology']},
+        {number:'IV',title:'Infectious Disease Serology',items:['Viral pathogens — hepatitis A/B/C, EBV, HIV, CMV, rubella, and measles','Treponema pallidum and Borrelia burgdorferi infection stages','Tuberculosis infection testing']},
+        {number:'V',title:'Serologic Procedures',items:['ANA, thyroid antibodies, and rheumatoid factor','Labeled immunoassays and immunofluorescence','Nontreponemal and treponemal syphilis testing','Cytokine testing']},
+        {number:'VI',title:'Test Results',items:['Interpretation','Confirmatory testing','Disease state correlation']}
+      ]
+    },
     chapters:[
       {number:'3.1',title:'Basic Principles of Immunology',topics:['Innate immunity','Adaptive immunity','Cells and organs','Antigens','Cytokines'],reading:['Cells and organs of the immune system','Innate and adaptive immune responses','Antigens, antibodies, cytokines, and immune regulation'],summary:'',videoUrl:''},
       {number:'3.2',title:'Immunologic Procedures',topics:['Agglutination','Precipitation','Immunoassay','Immunofluorescence','Flow cytometry'],reading:['Antigen–antibody reactions','Serologic methods and immunoassays','Immunofluorescence and flow cytometry','Assay quality and interpretation'],summary:'',videoUrl:''},
@@ -3586,16 +3624,22 @@ function renderStudyOutlineTab(el){
         <div>
           <div class="study-outline-kicker">Study Outline</div>
           <h2>${esc(outline.title)}</h2>
-          <p>Select a section to open its study window. Each window is ready for a quick summary, an external video embed, and a focused reading guide.</p>
+          <p>Select a section to open its study window.</p>
         </div>
-        <div class="study-embed-note">External video embeds · no video files stored</div>
       </section>
+      <button class="study-ascp-card" type="button" onclick="openASCPStudyOutline('${subjectKey}')">
+        <span class="study-ascp-mark">ASCP</span>
+        <span>
+          <span class="study-ascp-title">ASCP Examination Content Outline</span>
+          <span class="study-ascp-sub">${esc(outline.title)} · ${esc(outline.ascp.percent)} of the examination</span>
+        </span>
+        <span class="study-ascp-open" aria-hidden="true">›</span>
+      </button>
       <div class="study-outline-grid">${cards}</div>
       <details class="study-bibliography">
         <summary>Source bibliography (${outline.bibliography.length} books)</summary>
         <div class="study-bibliography-body">
-          <div class="study-bibliography-note">These are the books listed in the supplied ${esc(outline.title)} bibliography. That bibliography does not include chapter or page numbers. The study windows list the chapter-title keywords to use now; exact chapter and page mappings can be added after the matching editions are uploaded.</div>
-          <ol>${bibliography}</ol>
+          <ol style="margin-top:14px">${bibliography}</ol>
         </div>
       </details>
     </div>`;
@@ -3626,7 +3670,52 @@ function externalStudyVideoEmbedUrl(url){
 function studyVideoEmbedHtml(url){
   const embedUrl=externalStudyVideoEmbedUrl(url);
   if(embedUrl)return `<div class="study-video-slot" style="padding:0"><iframe src="${esc(embedUrl)}" title="Study video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
-  return '<div class="study-video-slot"><div><strong>External video space</strong><br>Add a YouTube or Vimeo link later and it will play here without storing the video on this site or your computer.</div></div>';
+  return '<div class="study-video-slot is-empty" aria-label="Video"></div>';
+}
+
+function openASCPStudyOutline(subjectKey){
+  const outline=STUDY_OUTLINES[subjectKey];
+  const ascp=outline?.ascp;
+  if(!outline||!ascp)return;
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!dialog||!body)return;
+  dialog.classList.add('study-outline-modal');
+  dialog.style.setProperty('--study-accent','#c89400');
+  const sections=ascp.sections.map(section=>`
+    <section class="ascp-section-card">
+      <div class="ascp-section-head">
+        <span class="ascp-section-number">${esc(section.number)}</span>
+        <span class="ascp-section-title">${esc(section.title)}</span>
+      </div>
+      <ul>${section.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>
+    </section>`).join('');
+  const bibliography=outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('');
+  body.innerHTML=`
+    <div class="study-outline-modal-body">
+      <header class="study-window-head">
+        <span class="study-window-number">ASCP</span>
+        <div style="min-width:0;flex:1">
+          <div class="study-window-title">${esc(outline.title)} Content Outline</div>
+          <div class="study-window-sub">${esc(ascp.sourceLabel)} · ${esc(ascp.percent)} of the examination</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow()" aria-label="Close ASCP outline">✕</button>
+      </header>
+      <div class="study-window-content">
+        <div class="ascp-outline-grid">${sections}</div>
+        <section class="study-window-panel">
+          <h3>Book Chapters / Pages</h3>
+          <div class="study-specifics-area" aria-label="ASCP book chapters and pages"></div>
+        </section>
+        <section class="study-window-panel">
+          <h3>Source Bibliography</h3>
+          <ol style="margin:0;padding-left:20px;color:var(--text2)">${bibliography}</ol>
+        </section>
+      </div>
+    </div>`;
+  modal.onclick=e=>{if(e.target===modal)closeStudyOutlineWindow();};
+  modal.classList.remove('hidden');
 }
 
 function openStudyOutlineChapter(subjectKey,index){
@@ -3641,7 +3730,7 @@ function openStudyOutlineChapter(subjectKey,index){
   dialog.style.setProperty('--study-accent',outline.accent);
   const summary=chapter.summary
     ?`<p>${escNL(chapter.summary)}</p>`
-    :'<p>This section is ready for the quick summary. The outline and reading targets are in place so the summary can be added without changing the layout.</p>';
+    :'<div class="study-empty-area" aria-label="Quick summary"></div>';
   body.innerHTML=`
     <div class="study-outline-modal-body">
       <header class="study-window-head">
@@ -3655,7 +3744,6 @@ function openStudyOutlineChapter(subjectKey,index){
       <div class="study-window-content">
         <section class="study-window-panel">
           <h3>What to study</h3>
-          <p>Use these topics to organize notes, practice questions, and future summaries.</p>
           <div class="study-topic-list">${chapter.topics.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
         </section>
         <section class="study-window-panel">
@@ -3667,9 +3755,8 @@ function openStudyOutlineChapter(subjectKey,index){
           ${studyVideoEmbedHtml(chapter.videoUrl)}
         </section>
         <section class="study-window-panel">
-          <h3>Reading guide</h3>
-          <p>In the listed bibliography editions, use the table of contents or index to find chapters with these titles or closely matching headings.</p>
-          <div class="study-topic-list">${chapter.reading.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
+          <h3>Book Chapters / Pages</h3>
+          <div class="study-specifics-area" aria-label="Book chapters and pages"></div>
         </section>
       </div>
     </div>`;
