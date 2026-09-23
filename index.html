@@ -1009,7 +1009,8 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .ascp-outline-line.level-3{padding-left:40px}
 .ascp-topic-summary{margin-top:17px;padding-top:15px;border-top:1px solid var(--border)}
 .ascp-topic-summary-title{margin-bottom:8px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text)}
-.ascp-topic-summary-box{min-height:104px;border:1px solid var(--border);border-radius:10px;background:var(--bg3)}
+.ascp-topic-summary-box{min-height:104px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg3)}
+.ascp-topic-summary-box p{margin:0;color:var(--text2);font-size:13px;line-height:1.65}
 .study-empty-area{min-height:74px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
 .study-video-slot.is-empty{min-height:220px;color:transparent}
 @media(max-width:720px){
@@ -1521,6 +1522,7 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Carbohydrates",
+              "summary": "Glucose concentration reflects intestinal absorption, hepatic production, cellular use, insulin, and counterregulatory hormones. Laboratory assessment includes plasma glucose, tolerance testing, and glycated proteins, with attention to specimen timing, glycolysis, method interference, and the pattern expected in diabetes or hypoglycemia.",
               "lines": [
                 {
                   "level": 1,
@@ -1571,6 +1573,7 @@ const STUDY_OUTLINES={
             {
               "letter": "B",
               "title": "Lipids",
+              "summary": "Cholesterol and triglycerides circulate in lipoproteins whose apolipoproteins direct transport and metabolism. Interpret total cholesterol, HDL, LDL, and triglycerides together, considering fasting status, calculation limits, analytical interference, inherited disorders, and cardiovascular risk.",
               "lines": [
                 {
                   "level": 1,
@@ -1633,6 +1636,7 @@ const STUDY_OUTLINES={
             {
               "letter": "C",
               "title": "Heme Derivatives",
+              "summary": "Heme breakdown produces bilirubin, which is transported to the liver, conjugated, and excreted. Bilirubin fractions and urobilinogen help separate increased production, impaired hepatic handling, and obstruction. Hemoglobin derivatives, myoglobin, and porphyrins require methods and specimen handling suited to their chemistry.",
               "lines": [
                 {
                   "level": 1,
@@ -1701,6 +1705,7 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Enzymes",
+              "summary": "Enzyme assays measure reaction rate under controlled substrate, pH, temperature, and cofactor conditions. Tissue distribution and isoenzymes give diagnostic value to LD, CK, AST, ALT, GGT, lipase, amylase, alkaline phosphatase, and related enzymes, but results must be correlated with timing and organ patterns.",
               "lines": [
                 {
                   "level": 1,
@@ -1775,6 +1780,7 @@ const STUDY_OUTLINES={
             {
               "letter": "B",
               "title": "Proteins and Other Nitrogen-Containing Compounds",
+              "summary": "Protein concentration and electrophoretic patterns reflect synthesis, transport, inflammation, immune activity, and loss. Urea, creatinine, uric acid, and ammonia assess different metabolic and excretory processes. Clearance calculations, cardiac markers, and tumor markers require correct timing and clinical correlation.",
               "lines": [
                 {
                   "level": 1,
@@ -1859,6 +1865,7 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Acid-Base Determinations (Including Blood Gases)",
+              "summary": "The bicarbonate and carbonic acid buffer relationship links pH with PCO2 and bicarbonate. Interpret all three values to identify metabolic or respiratory acidosis or alkalosis and expected compensation. Anaerobic collection, correct heparin, prompt analysis, and temperature control protect blood gas accuracy.",
               "lines": [
                 {
                   "level": 1,
@@ -1905,6 +1912,7 @@ const STUDY_OUTLINES={
             {
               "letter": "B",
               "title": "Electrolytes",
+              "summary": "Sodium and its accompanying anions dominate extracellular osmolality, while potassium, calcium, magnesium, phosphorus, iron, and trace elements support cellular and organ function. Ion selective methods, specimen quality, fluid balance, and calculations such as anion gap and osmolality guide interpretation.",
               "lines": [
                 {
                   "level": 1,
@@ -1961,6 +1969,7 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Endocrinology",
+              "summary": "Endocrine results are interpreted through feedback axes, target gland function, hormone binding, and secretion timing. Pair pituitary and target hormones when appropriate, account for circadian or episodic release, and use stimulation or suppression tests when a basal result cannot localize dysfunction.",
               "lines": [
                 {
                   "level": 1,
@@ -2035,6 +2044,7 @@ const STUDY_OUTLINES={
             {
               "letter": "B",
               "title": "Vitamins and Nutrition",
+              "summary": "Water soluble and fat soluble vitamins serve as cofactors or regulators in metabolism. Deficiency and excess produce characteristic biochemical patterns, while specimen protection, nutritional history, absorption, storage, and interacting disease states affect interpretation.",
               "lines": [
                 {
                   "level": 1,
@@ -2077,6 +2087,7 @@ const STUDY_OUTLINES={
             {
               "letter": "C",
               "title": "Therapeutic Drug Monitoring",
+              "summary": "A measured drug concentration is meaningful only when linked to dose, specimen time, absorption, distribution, metabolism, excretion, and therapeutic range. Peak or trough collection depends on the drug, and altered protein binding or organ function can change toxicity risk at a reported concentration.",
               "lines": [
                 {
                   "level": 1,
@@ -2147,6 +2158,7 @@ const STUDY_OUTLINES={
             {
               "letter": "D",
               "title": "Toxicology",
+              "summary": "Toxicology testing combines rapid screening with specific confirmation. Interpret results with exposure time, metabolism, symptoms, specimen integrity, and analytical limits. Volatile substances, metals, drugs of abuse, and common overdoses require methods and collection procedures suited to the suspected toxin.",
               "lines": [
                 {
                   "level": 1,
@@ -2215,18 +2227,19 @@ const STUDY_OUTLINES={
       ]
     },
     chapters:[
-      {number:'6.1',title:'Instrumentation',topics:['Spectrophotometry','Electrochemistry','Chromatography','Mass spectrometry','Automation'],reading:['Laboratory instrumentation and analytical principles','Spectrophotometry and optical methods','Electrochemical methods and ion-selective electrodes','Chromatography and mass spectrometry'],summary:'',videoUrl:''},
-      {number:'6.2',title:'Blood Gases, pH, and Electrolytes',topics:['Acid–base balance','Blood gases','Electrolytes','Osmolality','Anion gap'],reading:['Blood gas measurement and acid–base interpretation','Electrolytes and osmolality','Ion-selective electrode methods'],summary:'',videoUrl:''},
-      {number:'6.3',title:'Glucose, Hemoglobin, Iron, and Bilirubin',topics:['Glucose testing','Diabetes','Hemoglobin derivatives','Iron studies','Bilirubin'],reading:['Carbohydrates and diabetes mellitus','Hemoglobin and iron metabolism','Heme catabolism and bilirubin'],summary:'',videoUrl:''},
-      {number:'6.4',title:'Creatinine, Uric Acid, BUN, and Ammonia',topics:['Renal function','Nitrogen metabolites','Creatinine','Uric acid','Ammonia'],reading:['Nonprotein nitrogen compounds','Renal function testing','Creatinine, urea, uric acid, and ammonia methods'],summary:'',videoUrl:''},
-      {number:'6.5',title:'Proteins, Electrophoresis, and Lipids',topics:['Plasma proteins','Electrophoresis','Lipoproteins','Dyslipidemia'],reading:['Plasma proteins and immunochemical measurement','Serum protein electrophoresis','Lipids, lipoproteins, and cardiovascular risk'],summary:'',videoUrl:''},
-      {number:'6.6',title:'Enzymes and Cardiac Markers',topics:['Enzyme kinetics','Liver enzymes','Cardiac biomarkers','Isoenzymes'],reading:['Clinical enzymology','Enzymes in liver and muscle disease','Cardiac biomarkers and acute coronary syndromes'],summary:'',videoUrl:''},
-      {number:'6.7',title:'Clinical Endocrinology',topics:['Pituitary','Thyroid','Adrenal','Gonadal hormones','Calcium regulation'],reading:['Hormones and endocrine function','Pituitary, thyroid, and adrenal testing','Reproductive endocrinology','Parathyroid hormone and calcium metabolism'],summary:'',videoUrl:''},
-      {number:'6.8',title:'Toxicology and Therapeutic Drug Monitoring',topics:['Pharmacokinetics','TDM','Drugs of abuse','Toxic alcohols','Poisoning'],reading:['Therapeutic drug monitoring','Clinical toxicology','Drugs of abuse testing','Pharmacokinetics and specimen timing'],summary:'',videoUrl:''},
-      {number:'6.9',title:'Tumor Markers',topics:['Tumor-associated antigens','Screening limits','Monitoring therapy'],reading:['Cancer biology and tumor markers','Clinical use and limitations of tumor-associated markers'],summary:'',videoUrl:''},
-      {number:'6.10',title:'Clinical Chemistry Problem-Solving',topics:['Calculations','Interferences','Method evaluation','Pattern recognition'],reading:['Analytical interferences and method evaluation','Clinical chemistry calculations','Integrated case interpretation'],summary:'',videoUrl:''}
+      {number:'6.1',title:'Instrumentation',topics:['Spectrophotometry','Electrochemistry','Chromatography','Mass spectrometry','Automation'],reading:['Laboratory instrumentation and analytical principles','Spectrophotometry and optical methods','Electrochemical methods and ion-selective electrodes','Chromatography and mass spectrometry'],summary:'Clinical chemistry instruments convert physical or chemical signals into quantitative results. Review photometry components and Beer law, atomic absorption, nephelometry and turbidimetry, fluorescence and chemiluminescence, chromatography, electrophoresis, electrochemistry, and the calibration and quality checks that reveal analytical error.',videoUrl:''},
+      {number:'6.2',title:'Blood Gases, pH, and Electrolytes',topics:['Acid–base balance','Blood gases','Electrolytes','Osmolality','Anion gap'],reading:['Blood gas measurement and acid–base interpretation','Electrolytes and osmolality','Ion-selective electrode methods'],summary:'Blood pH reflects the balance between bicarbonate and carbonic acid. Interpret pH, PCO2, and bicarbonate together, identify whether the primary process is respiratory or metabolic, and then assess compensation. Electrolytes regulate fluid balance, neuromuscular activity, and osmolality, while collection and handling can rapidly alter potassium and blood gas results.',videoUrl:''},
+      {number:'6.3',title:'Glucose, Hemoglobin, Iron, and Bilirubin',topics:['Glucose testing','Diabetes','Hemoglobin derivatives','Iron studies','Bilirubin'],reading:['Carbohydrates and diabetes mellitus','Hemoglobin and iron metabolism','Heme catabolism and bilirubin'],summary:'Glucose homeostasis depends on insulin, counterregulatory hormones, hepatic production, and tissue use. Hemoglobin, iron transport, bilirubin production, conjugation, and excretion connect erythrocyte turnover with liver function. Interpret glucose and glycated hemoglobin with specimen timing, and distinguish prehepatic, hepatic, and posthepatic bilirubin patterns.',videoUrl:''},
+      {number:'6.4',title:'Creatinine, Uric Acid, BUN, and Ammonia',topics:['Renal function','Nitrogen metabolites','Creatinine','Uric acid','Ammonia'],reading:['Nonprotein nitrogen compounds','Renal function testing','Creatinine, urea, uric acid, and ammonia methods'],summary:'Urea, creatinine, uric acid, and ammonia are nitrogenous waste products with different sources and routes of removal. BUN and creatinine are interpreted together to assess renal perfusion and filtration, uric acid reflects purine metabolism, and ammonia rises when hepatic conversion to urea is impaired. Collection, storage, and interference control are especially important for ammonia.',videoUrl:''},
+      {number:'6.5',title:'Proteins, Electrophoresis, and Lipids',topics:['Plasma proteins','Electrophoresis','Lipoproteins','Dyslipidemia'],reading:['Plasma proteins and immunochemical measurement','Serum protein electrophoresis','Lipids, lipoproteins, and cardiovascular risk'],summary:'Plasma proteins maintain oncotic pressure, transport substances, and support immunity. Total protein and albumin measurements are interpreted with serum protein electrophoresis patterns to recognize inflammation, hepatic disease, nephrotic loss, and monoclonal gammopathy. Lipid and lipoprotein results describe transport of cholesterol and triglycerides and help assess cardiovascular risk.',videoUrl:''},
+      {number:'6.6',title:'Enzymes and Cardiac Markers',topics:['Enzyme kinetics','Liver enzymes','Cardiac biomarkers','Isoenzymes'],reading:['Clinical enzymology','Enzymes in liver and muscle disease','Cardiac biomarkers and acute coronary syndromes'],summary:'Enzyme activity is measured under controlled conditions of substrate, pH, temperature, cofactors, and inhibitors. Tissue distribution and isoenzyme patterns help localize injury. Cardiac assessment relies on marker kinetics and clinical timing, with cardiac troponin as the principal marker of myocardial injury and natriuretic peptides supporting heart failure evaluation.',videoUrl:''},
+      {number:'6.7',title:'Clinical Endocrinology',topics:['Pituitary','Thyroid','Adrenal','Gonadal hormones','Calcium regulation'],reading:['Hormones and endocrine function','Pituitary, thyroid, and adrenal testing','Reproductive endocrinology','Parathyroid hormone and calcium metabolism'],summary:'Endocrine testing follows gland axes and feedback control. Interpret the target hormone with its controlling pituitary hormone, consider circadian or episodic secretion, and use stimulation or suppression testing when a random value cannot distinguish primary from secondary disease.',videoUrl:''},
+      {number:'6.8',title:'Toxicology and Therapeutic Drug Monitoring',topics:['Pharmacokinetics','TDM','Drugs of abuse','Toxic alcohols','Poisoning'],reading:['Therapeutic drug monitoring','Clinical toxicology','Drugs of abuse testing','Pharmacokinetics and specimen timing'],summary:'Therapeutic drug monitoring links concentration with dose timing, absorption, distribution, metabolism, excretion, and therapeutic range. Peak and trough specimens must match the drug and clinical question. Toxicology uses screening methods for rapid detection and more specific methods for confirmation, with specimen integrity and clinical correlation guiding interpretation.',videoUrl:''},
+      {number:'6.9',title:'Tumor Markers',topics:['Tumor-associated antigens','Screening limits','Monitoring therapy'],reading:['Cancer biology and tumor markers','Clinical use and limitations of tumor-associated markers'],summary:'Tumor markers are usually proteins or antigens released by malignant or associated tissues. Their greatest value is monitoring treatment, recurrence, or tumor burden after diagnosis because many lack enough specificity for population screening. Interpret trends with the tumor type, analytical method, and nonmalignant causes of elevation.',videoUrl:''},
+      {number:'6.10',title:'Clinical Chemistry Problem-Solving',topics:['Calculations','Interferences','Method evaluation','Pattern recognition'],reading:['Analytical interferences and method evaluation','Clinical chemistry calculations','Integrated case interpretation'],summary:'Clinical chemistry problem solving begins with specimen quality, method limitations, reference intervals, and internal consistency. Check timing, contamination, hemolysis, lipemia, icterus, calibration, and interfering substances before assigning a disease explanation. Correlate related analytes and repeat or confirm results when the pattern is physiologically implausible.',videoUrl:''}
     ],
     bibliography:[
+      'Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020.',
       'Bishop ML, Fody EP, Van Siclen C, Mistler JM, Moy M. Clinical Chemistry: Principles, Techniques, and Correlations. 9th ed. Jones & Bartlett Learning; 2023.',
       'Burtis CA, Ashwood ER, Burns DE. Tietz Fundamentals of Clinical Chemistry. 7th ed. Saunders; 2015.',
       'Burtis CA, Ashwood ER, Burns DE. Tietz Textbook of Clinical Chemistry and Molecular Diagnostics. 5th ed. Saunders; 2012.',
@@ -2246,6 +2259,7 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Immune System Physiology",
+              "summary": "Innate defenses act quickly through barriers, phagocytes, inflammation, complement, and natural killer cells. Adaptive immunity uses antigen specific B cells, T cells, antibodies, cytokines, and memory. Bone marrow, thymus, lymph nodes, spleen, and mucosal tissue organize immune development and response.",
               "lines": [
                 {
                   "level": 1,
@@ -2264,6 +2278,7 @@ const STUDY_OUTLINES={
             {
               "letter": "B",
               "title": "Immunoglobulins",
+              "summary": "Each immunoglobulin class has a characteristic heavy chain, distribution, and role. IgM appears early and activates complement efficiently, IgG dominates the secondary response and crosses the placenta, IgA protects mucosal surfaces, IgE mediates immediate allergy, and IgD functions mainly as a B cell receptor.",
               "lines": [
                 {
                   "level": 1,
@@ -2282,6 +2297,7 @@ const STUDY_OUTLINES={
             {
               "letter": "C",
               "title": "Antigen-Antibody Interactions",
+              "summary": "Antigen antibody binding is specific, reversible, and influenced by affinity, avidity, concentration, pH, temperature, and incubation. Visible reactions depend on suitable proportions, so antigen or antibody excess can weaken a result. Laboratory methods convert binding into precipitation, agglutination, fluorescence, enzyme signal, or cell measurements.",
               "lines": [
                 {
                   "level": 1,
@@ -2304,6 +2320,7 @@ const STUDY_OUTLINES={
             {
               "letter": "D",
               "title": "Complement",
+              "summary": "The classical, alternative, and lectin pathways converge on C3 activation and the terminal membrane attack complex. Complement promotes opsonization, inflammation, chemotaxis, and lysis. Component levels and functional assays help identify consumption or inherited deficiency.",
               "lines": [
                 {
                   "level": 1,
@@ -2324,6 +2341,7 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Autoimmunity",
+              "summary": "Loss of self tolerance permits antibodies or cells to target host tissue. ANA testing supports evaluation of systemic autoimmune disease, while disease associated antibodies improve specificity and organ specific antibodies support thyroid and other localized disorders. Results must match the clinical pattern.",
               "lines": [
                 {
                   "level": 1,
@@ -2338,6 +2356,7 @@ const STUDY_OUTLINES={
             {
               "letter": "B",
               "title": "Hypersensitivity",
+              "summary": "Type I reactions are immediate and IgE mediated, type II reactions target cells or tissues, type III reactions deposit immune complexes, and type IV reactions are delayed and T cell mediated. The suspected mechanism determines the useful specimen, method, and time of testing.",
               "lines": [
                 {
                   "level": 1,
@@ -2348,6 +2367,7 @@ const STUDY_OUTLINES={
             {
               "letter": "C",
               "title": "Immunoproliferative Diseases",
+              "summary": "A clonal B cell or plasma cell process can produce a monoclonal immunoglobulin. Serum and urine electrophoresis, immunofixation, quantitative immunoglobulins, and light chain assessment help distinguish monoclonal gammopathy from a broad polyclonal immune response.",
               "lines": [
                 {
                   "level": 1,
@@ -2358,6 +2378,7 @@ const STUDY_OUTLINES={
             {
               "letter": "D",
               "title": "Immunodeficiency",
+              "summary": "Primary immunodeficiencies may affect B cells, T cells, phagocytes, complement, or combined immunity. Acquired causes include HIV and other conditions that reduce immune function. Quantitative immunoglobulins, complement studies, and lymphocyte subset analysis help localize the defect.",
               "lines": [
                 {
                   "level": 1,
@@ -2378,16 +2399,19 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Graft-versus-host Disease",
+              "summary": "Graft versus host disease occurs when immunocompetent donor lymphocytes attack recipient tissues, most often after hematopoietic cell transplantation. Prevention and evaluation depend on donor compatibility, immune status, the organs involved, and the post transplant clinical pattern.",
               "lines": []
             },
             {
               "letter": "B",
               "title": "HLA Typing",
+              "summary": "HLA class I molecules are expressed on nearly all nucleated cells, while class II molecules are concentrated on antigen presenting cells. Because HLA genes are highly polymorphic and inherited as haplotypes, closer donor and recipient matching and compatible crossmatch results reduce immune transplant risk.",
               "lines": []
             },
             {
               "letter": "C",
               "title": "Tumor Immunology",
+              "summary": "Tumor cells may express altered or increased antigens while evading immune destruction. Cytotoxic cells, natural killer cells, antibodies, and cytokines can participate in tumor immunity. Most tumor markers are more useful for monitoring burden, treatment, or recurrence than for screening.",
               "lines": []
             }
           ]
@@ -2399,16 +2423,19 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Clinical Significance and Epidemiology of Viral Pathogens (e.g., hepatitis [A, B, C], EBV, HIV, CMV, rubella, measles)",
+              "summary": "Viral serology depends on the sequence of antigen, early antibody, later antibody, and immune memory. The chapter details marker patterns for hepatitis viruses, Epstein Barr virus, rubella, and HIV. Correct interpretation requires the suspected stage of infection and appropriate confirmation.",
               "lines": []
             },
             {
               "letter": "B",
               "title": "Stages of Infection of Treponema pallidum and Borrelia burgdorferi",
+              "summary": "Syphilis progresses through primary, secondary, latent, and tertiary stages, with test sensitivity and antibody patterns changing over time. Lyme serology also depends on disease stage and immune response. Clinical findings and exposure history remain necessary when interpreting either infection.",
               "lines": []
             },
             {
               "letter": "C",
               "title": "Tuberculosis Infection (e.g., interferon-gamma release assay, PPD)",
+              "summary": "The book discusses the tuberculin skin reaction as a type IV delayed hypersensitivity response that develops through sensitized T cells and is read after the expected delay. Interpretation requires immune status and prior sensitization to be considered.",
               "lines": []
             }
           ]
@@ -2420,41 +2447,49 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "ANA",
+              "summary": "ANA is a sensitive screening marker for several systemic autoimmune diseases but is not disease specific. Indirect immunofluorescence reports both titer and nuclear pattern, and positive results are followed by antibody tests chosen for the suspected disorder.",
               "lines": []
             },
             {
               "letter": "B",
               "title": "Thyroid Antibodies",
+              "summary": "Antithyroglobulin and thyroid peroxidase antibodies support autoimmune thyroid disease evaluation. Their presence should be interpreted with thyroid function tests and the clinical picture because an antibody result alone does not define current gland function.",
               "lines": []
             },
             {
               "letter": "C",
               "title": "Rheumatoid Factor",
+              "summary": "Rheumatoid factor is usually an IgM antibody directed against the Fc portion of IgG. Agglutination or related methods can detect it, but it is neither fully sensitive nor specific for rheumatoid arthritis, so it must be interpreted with symptoms and other laboratory findings.",
               "lines": []
             },
             {
               "letter": "D",
               "title": "Labeled Immunoassays (e.g., ELISA)",
+              "summary": "Labeled immunoassays attach an enzyme or other measurable label to an antigen or antibody. Competitive and noncompetitive formats produce different signal relationships, and accurate results depend on wash steps, calibrators, controls, reaction timing, and awareness of cross reactivity or concentration effects.",
               "lines": []
             },
             {
               "letter": "E",
               "title": "Nontreponemal Syphilis Testing (e.g., RPR)",
+              "summary": "RPR and related nontreponemal tests detect reagin antibodies against cardiolipin containing antigen. They are useful for screening and following treatment titers, but biologic false positive reactions occur and a reactive result requires treponemal confirmation.",
               "lines": []
             },
             {
               "letter": "F",
               "title": "Treponemal Syphilis Testing (e.g., MHATP)",
+              "summary": "Treponemal methods detect antibodies directed against Treponema pallidum and are used to confirm a reactive nontreponemal result or within a reverse algorithm. They often remain reactive after treatment, so they do not reliably measure therapeutic response.",
               "lines": []
             },
             {
               "letter": "G",
               "title": "Cytokine Testing",
+              "summary": "Cytokines are soluble signals that regulate activation, growth, inflammation, and communication among immune cells. Their source and target help explain immune patterns, while laboratory measurement may support investigation of selected immune disorders and inflammatory states.",
               "lines": []
             },
             {
               "letter": "H",
               "title": "Immunofluorescence",
+              "summary": "Direct immunofluorescence detects antigen with a labeled antibody. Indirect immunofluorescence detects patient antibody with a labeled antihuman reagent and can increase sensitivity. Substrate selection, controls, fluorescence pattern, and titer are central to interpretation.",
               "lines": []
             }
           ]
@@ -2466,16 +2501,19 @@ const STUDY_OUTLINES={
             {
               "letter": "A",
               "title": "Interpretation",
+              "summary": "Interpret serology by combining the assay principle, cutoff, titer or pattern, specimen timing, expected immune response, and disease prevalence. A result gains meaning from the complete marker pattern and clinical setting rather than from a single reactive value.",
               "lines": []
             },
             {
               "letter": "B",
               "title": "Confirmatory Testing",
+              "summary": "A reactive screening result should be followed by the more specific method or marker sequence appropriate to the disease. Confirmation may use a different antigen, assay format, or supplemental pattern so that the same interference is less likely to reproduce the initial result.",
               "lines": []
             },
             {
               "letter": "C",
               "title": "Disease State Correlation",
+              "summary": "Correlate immune results with symptoms, exposure, immune status, disease stage, and related laboratory findings. Unexpected combinations may reflect early infection, past immunity, cross reactivity, immunosuppression, treatment, or technical error and should be resolved before diagnosis.",
               "lines": []
             }
           ]
@@ -2483,16 +2521,17 @@ const STUDY_OUTLINES={
       ]
     },
     chapters:[
-      {number:'3.1',title:'Basic Principles of Immunology',topics:['Innate immunity','Adaptive immunity','Cells and organs','Antigens','Cytokines'],reading:['Cells and organs of the immune system','Innate and adaptive immune responses','Antigens, antibodies, cytokines, and immune regulation'],summary:'',videoUrl:''},
-      {number:'3.2',title:'Immunologic Procedures',topics:['Agglutination','Precipitation','Immunoassay','Immunofluorescence','Flow cytometry'],reading:['Antigen–antibody reactions','Serologic methods and immunoassays','Immunofluorescence and flow cytometry','Assay quality and interpretation'],summary:'',videoUrl:''},
-      {number:'3.3',title:'Infectious Diseases',topics:['Serologic diagnosis','Viral markers','Bacterial antibodies','Congenital infections'],reading:['Serologic diagnosis of infectious disease','Viral hepatitis and HIV testing','Syphilis and other microbial serology'],summary:'',videoUrl:''},
-      {number:'3.4',title:'Autoimmune Diseases',topics:['ANA patterns','Autoantibodies','Systemic disease','Organ-specific disease'],reading:['Mechanisms of autoimmunity','Systemic autoimmune diseases','Organ-specific autoimmunity','Autoantibody testing and interpretation'],summary:'',videoUrl:''},
-      {number:'3.5',title:'Hypersensitivity',topics:['Types I–IV','Allergy testing','Immune complex disease'],reading:['Immediate hypersensitivity and allergy','Antibody-mediated and immune-complex reactions','Delayed-type hypersensitivity'],summary:'',videoUrl:''},
-      {number:'3.6',title:'Immunoglobulins, Complement, and Cellular Testing',topics:['Immunoglobulin classes','Complement pathways','Lymphocyte subsets','Immunodeficiency'],reading:['Immunoglobulin structure and function','Complement pathways and testing','Cellular immune testing','Primary and secondary immunodeficiencies'],summary:'',videoUrl:''},
-      {number:'3.7',title:'Tumor Testing and Transplantation',topics:['Tumor immunology','HLA','Transplant matching','Rejection'],reading:['Tumor immunology and laboratory markers','Major histocompatibility complex and HLA testing','Transplant immunology and rejection'],summary:'',videoUrl:''},
-      {number:'3.8',title:'Immunology Problem-Solving',topics:['Serology patterns','Method selection','Result correlation','Troubleshooting'],reading:['Integrated serology interpretation','Method selection and troubleshooting','Clinical immunology case studies'],summary:'',videoUrl:''}
+      {number:'3.1',title:'Basic Principles of Immunology',topics:['Innate immunity','Adaptive immunity','Cells and organs','Antigens','Cytokines'],reading:['Cells and organs of the immune system','Innate and adaptive immune responses','Antigens, antibodies, cytokines, and immune regulation'],summary:'Innate immunity provides immediate barriers, inflammation, phagocytosis, complement, and natural killer activity. Adaptive immunity adds antigen specific B cell and T cell responses, antibody production, and memory. Cytokines coordinate these cells, while primary and secondary lymphoid tissues support their development and activation.',videoUrl:''},
+      {number:'3.2',title:'Immunologic Procedures',topics:['Agglutination','Precipitation','Immunoassay','Immunofluorescence','Flow cytometry'],reading:['Antigen–antibody reactions','Serologic methods and immunoassays','Immunofluorescence and flow cytometry','Assay quality and interpretation'],summary:'Immunologic methods depend on specific antigen antibody binding. Precipitation and agglutination make complexes visible, labeled immunoassays add measurable enzyme or fluorescent signals, and flow cytometry identifies cells through light scatter and labeled monoclonal antibodies. Proper controls, dilution, reaction conditions, and cutoff interpretation are essential.',videoUrl:''},
+      {number:'3.3',title:'Infectious Diseases',topics:['Serologic diagnosis','Viral markers','Bacterial antibodies','Congenital infections'],reading:['Serologic diagnosis of infectious disease','Viral hepatitis and HIV testing','Syphilis and other microbial serology'],summary:'Infectious disease serology is interpreted through the timing and class of antibody, antigen detection, and the expected marker sequence. Hepatitis, Epstein Barr virus, rubella, HIV, syphilis, and Lyme disease each require different combinations of screening, confirmatory, and stage specific results.',videoUrl:''},
+      {number:'3.4',title:'Autoimmune Diseases',topics:['ANA patterns','Autoantibodies','Systemic disease','Organ-specific disease'],reading:['Mechanisms of autoimmunity','Systemic autoimmune diseases','Organ-specific autoimmunity','Autoantibody testing and interpretation'],summary:'Autoimmunity develops when self tolerance fails and immune responses target host antigens. Laboratory evaluation uses the clinical pattern together with screening tests such as ANA and more specific antibodies for systemic or organ specific disease. A positive antibody alone does not establish disease.',videoUrl:''},
+      {number:'3.5',title:'Hypersensitivity',topics:['Types I–IV','Allergy testing','Immune complex disease'],reading:['Immediate hypersensitivity and allergy','Antibody-mediated and immune-complex reactions','Delayed-type hypersensitivity'],summary:'Hypersensitivity reactions are grouped by mechanism. Type I uses IgE and mast cell mediators, type II targets cell or tissue antigens, type III deposits immune complexes, and type IV is delayed and T cell mediated. Testing should match the suspected mechanism and the timing of the reaction.',videoUrl:''},
+      {number:'3.6',title:'Immunoglobulins, Complement, and Cellular Testing',topics:['Immunoglobulin classes','Complement pathways','Lymphocyte subsets','Immunodeficiency'],reading:['Immunoglobulin structure and function','Complement pathways and testing','Cellular immune testing','Primary and secondary immunodeficiencies'],summary:'Immunoglobulin classes differ in structure, distribution, and function. Complement activation promotes inflammation, opsonization, and membrane attack, while functional assays and component measurements help identify consumption or deficiency. Flow cytometry and immunoglobulin studies help evaluate cellular and humoral immunodeficiency.',videoUrl:''},
+      {number:'3.7',title:'Tumor Testing and Transplantation',topics:['Tumor immunology','HLA','Transplant matching','Rejection'],reading:['Tumor immunology and laboratory markers','Major histocompatibility complex and HLA testing','Transplant immunology and rejection'],summary:'HLA molecules present antigen and help distinguish self from nonself. HLA matching and recipient antibody testing reduce transplant risk, while immune responses can cause rejection or graft versus host disease. Tumor immunology examines tumor antigens, immune escape, and markers used mainly to monitor disease.',videoUrl:''},
+      {number:'3.8',title:'Immunology Problem-Solving',topics:['Serology patterns','Method selection','Result correlation','Troubleshooting'],reading:['Integrated serology interpretation','Method selection and troubleshooting','Clinical immunology case studies'],summary:'Immunology problem solving combines the suspected mechanism, stage of disease, specimen timing, method, controls, and result pattern. Screening results should be followed by the appropriate specific test, and discordant findings should be checked for timing, cross reactivity, technical error, or an alternative diagnosis.',videoUrl:''}
     ],
     bibliography:[
+      'Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020.',
       'Bishop ML, Fody EP, Van Siclen C, Mistler JM, Moy M. Clinical Chemistry: Principles, Techniques, and Correlations. 9th ed. Jones & Bartlett Learning; 2023.',
       'Chapel H, Haeney M, Misbah S, et al. Essentials of Clinical Immunology. 6th ed. Wiley Blackwell; 2014.',
       'Detrick B, Hamilton RG, Schmitz J. Manual of Molecular and Clinical Laboratory Immunology. 8th ed. ASM Press; 2017.',
@@ -2525,11 +2564,11 @@ const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Synthesis of Heme',url:'Synthesis_of_Heme.html',description:'Drag 10 pathway labels and 8 enzymes across cytosol and mitochondria',topic:'Chemistry',icon:'HM',color:'#2980b9',preview_url:'assets/interactive-previews/synthesis_of_heme.png'}
 ];
 const RESOURCES=[
+  {title:'Success! in Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman and Janelle M. Chiasera. Pearson; 2020. ISBN 9780134989181.',note:'First summary source for Clinical Chemistry and Immunology when the topic is covered.'},
   {title:'Clinical Chemistry: Principles, Techniques, and Correlations, Ninth Edition',meta:'Michael L. Bishop, Edward P. Fody, Carleen Van Siclen, James March Mistler, and Michelle Moy. Jones & Bartlett Learning; 2023. ISBN 9781284238860.',note:'First-reference source for Clinical Chemistry and Immunology when the topic is covered.'},
   {title:'MLS OIT Lecture Materials',meta:'MLS program faculty; instructor-provided lecture notes, slides, handouts, procedure notes, and course packets.',note:'Primary course source for class-specific study tools.'},
   {title:'ASCP/ASCPi MLS Content Guideline',meta:'American Society for Clinical Pathology Board of Certification (ASCP BOC). MLS(ASCP) and MLS(ASCPi) examination content guideline and exam-percentage outline.',note:'Exam-domain and percentage-weighting reference.'},
   {title:'ASCP BOC Study Guide / Content Outline',meta:'American Society for Clinical Pathology Board of Certification (ASCP BOC). Medical Laboratory Scientist certification study guide, reading list, and content-outline materials.',note:'Certification outline and study-planning reference.'},
-  {title:'Success! In Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman and Janelle M. Chiasera. Pearson textbook reference.',note:'Course review source for MLS concepts and study organization.'},
   {title:'Medical Laboratory Science Review, Fifth Edition',meta:'Robert R. Harr. F.A. Davis textbook review source.',note:'Textbook question source. Explanations are referenced to the assigned book, not reproduced.'},
   {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, laboratory manuals, procedure notes, and instructor handouts.',note:'Definitions, tables, algorithms, images, and interpretive-rule references.'},
   {title:'Calculations and Reference Ranges Sources',meta:'Assigned MLS program formula sheets, course reference-range tables, lecture notes, and laboratory calculation references.',note:'Conventional-unit reference range and formula source group.'}
@@ -4628,7 +4667,7 @@ function openASCPStudyOutline(subjectKey){
         ${lines?`<div class="ascp-outline-lines">${lines}</div>`:''}
         <div class="ascp-topic-summary">
           <div class="ascp-topic-summary-title">Summary</div>
-          <div class="ascp-topic-summary-box"></div>
+          <div class="ascp-topic-summary-box">${topic.summary?`<p>${escNL(topic.summary)}</p>`:''}</div>
         </div>
       </article>`;
     }).join('');
