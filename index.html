@@ -996,11 +996,20 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .study-ascp-open{margin-left:auto;font-size:25px;font-weight:700}
 .ascp-outline-grid{display:grid;grid-template-columns:1fr;gap:16px}
 .ascp-section-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:21px 22px}
-.ascp-section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
-.ascp-section-number{color:#c89400;font-family:var(--mono);font-size:13px;font-weight:900}
-.ascp-section-title{font-size:16px;font-weight:750;color:var(--text)}
-.ascp-section-card ul{margin:0;padding-left:20px;color:var(--text2)}
-.ascp-section-card li{padding:5px 0;font-size:14px;line-height:1.6}
+.ascp-section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+.ascp-section-number{color:#c89400;font-family:var(--mono);font-size:14px;font-weight:900}
+.ascp-section-title{font-size:18px;font-weight:750;color:var(--text)}
+.ascp-topic-list{display:grid;gap:16px}
+.ascp-topic-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
+.ascp-topic-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.ascp-topic-letter{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:28px;border-radius:8px;background:#f4c8422b;border:1px solid #c8940066;color:#a87600;font-family:var(--mono);font-size:12px;font-weight:900}
+.ascp-topic-title{padding-top:3px;font-size:15px;font-weight:750;line-height:1.45;color:var(--text)}
+.ascp-outline-lines{display:grid;gap:5px;color:var(--text2);font-size:13px;line-height:1.55}
+.ascp-outline-line.level-2{padding-left:20px}
+.ascp-outline-line.level-3{padding-left:40px}
+.ascp-topic-summary{margin-top:17px;padding-top:15px;border-top:1px solid var(--border)}
+.ascp-topic-summary-title{margin-bottom:8px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text)}
+.ascp-topic-summary-box{min-height:104px;border:1px solid var(--border);border-radius:10px;background:var(--bg3)}
 .study-empty-area{min-height:74px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
 .study-video-slot.is-empty{min-height:220px;color:transparent}
 @media(max-width:720px){
@@ -1503,12 +1512,706 @@ const STUDY_OUTLINES={
     title:'Clinical Chemistry',
     accent:'#2f7dd1',
     ascp:{
-      percent:'17–22%',
-      sections:[
-        {number:'I',title:'General Chemistry',items:['Carbohydrates — theory, physiology, procedures, interpretation, and disease correlation','Lipids — lipoproteins, phospholipids, triglycerides, cholesterol, and apolipoproteins','Heme derivatives — hemoglobin, bilirubin, urobilinogen, myoglobin, and porphyrins']},
-        {number:'II',title:'Proteins and Enzymes',items:['Enzymes — LD, CK, AST/ALT, GGT, lipase, amylase, alkaline phosphatase, and ACE','Proteins and other nitrogen-containing compounds','Amino acids, urea, uric acid, creatinine, ammonia, tumor markers, and cardiac markers','Procedures, clearances, interpretation, and disease correlation']},
-        {number:'III',title:'Acid-Base, Blood Gases, and Electrolytes',items:['Acid-base determinations and blood gases','Henderson-Hasselbalch equation, pH, hydrogen ions, and oxygen/carbon dioxide transport','Electrolytes, calcium, magnesium, phosphorus, iron, TIBC, and trace elements','Osmolality and anion gap calculations']},
-        {number:'IV',title:'Special Chemistry',items:['Endocrinology','Vitamins and nutrition','Therapeutic drug monitoring','Toxicology']}
+      "percent": "17 – 22%",
+      "sections": [
+        {
+          "number": "I",
+          "title": "General Chemistry",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Carbohydrates",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolic pathways"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Physical and chemical properties"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Tolerance testing"
+                },
+                {
+                  "level": 2,
+                  "text": "d. Glycated proteins"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "B",
+              "title": "Lipids",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolic pathways"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Physical and chemical properties"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Lipoproteins"
+                },
+                {
+                  "level": 3,
+                  "text": "2) Phospholipids"
+                },
+                {
+                  "level": 3,
+                  "text": "3) Triglycerides"
+                },
+                {
+                  "level": 3,
+                  "text": "4) Cholesterol"
+                },
+                {
+                  "level": 3,
+                  "text": "5) Apolipoproteins"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "C",
+              "title": "Heme Derivatives",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolic pathways"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Physical and chemical properties"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Hemoglobin"
+                },
+                {
+                  "level": 3,
+                  "text": "2) Bilirubin"
+                },
+                {
+                  "level": 3,
+                  "text": "3) Urobilinogen"
+                },
+                {
+                  "level": 3,
+                  "text": "4) Myoglobin"
+                },
+                {
+                  "level": 3,
+                  "text": "5) Porphyrins"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "II",
+          "title": "Proteins and Enzymes",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Enzymes",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolic pathways"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Physical and chemical properties"
+                },
+                {
+                  "level": 3,
+                  "text": "1) LD"
+                },
+                {
+                  "level": 3,
+                  "text": "2) CK"
+                },
+                {
+                  "level": 3,
+                  "text": "3) AST/ALT"
+                },
+                {
+                  "level": 3,
+                  "text": "4) GGT"
+                },
+                {
+                  "level": 3,
+                  "text": "5) Lipase"
+                },
+                {
+                  "level": 3,
+                  "text": "6) Amylase"
+                },
+                {
+                  "level": 3,
+                  "text": "7) Alkaline phosphatase"
+                },
+                {
+                  "level": 3,
+                  "text": "8) Angiotensin converting enzyme"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "B",
+              "title": "Proteins and Other Nitrogen-Containing Compounds",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolic pathways"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Physical and chemical properties"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Proteins"
+                },
+                {
+                  "level": 3,
+                  "text": "2) Amino acids"
+                },
+                {
+                  "level": 3,
+                  "text": "3) Urea"
+                },
+                {
+                  "level": 3,
+                  "text": "4) Uric acid"
+                },
+                {
+                  "level": 3,
+                  "text": "5) Creatinine"
+                },
+                {
+                  "level": 3,
+                  "text": "6) Ammonia"
+                },
+                {
+                  "level": 3,
+                  "text": "7) Tumor markers"
+                },
+                {
+                  "level": 3,
+                  "text": "8) Cardiac markers"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Clearances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "III",
+          "title": "Acid-Base, Blood Gases, and Electrolytes",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Acid-Base Determinations (Including Blood Gases)",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Henderson-Hasselbach equation"
+                },
+                {
+                  "level": 2,
+                  "text": "b. pH and H+ ion concentration"
+                },
+                {
+                  "level": 2,
+                  "text": "c. CO2 and O2 transport"
+                },
+                {
+                  "level": 2,
+                  "text": "d. Normal and abnormal states"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Analytical principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "B",
+              "title": "Electrolytes",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Sodium, potassium, chloride, CO2, bicarbonate"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Calcium, magnesium, phosphorus, iron, TIBC"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Trace elements"
+                },
+                {
+                  "level": 2,
+                  "text": "d. Normal and abnormal states"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Calculations (osmolality, anion gap)"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "5. Disease state correlation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "IV",
+          "title": "Special Chemistry",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Endocrinology",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolic pathways"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Mechanism of action"
+                },
+                {
+                  "level": 2,
+                  "text": "d. Physical and chemical properties"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Steroid hormones (e.g., cortisol, estrogen, hCG)"
+                },
+                {
+                  "level": 3,
+                  "text": "2) Peptide hormones (e.g., insulin, prolactin)"
+                },
+                {
+                  "level": 3,
+                  "text": "3) Thyroid hormones"
+                },
+                {
+                  "level": 3,
+                  "text": "4) Catecholamines"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Fluorescence"
+                },
+                {
+                  "level": 3,
+                  "text": "2) Immunoassay"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Stimulation/suppression tests"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "B",
+              "title": "Vitamins and Nutrition",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Biochemical theory and physiology"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Metabolism and action"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Normal and abnormal states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Properties"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "C",
+              "title": "Therapeutic Drug Monitoring",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Pharmacokinetics"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Therapeutic states"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Toxic states"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Metabolism and excretion"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Chemical and physical properties"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Aminoglycosides (e.g., gentamicin)"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Cardioactive (e.g., digoxin)"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Anticonvulsants (e.g., phenobarbital)"
+                },
+                {
+                  "level": 2,
+                  "text": "d. Antidepressants (e.g., lithium)"
+                },
+                {
+                  "level": 2,
+                  "text": "e. Immunosuppressants (e.g., tacrolimus)"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Immunoassay"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "5. Disease state correlation"
+                }
+              ]
+            },
+            {
+              "letter": "D",
+              "title": "Toxicology",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Toxicokinetics"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Toxic effects, signs and symptoms"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Metabolism and excretion"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Chemical and physical properties"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Alcohols"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Heavy metals (e.g., lead)"
+                },
+                {
+                  "level": 2,
+                  "text": "c. Analgesics (e.g., acetaminophen)"
+                },
+                {
+                  "level": 2,
+                  "text": "d. Drugs of abuse"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Test procedures"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 3,
+                  "text": "1) Immunoassay"
+                },
+                {
+                  "level": 3,
+                  "text": "2) Enzymatic methods"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"
+                },
+                {
+                  "level": 1,
+                  "text": "4. Test result interpretation"
+                },
+                {
+                  "level": 1,
+                  "text": "5. Disease state correlation"
+                }
+              ]
+            }
+          ]
+        }
       ]
     },
     chapters:[
@@ -1534,14 +2237,249 @@ const STUDY_OUTLINES={
     title:'Immunology',
     accent:'#7b61ff',
     ascp:{
-      percent:'5–10%',
-      sections:[
-        {number:'I',title:'Principles of Immunology',items:['Immune system physiology — primary and secondary responses; B cells, T cells, and macrophages; genetics','Immunoglobulins — classes, subclasses, structure, and properties','Antigen-antibody interactions — principles and testing methods','Complement — classical and alternative pathways and biologic properties']},
-        {number:'II',title:'Diseases of the Immune System',items:['Autoimmunity — systemic and organ-specific','Hypersensitivity — types I, II, III, and IV','Immunoproliferative diseases — monoclonal gammopathies','Immunodeficiency — hereditary and acquired']},
-        {number:'III',title:'Transplantation',items:['Graft-versus-host disease','HLA typing','Tumor immunology']},
-        {number:'IV',title:'Infectious Disease Serology',items:['Viral pathogens — hepatitis A/B/C, EBV, HIV, CMV, rubella, and measles','Treponema pallidum and Borrelia burgdorferi infection stages','Tuberculosis infection testing']},
-        {number:'V',title:'Serologic Procedures',items:['ANA, thyroid antibodies, and rheumatoid factor','Labeled immunoassays and immunofluorescence','Nontreponemal and treponemal syphilis testing','Cytokine testing']},
-        {number:'VI',title:'Test Results',items:['Interpretation','Confirmatory testing','Disease state correlation']}
+      "percent": "5 – 10%",
+      "sections": [
+        {
+          "number": "I",
+          "title": "Principles of Immunology",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Immune System Physiology",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Primary and secondary response"
+                },
+                {
+                  "level": 1,
+                  "text": "2. B and T cells, macrophages"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Genetics"
+                }
+              ]
+            },
+            {
+              "letter": "B",
+              "title": "Immunoglobulins",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Classes and subclasses"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Structure"
+                },
+                {
+                  "level": 1,
+                  "text": "3. Biologic and physical properties"
+                }
+              ]
+            },
+            {
+              "letter": "C",
+              "title": "Antigen-Antibody Interactions",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Principles"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Testing"
+                },
+                {
+                  "level": 2,
+                  "text": "a. Principles"
+                },
+                {
+                  "level": 2,
+                  "text": "b. Methods"
+                }
+              ]
+            },
+            {
+              "letter": "D",
+              "title": "Complement",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Classical and alternative pathway mechanisms"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Biologic properties"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "II",
+          "title": "Diseases of the Immune System",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Autoimmunity",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Systemic (e.g., SLE)"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Organ-specific (e.g., Graves disease)"
+                }
+              ]
+            },
+            {
+              "letter": "B",
+              "title": "Hypersensitivity",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. I, II, III, IV"
+                }
+              ]
+            },
+            {
+              "letter": "C",
+              "title": "Immunoproliferative Diseases",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Monoclonal gammopathies (e.g., plasma cell myeloma, Waldenström macroglobulinemia)"
+                }
+              ]
+            },
+            {
+              "letter": "D",
+              "title": "Immunodeficiency",
+              "lines": [
+                {
+                  "level": 1,
+                  "text": "1. Hereditary (e.g., SCID)"
+                },
+                {
+                  "level": 1,
+                  "text": "2. Acquired (e.g., HIV)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "III",
+          "title": "Transplantation",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Graft-versus-host Disease",
+              "lines": []
+            },
+            {
+              "letter": "B",
+              "title": "HLA Typing",
+              "lines": []
+            },
+            {
+              "letter": "C",
+              "title": "Tumor Immunology",
+              "lines": []
+            }
+          ]
+        },
+        {
+          "number": "IV",
+          "title": "Infectious Disease Serology",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Clinical Significance and Epidemiology of Viral Pathogens (e.g., hepatitis [A, B, C], EBV, HIV, CMV, rubella, measles)",
+              "lines": []
+            },
+            {
+              "letter": "B",
+              "title": "Stages of Infection of Treponema pallidum and Borrelia burgdorferi",
+              "lines": []
+            },
+            {
+              "letter": "C",
+              "title": "Tuberculosis Infection (e.g., interferon-gamma release assay, PPD)",
+              "lines": []
+            }
+          ]
+        },
+        {
+          "number": "V",
+          "title": "Serologic Procedures",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "ANA",
+              "lines": []
+            },
+            {
+              "letter": "B",
+              "title": "Thyroid Antibodies",
+              "lines": []
+            },
+            {
+              "letter": "C",
+              "title": "Rheumatoid Factor",
+              "lines": []
+            },
+            {
+              "letter": "D",
+              "title": "Labeled Immunoassays (e.g., ELISA)",
+              "lines": []
+            },
+            {
+              "letter": "E",
+              "title": "Nontreponemal Syphilis Testing (e.g., RPR)",
+              "lines": []
+            },
+            {
+              "letter": "F",
+              "title": "Treponemal Syphilis Testing (e.g., MHATP)",
+              "lines": []
+            },
+            {
+              "letter": "G",
+              "title": "Cytokine Testing",
+              "lines": []
+            },
+            {
+              "letter": "H",
+              "title": "Immunofluorescence",
+              "lines": []
+            }
+          ]
+        },
+        {
+          "number": "VI",
+          "title": "Test Results",
+          "topics": [
+            {
+              "letter": "A",
+              "title": "Interpretation",
+              "lines": []
+            },
+            {
+              "letter": "B",
+              "title": "Confirmatory Testing",
+              "lines": []
+            },
+            {
+              "letter": "C",
+              "title": "Disease State Correlation",
+              "lines": []
+            }
+          ]
+        }
       ]
     },
     chapters:[
@@ -3679,14 +4617,29 @@ function openASCPStudyOutline(subjectKey){
   if(!modal||!dialog||!body)return;
   dialog.classList.add('study-outline-modal');
   dialog.style.setProperty('--study-accent','#c89400');
-  const sections=ascp.sections.map(section=>`
-    <section class="ascp-section-card">
+  const sections=ascp.sections.map(section=>{
+    const topics=section.topics.map(topic=>{
+      const lines=(topic.lines||[]).map(line=>`<div class="ascp-outline-line level-${line.level}">${esc(line.text)}</div>`).join('');
+      return `<article class="ascp-topic-card">
+        <div class="ascp-topic-head">
+          <span class="ascp-topic-letter">${esc(topic.letter)}.</span>
+          <span class="ascp-topic-title">${esc(topic.title)}</span>
+        </div>
+        ${lines?`<div class="ascp-outline-lines">${lines}</div>`:''}
+        <div class="ascp-topic-summary">
+          <div class="ascp-topic-summary-title">Summary</div>
+          <div class="ascp-topic-summary-box"></div>
+        </div>
+      </article>`;
+    }).join('');
+    return `<section class="ascp-section-card">
       <div class="ascp-section-head">
         <span class="ascp-section-number">${esc(section.number)}</span>
         <span class="ascp-section-title">${esc(section.title)}</span>
       </div>
-      <ul>${section.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>
-    </section>`).join('');
+      <div class="ascp-topic-list">${topics}</div>
+    </section>`;
+  }).join('');
   body.innerHTML=`
     <div class="study-outline-modal-body">
       <header class="study-window-head">
