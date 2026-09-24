@@ -1005,10 +1005,14 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .ascp-topic-letter{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:31px;border-radius:9px;background:#f4c8422b;border:1px solid #c8940066;color:#a87600;font-family:var(--mono);font-size:13px;font-weight:900}
 .ascp-topic-title{padding-top:3px;font-size:16px;font-weight:800;line-height:1.45;color:var(--text)}
 .ascp-topic-body{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(280px,.88fr);gap:20px;align-items:start}
-.ascp-outline-column{min-width:0;padding:13px 15px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)}
+.ascp-outline-column{min-width:0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)}
 .ascp-outline-lines{display:grid;gap:7px;color:var(--text2);font-size:14px;line-height:1.58}
 .ascp-outline-line.level-2{padding-left:22px}
 .ascp-outline-line.level-3{padding-left:44px}
+.ascp-outline-editor{display:block;width:100%;min-height:150px;resize:vertical;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text);padding:11px 12px;font:inherit;font-family:var(--mono);font-size:13px;line-height:1.65;white-space:pre-wrap}
+.ascp-outline-editor:focus{outline:2px solid color-mix(in srgb,#c89400 55%,transparent);border-color:#c89400}
+.ascp-outline-readonly{min-height:150px;padding:11px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text2);font-family:var(--mono);font-size:13px;line-height:1.65;white-space:pre-wrap}
+.ascp-outline-actions{display:flex;justify-content:flex-end;align-items:center;gap:9px;margin-top:8px}
 .ascp-summary-column{display:grid;gap:11px;min-width:0}
 .ascp-summary-block{padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)}
 .ascp-summary-label{display:flex;align-items:baseline;gap:7px;margin-bottom:8px;color:var(--text);font-size:12px;font-weight:800;line-height:1.4}
@@ -1153,9 +1157,11 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
 .media-zoom-image-wrap{
   position:relative;
   display:flex;
+  flex:1 1 auto;
   align-items:center;
   justify-content:center;
-  min-height:180px;
+  width:100%;
+  min-height:0;
   cursor:crosshair;
 }
 .media-zoom-lens{
@@ -1190,8 +1196,9 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
   backdrop-filter:blur(8px);
 }
 .media-zoom-dialog{
-  width:min(96vw,1180px);
-  max-height:94vh;
+  width:min(98vw,1800px);
+  height:96vh;
+  max-height:96vh;
   display:flex;
   flex-direction:column;
   gap:10px;
@@ -1200,8 +1207,11 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
 .media-zoom-actions{display:flex;justify-content:flex-end;gap:8px}
 .media-zoom-actions .btn{background:rgba(255,255,255,.94);color:#1c2437;border-color:#fff}
 .media-zoom-dialog img{
-  max-width:100%;
-  max-height:84vh;
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  max-height:none;
   object-fit:contain;
   background:#fff;
   border:1px solid rgba(255,255,255,.36);
@@ -2792,8 +2802,8 @@ const STUDY_OUTLINES={
         "Reticulocytes",
         "Morphology"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Blood cell production begins with hematopoietic stem cells and proceeds through recognizable erythroid, myeloid, lymphoid, and megakaryocytic stages. CBC measurements, indices, reticulocyte counts, manual counts, and smear review must be interpreted together while accounting for specimen quality and analyzer interference.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.1, PDF pp. 19 to 28.",
       "videoUrl": ""
     },
     {
@@ -2806,8 +2816,8 @@ const STUDY_OUTLINES={
         "Hypoproliferation",
         "Blood loss"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Normocytic, normochromic anemia may result from acute blood loss, reduced marrow production, or shortened red cell survival. Reticulocyte response, bilirubin, LD, haptoglobin, antiglobulin testing, and red cell morphology help separate underproduction from inherited or acquired hemolysis.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.2, PDF pp. 29 to 36.",
       "videoUrl": ""
     },
     {
@@ -2819,8 +2829,8 @@ const STUDY_OUTLINES={
         "Sideroblastic anemia",
         "Chronic inflammation"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Microcytic, hypochromic anemia reflects impaired hemoglobin synthesis from limited iron, abnormal globin production, defective heme synthesis, or chronic inflammation. Iron studies, RDW, red cell count, smear findings, and hemoglobin analysis distinguish the major causes.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.3, PDF pp. 37 to 40.",
       "videoUrl": ""
     },
     {
@@ -2832,8 +2842,8 @@ const STUDY_OUTLINES={
         "Folate",
         "Nonmegaloblastic causes"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Macrocytosis is divided into megaloblastic disorders caused by impaired DNA synthesis and nonmegaloblastic disorders associated with liver disease, alcohol, reticulocytosis, or other conditions. Smear morphology, vitamin B12 and folate testing, reticulocyte count, and clinical findings guide the distinction.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.4, PDF pp. 41 to 43.",
       "videoUrl": ""
     },
     {
@@ -2845,8 +2855,8 @@ const STUDY_OUTLINES={
         "Hereditary anomalies",
         "Morphology"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "White blood cell disorders may change cell number, maturation, function, or morphology. The total count, differential, smear appearance, patient age, and clinical setting help separate reactive patterns from hereditary abnormalities and clonal disease.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.5, PDF pp. 44 to 47.",
       "videoUrl": ""
     },
     {
@@ -2858,8 +2868,8 @@ const STUDY_OUTLINES={
         "Cytochemistry",
         "Immunophenotyping"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Acute leukemias produce a clonal expansion of blasts that replaces normal marrow and disrupts blood cell production. Morphology provides the initial pattern, while cytochemistry, flow cytometry, cytogenetics, and molecular findings establish lineage and classification.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.6, PDF pp. 48 to 55.",
       "videoUrl": ""
     },
     {
@@ -2871,8 +2881,8 @@ const STUDY_OUTLINES={
         "Myeloproliferative neoplasms",
         "Plasma cell disorders"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Chronic myeloid and lymphoid neoplasms usually show more mature appearing cells than acute leukemia, but each has a characteristic blood, marrow, immunophenotypic, and molecular pattern. CBC trends, smear findings, flow cytometry, protein studies, and targeted genetic tests support classification.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.7, PDF pp. 56 to 62.",
       "videoUrl": ""
     },
     {
@@ -2884,8 +2894,8 @@ const STUDY_OUTLINES={
         "Calculations",
         "Integrated cases"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Hematology problem solving combines CBC values, calculated indices, reticulocyte response, morphology, and clinical history. Internal consistency checks and recognition of analyzer artifacts prevent interpretation of spurious results as disease.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.8, PDF pp. 63 to 77.",
       "videoUrl": ""
     },
     {
@@ -2897,8 +2907,8 @@ const STUDY_OUTLINES={
         "Reagents",
         "Screening tests"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Hemostasis depends on the coordinated activity of vessels, platelets, coagulation factors, natural inhibitors, and fibrinolysis. PT, APTT, thrombin time, fibrinogen, and related methods are affected by reagent sensitivity, collection technique, citrate volume, processing time, and anticoagulant therapy.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.1, PDF pp. 79 to 86.",
       "videoUrl": ""
     },
     {
@@ -2910,8 +2920,8 @@ const STUDY_OUTLINES={
         "von Willebrand disease",
         "Vascular disorders"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Primary hemostatic disorders arise from abnormal vessel integrity, platelet number, platelet function, or von Willebrand factor. Platelet count and smear review are paired with bleeding history and appropriate functional or von Willebrand testing.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.2, PDF pp. 87 to 93.",
       "videoUrl": ""
     },
     {
@@ -2923,8 +2933,8 @@ const STUDY_OUTLINES={
         "Laboratory patterns",
         "Factor assays"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Coagulation factor deficiencies produce characteristic PT and APTT patterns based on the affected pathway. Mixing studies distinguish many deficiencies from inhibitors, and specific factor assays confirm the deficient activity.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.3, PDF pp. 94 to 100.",
       "videoUrl": ""
     },
     {
@@ -2936,8 +2946,8 @@ const STUDY_OUTLINES={
         "DIC",
         "Anticoagulant monitoring"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Unexpected clotting test prolongation may reflect a specific factor inhibitor, lupus anticoagulant, heparin, or another anticoagulant drug. Thrombotic risk evaluation combines acquired conditions with inherited defects, while drug monitoring uses the assay appropriate to the medication.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.4, PDF pp. 101 to 112.",
       "videoUrl": ""
     },
     {
@@ -2949,8 +2959,8 @@ const STUDY_OUTLINES={
         "Coagulation cases",
         "Result correlation"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Hemostasis problem solving begins with platelet count, PT, APTT, thrombin time, fibrinogen, and D dimer, followed by mixing studies or targeted assays. The final interpretation must account for bleeding or thrombosis history, specimen integrity, medications, and the complete laboratory pattern.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.5, PDF pp. 113 to 125.",
       "videoUrl": ""
     }
   ],
@@ -3083,8 +3093,8 @@ const STUDY_OUTLINES={
         "Reagent strips",
         "Confirmatory tests"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Routine urinalysis integrates specimen appearance, concentration, and reagent strip chemistry with renal physiology. Results must be checked for collection and storage effects, strip limitations, interfering substances, and the need for confirmatory testing.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.1, PDF pp. 480 to 498.",
       "videoUrl": ""
     },
     {
@@ -3097,8 +3107,8 @@ const STUDY_OUTLINES={
         "Microorganisms",
         "Artifacts"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Urine sediment examination identifies cells, casts, crystals, microorganisms, contaminants, and artifacts. Findings are interpreted with urine concentration, pH, chemical results, collection quality, and the clinical pattern to distinguish renal or urinary disease from contamination.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.2, PDF pp. 499 to 512.",
       "videoUrl": ""
     },
     {
@@ -3110,8 +3120,8 @@ const STUDY_OUTLINES={
         "Pericardial fluid",
         "Synovial fluid"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Cerebrospinal, serous, and synovial fluids require prompt, specimen specific physical, chemical, and microscopic evaluation. Cell counts, differentials, protein, glucose, crystal analysis, and other tests are selected according to the fluid and the suspected infectious, inflammatory, hemorrhagic, or malignant process.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.3, PDF pp. 513 to 526.",
       "videoUrl": ""
     },
     {
@@ -3123,8 +3133,8 @@ const STUDY_OUTLINES={
         "Gastric analysis",
         "Semen analysis"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Amniotic, gastrointestinal, and seminal fluids use different collection methods, reference expectations, and analytical goals. Interpretation may assess fetal status, gastrointestinal bleeding or malabsorption, gastric function, or sperm concentration, motility, and morphology.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.4, PDF pp. 527 to 538.",
       "videoUrl": ""
     },
     {
@@ -3136,8 +3146,8 @@ const STUDY_OUTLINES={
         "Body fluid patterns",
         "Integrated cases"
       ],
-      "summary": "",
-      "citation": "",
+      "summary": "Urinalysis and body fluid problem solving correlates appearance, chemistry, microscopy, cell counts, and clinical history. Discordant findings should prompt review of specimen quality, timing, method limitations, contamination, and the possibility of a different disease process.",
+      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.5, PDF pp. 539 to 551.",
       "videoUrl": ""
     }
   ],
@@ -5520,6 +5530,9 @@ function studyVideoEmbedHtml(url){
   return '<div class="study-video-slot is-empty" aria-label="Video"></div>';
 }
 
+function ascpOutlineText(topic){
+  return (topic.lines||[]).map(line=>`${'  '.repeat(Math.max(0,Number(line.level||1)-1))}${String(line.text||'')}`).join('\n');
+}
 function ascpSummaryGroups(topic){
   const groups=[];
   for(const line of (topic.lines||[])){
@@ -5585,7 +5598,13 @@ async function openASCPStudyOutline(subjectKey){
   const savedNotes=await loadASCPStudyNotes(subjectKey);
   const sections=ascp.sections.map(section=>{
     const topics=section.topics.map(topic=>{
-      const lines=(topic.lines||[]).map(line=>`<div class="ascp-outline-line level-${line.level}">${esc(line.text)}</div>`).join('');
+      const outlineKey=ascpStudyNoteKey(subjectKey,section.number,topic.letter,'outline');
+      const originalOutline=ascpOutlineText(topic);
+      const outlineText=Object.prototype.hasOwnProperty.call(savedNotes,outlineKey)?savedNotes[outlineKey].text:originalOutline;
+      const outlineId='ascp-note-'+studyNoteDomId(outlineKey);
+      const outlineColumn=isAdmin
+        ?`<textarea class="ascp-outline-editor" id="${outlineId}">${esc(outlineText)}</textarea><div class="ascp-outline-actions"><span class="ascp-summary-status" id="${outlineId}-status"></span><button class="btn btn-primary btn-xs" type="button" onclick="saveASCPStudyNote('${jsAttr(subjectKey)}','${jsAttr(outlineKey)}')">Save</button></div>`
+        :`<div class="ascp-outline-readonly">${outlineText?escNL(outlineText):''}</div>`;
       const summaryBlocks=ascpSummaryGroups(topic).map(group=>{
         const key=ascpStudyNoteKey(subjectKey,section.number,topic.letter,group.number);
         const saved=savedNotes[key]?.text||'';
@@ -5604,7 +5623,7 @@ async function openASCPStudyOutline(subjectKey){
           <span class="ascp-topic-title">${esc(topic.title)}</span>
         </div>
         <div class="ascp-topic-body">
-          <div class="ascp-outline-column">${lines?`<div class="ascp-outline-lines">${lines}</div>`:''}</div>
+          <div class="ascp-outline-column">${outlineColumn}</div>
           <div class="ascp-summary-column">${summaryBlocks}</div>
         </div>
       </article>`;
@@ -13826,36 +13845,18 @@ function questionMediaUrls(qOrText){
   }
   return [...new Set(urls.filter(Boolean))];
 }
-function hasInsertedQuestionMedia(qOrText){
-  return questionMediaUrls(qOrText).length>0;
-}
-function looksLikeRepeatedLabValueLine(line){
-  const t=String(line||'').trim();
-  if(!t)return false;
-  if(/^[-—–]+$/.test(t))return true;
-  const analyte=/^(?:WBC|RBC|HGB|HCT|MCV|MCHC?|RDW|PLT|MPV|RETIC|NE|LY|MO|EO|BA|NRBC|PT|PTT|APTT|INR|FIB(?:RINOGEN)?|D[- ]?DIMER|GLU(?:COSE)?|BUN|CREAT(?:ININE)?|NA|K|CL|CO2|CA|MG|PHOS|AST|ALT|ALP|BILI(?:RUBIN)?|ALB(?:UMIN)?|TP|LDH|CK|CRP|ESR)\b/i;
-  if(analyte.test(t)&&(/[=:]/.test(t)||/\d/.test(t)))return true;
-  if(/\b(?:fL|pg|g\/dL|mg\/dL|mmol\/L|x\s*10|%|cells?|\/uL|\/L)\b/i.test(t)&&(/[=:]/.test(t)||/\d/.test(t)))return true;
-  return false;
-}
-function removeRepeatedLabValuesWhenMedia(text,qOrText){
-  if(!hasInsertedQuestionMedia(qOrText))return text;
-  const lines=String(text||'').split(/\n/);
-  const kept=lines.filter(line=>!looksLikeRepeatedLabValueLine(line));
-  return kept.join('\n').replace(/\n{3,}/g,'\n\n').trim();
-}
 function cleanQuestionText(qOrText){
   const text=typeof qOrText==='string'?qOrText:(qOrText?.question||'');
   const cleaned=String(text||'')
     .replace(/\[\[media:[^\]]+\]\]\s*/g,'')
     .replace(/\[IMAGE\/RESULT PLACEHOLDER[^\]]+\]\s*/g,'')
     .trim();
-  return removeRepeatedLabValuesWhenMedia(cleaned,qOrText);
+  return cleaned;
 }
 function renderQuestionMedia(qOrText){
   const urls=questionMediaUrls(qOrText);
   if(!urls.length)return '';
-  return `<div class="question-media">${urls.map((url,i)=>`<button class="question-media-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" title="Click to open full size."><img src="${esc(url)}" alt="Question visual ${i+1}" loading="lazy"></button>`).join('')}</div>`;
+  return `<div class="question-media">${urls.map((url,i)=>`<button class="question-media-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" aria-label="Open image full size"><img src="${esc(url)}" alt="Question visual ${i+1}" loading="lazy"></button>`).join('')}</div>`;
 }
 
 function updateZoomModalLens(event){
@@ -13889,7 +13890,7 @@ function openQuestionMediaZoom(url){
   const modal=document.createElement('div');
   modal.id='question-media-zoom-modal';
   modal.className='media-zoom-modal';
-  modal.innerHTML=`<div class="media-zoom-dialog" role="dialog" aria-modal="true" aria-label="Question image zoom"><div class="media-zoom-actions"><button class="btn btn-ghost" onclick="closeQuestionMediaZoom()">Close</button></div><div class="media-zoom-image-wrap" onpointerenter="updateZoomModalLens(event)" onpointermove="updateZoomModalLens(event)" onpointerleave="hideZoomModalLens(event)" title="Hover to magnify"><img src="${esc(url)}" alt="Zoomed question visual"><span class="media-zoom-lens" aria-hidden="true"></span></div></div>`;
+  modal.innerHTML=`<div class="media-zoom-dialog" role="dialog" aria-modal="true" aria-label="Question image zoom"><div class="media-zoom-actions"><button class="btn btn-ghost" onclick="closeQuestionMediaZoom()">Close</button></div><div class="media-zoom-image-wrap" onpointerenter="updateZoomModalLens(event)" onpointermove="updateZoomModalLens(event)" onpointerleave="hideZoomModalLens(event)"><img src="${esc(url)}" alt="Zoomed question visual"><span class="media-zoom-lens" aria-hidden="true"></span></div></div>`;
   modal.addEventListener('click',e=>{if(e.target===modal)closeQuestionMediaZoom();});
   document.body.appendChild(modal);
 }
