@@ -300,23 +300,38 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.calc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;box-shadow:0 10px 24px rgba(18,35,74,.05)}
-.calc-card-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.calc-card-title{font-size:15px;font-weight:800;color:var(--text)}
-.calc-formula-board{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--accent) 7%,var(--bg2)));border:1px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-radius:var(--r2);padding:15px 16px;overflow-x:auto}
-.calc-equation-label{font-size:12px;font-weight:900;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.08em}
-.calc-equals{font-size:22px;font-weight:900;color:var(--text)}
-.calc-equation-text{font-family:var(--mono);font-size:17px;font-weight:900;color:var(--accent2);white-space:nowrap;letter-spacing:0}
-.calc-fraction{display:inline-flex;flex-direction:column;align-items:center;min-width:220px}
-.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:16px;font-weight:900;color:var(--accent2);padding:7px 16px;text-align:center;white-space:nowrap}
-.calc-fraction-top{border-bottom:3px solid var(--accent2)}
-.calc-support-note{margin-top:9px;font-size:12px;color:var(--text2);line-height:1.45}
-.rr-table{border-collapse:collapse;width:100%;min-width:360px}
-.rr-table th{background:var(--bg4);border:1px solid var(--border2);padding:9px 12px;text-align:left;font-weight:800;font-size:13px;color:var(--text)}
-.rr-table td{border:1px solid var(--border);padding:8px 12px;font-size:13px;color:var(--text)}
-.rr-table tr:nth-child(odd) td{background:var(--bg3)}
-.rr-table .rr-value{text-align:center;font-family:var(--mono);font-size:14px;font-weight:800;color:var(--text)}
-.rr-table .rr-unit{font-size:11px;color:var(--text3);margin-left:4px;font-weight:600}
+.formula-sheet{display:grid;gap:18px}
+.formula-category{--category-color:#2f7dd1;border:1px solid color-mix(in srgb,var(--category-color) 32%,var(--border));border-radius:16px;background:var(--bg2);box-shadow:0 10px 24px rgba(18,35,74,.05);overflow:hidden;break-inside:avoid}
+.formula-category-head{display:flex;align-items:center;gap:9px;padding:10px 14px;background:color-mix(in srgb,var(--category-color) 10%,var(--bg2));border-bottom:1px solid color-mix(in srgb,var(--category-color) 24%,var(--border));color:var(--category-color);font-size:12px;font-weight:900;line-height:1.3;text-transform:uppercase;letter-spacing:.07em}
+.formula-category-head::before{content:'';width:7px;height:22px;border-radius:99px;background:var(--category-color);box-shadow:0 3px 9px color-mix(in srgb,var(--category-color) 34%,transparent)}
+.calc-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}
+.calc-card{background:var(--bg2);border:1px solid var(--border);border-top:3px solid var(--category-color,#2f7dd1);border-radius:12px;padding:12px 13px;box-shadow:0 5px 14px rgba(18,35,74,.045);min-width:0;break-inside:avoid}
+.calc-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.calc-card-title{font-size:14px;font-weight:850;color:var(--text);line-height:1.3}
+.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:9px;flex-wrap:wrap;background:color-mix(in srgb,var(--category-color,#2f7dd1) 5%,var(--bg3));border:1px solid color-mix(in srgb,var(--category-color,#2f7dd1) 24%,var(--border));border-radius:10px;padding:9px 10px;min-width:0}
+.calc-equation-label{font-size:10px;font-weight:900;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+.calc-equals{font-size:18px;font-weight:900;color:var(--text)}
+.calc-equation-text{font-family:var(--mono);font-size:13px;font-weight:850;color:var(--category-color,#2f7dd1);line-height:1.35;overflow-wrap:anywhere;min-width:0}
+.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:145px;max-width:100%;color:var(--category-color,#2f7dd1)}
+.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:900;color:inherit;padding:4px 10px;text-align:center;line-height:1.25;white-space:normal;overflow-wrap:anywhere;width:100%}
+.calc-fraction-top{border-bottom:2px solid currentColor}
+.calc-support-note{margin-top:7px;font-size:11px;color:var(--text2);line-height:1.4}
+.rr-category-grid{display:grid;grid-template-columns:repeat(2,minmax(340px,1fr));gap:14px;align-items:start}
+.rr-category-card{--category-color:#2f7dd1;border:1px solid color-mix(in srgb,var(--category-color) 30%,var(--border));border-radius:14px;background:var(--bg2);overflow:hidden;box-shadow:0 8px 20px rgba(18,35,74,.05);break-inside:avoid}
+.rr-category-card .formula-category-head{padding:9px 12px}
+.rr-table-wrap{overflow:visible}
+.rr-table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed}
+.rr-table th{background:color-mix(in srgb,var(--category-color) 7%,var(--bg3));border:0;border-bottom:1px solid color-mix(in srgb,var(--category-color) 22%,var(--border));padding:7px 10px;text-align:left;font-weight:800;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+.rr-table th:last-child{text-align:right}
+.rr-table td{border:0;border-bottom:1px solid var(--border);padding:7px 10px;font-size:12px;color:var(--text);line-height:1.25;vertical-align:middle}
+.rr-table tr:last-child td{border-bottom:0}
+.rr-table tr:nth-child(even) td{background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2))}
+.rr-table .rr-analyte{font-weight:750;width:49%}
+.rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:12px;font-weight:900;color:var(--category-color);white-space:nowrap}
+.rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:4px;font-weight:650}
+.rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
+@media(max-width:900px){.calc-category-grid,.rr-category-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.calc-category-grid{padding:8px}.calc-formula-board{align-items:flex-start}.calc-fraction{min-width:118px}.rr-table td{padding:7px 8px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
 /* Quiz */
 .admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
@@ -3482,15 +3497,18 @@ const CALC_PLACEHOLDERS=[
 ];
 
 const RR_PLACEHOLDERS=[
-  {id:'builtin-rr-wbc',type:'rr',_placeholder:true,name:'WBC',category:'Hematology - CBC',conventional_value:'4.5-11.0',conventional_unit:'x 10^3/uL',si_value:'4.5-11.0',si_unit:'x 10^9/L',notes:'Adult study range'},
+  {id:'builtin-rr-wbc',type:'rr',_placeholder:true,name:'WBC',category:'Hematology - CBC',conventional_value:'4.3-10.8',conventional_unit:'x 10^3/uL',si_value:'4.3-10.8',si_unit:'x 10^9/L',notes:'Adult study range'},
   {id:'builtin-rr-rbc-m',type:'rr',_placeholder:true,name:'RBC - male',category:'Hematology - CBC',conventional_value:'4.5-5.9',conventional_unit:'x 10^6/uL',si_value:'4.5-5.9',si_unit:'x 10^12/L',notes:'Adult study range'},
   {id:'builtin-rr-rbc-f',type:'rr',_placeholder:true,name:'RBC - female',category:'Hematology - CBC',conventional_value:'4.1-5.1',conventional_unit:'x 10^6/uL',si_value:'4.1-5.1',si_unit:'x 10^12/L',notes:'Adult study range'},
-  {id:'builtin-rr-hgb-m',type:'rr',_placeholder:true,name:'Hemoglobin - male',category:'Hematology - CBC',conventional_value:'13.5-17.5',conventional_unit:'g/dL',si_value:'135-175',si_unit:'g/L',notes:'Adult study range'},
+  {id:'builtin-rr-hgb-m',type:'rr',_placeholder:true,name:'Hemoglobin - male',category:'Hematology - CBC',conventional_value:'13-18',conventional_unit:'g/dL',si_value:'130-180',si_unit:'g/L',notes:'Adult study range'},
   {id:'builtin-rr-hgb-f',type:'rr',_placeholder:true,name:'Hemoglobin - female',category:'Hematology - CBC',conventional_value:'12.0-16.0',conventional_unit:'g/dL',si_value:'120-160',si_unit:'g/L',notes:'Adult study range'},
-  {id:'builtin-rr-hct-m',type:'rr',_placeholder:true,name:'Hematocrit - male',category:'Hematology - CBC',conventional_value:'41-53',conventional_unit:'%',si_value:'0.41-0.53',si_unit:'L/L',notes:'Adult study range'},
-  {id:'builtin-rr-hct-f',type:'rr',_placeholder:true,name:'Hematocrit - female',category:'Hematology - CBC',conventional_value:'36-46',conventional_unit:'%',si_value:'0.36-0.46',si_unit:'L/L',notes:'Adult study range'},
+  {id:'builtin-rr-hct-m',type:'rr',_placeholder:true,name:'Hematocrit - male',category:'Hematology - CBC',conventional_value:'41.5-50.5',conventional_unit:'%',si_value:'0.415-0.505',si_unit:'L/L',notes:'Adult study range'},
+  {id:'builtin-rr-hct-f',type:'rr',_placeholder:true,name:'Hematocrit - female',category:'Hematology - CBC',conventional_value:'36-44.5',conventional_unit:'%',si_value:'0.36-0.445',si_unit:'L/L',notes:'Adult study range'},
   {id:'builtin-rr-plt',type:'rr',_placeholder:true,name:'Platelets',category:'Hematology - CBC',conventional_value:'150-450',conventional_unit:'x 10^3/uL',si_value:'150-450',si_unit:'x 10^9/L',notes:'Adult study range'},
   {id:'builtin-rr-retic',type:'rr',_placeholder:true,name:'Reticulocytes',category:'Hematology - CBC',conventional_value:'0.5-2.5',conventional_unit:'%',si_value:'0.005-0.025',si_unit:'fraction',notes:'Adult study range'},
+  {id:'builtin-rr-mcv',type:'rr',_placeholder:true,name:'MCV',category:'Hematology - CBC',conventional_value:'80-98',conventional_unit:'fL',si_value:'80-98',si_unit:'fL',notes:'Adult study range'},
+  {id:'builtin-rr-mch',type:'rr',_placeholder:true,name:'MCH',category:'Hematology - CBC',conventional_value:'27-32',conventional_unit:'pg',si_value:'27-32',si_unit:'pg',notes:'Adult study range'},
+  {id:'builtin-rr-mchc',type:'rr',_placeholder:true,name:'MCHC',category:'Hematology - CBC',conventional_value:'32-36',conventional_unit:'%',si_value:'0.32-0.36',si_unit:'fraction',notes:'Adult study range'},
   {id:'builtin-rr-pt',type:'rr',_placeholder:true,name:'PT',category:'Hematology - Coagulation',conventional_value:'11-13.5',conventional_unit:'sec',si_value:'11-13.5',si_unit:'sec',notes:'Reagent dependent'},
   {id:'builtin-rr-inr',type:'rr',_placeholder:true,name:'INR',category:'Hematology - Coagulation',conventional_value:'0.8-1.1',conventional_unit:'ratio',si_value:'0.8-1.1',si_unit:'ratio',notes:'No anticoagulation'},
   {id:'builtin-rr-aptt',type:'rr',_placeholder:true,name:'aPTT',category:'Hematology - Coagulation',conventional_value:'25-35',conventional_unit:'sec',si_value:'25-35',si_unit:'sec',notes:'Reagent dependent'},
@@ -3530,9 +3548,10 @@ const RR_PLACEHOLDERS=[
   {id:'builtin-rr-phenytoin',type:'rr',_placeholder:true,name:'Phenytoin',category:'Chemistry - Therapeutic Drugs',conventional_value:'10-20',conventional_unit:'ug/mL',si_value:'40-80',si_unit:'umol/L',notes:'Therapeutic range'},
   {id:'builtin-rr-theophylline',type:'rr',_placeholder:true,name:'Theophylline',category:'Chemistry - Therapeutic Drugs',conventional_value:'10-20',conventional_unit:'ug/mL',si_value:'55-110',si_unit:'umol/L',notes:'Therapeutic range'},
   {id:'builtin-rr-abg-ph',type:'rr',_placeholder:true,name:'Arterial pH',category:'Chemistry - Blood Gas',conventional_value:'7.35-7.45',conventional_unit:'pH',si_value:'7.35-7.45',si_unit:'pH',notes:'Adult arterial range'},
-  {id:'builtin-rr-abg-pco2',type:'rr',_placeholder:true,name:'pCO2',category:'Chemistry - Blood Gas',conventional_value:'35-45',conventional_unit:'mmHg',si_value:'4.7-6.0',si_unit:'kPa',notes:'Adult arterial range'},
+  {id:'builtin-rr-abg-pco2',type:'rr',_placeholder:true,name:'pCO2',category:'Chemistry - Blood Gas',conventional_value:'34-45',conventional_unit:'mmHg',si_value:'4.66-5.99',si_unit:'kPa',notes:'Adult arterial range'},
   {id:'builtin-rr-abg-hco3',type:'rr',_placeholder:true,name:'HCO3-',category:'Chemistry - Blood Gas',conventional_value:'22-26',conventional_unit:'mmol/L',si_value:'22-26',si_unit:'mmol/L',notes:'Adult arterial range'},
-  {id:'builtin-rr-abg-po2',type:'rr',_placeholder:true,name:'pO2',category:'Chemistry - Blood Gas',conventional_value:'80-100',conventional_unit:'mmHg',si_value:'10.6-13.3',si_unit:'kPa',notes:'Adult arterial range'},
+  {id:'builtin-rr-abg-po2',type:'rr',_placeholder:true,name:'pO2',category:'Chemistry - Blood Gas',conventional_value:'83-108',conventional_unit:'mmHg',si_value:'11.04-14.36',si_unit:'kPa',notes:'Adult arterial range'},
+  {id:'builtin-rr-hsctn',type:'rr',_placeholder:true,name:'hs-cTn - female / male',category:'Chemistry - Cardiac Markers',conventional_value:'F <10; M <15',conventional_unit:'ng/L',si_value:'F <10; M <15',si_unit:'ng/L',notes:'Common memorization cutoff; method and laboratory dependent'},
   {id:'builtin-rr-tsh',type:'rr',_placeholder:true,name:'TSH',category:'Chemistry - Endocrine',conventional_value:'0.4-4.0',conventional_unit:'uIU/mL',si_value:'0.4-4.0',si_unit:'mIU/L',notes:'Adult study range'},
   {id:'builtin-rr-ft4',type:'rr',_placeholder:true,name:'Free T4',category:'Chemistry - Endocrine',conventional_value:'0.8-1.8',conventional_unit:'ng/dL',si_value:'10-23',si_unit:'pmol/L',notes:'Adult study range'},
   {id:'builtin-rr-pth',type:'rr',_placeholder:true,name:'PTH',category:'Chemistry - Endocrine',conventional_value:'10-65',conventional_unit:'pg/mL',si_value:'10-65',si_unit:'ng/L',notes:'Adult study range'},
@@ -11484,37 +11503,49 @@ async function renderFormulasView(v){
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16 flex-wrap">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
-      <div class="section-title">Calculations / Reference Ranges</div>
+      <div class="section-title">Calculations &amp; Reference Ranges</div>
       <div class="flex gap-8 ml-auto flex-wrap">
-        <button class="btn btn-ghost btn-sm" onclick="openFormulasExport()">📄 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="openFormulasExport()">Print / PDF</button>
         ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="openFormulaEditor(null,'${activeTab}')">+ Add ${activeTab==='calc'?'Calculation':'Reference Range'}</button>`:''}
       </div>
     </div>
     <div class="tabs mb-16">
-      <button class="tab ${activeTab==='calc'?'active':''}" onclick="appState._fmTab='calc';renderView()">Calculations</button>
-      <button class="tab ${activeTab==='rr'?'active':''}" onclick="appState._fmTab='rr';renderView()">Reference Ranges</button>
+      <button class="tab ${activeTab==='calc'?'active':''}" onclick="appState._fmTab='calc';renderView()">Calculations (${calcData.length})</button>
+      <button class="tab ${activeTab==='rr'?'active':''}" onclick="appState._fmTab='rr';renderView()">Reference Ranges (${rrData.length})</button>
     </div>
     ${activeTab==='calc'?renderCalcTab(calcCats,calcData):renderRRTab(rrCats,rrData)}
   `;
 }
 
+function formulaCategoryColor(category){
+  const c=String(category||'').toLowerCase();
+  if(c.includes('hematology'))return '#b22222';
+  if(c.includes('urinalysis')||c.includes('body fluid'))return '#c8a800';
+  if(c.includes('immunology')||c.includes('serology'))return '#7b61ff';
+  if(c.includes('lab operations'))return '#287f7a';
+  if(c.includes('microbiology')||c.includes('parasitology')||c.includes('mycology'))return '#2f9c63';
+  if(c.includes('blood bank'))return '#a61e2b';
+  return '#2f7dd1';
+}
+
 function renderCalcTab(cats,all){
   if(!all.length)return '<div class="empty">No calculations yet. Use Admin mode to add some.</div>';
-  return Object.entries(cats).map(([cat,items])=>`
-    <div class="mb-24">
-      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${esc(cat)}</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
+  return `<div class="formula-sheet">${Object.entries(cats).map(([cat,items])=>`
+    <section class="formula-category" style="--category-color:${formulaCategoryColor(cat)}">
+      <div class="formula-category-head">${esc(cat)}</div>
+      <div class="calc-category-grid">
         ${items.map(f=>renderCalcCard(f)).join('')}
       </div>
-    </div>`).join('');
+    </section>`).join('')}</div>`;
 }
 
 function renderCalcCard(f){
-  const steps=(f.steps||[]).filter(Boolean);
-  const hasFraction=f.numerator||f.denominator;
+  const steps=(f.steps||[]).filter(Boolean).map(String);
+  const hasFraction=!!(f.numerator||f.denominator);
   const label=f.result_label||f.name;
+  const support=[...(hasFraction?steps:[]),String(f.notes||'').trim()].filter(Boolean);
   return `
-    <div class="calc-card">
+    <article class="calc-card">
       <div class="calc-card-head">
         <span class="calc-card-title">${esc(f.name)}</span>
         ${isAdmin&&!f._placeholder?`<div class="ml-auto flex gap-6">
@@ -11526,55 +11557,38 @@ function renderCalcCard(f){
         <div class="calc-formula-board">
           <div class="calc-equation-label">${esc(label)}</div>
           <div class="calc-equals">=</div>
-          <div class="calc-fraction">
+          <div class="calc-fraction" aria-label="${esc((f.numerator||'')+' divided by '+(f.denominator||''))}">
             <div class="calc-fraction-top">${esc(f.numerator||'...')}</div>
             <div class="calc-fraction-bottom">${esc(f.denominator||'...')}</div>
           </div>
           ${f.multiplier?`<div class="calc-equation-text">x ${esc(f.multiplier)}</div>`:''}
         </div>`:''}
-      ${steps.length?`
-        <div style="display:flex;flex-direction:column;gap:8px;margin-top:${hasFraction?'10px':'0'}">
-          ${steps.map(raw=>{
-            const s=String(raw||'');
-            return `
-            <div class="calc-formula-board">
-              <div class="calc-equation-label">${esc(hasFraction?'Note':(s.includes('=')?'Formula':label))}</div>
-              ${hasFraction?'':(s.includes('=')?'':'<div class="calc-equals">=</div>')}
-              <div class="calc-equation-text">${esc(s)}</div>
-            </div>`;
-          }).join('')}
+      ${!hasFraction&&steps.length?`
+        <div class="calc-formula-board">
+          <div class="calc-equation-text">${steps.map(esc).join('<br>')}</div>
         </div>`:''}
-    </div>`;
+      ${support.length?`<div class="calc-support-note">${support.map(esc).join(' • ')}</div>`:''}
+    </article>`;
 }
 
 function renderRRTab(cats,all){
   if(!all.length)return '<div class="empty">No reference ranges yet. Use Admin mode to add some.</div>';
-  return Object.entries(cats).map(([cat,items])=>`
-    <div class="mb-24">
-      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">${esc(cat)}</div>
-      <div style="overflow-x:auto">
+  return `<div class="rr-category-grid">${Object.entries(cats).map(([cat,items])=>`
+    <section class="rr-category-card" style="--category-color:${formulaCategoryColor(cat)}">
+      <div class="formula-category-head">${esc(cat)}</div>
+      <div class="rr-table-wrap">
         <table class="rr-table">
-          <thead>
-            <tr>
-              <th>Analyte</th>
-              <th style="text-align:center">Conventional Units</th>
-              ${isAdmin?'<th style="width:90px"></th>':''}
-            </tr>
-          </thead>
+          <thead><tr><th>Analyte</th><th>Conventional units</th></tr></thead>
           <tbody>
-            ${items.map((f,ri)=>`
+            ${items.map(f=>`
               <tr>
-                <td style="font-weight:700">${esc(f.name)}</td>
-                <td class="rr-value">${esc(f.conventional_value||'—')}${f.conventional_unit?'<span class="rr-unit">'+esc(f.conventional_unit)+'</span>':''}</td>
-                ${isAdmin&&!f._placeholder?`<td style="border:1px solid var(--border);padding:6px;text-align:center">
-                  <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','rr')">Edit</button>
-                  <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
-                </td>`:isAdmin?'<td style="border:1px solid var(--border);padding:6px;text-align:center;font-size:11px;color:var(--text3)">placeholder</td>':''}
+                <td class="rr-analyte">${esc(f.name)}${isAdmin&&!f._placeholder?`<span class="rr-row-actions"><button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','rr')">Edit</button><button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button></span>`:''}</td>
+                <td class="rr-value">${esc(f.conventional_value||'--')}${f.conventional_unit?'<span class="rr-unit">'+esc(f.conventional_unit)+'</span>':''}</td>
               </tr>`).join('')}
           </tbody>
         </table>
       </div>
-    </div>`).join('');
+    </section>`).join('')}</div>`;
 }
 
 async function openFormulaEditor(id,type){
@@ -11674,9 +11688,10 @@ async function openFormulasExport(){
 
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
-      <div style="font-size:16px;font-weight:600">Export to PDF</div>
+      <div style="font-size:16px;font-weight:600">Print-ready PDF</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
+    <div style="font-size:12px;color:var(--text2);margin:-6px 0 14px">Each selected sheet fits on one landscape page.</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
       <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
         <input type="checkbox" id="exp-calc" ${calcData.length?'checked':''} ${!calcData.length?'disabled':''} style="width:16px;height:16px">
@@ -11701,62 +11716,110 @@ async function openFormulasExport(){
 
 function calcFormulaText(f){
   if(!f)return '';
-  if((f.steps||[]).filter(Boolean).length)return (f.steps||[]).filter(Boolean).join(' | ');
   const left=f.result_label?f.result_label+' = ':'';
   if(f.numerator||f.denominator){
     const frac=(f.numerator||'...')+' / '+(f.denominator||'...');
     return left+frac+(f.multiplier?' x '+f.multiplier:'');
   }
+  if((f.steps||[]).filter(Boolean).length)return (f.steps||[]).filter(Boolean).join(' | ');
   return f.formula||f.name||'';
 }
 
+function pdfCategoryRgb(category){
+  const c=String(category||'').toLowerCase();
+  if(c.includes('hematology'))return [178,34,34];
+  if(c.includes('urinalysis')||c.includes('body fluid'))return [186,151,0];
+  if(c.includes('immunology')||c.includes('serology'))return [123,97,255];
+  if(c.includes('lab operations'))return [40,127,122];
+  if(c.includes('microbiology')||c.includes('parasitology')||c.includes('mycology'))return [47,156,99];
+  if(c.includes('blood bank'))return [166,30,43];
+  return [47,125,209];
+}
+function pdfTint(rgb,amount=.9){return rgb.map(v=>Math.round(v+(255-v)*amount));}
+
 function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
+  const items=calcData||[];
   const cW=pageW-margin*2;
+  doc.setFillColor(255,255,255);
+  doc.rect(0,0,pageW,pageH,'F');
   doc.setFillColor(38,96,207);
   doc.rect(0,0,pageW,18,'F');
   doc.setTextColor(255,255,255);
   doc.setFont('helvetica','bold');
   doc.setFontSize(14);
-  doc.text('Calculations - One Page',margin,12);
+  doc.text('Calculations - Memorization Sheet',margin,12);
   doc.setFontSize(8);
   doc.setFont('helvetica','normal');
-  doc.text('Formula-only study sheet',pageW-margin,12,{align:'right'});
+  doc.text(items.length+' formulas - one page',pageW-margin,12,{align:'right'});
 
-  const cols=2;
-  const gap=5;
-  const colW=(cW-gap)/cols;
-  const rowH=13.2;
-  const startY=24;
-  const rowsPerCol=Math.floor((pageH-startY-14)/rowH);
-  const maxItems=rowsPerCol*cols;
-  const items=(calcData||[]).slice(0,maxItems);
+  const cols=Math.min(4,Math.max(2,Math.ceil(items.length/7)));
+  const gap=4;
+  const colW=(cW-gap*(cols-1))/cols;
+  const startY=23;
+  const bottom=12;
+  const rowsPerCol=Math.max(1,Math.ceil(items.length/cols));
+  const rowH=(pageH-startY-bottom)/rowsPerCol;
   items.forEach((f,i)=>{
     const col=Math.floor(i/rowsPerCol);
     const row=i%rowsPerCol;
     const x=margin+col*(colW+gap);
     const y=startY+row*rowH;
-    doc.setFillColor(i%2===0?246:255,i%2===0?248:255,i%2===0?252:255);
-    doc.setDrawColor(198,205,226);
-    doc.roundedRect(x,y,colW,rowH-1.4,1.8,1.8,'FD');
+    const h=Math.max(13,rowH-1.4);
+    const color=pdfCategoryRgb(f.category);
+    const tint=pdfTint(color,.94);
+    doc.setFillColor(...tint);
+    doc.setDrawColor(...pdfTint(color,.68));
+    doc.roundedRect(x,y,colW,h,1.8,1.8,'FD');
+    doc.setFillColor(...color);
+    doc.roundedRect(x,y,1.7,h,1,1,'F');
+
     doc.setFont('helvetica','bold');
-    doc.setFontSize(7.6);
+    doc.setFontSize(rowH<19?6.4:7.4);
     doc.setTextColor(18,25,45);
-    doc.text(doc.splitTextToSize(String(f.name||''),colW-5).slice(0,1),x+2.5,y+4.3);
-    doc.setFont('courier','bold');
-    doc.setFontSize(6.8);
-    doc.setTextColor(28,92,185);
-    doc.text(doc.splitTextToSize(calcFormulaText(f),colW-5).slice(0,2),x+2.5,y+8.2);
+    doc.text(doc.splitTextToSize(String(f.name||''),colW-27).slice(0,1),x+3.2,y+4.6);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(5.3);
+    doc.setTextColor(...color);
+    doc.text(doc.splitTextToSize(String(f.category||''),23).slice(0,1),x+colW-2.5,y+4.4,{align:'right'});
+
+    if(f.numerator||f.denominator){
+      const label=String(f.result_label||f.name||'');
+      const labelW=Math.min(25,Math.max(13,doc.getTextWidth(label)+2));
+      const multW=f.multiplier?10:0;
+      const fracLeft=x+labelW+9;
+      const fracRight=x+colW-3-multW;
+      const fracMid=(fracLeft+fracRight)/2;
+      const lineY=y+h*.61;
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(rowH<19?5.7:6.3);
+      doc.setTextColor(62,68,84);
+      doc.text(doc.splitTextToSize(label,labelW).slice(0,1),x+3.2,lineY+.8);
+      doc.setFontSize(8);
+      doc.text('=',x+labelW+4,lineY+.8);
+      doc.setDrawColor(...color);
+      doc.setLineWidth(.45);
+      doc.line(fracLeft,lineY,fracRight,lineY);
+      doc.setFont('courier','bold');
+      doc.setFontSize(rowH<19?5.4:6.1);
+      doc.setTextColor(...color);
+      doc.text(doc.splitTextToSize(String(f.numerator||'...'),Math.max(12,fracRight-fracLeft-2)).slice(0,1),fracMid,lineY-2,{align:'center'});
+      doc.text(doc.splitTextToSize(String(f.denominator||'...'),Math.max(12,fracRight-fracLeft-2)).slice(0,1),fracMid,lineY+4.3,{align:'center'});
+      if(f.multiplier)doc.text('x '+String(f.multiplier),x+colW-2.5,lineY+.8,{align:'right'});
+    }else{
+      doc.setFont('courier','bold');
+      doc.setFontSize(rowH<19?5.8:6.7);
+      doc.setTextColor(...color);
+      const formula=calcFormulaText(f);
+      doc.text(doc.splitTextToSize(formula,colW-7).slice(0,rowH<19?2:3),x+3.2,y+9.2);
+    }
   });
-  if((calcData||[]).length>maxItems){
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(7);
-    doc.setTextColor(180,50,60);
-    doc.text(`Showing ${maxItems} of ${calcData.length} calculations on this one-page sheet.`,margin,pageH-8);
-  }
 }
 
 function drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin){
+  const items=calcData||[];
   const cW=pageW-margin*2;
+  doc.setFillColor(255,255,255);
+  doc.rect(0,0,pageW,pageH,'F');
   doc.setFillColor(38,96,207);
   doc.rect(0,0,pageW,18,'F');
   doc.setTextColor(255,255,255);
@@ -11765,133 +11828,114 @@ function drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin){
   doc.text('Calculations - Blank Practice',margin,12);
   doc.setFontSize(8);
   doc.setFont('helvetica','normal');
-  doc.text('Write each formula from memory.',pageW-margin,12,{align:'right'});
+  doc.text('Write each formula from memory',pageW-margin,12,{align:'right'});
 
-  const cols=2;
-  const gap=7;
-  const colW=(cW-gap)/cols;
-  const rowH=17;
-  const startY=25;
-  const rowsPerCol=Math.floor((pageH-startY-12)/rowH);
-  const maxItems=rowsPerCol*cols;
-  const items=(calcData||[]).slice(0,maxItems);
+  const cols=Math.min(4,Math.max(2,Math.ceil(items.length/7)));
+  const gap=4;
+  const colW=(cW-gap*(cols-1))/cols;
+  const startY=23;
+  const bottom=12;
+  const rowsPerCol=Math.max(1,Math.ceil(items.length/cols));
+  const rowH=(pageH-startY-bottom)/rowsPerCol;
   items.forEach((f,i)=>{
     const col=Math.floor(i/rowsPerCol);
     const row=i%rowsPerCol;
     const x=margin+col*(colW+gap);
     const y=startY+row*rowH;
-    doc.setDrawColor(198,205,226);
-    doc.setFillColor(250,251,254);
-    doc.roundedRect(x,y,colW,rowH-1.4,1.8,1.8,'FD');
+    const h=rowH-1.4;
+    const color=pdfCategoryRgb(f.category);
+    doc.setFillColor(...pdfTint(color,.96));
+    doc.setDrawColor(...pdfTint(color,.68));
+    doc.roundedRect(x,y,colW,h,1.8,1.8,'FD');
+    doc.setFillColor(...color);
+    doc.rect(x,y,1.5,h,'F');
     doc.setFont('helvetica','bold');
-    doc.setFontSize(8.2);
+    doc.setFontSize(7.2);
     doc.setTextColor(18,25,45);
-    doc.text(doc.splitTextToSize(String(f.name||''),colW-5).slice(0,1),x+2.5,y+5);
-    doc.setDrawColor(44,83,170);
-    doc.setLineWidth(0.35);
-    doc.line(x+2.5,y+11.2,x+colW-2.5,y+11.2);
-    doc.line(x+2.5,y+15.2,x+colW-2.5,y+15.2);
+    doc.text(doc.splitTextToSize(String(f.name||''),colW-6).slice(0,1),x+3.2,y+4.8);
+    doc.setDrawColor(...color);
+    doc.setLineWidth(.28);
+    doc.line(x+3.2,y+h*.55,x+colW-3,y+h*.55);
+    doc.line(x+3.2,y+h*.8,x+colW-3,y+h*.8);
   });
-  if((calcData||[]).length>maxItems){
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(7);
-    doc.setTextColor(180,50,60);
-    doc.text(`Showing ${maxItems} of ${calcData.length} calculations on this one-page sheet.`,margin,pageH-8);
-  }
 }
 
 function rrConventionalText(f){
-  return (f.conventional_value||'—')+(f.conventional_unit?' '+f.conventional_unit:'');
+  return (f.conventional_value||'--')+(f.conventional_unit?' '+f.conventional_unit:'');
 }
 
-function drawRRCompactPages(doc,rrData,pageW,pageH,margin){
-  const refresh=()=>{pageW=doc.internal.pageSize.getWidth();pageH=doc.internal.pageSize.getHeight();};
-  refresh();
-  const cW=pageW-margin*2;
-  const cols=3;
-  const gap=5;
-  const colW=(cW-gap*(cols-1))/cols;
-  const top=24;
-  const bottom=10;
-  let col=0;
-  let x=margin;
-  let y=top;
-  function header(){
-    refresh();
-    doc.setFillColor(40,60,100);
-    doc.rect(0,0,pageW,18,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(14);
-    doc.text('Reference Ranges - Conventional Units',margin,12);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(8);
-    doc.text('Compact study sheet',pageW-margin,12,{align:'right'});
-  }
-  function colHeader(){
-    doc.setFillColor(222,227,241);
-    doc.setDrawColor(176,184,210);
-    doc.rect(x,y,colW*.48,6,'FD');
-    doc.rect(x+colW*.48,y,colW*.52,6,'FD');
-    doc.setTextColor(20,24,42);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(7.5);
-    doc.text('Analyte',x+2,y+4.2);
-    doc.text('Conventional',x+colW*.48+2,y+4.2);
-    y+=6;
-  }
-  function nextCol(){
-    col++;
-    if(col>=cols){
-      doc.addPage('a4','landscape');
-      refresh();
-      header();
-      col=0;
-    }
-    x=margin+col*(colW+gap);
-    y=top;
-    colHeader();
-  }
-  function ensure(h){
-    if(y+h>pageH-bottom)nextCol();
-  }
-  const cats={};
-  const order=[];
+function drawRROnePage(doc,rrData,pageW,pageH,margin){
+  doc.setFillColor(255,255,255);
+  doc.rect(0,0,pageW,pageH,'F');
+  const cats=[];
+  const catMap={};
   (rrData||[]).forEach(f=>{
-    const c=f.category||'General';
-    if(!cats[c]){cats[c]=[];order.push(c);}
-    cats[c].push(f);
+    const name=f.category||'General';
+    if(!catMap[name]){catMap[name]=[];cats.push(name);}
+    catMap[name].push(f);
   });
-  header();
-  colHeader();
-  order.forEach(cat=>{
-    ensure(6);
-    doc.setFillColor(245,247,252);
-    doc.setDrawColor(198,205,226);
-    doc.rect(x,y,colW,5.5,'FD');
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(7.2);
-    doc.setTextColor(68,78,118);
-    doc.text(doc.splitTextToSize(cat.toUpperCase(),colW-4).slice(0,1),x+2,y+3.8);
-    y+=5.5;
-    cats[cat].forEach((f,i)=>{
-      const rowH=6.2;
-      ensure(rowH);
-      doc.setFillColor(i%2===0?252:246,i%2===0?252:248,i%2===0?254:252);
-      doc.setDrawColor(205,211,230);
-      doc.rect(x,y,colW*.48,rowH,'FD');
-      doc.rect(x+colW*.48,y,colW*.52,rowH,'FD');
+  doc.setFillColor(40,60,100);
+  doc.rect(0,0,pageW,18,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.text('Reference Ranges - Conventional Units',margin,12);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.text((rrData||[]).length+' memorization ranges - one page',pageW-margin,12,{align:'right'});
+
+  const cols=4;
+  const gap=4;
+  const cW=pageW-margin*2;
+  const colW=(cW-gap*(cols-1))/cols;
+  const top=23;
+  const bottom=12;
+  const contentH=pageH-top-bottom;
+  const stacks=Array.from({length:cols},()=>({names:[],weight:0}));
+  cats.forEach(name=>{
+    const target=stacks.reduce((best,stack,i)=>stack.weight<stacks[best].weight?i:best,0);
+    stacks[target].names.push(name);
+    stacks[target].weight+=catMap[name].length+1.35;
+  });
+
+  stacks.forEach((stack,col)=>{
+    const x=margin+col*(colW+gap);
+    const itemCount=stack.names.reduce((n,name)=>n+catMap[name].length,0);
+    const catCount=stack.names.length;
+    const catH=5.2;
+    const catGap=1.2;
+    const rowH=Math.min(7.2,(contentH-catCount*(catH+catGap))/Math.max(1,itemCount));
+    let y=top;
+    stack.names.forEach(name=>{
+      const color=pdfCategoryRgb(name);
+      doc.setFillColor(...pdfTint(color,.87));
+      doc.setDrawColor(...pdfTint(color,.56));
+      doc.roundedRect(x,y,colW,catH,1.1,1.1,'FD');
+      doc.setFillColor(...color);
+      doc.rect(x,y,1.5,catH,'F');
       doc.setFont('helvetica','bold');
-      doc.setFontSize(7);
-      doc.setTextColor(18,25,45);
-      doc.text(doc.splitTextToSize(String(f.name||''),colW*.48-4).slice(0,1),x+2,y+4.2);
-      doc.setFont('courier','bold');
-      doc.setFontSize(6.8);
-      doc.setTextColor(28,92,185);
-      doc.text(doc.splitTextToSize(rrConventionalText(f),colW*.52-4).slice(0,1),x+colW*.48+2,y+4.2);
-      y+=rowH;
+      doc.setFontSize(6.2);
+      doc.setTextColor(...color);
+      doc.text(doc.splitTextToSize(name.toUpperCase(),colW-5).slice(0,1),x+3,y+3.6);
+      y+=catH;
+      catMap[name].forEach((f,i)=>{
+        const tint=i%2===0?pdfTint(color,.97):[255,255,255];
+        doc.setFillColor(...tint);
+        doc.setDrawColor(219,223,235);
+        doc.rect(x,y,colW*.49,rowH,'FD');
+        doc.rect(x+colW*.49,y,colW*.51,rowH,'FD');
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(Math.max(5.8,Math.min(6.8,rowH*.92)));
+        doc.setTextColor(18,25,45);
+        doc.text(doc.splitTextToSize(String(f.name||''),colW*.49-3.5).slice(0,1),x+1.7,y+rowH*.69);
+        doc.setFont('courier','bold');
+        doc.setFontSize(Math.max(5.6,Math.min(6.6,rowH*.9)));
+        doc.setTextColor(...color);
+        doc.text(doc.splitTextToSize(rrConventionalText(f),colW*.51-3.5).slice(0,1),x+colW*.49+1.7,y+rowH*.69);
+        y+=rowH;
+      });
+      y+=catGap;
     });
-    y+=2;
   });
 }
 
@@ -11922,11 +11966,11 @@ function generateFormulasPDF(){
     if(inclRR&&rrData.length){
       if(inclCalc)doc.addPage('a4','landscape');
       refreshPage();
-      drawRRCompactPages(doc,rrData,pageW,pageH,margin);
+      drawRROnePage(doc,rrData,pageW,pageH,margin);
       y=pageH;
     }
     const tot=doc.internal.getNumberOfPages();
-    for(let p=1;p<=tot;p++){doc.setPage(p);refreshPage();doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep — Calculations & Reference Ranges · Page '+p+' of '+tot,margin,pageH-6);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});}
+    for(let p=1;p<=tot;p++){doc.setPage(p);refreshPage();doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep - Calculations & Reference Ranges - Page '+p+' of '+tot,margin,pageH-6);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});}
     doc.save(blankCalc&&inclCalc&&!inclRR?'mls_calc_blank_practice.pdf':'mls_calc_rr.pdf');
     document.getElementById('condition-modal').classList.add('hidden');
   }catch(err){alert('PDF export failed: '+err.message);}
