@@ -988,13 +988,11 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .study-outline-hero h2{margin:0 0 8px;font-size:26px;color:var(--text)}
 .study-outline-hero p{margin:0;max-width:720px;color:var(--text2);font-size:17px;line-height:1.55}
 .study-embed-note{flex:0 0 auto;padding:7px 10px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:10px;white-space:nowrap}
-.study-outline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.study-chapter-card{appearance:none;width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:21px 20px;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
-.study-chapter-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--study-accent) 65%,var(--border));box-shadow:0 10px 24px #00000012}
-.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:48px;height:34px;padding:0 9px;border-radius:10px;background:color-mix(in srgb,var(--study-accent) 13%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:14px;font-weight:800}
-.study-chapter-title{font-size:16px;font-weight:700;line-height:1.35;color:var(--text)}
-.study-chapter-topics{margin-top:6px;font-size:13px;color:var(--text3);line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.study-chapter-open{color:var(--study-accent);font-size:20px}
+.study-outline-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px}
+.study-chapter-card{appearance:none;width:100%;min-height:52px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;padding:10px 12px;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;transition:background .14s ease,border-color .14s ease}
+.study-chapter-card:hover{background:color-mix(in srgb,var(--study-accent) 4%,var(--bg2));border-color:color-mix(in srgb,var(--study-accent) 55%,var(--border))}
+.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:40px;height:26px;padding:0 7px;border-radius:6px;background:color-mix(in srgb,var(--study-accent) 11%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:11px;font-weight:800}
+.study-chapter-title{font-size:13px;font-weight:700;line-height:1.3;color:var(--text)}
 .study-bibliography{margin-top:16px;border:1px solid var(--border);border-radius:var(--r2);background:var(--bg2);overflow:hidden}
 .study-bibliography summary{cursor:pointer;padding:17px 19px;font-size:15px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;justify-content:space-between}
 .study-bibliography summary::-webkit-details-marker{display:none}
@@ -2267,23 +2265,26 @@ const STUDY_OUTLINES={
       ]
     },
     chapters:[
-      {number:'6.1',title:'Instrumentation',topics:['Spectrophotometry','Electrochemistry','Chromatography','Mass spectrometry','Automation'],reading:['Laboratory instrumentation and analytical principles','Spectrophotometry and optical methods','Electrochemical methods and ion-selective electrodes','Chromatography and mass spectrometry'],summary:'Clinical chemistry instruments convert physical or chemical signals into quantitative results. Review photometry components and Beer law, atomic absorption, nephelometry and turbidimetry, fluorescence and chemiluminescence, chromatography, electrophoresis, electrochemistry, and the calibration and quality checks that reveal analytical error.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.1, PDF pp. 282 to 307.',videoUrl:''},
-      {number:'6.2',title:'Blood Gases, pH, and Electrolytes',topics:['Acid–base balance','Blood gases','Electrolytes','Osmolality','Anion gap'],reading:['Blood gas measurement and acid–base interpretation','Electrolytes and osmolality','Ion-selective electrode methods'],summary:'Blood pH reflects the balance between bicarbonate and carbonic acid. Interpret pH, PCO2, and bicarbonate together, identify whether the primary process is respiratory or metabolic, and then assess compensation. Electrolytes regulate fluid balance, neuromuscular activity, and osmolality, while collection and handling can rapidly alter potassium and blood gas results.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.2, PDF pp. 308 to 330.',videoUrl:''},
-      {number:'6.3',title:'Glucose, Hemoglobin, Iron, and Bilirubin',topics:['Glucose testing','Diabetes','Hemoglobin derivatives','Iron studies','Bilirubin'],reading:['Carbohydrates and diabetes mellitus','Hemoglobin and iron metabolism','Heme catabolism and bilirubin'],summary:'Glucose homeostasis depends on insulin, counterregulatory hormones, hepatic production, and tissue use. Hemoglobin, iron transport, bilirubin production, conjugation, and excretion connect erythrocyte turnover with liver function. Interpret glucose and glycated hemoglobin with specimen timing, and distinguish prehepatic, hepatic, and posthepatic bilirubin patterns.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.3, PDF pp. 331 to 354.',videoUrl:''},
-      {number:'6.4',title:'Creatinine, Uric Acid, BUN, and Ammonia',topics:['Renal function','Nitrogen metabolites','Creatinine','Uric acid','Ammonia'],reading:['Nonprotein nitrogen compounds','Renal function testing','Creatinine, urea, uric acid, and ammonia methods'],summary:'Urea, creatinine, uric acid, and ammonia are nitrogenous waste products with different sources and routes of removal. BUN and creatinine are interpreted together to assess renal perfusion and filtration, uric acid reflects purine metabolism, and ammonia rises when hepatic conversion to urea is impaired. Collection, storage, and interference control are especially important for ammonia.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.4, PDF pp. 355 to 366.',videoUrl:''},
-      {number:'6.5',title:'Proteins, Electrophoresis, and Lipids',topics:['Plasma proteins','Electrophoresis','Lipoproteins','Dyslipidemia'],reading:['Plasma proteins and immunochemical measurement','Serum protein electrophoresis','Lipids, lipoproteins, and cardiovascular risk'],summary:'Plasma proteins maintain oncotic pressure, transport substances, and support immunity. Total protein and albumin measurements are interpreted with serum protein electrophoresis patterns to recognize inflammation, hepatic disease, nephrotic loss, and monoclonal gammopathy. Lipid and lipoprotein results describe transport of cholesterol and triglycerides and help assess cardiovascular risk.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.5, PDF pp. 367 to 389.',videoUrl:''},
-      {number:'6.6',title:'Enzymes and Cardiac Markers',topics:['Enzyme kinetics','Liver enzymes','Cardiac biomarkers','Isoenzymes'],reading:['Clinical enzymology','Enzymes in liver and muscle disease','Cardiac biomarkers and acute coronary syndromes'],summary:'Enzyme activity is measured under controlled conditions of substrate, pH, temperature, cofactors, and inhibitors. Tissue distribution and isoenzyme patterns help localize injury. Cardiac assessment relies on marker kinetics and clinical timing, with cardiac troponin as the principal marker of myocardial injury and natriuretic peptides supporting heart failure evaluation.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.6, PDF pp. 390 to 415.',videoUrl:''},
-      {number:'6.7',title:'Clinical Endocrinology',topics:['Pituitary','Thyroid','Adrenal','Gonadal hormones','Calcium regulation'],reading:['Hormones and endocrine function','Pituitary, thyroid, and adrenal testing','Reproductive endocrinology','Parathyroid hormone and calcium metabolism'],summary:'Endocrine testing follows gland axes and feedback control. Interpret the target hormone with its controlling pituitary hormone, consider circadian or episodic secretion, and use stimulation or suppression testing when a random value cannot distinguish primary from secondary disease.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.7, PDF pp. 416 to 432.',videoUrl:''},
-      {number:'6.8',title:'Toxicology and Therapeutic Drug Monitoring',topics:['Pharmacokinetics','TDM','Drugs of abuse','Toxic alcohols','Poisoning'],reading:['Therapeutic drug monitoring','Clinical toxicology','Drugs of abuse testing','Pharmacokinetics and specimen timing'],summary:'Therapeutic drug monitoring links concentration with dose timing, absorption, distribution, metabolism, excretion, and therapeutic range. Peak and trough specimens must match the drug and clinical question. Toxicology uses screening methods for rapid detection and more specific methods for confirmation, with specimen integrity and clinical correlation guiding interpretation.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.8, PDF pp. 433 to 446.',videoUrl:''},
-      {number:'6.9',title:'Tumor Markers',topics:['Tumor-associated antigens','Screening limits','Monitoring therapy'],reading:['Cancer biology and tumor markers','Clinical use and limitations of tumor-associated markers'],summary:'Tumor markers are usually proteins or antigens released by malignant or associated tissues. Their greatest value is monitoring treatment, recurrence, or tumor burden after diagnosis because many lack enough specificity for population screening. Interpret trends with the tumor type, analytical method, and nonmalignant causes of elevation.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.9, PDF pp. 447 to 456.',videoUrl:''},
-      {number:'6.10',title:'Clinical Chemistry Problem-Solving',topics:['Calculations','Interferences','Method evaluation','Pattern recognition'],reading:['Analytical interferences and method evaluation','Clinical chemistry calculations','Integrated case interpretation'],summary:'Clinical chemistry problem solving begins with specimen quality, method limitations, reference intervals, and internal consistency. Check timing, contamination, hemolysis, lipemia, icterus, calibration, and interfering substances before assigning a disease explanation. Correlate related analytes and repeat or confirm results when the pattern is physiologically implausible.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 6.10, PDF pp. 457 to 478.',videoUrl:''}
+      {number:"1.1",title:"Instrumentation and Analytical Principles",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 2 to 18."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 2 to 18.",videoUrl:""},
+      {number:"1.2",title:"Proteins and Tumor Markers",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 19 to 27."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 19 to 27.",videoUrl:""},
+      {number:"1.3",title:"Nonprotein Nitrogenous Compounds",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 28 to 30."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 28 to 30.",videoUrl:""},
+      {number:"1.4",title:"Carbohydrates",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 31 to 35."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 31 to 35.",videoUrl:""},
+      {number:"1.5",title:"Lipids and Lipoproteins",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 36 to 41."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 36 to 41.",videoUrl:""},
+      {number:"1.6",title:"Enzymes and Cardiac Assessment",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 42 to 51."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 42 to 51.",videoUrl:""},
+      {number:"1.7",title:"Liver Function and Porphyrin Formation",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 52 to 55."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 52 to 55.",videoUrl:""},
+      {number:"1.8",title:"Electrolytes and Osmolality",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 56 to 62."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 56 to 62.",videoUrl:""},
+      {number:"1.9",title:"Acid Base Metabolism",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 63 to 67."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 63 to 67.",videoUrl:""},
+      {number:"1.10",title:"Endocrinology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 68 to 83."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 68 to 83.",videoUrl:""},
+      {number:"1.11",title:"Therapeutic Drug Monitoring",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 84 to 89."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 84 to 89.",videoUrl:""},
+      {number:"1.12",title:"Toxicology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 90 to 92."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 90 to 92.",videoUrl:""},
+      {number:"1.13",title:"Vitamins",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 93 to 94."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 1, pp. 93 to 94.",videoUrl:""},
     ],
     bibliography:[
       'Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020.',
       'Bishop ML, Fody EP, Van Siclen C, Mistler JM, Moy M. Clinical Chemistry: Principles, Techniques, and Correlations. 9th ed. Jones & Bartlett Learning; 2023.',
       'Burtis CA, Ashwood ER, Burns DE. Tietz Fundamentals of Clinical Chemistry. 7th ed. Saunders; 2015.',
       'Burtis CA, Ashwood ER, Burns DE. Tietz Textbook of Clinical Chemistry and Molecular Diagnostics. 5th ed. Saunders; 2012.',
-      'McPherson RA, Pincus MR. Henry’s Clinical Diagnosis and Management by Laboratory Methods. 23rd ed. Elsevier; 2017.'
+      'McPherson RA, Pincus MR. Henry’s Clinical Diagnosis and Management by Laboratory Methods. 23rd ed. Elsevier; 2017.',
     ]
   },
   hematology:{
@@ -2790,181 +2791,35 @@ const STUDY_OUTLINES={
     ]
   },
   "chapters": [
-    {
-      "number": "1.1",
-      "title": "Basic Hematology Concepts and Laboratory Procedures",
-      "topics": [
-        "Hematopoiesis",
-        "CBC and indices",
-        "Manual and automated counts",
-        "Reticulocytes",
-        "Morphology"
-      ],
-      "summary": "Blood cell production begins with hematopoietic stem cells and proceeds through recognizable erythroid, myeloid, lymphoid, and megakaryocytic stages. CBC measurements, indices, reticulocyte counts, manual counts, and smear review must be interpreted together while accounting for specimen quality and analyzer interference.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.1, PDF pp. 19 to 28.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.2",
-      "title": "Normocytic and Normochromic Anemias",
-      "topics": [
-        "Hemolysis",
-        "Hereditary disorders",
-        "Acquired disorders",
-        "Hypoproliferation",
-        "Blood loss"
-      ],
-      "summary": "Normocytic, normochromic anemia may result from acute blood loss, reduced marrow production, or shortened red cell survival. Reticulocyte response, bilirubin, LD, haptoglobin, antiglobulin testing, and red cell morphology help separate underproduction from inherited or acquired hemolysis.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.2, PDF pp. 29 to 36.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.3",
-      "title": "Hypochromic and Microcytic Anemias",
-      "topics": [
-        "Iron deficiency",
-        "Thalassemia",
-        "Sideroblastic anemia",
-        "Chronic inflammation"
-      ],
-      "summary": "Microcytic, hypochromic anemia reflects impaired hemoglobin synthesis from limited iron, abnormal globin production, defective heme synthesis, or chronic inflammation. Iron studies, RDW, red cell count, smear findings, and hemoglobin analysis distinguish the major causes.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.3, PDF pp. 37 to 40.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.4",
-      "title": "Macrocytic and Normochromic Anemias",
-      "topics": [
-        "Megaloblastic anemia",
-        "Vitamin B12",
-        "Folate",
-        "Nonmegaloblastic causes"
-      ],
-      "summary": "Macrocytosis is divided into megaloblastic disorders caused by impaired DNA synthesis and nonmegaloblastic disorders associated with liver disease, alcohol, reticulocytosis, or other conditions. Smear morphology, vitamin B12 and folate testing, reticulocyte count, and clinical findings guide the distinction.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.4, PDF pp. 41 to 43.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.5",
-      "title": "Qualitative and Quantitative White Blood Cell Disorders",
-      "topics": [
-        "Benign leukocyte disorders",
-        "Quantitative abnormalities",
-        "Hereditary anomalies",
-        "Morphology"
-      ],
-      "summary": "White blood cell disorders may change cell number, maturation, function, or morphology. The total count, differential, smear appearance, patient age, and clinical setting help separate reactive patterns from hereditary abnormalities and clonal disease.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.5, PDF pp. 44 to 47.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.6",
-      "title": "Acute Leukemias",
-      "topics": [
-        "Acute myeloid leukemia",
-        "Acute lymphoblastic leukemia",
-        "Cytochemistry",
-        "Immunophenotyping"
-      ],
-      "summary": "Acute leukemias produce a clonal expansion of blasts that replaces normal marrow and disrupts blood cell production. Morphology provides the initial pattern, while cytochemistry, flow cytometry, cytogenetics, and molecular findings establish lineage and classification.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.6, PDF pp. 48 to 55.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.7",
-      "title": "Lymphoproliferative and Myeloproliferative Disorders",
-      "topics": [
-        "Chronic leukemias",
-        "Lymphomas",
-        "Myeloproliferative neoplasms",
-        "Plasma cell disorders"
-      ],
-      "summary": "Chronic myeloid and lymphoid neoplasms usually show more mature appearing cells than acute leukemia, but each has a characteristic blood, marrow, immunophenotypic, and molecular pattern. CBC trends, smear findings, flow cytometry, protein studies, and targeted genetic tests support classification.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.7, PDF pp. 56 to 62.",
-      "videoUrl": ""
-    },
-    {
-      "number": "1.8",
-      "title": "Hematology Problem-Solving",
-      "topics": [
-        "CBC patterns",
-        "Morphology correlation",
-        "Calculations",
-        "Integrated cases"
-      ],
-      "summary": "Hematology problem solving combines CBC values, calculated indices, reticulocyte response, morphology, and clinical history. Internal consistency checks and recognition of analyzer artifacts prevent interpretation of spurious results as disease.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 1.8, PDF pp. 63 to 77.",
-      "videoUrl": ""
-    },
-    {
-      "number": "2.1",
-      "title": "Coagulation and Fibrinolytic Systems/Reagents and Methods",
-      "topics": [
-        "Coagulation pathways",
-        "Fibrinolysis",
-        "Reagents",
-        "Screening tests"
-      ],
-      "summary": "Hemostasis depends on the coordinated activity of vessels, platelets, coagulation factors, natural inhibitors, and fibrinolysis. PT, APTT, thrombin time, fibrinogen, and related methods are affected by reagent sensitivity, collection technique, citrate volume, processing time, and anticoagulant therapy.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.1, PDF pp. 79 to 86.",
-      "videoUrl": ""
-    },
-    {
-      "number": "2.2",
-      "title": "Platelet and Vascular Disorders",
-      "topics": [
-        "Platelet number",
-        "Platelet function",
-        "von Willebrand disease",
-        "Vascular disorders"
-      ],
-      "summary": "Primary hemostatic disorders arise from abnormal vessel integrity, platelet number, platelet function, or von Willebrand factor. Platelet count and smear review are paired with bleeding history and appropriate functional or von Willebrand testing.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.2, PDF pp. 87 to 93.",
-      "videoUrl": ""
-    },
-    {
-      "number": "2.3",
-      "title": "Coagulation System Disorders",
-      "topics": [
-        "Factor deficiencies",
-        "Hemophilia",
-        "Laboratory patterns",
-        "Factor assays"
-      ],
-      "summary": "Coagulation factor deficiencies produce characteristic PT and APTT patterns based on the affected pathway. Mixing studies distinguish many deficiencies from inhibitors, and specific factor assays confirm the deficient activity.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.3, PDF pp. 94 to 100.",
-      "videoUrl": ""
-    },
-    {
-      "number": "2.4",
-      "title": "Inhibitors, Thrombotic Disorders, and Anticoagulant Drugs",
-      "topics": [
-        "Inhibitors",
-        "Thrombophilia",
-        "DIC",
-        "Anticoagulant monitoring"
-      ],
-      "summary": "Unexpected clotting test prolongation may reflect a specific factor inhibitor, lupus anticoagulant, heparin, or another anticoagulant drug. Thrombotic risk evaluation combines acquired conditions with inherited defects, while drug monitoring uses the assay appropriate to the medication.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.4, PDF pp. 101 to 112.",
-      "videoUrl": ""
-    },
-    {
-      "number": "2.5",
-      "title": "Hemostasis Problem-Solving",
-      "topics": [
-        "PT and APTT patterns",
-        "Mixing studies",
-        "Coagulation cases",
-        "Result correlation"
-      ],
-      "summary": "Hemostasis problem solving begins with platelet count, PT, APTT, thrombin time, fibrinogen, and D dimer, followed by mixing studies or targeted assays. The final interpretation must account for bleeding or thrombosis history, specimen integrity, medications, and the complete laboratory pattern.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 2.5, PDF pp. 113 to 125.",
-      "videoUrl": ""
-    }
-  ],
+      {number:"2.1",title:"Fundamental Hematology Principles",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 230 to 233."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 230 to 233.",videoUrl:""},
+      {number:"2.2",title:"Hematopoiesis",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 234 to 236."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 234 to 236.",videoUrl:""},
+      {number:"2.3",title:"Granulocytes",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 237 to 243."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 237 to 243.",videoUrl:""},
+      {number:"2.4",title:"Monocytes and Macrophages",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 244 to 245."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 244 to 245.",videoUrl:""},
+      {number:"2.5",title:"Lymphocytes and Plasma Cells",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 246 to 248."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 246 to 248.",videoUrl:""},
+      {number:"2.6",title:"Malignant Leukocyte Disorders",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 249 to 260."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 249 to 260.",videoUrl:""},
+      {number:"2.7",title:"Erythrocytes",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 261 to 266."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 261 to 266.",videoUrl:""},
+      {number:"2.8",title:"Hemoglobin",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 267 to 268."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 267 to 268.",videoUrl:""},
+      {number:"2.9",title:"Anemias",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 269 to 276."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 269 to 276.",videoUrl:""},
+      {number:"2.10",title:"Hemoglobinopathies",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 277 to 278."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 277 to 278.",videoUrl:""},
+      {number:"2.11",title:"Thalassemias",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 279 to 280."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 279 to 280.",videoUrl:""},
+      {number:"2.12",title:"Hematology Tests",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 281 to 286."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 2, pp. 281 to 286.",videoUrl:""},
+      {number:"3.1",title:"Introduction to the Vascular System",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 374."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 374.",videoUrl:""},
+      {number:"3.2",title:"Diseases and Conditions Associated with the Vascular System",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 374."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 374.",videoUrl:""},
+      {number:"3.3",title:"Introduction to Thrombocytes",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 375 to 377."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 375 to 377.",videoUrl:""},
+      {number:"3.4",title:"Diseases and Conditions Associated with Thrombocytes",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 378 to 379."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 378 to 379.",videoUrl:""},
+      {number:"3.5",title:"Introduction to Hemostasis",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 380 to 383."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 380 to 383.",videoUrl:""},
+      {number:"3.6",title:"The Fibrinolytic System",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 384."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 384.",videoUrl:""},
+      {number:"3.7",title:"Regulatory Proteins of Coagulation and Fibrinolysis",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 385."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 385.",videoUrl:""},
+      {number:"3.8",title:"Thrombotic Disorders",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 385 to 386."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 385 to 386.",videoUrl:""},
+      {number:"3.9",title:"Hemorrhagic Disorders",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 387 to 390."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 387 to 390.",videoUrl:""},
+      {number:"3.10",title:"Sample Collection, Handling, and Processing for Coagulation Testing",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 391."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 391.",videoUrl:""},
+      {number:"3.11",title:"Evaluation Tests for Secondary Hemostasis",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 392 to 394."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 392 to 394.",videoUrl:""},
+      {number:"3.12",title:"Evaluation Tests for the Fibrinolytic System",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 395."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, p. 395.",videoUrl:""},
+      {number:"3.13",title:"Anticoagulant Therapies",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 395 to 396."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 3, pp. 395 to 396.",videoUrl:""},
+    ],
   "bibliography": [
+    "Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020.",
     "Harr RR. Medical Laboratory Science Review. 5th ed. F.A. Davis; 2019.",
-    "Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020."
   ]
 },
   urinalysis:{
@@ -3081,77 +2936,20 @@ const STUDY_OUTLINES={
     ]
   },
   "chapters": [
-    {
-      "number": "7.1",
-      "title": "Routine Physical and Biochemical Urine Tests",
-      "topics": [
-        "Renal physiology",
-        "Color and clarity",
-        "Specific gravity",
-        "Reagent strips",
-        "Confirmatory tests"
-      ],
-      "summary": "Routine urinalysis integrates specimen appearance, concentration, and reagent strip chemistry with renal physiology. Results must be checked for collection and storage effects, strip limitations, interfering substances, and the need for confirmatory testing.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.1, PDF pp. 480 to 498.",
-      "videoUrl": ""
-    },
-    {
-      "number": "7.2",
-      "title": "Urine Microscopy and Clinical Correlations",
-      "topics": [
-        "Cells",
-        "Casts",
-        "Crystals",
-        "Microorganisms",
-        "Artifacts"
-      ],
-      "summary": "Urine sediment examination identifies cells, casts, crystals, microorganisms, contaminants, and artifacts. Findings are interpreted with urine concentration, pH, chemical results, collection quality, and the clinical pattern to distinguish renal or urinary disease from contamination.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.2, PDF pp. 499 to 512.",
-      "videoUrl": ""
-    },
-    {
-      "number": "7.3",
-      "title": "Cerebrospinal, Serous, and Synovial Fluids",
-      "topics": [
-        "CSF",
-        "Pleural and peritoneal fluid",
-        "Pericardial fluid",
-        "Synovial fluid"
-      ],
-      "summary": "Cerebrospinal, serous, and synovial fluids require prompt, specimen specific physical, chemical, and microscopic evaluation. Cell counts, differentials, protein, glucose, crystal analysis, and other tests are selected according to the fluid and the suspected infectious, inflammatory, hemorrhagic, or malignant process.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.3, PDF pp. 513 to 526.",
-      "videoUrl": ""
-    },
-    {
-      "number": "7.4",
-      "title": "Amniotic, Gastrointestinal, and Seminal Fluids",
-      "topics": [
-        "Amniotic fluid",
-        "Fecal testing",
-        "Gastric analysis",
-        "Semen analysis"
-      ],
-      "summary": "Amniotic, gastrointestinal, and seminal fluids use different collection methods, reference expectations, and analytical goals. Interpretation may assess fetal status, gastrointestinal bleeding or malabsorption, gastric function, or sperm concentration, motility, and morphology.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.4, PDF pp. 527 to 538.",
-      "videoUrl": ""
-    },
-    {
-      "number": "7.5",
-      "title": "Urinalysis and Body Fluids Problem-Solving",
-      "topics": [
-        "Result correlation",
-        "Microscopic identification",
-        "Body fluid patterns",
-        "Integrated cases"
-      ],
-      "summary": "Urinalysis and body fluid problem solving correlates appearance, chemistry, microscopy, cell counts, and clinical history. Discordant findings should prompt review of specimen quality, timing, method limitations, contamination, and the possibility of a different disease process.",
-      "citation": "Harr, Medical Laboratory Science Review, 5th ed., section 7.5, PDF pp. 539 to 551.",
-      "videoUrl": ""
-    }
-  ],
+      {number:"11.1",title:"Introduction to Urinalysis",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, p. 908."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, p. 908.",videoUrl:""},
+      {number:"11.2",title:"The Kidney and Urine Formation",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 908 to 910."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 908 to 910.",videoUrl:""},
+      {number:"11.3",title:"Renal Pathology and Renal Function Tests",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 911 to 912."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 911 to 912.",videoUrl:""},
+      {number:"11.4",title:"Urine Volume and Sample Handling",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, p. 913."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, p. 913.",videoUrl:""},
+      {number:"11.5",title:"Physical Examination of Urine",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 914 to 916."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 914 to 916.",videoUrl:""},
+      {number:"11.6",title:"Chemical Examination of Urine",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 917 to 922."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 917 to 922.",videoUrl:""},
+      {number:"11.7",title:"Microscopic Examination of Urine",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 923 to 928."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 923 to 928.",videoUrl:""},
+      {number:"11.8",title:"Special Urine Screening Tests",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 929 to 930."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 929 to 930.",videoUrl:""},
+      {number:"11.9",title:"Body Fluids and Fecal Analysis",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 931 to 934."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, pp. 931 to 934.",videoUrl:""},
+      {number:"11.10",title:"Automation",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 11, p. 935."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 11, p. 935.",videoUrl:""},
+    ],
   "bibliography": [
+    "Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020.",
     "Harr RR. Medical Laboratory Science Review. 5th ed. F.A. Davis; 2019.",
-    "Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020."
   ]
 },
   immunology:{
@@ -3404,14 +3202,30 @@ const STUDY_OUTLINES={
       ]
     },
     chapters:[
-      {number:'3.1',title:'Basic Principles of Immunology',topics:['Innate immunity','Adaptive immunity','Cells and organs','Antigens','Cytokines'],reading:['Cells and organs of the immune system','Innate and adaptive immune responses','Antigens, antibodies, cytokines, and immune regulation'],summary:'Innate immunity provides immediate barriers, inflammation, phagocytosis, complement, and natural killer activity. Adaptive immunity adds antigen specific B cell and T cell responses, antibody production, and memory. Cytokines coordinate these cells, while primary and secondary lymphoid tissues support their development and activation.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.1, PDF pp. 127 to 135.',videoUrl:''},
-      {number:'3.2',title:'Immunologic Procedures',topics:['Agglutination','Precipitation','Immunoassay','Immunofluorescence','Flow cytometry'],reading:['Antigen–antibody reactions','Serologic methods and immunoassays','Immunofluorescence and flow cytometry','Assay quality and interpretation'],summary:'Immunologic methods depend on specific antigen antibody binding. Precipitation and agglutination make complexes visible, labeled immunoassays add measurable enzyme or fluorescent signals, and flow cytometry identifies cells through light scatter and labeled monoclonal antibodies. Proper controls, dilution, reaction conditions, and cutoff interpretation are essential.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.2, PDF pp. 136 to 142.',videoUrl:''},
-      {number:'3.3',title:'Infectious Diseases',topics:['Serologic diagnosis','Viral markers','Bacterial antibodies','Congenital infections'],reading:['Serologic diagnosis of infectious disease','Viral hepatitis and HIV testing','Syphilis and other microbial serology'],summary:'Infectious disease serology is interpreted through the timing and class of antibody, antigen detection, and the expected marker sequence. Hepatitis, Epstein Barr virus, rubella, HIV, syphilis, and Lyme disease each require different combinations of screening, confirmatory, and stage specific results.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.3, PDF pp. 143 to 157.',videoUrl:''},
-      {number:'3.4',title:'Autoimmune Diseases',topics:['ANA patterns','Autoantibodies','Systemic disease','Organ-specific disease'],reading:['Mechanisms of autoimmunity','Systemic autoimmune diseases','Organ-specific autoimmunity','Autoantibody testing and interpretation'],summary:'Autoimmunity develops when self tolerance fails and immune responses target host antigens. Laboratory evaluation uses the clinical pattern together with screening tests such as ANA and more specific antibodies for systemic or organ specific disease. A positive antibody alone does not establish disease.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.4, PDF pp. 158 to 163.',videoUrl:''},
-      {number:'3.5',title:'Hypersensitivity',topics:['Types I–IV','Allergy testing','Immune complex disease'],reading:['Immediate hypersensitivity and allergy','Antibody-mediated and immune-complex reactions','Delayed-type hypersensitivity'],summary:'Hypersensitivity reactions are grouped by mechanism. Type I uses IgE and mast cell mediators, type II targets cell or tissue antigens, type III deposits immune complexes, and type IV is delayed and T cell mediated. Testing should match the suspected mechanism and the timing of the reaction.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.5, PDF pp. 164 to 167.',videoUrl:''},
-      {number:'3.6',title:'Immunoglobulins, Complement, and Cellular Testing',topics:['Immunoglobulin classes','Complement pathways','Lymphocyte subsets','Immunodeficiency'],reading:['Immunoglobulin structure and function','Complement pathways and testing','Cellular immune testing','Primary and secondary immunodeficiencies'],summary:'Immunoglobulin classes differ in structure, distribution, and function. Complement activation promotes inflammation, opsonization, and membrane attack, while functional assays and component measurements help identify consumption or deficiency. Flow cytometry and immunoglobulin studies help evaluate cellular and humoral immunodeficiency.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.6, PDF pp. 168 to 171.',videoUrl:''},
-      {number:'3.7',title:'Tumor Testing and Transplantation',topics:['Tumor immunology','HLA','Transplant matching','Rejection'],reading:['Tumor immunology and laboratory markers','Major histocompatibility complex and HLA testing','Transplant immunology and rejection'],summary:'HLA molecules present antigen and help distinguish self from nonself. HLA matching and recipient antibody testing reduce transplant risk, while immune responses can cause rejection or graft versus host disease. Tumor immunology examines tumor antigens, immune escape, and markers used mainly to monitor disease.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.7, PDF pp. 172 to 176.',videoUrl:''},
-      {number:'3.8',title:'Immunology Problem-Solving',topics:['Serology patterns','Method selection','Result correlation','Troubleshooting'],reading:['Integrated serology interpretation','Method selection and troubleshooting','Clinical immunology case studies'],summary:'Immunology problem solving combines the suspected mechanism, stage of disease, specimen timing, method, controls, and result pattern. Screening results should be followed by the appropriate specific test, and discordant findings should be checked for timing, cross reactivity, technical error, or an alternative diagnosis.',citation:'Harr, Medical Laboratory Science Review, 5th ed., section 3.8, PDF pp. 177 to 185.',videoUrl:''}
+      {number:"4.1",title:"Introduction to Immunology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 422 to 425."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 422 to 425.",videoUrl:""},
+      {number:"4.2",title:"The Immune System",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 426 to 428."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 426 to 428.",videoUrl:""},
+      {number:"4.3",title:"Major Histocompatibility Complex",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 429."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 429.",videoUrl:""},
+      {number:"4.4",title:"Nonspecific Immune Response",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 430 to 432."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 430 to 432.",videoUrl:""},
+      {number:"4.5",title:"Adaptive Immune Response",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 433 to 434."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 433 to 434.",videoUrl:""},
+      {number:"4.6",title:"Autoimmune Disease",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 435 to 438."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 435 to 438.",videoUrl:""},
+      {number:"4.7",title:"Hypersensitivity",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 439 to 441."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 439 to 441.",videoUrl:""},
+      {number:"4.8",title:"Immune Deficiency",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 442 to 444."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 442 to 444.",videoUrl:""},
+      {number:"4.9",title:"Hypergammaglobulinemia",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 445."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 445.",videoUrl:""},
+      {number:"4.10",title:"Transplant Immunology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 446 to 447."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 446 to 447.",videoUrl:""},
+      {number:"4.11",title:"Tumor Immunology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 447 to 448."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 447 to 448.",videoUrl:""},
+      {number:"4.12",title:"Antigen Antibody Reactions",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 449."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 449.",videoUrl:""},
+      {number:"4.13",title:"Precipitation Reactions",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 450."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 450.",videoUrl:""},
+      {number:"4.14",title:"Agglutination Reactions",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 451."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 451.",videoUrl:""},
+      {number:"4.15",title:"Labeled Reactions",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 452."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 452.",videoUrl:""},
+      {number:"4.16",title:"Complement Fixation",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 453."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 453.",videoUrl:""},
+      {number:"4.17",title:"Cellular Assays",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 453 to 454."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 453 to 454.",videoUrl:""},
+      {number:"4.18",title:"Streptococcal Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 455."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, p. 455.",videoUrl:""},
+      {number:"4.19",title:"Syphilis Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 456 to 459."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 456 to 459.",videoUrl:""},
+      {number:"4.20",title:"Borrelia burgdorferi Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 459 to 460."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 459 to 460.",videoUrl:""},
+      {number:"4.21",title:"Rubella Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 460 to 462."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 460 to 462.",videoUrl:""},
+      {number:"4.22",title:"Epstein Barr Virus Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 462 to 463."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 462 to 463.",videoUrl:""},
+      {number:"4.23",title:"Viral Hepatitis Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 463 to 466."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 463 to 466.",videoUrl:""},
+      {number:"4.24",title:"Human Immunodeficiency Virus Serology",topics:[],reading:["Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 466 to 468."],summary:"",citation:"Success! in Clinical Laboratory Science, 5th ed., Chapter 4, pp. 466 to 468.",videoUrl:""},
     ],
     bibliography:[
       'Lehman DC, Chiasera JM. Success! in Clinical Laboratory Science. 5th ed. Pearson; 2020.',
@@ -3423,7 +3237,7 @@ const STUDY_OUTLINES={
       'Nakamura R, Burek L, Cook L, et al. Clinical Diagnostic Immunology: Protocols in Quality Assurance and Standardization. Blackwell Publishing; 1998.',
       'Playfair H, Chain BM. Immunology at a Glance. 10th ed. Blackwell Publishing; 2012.',
       'Geha R, Notarangelo L. Case Studies in Immunology: A Clinical Companion. 7th ed. Garland Science; 2016.',
-      'Stevens CD. Clinical Immunology and Serology: A Laboratory Perspective. F.A. Davis; 2016.'
+      'Stevens CD. Clinical Immunology and Serology: A Laboratory Perspective. F.A. Davis; 2016.',
     ]
   }
 };
@@ -3447,8 +3261,8 @@ const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Synthesis of Heme',url:'Synthesis_of_Heme.html',description:'Drag 10 pathway labels and 8 enzymes across cytosol and mitochondria',topic:'Chemistry',icon:'HM',color:'#2980b9',preview_url:'assets/interactive-previews/synthesis_of_heme.png'}
 ];
 const RESOURCES=[
-  {title:'Success! in Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman and Janelle M. Chiasera. Pearson; 2020. ISBN 9780134989181.',note:'First summary source for Clinical Chemistry and Immunology when the topic is covered.'},
-  {title:'Clinical Chemistry: Principles, Techniques, and Correlations, Ninth Edition',meta:'Michael L. Bishop, Edward P. Fody, Carleen Van Siclen, James March Mistler, and Michelle Moy. Jones & Bartlett Learning; 2023. ISBN 9781284238860.',note:'First-reference source for Clinical Chemistry and Immunology when the topic is covered.'},
+  {title:'Success! in Clinical Laboratory Science, Fifth Edition',meta:'Donald C. Lehman and Janelle M. Chiasera. Pearson; 2020. ISBN 9780134989181.',note:'Primary outline and summary source for Clinical Chemistry, Hematology and Hemostasis, Immunology, and Urinalysis.'},
+  {title:'Clinical Chemistry: Principles, Techniques, and Correlations, Ninth Edition',meta:'Michael L. Bishop, Edward P. Fody, Carleen Van Siclen, James March Mistler, and Michelle Moy. Jones & Bartlett Learning; 2023. ISBN 9781284238860.',note:'Supplemental reference for Clinical Chemistry and Immunology when the topic is covered.'},
   {title:'MLS OIT Lecture Materials',meta:'MLS program faculty; instructor-provided lecture notes, slides, handouts, procedure notes, and course packets.',note:'Primary course source for class-specific study tools.'},
   {title:'ASCP/ASCPi MLS Content Guideline',meta:'American Society for Clinical Pathology Board of Certification (ASCP BOC). MLS(ASCP) and MLS(ASCPi) examination content guideline and exam-percentage outline.',note:'Exam-domain and percentage-weighting reference.'},
   {title:'ASCP BOC Study Guide / Content Outline',meta:'American Society for Clinical Pathology Board of Certification (ASCP BOC). Medical Laboratory Scientist certification study guide, reading list, and content-outline materials.',note:'Certification outline and study-planning reference.'},
@@ -5470,11 +5284,7 @@ function renderStudyOutlineTab(el){
   const cards=outline.chapters.map((chapter,index)=>`
     <button class="study-chapter-card" type="button" onclick="openStudyOutlineChapter('${subjectKey}',${index})">
       <span class="study-chapter-number">${esc(chapter.number)}</span>
-      <span>
-        <span class="study-chapter-title">${esc(chapter.title)}</span>
-        <span class="study-chapter-topics">${chapter.topics.map(esc).join(' · ')}</span>
-      </span>
-      <span class="study-chapter-open" aria-hidden="true">›</span>
+      <span class="study-chapter-title">${esc(chapter.title)}</span>
     </button>`).join('');
   const bibliography=outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('');
   el.innerHTML=`
@@ -5663,8 +5473,14 @@ function openStudyOutlineChapter(subjectKey,index){
   dialog.classList.add('study-outline-modal');
   dialog.style.setProperty('--study-accent',outline.accent);
   const summary=chapter.summary
-    ?`<p>${escNL(chapter.summary)}</p>${chapter.citation?`<p class="study-summary-citation">(${esc(chapter.citation)})</p>`:''}`
+    ?`<p>${escNL(chapter.summary)}</p>`
     :'<div class="study-empty-area" aria-label="Quick summary"></div>';
+  const source=chapter.citation?`<p class="study-summary-citation">(${esc(chapter.citation)})</p>`:'';
+  const topics=chapter.topics?.length?`
+        <section class="study-window-panel">
+          <h3>What to study</h3>
+          <div class="study-topic-list">${chapter.topics.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
+        </section>`:'';
   body.innerHTML=`
     <div class="study-outline-modal-body">
       <header class="study-window-head">
@@ -5675,13 +5491,11 @@ function openStudyOutlineChapter(subjectKey,index){
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow()" aria-label="Close study window">✕</button>
       </header>
       <div class="study-window-content">
-        <section class="study-window-panel">
-          <h3>What to study</h3>
-          <div class="study-topic-list">${chapter.topics.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
-        </section>
+        ${topics}
         <section class="study-window-panel">
           <h3>Quick summary</h3>
           ${summary}
+          ${source}
         </section>
         <section class="study-window-panel">
           <h3>Video</h3>
