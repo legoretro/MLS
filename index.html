@@ -300,38 +300,39 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-sheet{display:grid;gap:18px}
-.formula-category{--category-color:#2f7dd1;border:1px solid color-mix(in srgb,var(--category-color) 32%,var(--border));border-radius:16px;background:var(--bg2);box-shadow:0 10px 24px rgba(18,35,74,.05);overflow:hidden;break-inside:avoid}
-.formula-category-head{display:flex;align-items:center;gap:9px;padding:10px 14px;background:color-mix(in srgb,var(--category-color) 10%,var(--bg2));border-bottom:1px solid color-mix(in srgb,var(--category-color) 24%,var(--border));color:var(--category-color);font-size:12px;font-weight:900;line-height:1.3;text-transform:uppercase;letter-spacing:.07em}
-.formula-category-head::before{content:'';width:7px;height:22px;border-radius:99px;background:var(--category-color);box-shadow:0 3px 9px color-mix(in srgb,var(--category-color) 34%,transparent)}
-.calc-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}
-.calc-card{background:var(--bg2);border:1px solid var(--border);border-top:3px solid var(--category-color,#2f7dd1);border-radius:12px;padding:12px 13px;box-shadow:0 5px 14px rgba(18,35,74,.045);min-width:0;break-inside:avoid}
+.formula-sheet{display:grid;gap:22px}
+.formula-category{--category-color:#2f7dd1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid}
+.formula-category-head{display:flex;align-items:center;gap:9px;padding:11px 14px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.3;text-transform:uppercase;letter-spacing:.055em}
+.formula-category-head::before{content:'';width:4px;height:18px;border-radius:2px;background:var(--category-color)}
+.calc-category-grid{column-count:2;column-gap:0;padding:0;align-items:start}
+.calc-card{background:var(--bg2);border:0;border-left:3px solid color-mix(in srgb,var(--category-color,#2f7dd1) 72%,var(--border2));border-bottom:1px solid var(--border);border-radius:0;padding:13px 15px;min-width:0;break-inside:avoid;page-break-inside:avoid;display:inline-block;width:100%;vertical-align:top}
+.calc-card:nth-last-child(-n+2){border-bottom-color:transparent}
 .calc-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.calc-card-title{font-size:14px;font-weight:850;color:var(--text);line-height:1.3}
-.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:9px;flex-wrap:wrap;background:color-mix(in srgb,var(--category-color,#2f7dd1) 5%,var(--bg3));border:1px solid color-mix(in srgb,var(--category-color,#2f7dd1) 24%,var(--border));border-radius:10px;padding:9px 10px;min-width:0}
-.calc-equation-label{font-size:10px;font-weight:900;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
-.calc-equals{font-size:18px;font-weight:900;color:var(--text)}
-.calc-equation-text{font-family:var(--mono);font-size:13px;font-weight:850;color:var(--category-color,#2f7dd1);line-height:1.35;overflow-wrap:anywhere;min-width:0}
-.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:145px;max-width:100%;color:var(--category-color,#2f7dd1)}
-.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:900;color:inherit;padding:4px 10px;text-align:center;line-height:1.25;white-space:normal;overflow-wrap:anywhere;width:100%}
-.calc-fraction-top{border-bottom:2px solid currentColor}
-.calc-support-note{margin-top:7px;font-size:11px;color:var(--text2);line-height:1.4}
-.rr-category-grid{display:grid;grid-template-columns:repeat(2,minmax(340px,1fr));gap:14px;align-items:start}
-.rr-category-card{--category-color:#2f7dd1;border:1px solid color-mix(in srgb,var(--category-color) 30%,var(--border));border-radius:14px;background:var(--bg2);overflow:hidden;box-shadow:0 8px 20px rgba(18,35,74,.05);break-inside:avoid}
-.rr-category-card .formula-category-head{padding:9px 12px}
+.calc-card-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.3}
+.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:10px 12px;min-width:0}
+.calc-equation-label{font-size:10px;font-weight:850;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.calc-equals{font-size:18px;font-weight:850;color:var(--text)}
+.calc-equation-text{font-family:var(--mono);font-size:15px;font-weight:800;color:var(--text);line-height:1.4;overflow-wrap:anywhere;min-width:0}
+.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:180px;max-width:100%;color:var(--text)}
+.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:14px;font-weight:850;color:inherit;padding:4px 11px;text-align:center;line-height:1.25;white-space:normal;overflow-wrap:anywhere;width:100%}
+.calc-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
+.calc-support-note{margin-top:7px;font-size:12px;color:var(--text2);line-height:1.45}
+.rr-category-grid{display:grid;grid-template-columns:repeat(2,minmax(340px,1fr));gap:18px;align-items:start}
+.rr-category-card{--category-color:#2f7dd1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid}
+.rr-category-card .formula-category-head{padding:10px 13px}
 .rr-table-wrap{overflow:visible}
 .rr-table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed}
-.rr-table th{background:color-mix(in srgb,var(--category-color) 7%,var(--bg3));border:0;border-bottom:1px solid color-mix(in srgb,var(--category-color) 22%,var(--border));padding:7px 10px;text-align:left;font-weight:800;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+.rr-table th{background:var(--bg3);border:0;border-bottom:1px solid var(--border2);padding:8px 11px;text-align:left;font-weight:800;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
 .rr-table th:last-child{text-align:right}
-.rr-table td{border:0;border-bottom:1px solid var(--border);padding:7px 10px;font-size:12px;color:var(--text);line-height:1.25;vertical-align:middle}
+.rr-table td{border:0;border-bottom:1px solid var(--border);padding:8px 11px;font-size:13px;color:var(--text);line-height:1.25;vertical-align:middle}
 .rr-table tr:last-child td{border-bottom:0}
-.rr-table tr:nth-child(even) td{background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2))}
+.rr-table tr:nth-child(even) td{background:color-mix(in srgb,var(--text) 1.8%,var(--bg2))}
 .rr-table .rr-analyte{font-weight:750;width:49%}
-.rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:12px;font-weight:900;color:var(--category-color);white-space:nowrap}
+.rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:13px;font-weight:850;color:var(--text);white-space:nowrap}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:4px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
-@media(max-width:900px){.calc-category-grid,.rr-category-grid{grid-template-columns:1fr}}
-@media(max-width:520px){.calc-category-grid{padding:8px}.calc-formula-board{align-items:flex-start}.calc-fraction{min-width:118px}.rr-table td{padding:7px 8px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
+@media(max-width:900px){.calc-category-grid{column-count:1}.rr-category-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.calc-card{padding:12px}.calc-formula-board{align-items:flex-start}.calc-fraction{min-width:135px}.rr-table td{padding:7px 8px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
 /* Quiz */
 .admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
@@ -1166,38 +1167,21 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
   border:0;
   border-radius:14px;
   background:transparent;
-  cursor:zoom-in;
+  cursor:pointer;
   overflow:hidden;
 }
 .media-zoom-image-wrap{
-  position:relative;
   display:flex;
   flex:1 1 auto;
   align-items:center;
   justify-content:center;
   width:100%;
   min-height:0;
-  cursor:crosshair;
+  max-height:calc(94vh - 64px);
+  overflow:auto;
+  background:#fff;
+  border-radius:12px;
 }
-.media-zoom-lens{
-  position:fixed;
-  left:0;
-  top:0;
-  width:220px;
-  height:220px;
-  border:4px solid rgba(255,255,255,.96);
-  border-radius:50%;
-  background-color:#fff;
-  background-repeat:no-repeat;
-  box-shadow:0 18px 46px rgba(8,12,24,.34),0 0 0 1px rgba(24,34,58,.28);
-  opacity:0;
-  pointer-events:none;
-  transform:translate(-50%,-50%);
-  transition:opacity .12s ease;
-  z-index:1450;
-}
-.media-zoom-image-wrap.is-magnifying .media-zoom-lens{opacity:1}
-@media(hover:none),(pointer:coarse){.media-zoom-lens{display:none}}
 .question-media-zoom:focus-visible img{outline:3px solid var(--accent);outline-offset:4px}
 .media-zoom-modal{
   position:fixed;
@@ -1211,9 +1195,8 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
   backdrop-filter:blur(8px);
 }
 .media-zoom-dialog{
-  width:min(98vw,1800px);
-  height:96vh;
-  max-height:96vh;
+  width:min(96vw,1600px);
+  max-height:94vh;
   display:flex;
   flex-direction:column;
   gap:10px;
@@ -1223,16 +1206,16 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
 .media-zoom-actions .btn{background:rgba(255,255,255,.94);color:#1c2437;border-color:#fff}
 .media-zoom-dialog img{
   display:block;
-  width:100%;
-  height:100%;
-  max-width:none;
-  max-height:none;
+  width:auto;
+  height:auto;
+  max-width:100%;
+  max-height:calc(94vh - 68px);
   object-fit:contain;
   background:#fff;
-  border:1px solid rgba(255,255,255,.36);
-  border-radius:18px;
-  padding:10px;
-  box-shadow:0 24px 70px rgba(0,0,0,.38);
+  border:0;
+  border-radius:10px;
+  padding:0;
+  box-shadow:none;
 }
 .quiz-source-note{
   background:color-mix(in srgb,var(--accent) 9%,var(--bg2));
@@ -11691,7 +11674,7 @@ async function openFormulasExport(){
       <div style="font-size:16px;font-weight:600">Print-ready PDF</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
-    <div style="font-size:12px;color:var(--text2);margin:-6px 0 14px">Each selected sheet fits on one landscape page.</div>
+    <div style="font-size:12px;color:var(--text2);margin:-6px 0 14px">Each selected sheet fits on one portrait page.</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
       <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
         <input type="checkbox" id="exp-calc" ${calcData.length?'checked':''} ${!calcData.length?'disabled':''} style="width:16px;height:16px">
@@ -11737,80 +11720,116 @@ function pdfCategoryRgb(category){
 }
 function pdfTint(rgb,amount=.9){return rgb.map(v=>Math.round(v+(255-v)*amount));}
 
+function pdfHeader(doc,title,subtitle,pageW,margin){
+  doc.setFillColor(255,255,255);
+  doc.rect(0,0,pageW,20,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(13.5);
+  doc.setTextColor(28,36,55);
+  doc.text(title,margin,11.5);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7.2);
+  doc.setTextColor(88,96,112);
+  doc.text(subtitle,pageW-margin,11.5,{align:'right'});
+  doc.setDrawColor(55,91,150);
+  doc.setLineWidth(.65);
+  doc.line(margin,16,pageW-margin,16);
+}
+
+function fitPdfText(doc,text,maxWidth,startSize,minSize=5.2){
+  let size=startSize;
+  doc.setFontSize(size);
+  const width=doc.getTextWidth(String(text||''));
+  if(width>maxWidth&&width>0){size=Math.max(minSize,size*(maxWidth/width));doc.setFontSize(size);}
+  return size;
+}
+
 function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
   const items=calcData||[];
   const cW=pageW-margin*2;
-  doc.setFillColor(255,255,255);
-  doc.rect(0,0,pageW,pageH,'F');
-  doc.setFillColor(38,96,207);
-  doc.rect(0,0,pageW,18,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(14);
-  doc.text('Calculations - Memorization Sheet',margin,12);
-  doc.setFontSize(8);
-  doc.setFont('helvetica','normal');
-  doc.text(items.length+' formulas - one page',pageW-margin,12,{align:'right'});
+  doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
+  pdfHeader(doc,'Calculations - Memorization Sheet',items.length+' formulas - portrait',pageW,margin);
 
-  const cols=Math.min(4,Math.max(2,Math.ceil(items.length/7)));
-  const gap=4;
-  const colW=(cW-gap*(cols-1))/cols;
-  const startY=23;
-  const bottom=12;
+  const cols=2;
+  const gap=5;
+  const colW=(cW-gap)/cols;
+  const startY=21;
+  const bottom=11;
   const rowsPerCol=Math.max(1,Math.ceil(items.length/cols));
-  const rowH=(pageH-startY-bottom)/rowsPerCol;
+  const rowPitch=(pageH-startY-bottom)/rowsPerCol;
   items.forEach((f,i)=>{
     const col=Math.floor(i/rowsPerCol);
     const row=i%rowsPerCol;
     const x=margin+col*(colW+gap);
-    const y=startY+row*rowH;
-    const h=Math.max(13,rowH-1.4);
+    const y=startY+row*rowPitch;
+    const h=rowPitch-1.8;
     const color=pdfCategoryRgb(f.category);
-    const tint=pdfTint(color,.94);
-    doc.setFillColor(...tint);
-    doc.setDrawColor(...pdfTint(color,.68));
-    doc.roundedRect(x,y,colW,h,1.8,1.8,'FD');
+    doc.setFillColor(255,255,255);
+    doc.setDrawColor(205,209,218);
+    doc.roundedRect(x,y,colW,h,.9,.9,'FD');
     doc.setFillColor(...color);
-    doc.roundedRect(x,y,1.7,h,1,1,'F');
+    doc.rect(x,y,1.25,h,'F');
 
     doc.setFont('helvetica','bold');
-    doc.setFontSize(rowH<19?6.4:7.4);
-    doc.setTextColor(18,25,45);
-    doc.text(doc.splitTextToSize(String(f.name||''),colW-27).slice(0,1),x+3.2,y+4.6);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(5.3);
+    doc.setTextColor(25,31,46);
+    fitPdfText(doc,String(f.name||''),colW-30,8.5,6.5);
+    doc.text(String(f.name||''),x+3.2,y+5.2);
+    doc.setFont('helvetica','normal');
     doc.setTextColor(...color);
-    doc.text(doc.splitTextToSize(String(f.category||''),23).slice(0,1),x+colW-2.5,y+4.4,{align:'right'});
+    fitPdfText(doc,String(f.category||''),24,5.8,4.8);
+    doc.text(String(f.category||''),x+colW-2.5,y+4.9,{align:'right'});
 
     if(f.numerator||f.denominator){
       const label=String(f.result_label||f.name||'');
-      const labelW=Math.min(25,Math.max(13,doc.getTextWidth(label)+2));
-      const multW=f.multiplier?10:0;
-      const fracLeft=x+labelW+9;
-      const fracRight=x+colW-3-multW;
-      const fracMid=(fracLeft+fracRight)/2;
-      const lineY=y+h*.61;
+      const numerator=String(f.numerator||'...');
+      const denominator=String(f.denominator||'...');
+      const multiplier=f.multiplier?'x '+String(f.multiplier):'';
       doc.setFont('helvetica','bold');
-      doc.setFontSize(rowH<19?5.7:6.3);
-      doc.setTextColor(62,68,84);
-      doc.text(doc.splitTextToSize(label,labelW).slice(0,1),x+3.2,lineY+.8);
-      doc.setFontSize(8);
-      doc.text('=',x+labelW+4,lineY+.8);
+      fitPdfText(doc,label,23,7.1,5.5);
+      const labelW=Math.min(23,Math.max(11,doc.getTextWidth(label)+1));
+      const formulaY=y+12.7;
+      doc.setTextColor(62,68,80);
+      doc.text(label,x+3.2,formulaY+.8);
+      doc.setFontSize(8.2);
+      doc.text('=',x+labelW+4.6,formulaY+.8);
+
+      doc.setFont('courier','bold');
+      doc.setFontSize(7.4);
+      const formulaStart=x+labelW+9.5;
+      const formulaEnd=x+colW-3-(multiplier?11:0);
+      const maxFracW=Math.max(24,formulaEnd-formulaStart);
+      const needed=Math.max(doc.getTextWidth(numerator),doc.getTextWidth(denominator))+5;
+      const fracW=Math.min(maxFracW,Math.max(26,needed));
+      const fracMid=(formulaStart+formulaEnd)/2;
+      const fracLeft=fracMid-fracW/2;
+      const fracRight=fracMid+fracW/2;
+      doc.setTextColor(30,39,55);
+      fitPdfText(doc,numerator,fracW-2,7.4,5.4);
+      doc.text(numerator,fracMid,formulaY-1.8,{align:'center'});
+      fitPdfText(doc,denominator,fracW-2,7.4,5.4);
+      doc.text(denominator,fracMid,formulaY+4.3,{align:'center'});
       doc.setDrawColor(...color);
       doc.setLineWidth(.45);
-      doc.line(fracLeft,lineY,fracRight,lineY);
-      doc.setFont('courier','bold');
-      doc.setFontSize(rowH<19?5.4:6.1);
-      doc.setTextColor(...color);
-      doc.text(doc.splitTextToSize(String(f.numerator||'...'),Math.max(12,fracRight-fracLeft-2)).slice(0,1),fracMid,lineY-2,{align:'center'});
-      doc.text(doc.splitTextToSize(String(f.denominator||'...'),Math.max(12,fracRight-fracLeft-2)).slice(0,1),fracMid,lineY+4.3,{align:'center'});
-      if(f.multiplier)doc.text('x '+String(f.multiplier),x+colW-2.5,lineY+.8,{align:'right'});
+      doc.line(fracLeft,formulaY,fracRight,formulaY);
+      if(multiplier){doc.setFontSize(6.5);doc.setTextColor(30,39,55);doc.text(multiplier,x+colW-2.5,formulaY+.8,{align:'right'});}
     }else{
-      doc.setFont('courier','bold');
-      doc.setFontSize(rowH<19?5.8:6.7);
-      doc.setTextColor(...color);
       const formula=calcFormulaText(f);
-      doc.text(doc.splitTextToSize(formula,colW-7).slice(0,rowH<19?2:3),x+3.2,y+9.2);
+      doc.setFont('courier','bold');
+      doc.setTextColor(30,39,55);
+      fitPdfText(doc,formula,colW-7,7.7,5.7);
+      const formulaLines=doc.splitTextToSize(formula,colW-7).slice(0,2);
+      doc.text(formulaLines,x+3.2,y+11.5);
+    }
+
+    const noteParts=[];
+    if(f.numerator||f.denominator)noteParts.push(...(f.steps||[]).filter(Boolean));
+    if(f.notes)noteParts.push(String(f.notes));
+    if(noteParts.length){
+      const note=noteParts.join(' - ');
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(5.8);
+      doc.setTextColor(92,97,108);
+      doc.text(doc.splitTextToSize(note,colW-6).slice(0,2),x+3.2,y+h-4.3);
     }
   });
 }
@@ -11818,45 +11837,23 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
 function drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin){
   const items=calcData||[];
   const cW=pageW-margin*2;
-  doc.setFillColor(255,255,255);
-  doc.rect(0,0,pageW,pageH,'F');
-  doc.setFillColor(38,96,207);
-  doc.rect(0,0,pageW,18,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(14);
-  doc.text('Calculations - Blank Practice',margin,12);
-  doc.setFontSize(8);
-  doc.setFont('helvetica','normal');
-  doc.text('Write each formula from memory',pageW-margin,12,{align:'right'});
-
-  const cols=Math.min(4,Math.max(2,Math.ceil(items.length/7)));
-  const gap=4;
-  const colW=(cW-gap*(cols-1))/cols;
-  const startY=23;
-  const bottom=12;
+  doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
+  pdfHeader(doc,'Calculations - Blank Practice','Write each formula from memory - portrait',pageW,margin);
+  const cols=2;
+  const gap=5;
+  const colW=(cW-gap)/cols;
+  const startY=21;
+  const bottom=11;
   const rowsPerCol=Math.max(1,Math.ceil(items.length/cols));
-  const rowH=(pageH-startY-bottom)/rowsPerCol;
+  const rowPitch=(pageH-startY-bottom)/rowsPerCol;
   items.forEach((f,i)=>{
-    const col=Math.floor(i/rowsPerCol);
-    const row=i%rowsPerCol;
-    const x=margin+col*(colW+gap);
-    const y=startY+row*rowH;
-    const h=rowH-1.4;
+    const col=Math.floor(i/rowsPerCol),row=i%rowsPerCol;
+    const x=margin+col*(colW+gap),y=startY+row*rowPitch,h=rowPitch-1.8;
     const color=pdfCategoryRgb(f.category);
-    doc.setFillColor(...pdfTint(color,.96));
-    doc.setDrawColor(...pdfTint(color,.68));
-    doc.roundedRect(x,y,colW,h,1.8,1.8,'FD');
-    doc.setFillColor(...color);
-    doc.rect(x,y,1.5,h,'F');
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(7.2);
-    doc.setTextColor(18,25,45);
-    doc.text(doc.splitTextToSize(String(f.name||''),colW-6).slice(0,1),x+3.2,y+4.8);
-    doc.setDrawColor(...color);
-    doc.setLineWidth(.28);
-    doc.line(x+3.2,y+h*.55,x+colW-3,y+h*.55);
-    doc.line(x+3.2,y+h*.8,x+colW-3,y+h*.8);
+    doc.setFillColor(255,255,255);doc.setDrawColor(205,209,218);doc.roundedRect(x,y,colW,h,.9,.9,'FD');
+    doc.setFillColor(...color);doc.rect(x,y,1.25,h,'F');
+    doc.setFont('helvetica','bold');doc.setTextColor(25,31,46);fitPdfText(doc,String(f.name||''),colW-7,8.2,6.2);doc.text(String(f.name||''),x+3.2,y+5.2);
+    doc.setDrawColor(148,153,164);doc.setLineWidth(.25);doc.line(x+3.2,y+h*.57,x+colW-3,y+h*.57);doc.line(x+3.2,y+h*.82,x+colW-3,y+h*.82);
   });
 }
 
@@ -11865,73 +11862,51 @@ function rrConventionalText(f){
 }
 
 function drawRROnePage(doc,rrData,pageW,pageH,margin){
-  doc.setFillColor(255,255,255);
-  doc.rect(0,0,pageW,pageH,'F');
   const cats=[];
   const catMap={};
-  (rrData||[]).forEach(f=>{
-    const name=f.category||'General';
-    if(!catMap[name]){catMap[name]=[];cats.push(name);}
-    catMap[name].push(f);
-  });
-  doc.setFillColor(40,60,100);
-  doc.rect(0,0,pageW,18,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(14);
-  doc.text('Reference Ranges - Conventional Units',margin,12);
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(8);
-  doc.text((rrData||[]).length+' memorization ranges - one page',pageW-margin,12,{align:'right'});
+  (rrData||[]).forEach(f=>{const name=f.category||'General';if(!catMap[name]){catMap[name]=[];cats.push(name);}catMap[name].push(f);});
+  doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
+  pdfHeader(doc,'Reference Ranges - Conventional Units',(rrData||[]).length+' memorization ranges - portrait',pageW,margin);
 
-  const cols=4;
-  const gap=4;
+  const cols=3;
+  const gap=3;
   const cW=pageW-margin*2;
   const colW=(cW-gap*(cols-1))/cols;
-  const top=23;
-  const bottom=12;
-  const contentH=pageH-top-bottom;
+  const top=21;
+  const bottom=11;
+  const columnHeadH=6;
+  const contentH=pageH-top-bottom-columnHeadH;
   const stacks=Array.from({length:cols},()=>({names:[],weight:0}));
   cats.forEach(name=>{
     const target=stacks.reduce((best,stack,i)=>stack.weight<stacks[best].weight?i:best,0);
     stacks[target].names.push(name);
-    stacks[target].weight+=catMap[name].length+1.35;
+    stacks[target].weight+=catMap[name].length+1.25;
   });
 
   stacks.forEach((stack,col)=>{
     const x=margin+col*(colW+gap);
+    doc.setFillColor(244,245,247);doc.setDrawColor(190,195,205);
+    doc.rect(x,top,colW*.49,columnHeadH,'FD');doc.rect(x+colW*.49,top,colW*.51,columnHeadH,'FD');
+    doc.setFont('helvetica','bold');doc.setFontSize(6.7);doc.setTextColor(56,63,77);
+    doc.text('ANALYTE',x+1.8,top+4);doc.text('CONVENTIONAL',x+colW-1.8,top+4,{align:'right'});
+
     const itemCount=stack.names.reduce((n,name)=>n+catMap[name].length,0);
     const catCount=stack.names.length;
-    const catH=5.2;
-    const catGap=1.2;
-    const rowH=Math.min(7.2,(contentH-catCount*(catH+catGap))/Math.max(1,itemCount));
-    let y=top;
+    const catH=5.7,catGap=1.1;
+    const rowH=Math.min(8.25,(contentH-catCount*(catH+catGap))/Math.max(1,itemCount));
+    let y=top+columnHeadH;
     stack.names.forEach(name=>{
       const color=pdfCategoryRgb(name);
-      doc.setFillColor(...pdfTint(color,.87));
-      doc.setDrawColor(...pdfTint(color,.56));
-      doc.roundedRect(x,y,colW,catH,1.1,1.1,'FD');
-      doc.setFillColor(...color);
-      doc.rect(x,y,1.5,catH,'F');
-      doc.setFont('helvetica','bold');
-      doc.setFontSize(6.2);
-      doc.setTextColor(...color);
-      doc.text(doc.splitTextToSize(name.toUpperCase(),colW-5).slice(0,1),x+3,y+3.6);
+      doc.setFillColor(...pdfTint(color,.96));doc.setDrawColor(...pdfTint(color,.66));doc.rect(x,y,colW,catH,'FD');
+      doc.setFillColor(...color);doc.rect(x,y,.9,catH,'F');
+      doc.setFont('helvetica','bold');doc.setTextColor(...color);fitPdfText(doc,name.toUpperCase(),colW-4.5,6.4,5.3);doc.text(name.toUpperCase(),x+2.2,y+3.8);
       y+=catH;
       catMap[name].forEach((f,i)=>{
-        const tint=i%2===0?pdfTint(color,.97):[255,255,255];
-        doc.setFillColor(...tint);
-        doc.setDrawColor(219,223,235);
-        doc.rect(x,y,colW*.49,rowH,'FD');
-        doc.rect(x+colW*.49,y,colW*.51,rowH,'FD');
-        doc.setFont('helvetica','bold');
-        doc.setFontSize(Math.max(5.8,Math.min(6.8,rowH*.92)));
-        doc.setTextColor(18,25,45);
-        doc.text(doc.splitTextToSize(String(f.name||''),colW*.49-3.5).slice(0,1),x+1.7,y+rowH*.69);
-        doc.setFont('courier','bold');
-        doc.setFontSize(Math.max(5.6,Math.min(6.6,rowH*.9)));
-        doc.setTextColor(...color);
-        doc.text(doc.splitTextToSize(rrConventionalText(f),colW*.51-3.5).slice(0,1),x+colW*.49+1.7,y+rowH*.69);
+        doc.setFillColor(i%2===0?255:249,i%2===0?255:249,i%2===0?255:250);doc.setDrawColor(218,221,227);
+        doc.rect(x,y,colW*.49,rowH,'FD');doc.rect(x+colW*.49,y,colW*.51,rowH,'FD');
+        const nameText=String(f.name||''),valueText=rrConventionalText(f);
+        doc.setFont('helvetica','bold');doc.setTextColor(29,34,46);fitPdfText(doc,nameText,colW*.49-3.3,7.1,5.2);doc.text(nameText,x+1.6,y+rowH*.68);
+        doc.setFont('courier','bold');doc.setTextColor(42,47,58);fitPdfText(doc,valueText,colW*.51-3.3,6.7,5.0);doc.text(valueText,x+colW*.49+1.6,y+rowH*.68);
         y+=rowH;
       });
       y+=catGap;
@@ -11949,29 +11924,23 @@ function generateFormulasPDF(){
   if(!inclCalc&&!inclRR){alert('Select at least one section.');return;}
   try{
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
-    const margin=10;
-    let pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),cW=pageW-margin*2;
-    let y=margin;
-    const refreshPage=()=>{pageW=doc.internal.pageSize.getWidth();pageH=doc.internal.pageSize.getHeight();cW=pageW-margin*2;};
-    const checkPage=(n=10)=>{refreshPage();if(y+n>pageH-margin){doc.addPage('a4','landscape');refreshPage();y=margin;}};
-    const sectionHeader=(title)=>{checkPage(14);doc.setFillColor(40,60,100);doc.rect(margin,y,cW,10,'F');doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text(title,margin+4,y+7);y+=14;};
-    const catHeader=(title)=>{checkPage(8);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(60,80,140);doc.text(title.toUpperCase(),margin,y);y+=2;doc.setDrawColor(60,80,140);doc.setLineWidth(0.3);doc.line(margin,y,pageW-margin,y);y+=5;};
+    const doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+    const margin=9;
+    let pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
+    const refreshPage=()=>{pageW=doc.internal.pageSize.getWidth();pageH=doc.internal.pageSize.getHeight();};
 
     if(inclCalc&&calcData.length){
       if(blankCalc)drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin);
       else drawCalcOnePage(doc,calcData,pageW,pageH,margin);
-      y=pageH;
     }
     if(inclRR&&rrData.length){
-      if(inclCalc)doc.addPage('a4','landscape');
+      if(inclCalc)doc.addPage('a4','portrait');
       refreshPage();
       drawRROnePage(doc,rrData,pageW,pageH,margin);
-      y=pageH;
     }
     const tot=doc.internal.getNumberOfPages();
     for(let p=1;p<=tot;p++){doc.setPage(p);refreshPage();doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);doc.text('MLS BOC Prep - Calculations & Reference Ranges - Page '+p+' of '+tot,margin,pageH-6);doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-6,{align:'right'});}
-    doc.save(blankCalc&&inclCalc&&!inclRR?'mls_calc_blank_practice.pdf':'mls_calc_rr.pdf');
+    doc.save(blankCalc&&inclCalc&&!inclRR?'mls_calc_blank_practice_portrait.pdf':'mls_calc_rr_portrait.pdf');
     document.getElementById('condition-modal').classList.add('hidden');
   }catch(err){alert('PDF export failed: '+err.message);}
 }
@@ -13903,44 +13872,21 @@ function renderQuestionMedia(qOrText){
   return `<div class="question-media">${urls.map((url,i)=>`<button class="question-media-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" aria-label="Open image full size"><img src="${esc(url)}" alt="Question visual ${i+1}" loading="lazy"></button>`).join('')}</div>`;
 }
 
-function updateZoomModalLens(event){
-  if(!window.matchMedia||!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
-  const stage=event.currentTarget;
-  const img=stage?.querySelector('img');
-  const lens=stage?.querySelector('.media-zoom-lens');
-  if(!stage||!img||!lens)return;
-  const rect=img.getBoundingClientRect();
-  const x=Math.max(0,Math.min(rect.width,event.clientX-rect.left));
-  const y=Math.max(0,Math.min(rect.height,event.clientY-rect.top));
-  if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom){
-    stage.classList.remove('is-magnifying');
-    return;
-  }
-  const zoom=2.6;
-  const size=lens.offsetWidth||220;
-  lens.style.left=event.clientX+'px';
-  lens.style.top=event.clientY+'px';
-  lens.style.backgroundImage='url("'+String(img.currentSrc||img.src).replace(/"/g,'%22')+'")';
-  lens.style.backgroundSize=(rect.width*zoom)+'px '+(rect.height*zoom)+'px';
-  lens.style.backgroundPosition=(-(x*zoom-size/2))+'px '+(-(y*zoom-size/2))+'px';
-  stage.classList.add('is-magnifying');
-}
-function hideZoomModalLens(event){
-  event.currentTarget?.classList.remove('is-magnifying');
-}
-
 function openQuestionMediaZoom(url){
   closeQuestionMediaZoom();
   const modal=document.createElement('div');
   modal.id='question-media-zoom-modal';
   modal.className='media-zoom-modal';
-  modal.innerHTML=`<div class="media-zoom-dialog" role="dialog" aria-modal="true" aria-label="Question image zoom"><div class="media-zoom-actions"><button class="btn btn-ghost" onclick="closeQuestionMediaZoom()">Close</button></div><div class="media-zoom-image-wrap" onpointerenter="updateZoomModalLens(event)" onpointermove="updateZoomModalLens(event)" onpointerleave="hideZoomModalLens(event)"><img src="${esc(url)}" alt="Zoomed question visual"><span class="media-zoom-lens" aria-hidden="true"></span></div></div>`;
+  modal.innerHTML=`<div class="media-zoom-dialog" role="dialog" aria-modal="true" aria-label="Question image"><div class="media-zoom-actions"><button class="btn btn-ghost" type="button" onclick="closeQuestionMediaZoom()">Close</button></div><div class="media-zoom-image-wrap"><img src="${esc(url)}" alt="Question visual"></div></div>`;
   modal.addEventListener('click',e=>{if(e.target===modal)closeQuestionMediaZoom();});
+  document.body.style.overflow='hidden';
   document.body.appendChild(modal);
+  modal.querySelector('.media-zoom-actions .btn')?.focus();
 }
 function closeQuestionMediaZoom(){
   const modal=document.getElementById('question-media-zoom-modal');
   if(modal)modal.remove();
+  document.body.style.overflow='';
 }
 function renderQuestionWithMedia(qOrText){
   return `${escNL(cleanQuestionText(qOrText))}${renderQuestionMedia(qOrText)}`;
