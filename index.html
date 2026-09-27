@@ -1022,6 +1022,15 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .study-ascp-title{font-size:19px;font-weight:800;line-height:1.25}
 .study-ascp-sub{margin-top:5px;font-size:13px;font-weight:650;color:#5b4710}
 .study-ascp-open{margin-left:auto;font-size:25px;font-weight:700}
+.home-ascp-guide{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid #c79000;border-radius:999px;background:#fff8d8;color:#5b4710;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 5px 14px #b786181c}
+.home-ascp-guide:hover{background:#ffefaa}
+.study-guideline-button{flex:0 0 auto;max-width:330px;text-align:left;line-height:1.35}
+.modal.ascp-guideline-modal{width:min(1120px,calc(100vw - 24px));height:min(94vh,1040px);max-width:none;max-height:none;padding:0;overflow:hidden}
+.ascp-guideline-shell{height:100%;display:flex;flex-direction:column;background:var(--bg2)}
+.ascp-guideline-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.ascp-guideline-title{font-size:17px;font-weight:800;color:var(--text)}
+.ascp-guideline-date{font-size:11px;color:var(--text2);margin-top:3px}
+.ascp-guideline-frame{display:block;width:100%;height:100%;min-height:0;flex:1;border:0;background:#fff}
 .ascp-outline-grid{display:grid;grid-template-columns:1fr;gap:18px}
 .ascp-section-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:22px}
 .ascp-section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:17px}
@@ -1071,6 +1080,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   .study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ascp-outline-grid,.ascp-topic-body{grid-template-columns:1fr}
   .study-outline-hero{display:block}
+  .study-guideline-button{display:inline-flex;margin-top:13px;max-width:100%}
   .study-embed-note{display:inline-flex;margin-top:13px}
   .study-window-head,.study-window-content{padding-left:17px;padding-right:17px}
   .modal.study-outline-modal{max-height:94vh}
@@ -1581,9 +1591,8 @@ const SUBJECTS = [
   {key:'hematology',name:'Hematology/Hemostasis',icon:'🩸'},
   {key:'microbiology',name:'Microbiology',icon:'🦠'},
   {key:'para_myco',name:'Parasitology / Mycology',icon:'🍄🪱',_combined:['parasitology','mycology']},
-  {key:'urinalysis',name:'Urinalysis',icon:'🧪'},
+  {key:'urinalysis',name:'Urinalysis / Body Fluids',icon:'🧪'},
   {key:'immunology',name:'Immunology',icon:'🔬'},
-  {key:'molecular',name:'Molecular',icon:'🧬'},
   {key:'lab_operations',name:'Lab Operations',icon:'📊'}
 ];
 const PARA_MYCO_KEYS=['parasitology','mycology'];
@@ -3274,6 +3283,120 @@ const STUDY_OUTLINES={
     ]
   }
 };
+
+const ASCP_GUIDELINE_PDF='assets/ascp/ascp_ascpi_mls_content_guideline_2025-09-25.pdf';
+const ASCP_GUIDELINE_DATE='September 25, 2025';
+const ASCP_GUIDELINE_CITATION='ASCP Board of Certification. Medical Laboratory Scientist, MLS(ASCP) and MLS(ASCPi) Examination Content Guideline. Revised September 25, 2025.';
+const ascpLines=(...items)=>items.map(item=>({level:Array.isArray(item)?item[0]:1,text:Array.isArray(item)?item[1]:item}));
+const ascpTopic=(letter,title,...lines)=>({letter,title,lines:ascpLines(...lines)});
+
+Object.assign(STUDY_OUTLINES.clinical_chemistry,{description:'Carbohydrates, lipids, heme derivatives, enzymes, proteins and other nitrogen-containing compounds, acid-base determinations (including blood gases), electrolytes, endocrinology, vitamins and nutrition, therapeutic drug monitoring, and toxicology.'});
+Object.assign(STUDY_OUTLINES.hematology,{description:'Physiology, disease states, laboratory testing, hemostasis (including physiology, disease states, and laboratory determinations).'});
+Object.assign(STUDY_OUTLINES.urinalysis,{description:'Physical and chemical testing, microscopic analysis, physiology, and disease states for urinalysis and other body fluids.'});
+Object.assign(STUDY_OUTLINES.immunology,{description:'Principles of immunology, diseases of the immune system, transplantation, infectious disease serology, serologic procedures, and test results.'});
+
+Object.assign(STUDY_OUTLINES,{
+  blood_bank:{
+    title:'Blood Banking',accent:'#b93b44',
+    description:'Blood products, blood group systems, blood group immunology, physiology and pathophysiology, serologic and molecular testing, and transfusion practice.',
+    ascp:{percent:'17 – 22%',sections:[
+      {number:'I',title:'Blood Products',topics:[
+        ascpTopic('A','Donors','1. Qualification','2. Collection methods','3. Adverse reactions','4. Special donations (e.g., autologous)'),
+        ascpTopic('B','Processing','1. Testing','2. Labeling'),
+        ascpTopic('C','Storage','1. Anticoagulants/additives','2. Temperature requirements','3. Transportation','4. Properties of stored products','5. Expiration'),
+        ascpTopic('D','Blood Components','1. Red blood cells','2. Cryoprecipitated AHF','3. Platelets','4. Plasma','5. Granulocytes','6. Leukocyte-reduced components','7. Frozen/deglycerolized red blood cells','8. Apheresis products','9. Fractionation products','10. Whole blood','11. Washed red blood cells','12. Irradiated components'),
+        ascpTopic('E','Blood Component Quality Control')
+      ]},
+      {number:'II',title:'Blood Group Systems',topics:[
+        ascpTopic('A','Genetics','1. Basic','2. Molecular','3. Inheritance of blood groups'),
+        ascpTopic('B','Biochemistry/Antigens','1. ABO','2. Lewis','3. Rh','4. MNS','5. P1PK/Globoside (P)','6. Ii','7. Kell','8. Kidd','9. Duffy','10. Lutheran','11. Antigens of high prevalence','12. Antigens of low prevalence','13. HLA','14. Platelet-specific'),
+        ascpTopic('C','Role of Blood Groups in Transfusion','1. Immunogenicity','2. Antigen prevalence')
+      ]},
+      {number:'III',title:'Blood Group Immunology',topics:[
+        ascpTopic('A','Immune Response','1. Primary and secondary response','2. B and T cells, macrophages','3. Genetics'),
+        ascpTopic('B','Immunoglobulins','1. Classes and subclasses','2. Structure','3. Biologic and physical properties'),
+        ascpTopic('C','Antigen-Antibody Interactions','1. Principles',[2,'a. Principles'],[2,'b. Methods'],'2. Testing'),
+        ascpTopic('D','Complement','1. Classical and alternative pathway mechanisms','2. Biologic properties')
+      ]},
+      {number:'IV',title:'Physiology and Pathophysiology',topics:[
+        ascpTopic('A','Physiology of Blood','1. Circulation and blood volume','2. Composition and function of blood',[2,'a. Normal function'],[2,'b. Abnormal physiology'],'3. Cell survival','4. Cell metabolism'),
+        ascpTopic('B','Hemostasis and Coagulation','1. Coagulation factors and disorders','2. Platelet functions and disorders'),
+        ascpTopic('C','Hemolytic Disease of the Fetus and Newborn','1. Pathophysiology','2. Detection','3. Treatment','4. Prevention'),
+        ascpTopic('D','Anemias','1. Congenital and acquired','2. Immune hemolytic anemias: warm, cold, drug-induced'),
+        ascpTopic('E','Transplantation','1. Solid organ','2. Hematopoietic progenitor cell (HPC)')
+      ]},
+      {number:'V',title:'Serologic and Molecular Testing',topics:[
+        ascpTopic('A','Routine Tests','1. Blood grouping tests','2. Compatibility tests',[2,'a. Antibody detection'],[2,'b. Crossmatch'],'3. Antibody identification/clinical significance','4. Direct antiglobulin testing'),
+        ascpTopic('B','Reagents','1. Antiglobulin sera','2. Blood grouping sera','3. Reagent red cells'),
+        ascpTopic('C','Application of Special Tests and Reagents','1. Enzymes','2. Enhancement media','3. Lectins','4. Adsorptions','5. Elutions','6. Titrations','7. Cell separations','8. ELISA','9. Molecular techniques','10. Neutralization/inhibition','11. Use of thiol reagents','12. Immunofluorescence','13. Solid phase','14. Column agglutination test','15. Chloroquine diphosphate','16. EDTA glycine-acid'),
+        ascpTopic('D','Leukocyte/Platelet Testing','1. Cytotoxicity','2. Platelet testing'),
+        ascpTopic('E','Quality Assurance','1. Blood samples','2. Reagents','3. Test procedures')
+      ]},
+      {number:'VI',title:'Transfusion Practice',topics:[
+        ascpTopic('A','Indications for Transfusion'),ascpTopic('B','Component Therapy'),
+        ascpTopic('C','Adverse Effects of Transfusion','1. Immunologic reactions','2. Nonimmunologic reactions','3. Transfusion-transmitted diseases'),
+        ascpTopic('D','Apheresis and Extracorporeal Circulation'),ascpTopic('E','Blood Administration and Patient Blood Management')
+      ]}
+    ]},chapters:[],bibliography:[ASCP_GUIDELINE_CITATION]
+  },
+  microbiology:{
+    title:'Microbiology',accent:'#2fa66a',
+    description:'Preanalytic procedures; analytic procedures for bacteriology; analytic procedures for mycobacteriology, virology, parasitology, and mycology; and postanalytic procedures. This ASCP content area includes Parasitology and Mycology.',
+    ascp:{percent:'17 – 22%',sections:[
+      {number:'I',title:'Preanalytic Procedures',topics:[
+        ascpTopic('A','Specimen Collection and Transport','1. Patient identification and specimen labeling','2. Specimen collection','3. Specimen transport systems and conditions for all organisms'),
+        ascpTopic('B','Specimen Processing','1. Specimen prioritization and rejection criteria','2. Biosafety cabinet and personal protective equipment','3. Specimen preparation methods and applications','4. Media','5. Inoculation of media','6. Incubation conditions','7. Preparation methods for slides used for stains'),
+        ascpTopic('C','Stains: Procedure, Principle, and Interpretation','1. Gram','2. Acid-fast','3. Modified acid-fast','4. KOH and calcofluor-white','5. Trichrome','6. Giemsa','7. Acridine orange')
+      ]},
+      {number:'II',title:'Analytic Procedures for Bacteriology',topics:[
+        ascpTopic('A','Blood and Bone Marrow','1. Specimen sources','2. Continuous-monitoring systems','3. Rapid identification/resistance detection methods','4. Skin flora and clinical significance','5. Major pathogen identification','6. Common agents of endocarditis','7. Agents of bone marrow infection','8. Organism pathogenicity'),
+        ascpTopic('B','Cerebrospinal Fluid','1. Specimen sources','2. Major pathogens associated with acute meningitis','3. Common agents of shunt infections','4. Correlation with glucose, protein, and cell count','5. Direct detection and molecular methods','6. Organism pathogenicity'),
+        ascpTopic('C','Body Fluids from Normally Sterile Sites','1. Pleural, peritoneal, pericardial, ocular, synovial, and amniotic specimens','2. Indigenous organisms from mucosal surfaces and skin','3. Major pathogen identification','4. Molecular methods','5. Organism pathogenicity'),
+        ascpTopic('D','Lower Respiratory','1. Specimen sources','2. Quantitative and semiquantitative reporting','3. Oral flora morphology','4. Major pathogen identification','5. Direct detection and molecular methods','6. Organism pathogenicity'),
+        ascpTopic('E','Upper Respiratory','1. Specimen sources','2. Indigenous flora morphology','3. Major pathogen identification','4. Direct detection and molecular methods','5. Organism pathogenicity'),
+        ascpTopic('F','Gastrointestinal','1. Major pathogen identification','2. Direct detection and molecular methods','3. Serotyping','4. Organism pathogenicity','5. Helicobacter pylori detection'),
+        ascpTopic('G','Skin, Soft Tissue, and Bone','1. Specimen sources','2. Indigenous flora morphology','3. Major pathogen identification','4. Organism pathogenicity'),
+        ascpTopic('H','Genital Tract','1. Specimen sources','2. Indigenous organism morphology','3. Vaginitis pathogen detection','4. Culture and molecular detection','5. Organism pathogenicity'),
+        ascpTopic('I','Urine','1. Specimen sources','2. Major urinary pathogen identification','3. Colony counts and clinical significance','4. Correlation with urinalysis'),
+        ascpTopic('J','Identification Methods','1. Colony morphology','2. Rapid presumptive tests','3. Conventional biochemical identification','4. Commercial kits','5. Automated methods','6. MALDI-TOF MS','7. Multiplex molecular methods','8. Sequencing'),
+        ascpTopic('K','Antimicrobial Susceptibility Testing and Antibiotic Resistance','1. Method, theory, interpretation, and application','2. Phenotypic resistance detection','3. Mechanisms of action','4. Genetic resistance determinants','5. Intrinsic resistance patterns'),
+        ascpTopic('L','MRSA/MSSA, VRE, ESBL/CRE Screening','1. Specimen sources','2. Culture methods','3. Molecular methods'),
+        ascpTopic('M','BSL-3 Pathogens and Select Agents (Bioterrorism)','1. Specimen sources','2. Presumptive identification','3. Regional laboratory and Laboratory Response Network','4. Organism pathogenicity')
+      ]},
+      {number:'III',title:'Analytic Procedures for Mycobacteriology, Virology, Parasitology, and Mycology',topics:[
+        ascpTopic('A','Mycobacteriology and Nocardia spp.','1. Specimen sources','2. Major pathogens and disease states','3. Acid-fast reaction, colony morphology, and growth','4. Identification methods','5. Direct molecular detection','6. Antimicrobial therapy','7. Organism pathogenicity'),
+        ascpTopic('B','Virology','1. Specimen sources','2. Major pathogens and disease states','3. Direct detection of pathogens'),
+        ascpTopic('C','Parasitology','1. Specimen sources','2. Major pathogens and disease states','3. Microscopic and macroscopic identification','4. Direct and molecular detection'),
+        ascpTopic('D','Mycology','1. Specimen sources','2. Major pathogens and disease states','3. Colony morphology and growth characteristics','4. Microscopic identification','5. Direct and molecular detection','6. Other identification methods')
+      ]},
+      {number:'IV',title:'Postanalytic Procedures',topics:[
+        ascpTopic('A','Documentation Practices'),ascpTopic('B','Urgent and Critical Value Reporting'),ascpTopic('C','Result Review and Autoverification'),ascpTopic('D','Issuing Corrected Reports'),ascpTopic('E','Reporting to Infection Control/Prevention and Public Health')
+      ]}
+    ]},chapters:[],bibliography:[ASCP_GUIDELINE_CITATION]
+  },
+  lab_operations:{
+    title:'Laboratory Operations',accent:'#6b6fd6',
+    description:'Quality assessment and troubleshooting, safety, laboratory mathematics, manual and automated methodology and instrumentation, basic management principles, and education principles.',
+    ascp:{percent:'5 – 10%',sections:[
+      {number:'I',title:'Quality Assessment/Troubleshooting',topics:[
+        ascpTopic('A','Preanalytical, Analytical, Postanalytical'),ascpTopic('B','Quality Control'),ascpTopic('C','Point-of-care Testing (POCT)'),ascpTopic('D','Compliance'),ascpTopic('E','Regulation','1. Proficiency testing','2. Competency assessment','3. Accreditation standards')
+      ]},
+      {number:'II',title:'Safety',topics:[
+        ascpTopic('A','Safety Programs and Practices','1. Prevention of infection with bloodborne pathogens','2. Personal protective equipment (PPE)','3. Safe work practices','4. Packaging and transportation of specimens and microorganisms','5. Safety data sheets (SDS)'),
+        ascpTopic('B','Emergency Procedures','1. Needlesticks','2. Splashes to mucous membranes','3. Fire')
+      ]},
+      {number:'III',title:'Laboratory Mathematics',topics:[
+        ascpTopic('A','Concentration, Volume, and Dilutions'),ascpTopic('B','Molarity, Normality'),ascpTopic('C','Standard Curves'),ascpTopic('D','Mean, Median, Mode, and Confidence Intervals'),ascpTopic('E','Sensitivity, Specificity, and Predictive Value')
+      ]},
+      {number:'IV',title:'Manual/Automated Methodology and Instrumentation',topics:[
+        ascpTopic('A','Basic Laboratory Equipment'),ascpTopic('B','Spectrophotometry and Photometry'),ascpTopic('C','Mass Spectrometry'),ascpTopic('D','Osmometry'),ascpTopic('E','Electrophoresis'),ascpTopic('F','Chromatography'),ascpTopic('G','Electrochemistry'),ascpTopic('H','Fluorometry'),ascpTopic('I','Nephelometry'),ascpTopic('J','Flow Cytometry'),ascpTopic('K','Molecular Methods'),ascpTopic('L','Automated Microbiology Processors'),ascpTopic('M','Hematology Instrumentation')
+      ]},
+      {number:'V',title:'Basic Management Principles',topics:[ascpTopic('A','Basic Management Principles')]},
+      {number:'VI',title:'Education Principles',topics:[ascpTopic('A','Education Principles')]}
+    ]},chapters:[],bibliography:[ASCP_GUIDELINE_CITATION]
+  }
+});
+
 const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Guess: MLS Edition',url:'Guess_MLS_Edition.html',description:'Pick a subject, read the clue, and guess the answer',topic:'All Subjects',icon:'MLS',color:'#6b4fd8'},
   {title:"Who's That Blood Group?",url:'Blood_Group_Game.html',description:'Timed blood group cases plus rapid antigen-gated mini rounds',topic:'Blood Bank',icon:'BG',color:'#b22222',preview_url:'assets/interactive-previews/blood_group_game.png?v=20260606-4'},
@@ -3472,7 +3595,7 @@ const MICRO_FOLDER_GROUPS = [
 const CLASS_SUBJECTS = [
   {key:'blood_bank',   name:'Blood Bank',      icon:'🏥'},
   {key:'chemistry',    name:'Chemistry',        icon:'⚗️'},
-  {key:'urinalysis',   name:'Urinalysis',       icon:'🧪'},
+  {key:'urinalysis',   name:'Urinalysis / Body Fluids', icon:'🧪'},
   {key:'microbiology', name:'Microbiology',     icon:'🦠'}
 ];
 
@@ -4689,19 +4812,18 @@ function getSubjectIcon(key,fallback){
 const HOME_SUBJECT_DETAILS={
   blood_bank:'Questions, images, case studies',
   clinical_chemistry:'Questions, study outline, formulas, ranges',
-  hematology:'Questions, body fluids, morphology, cases',
+  hematology:'Questions, morphology, hemostasis, cases',
   microbiology:'Images, cases, organism ID',
-  urinalysis:'Questions, images, case studies',
+  urinalysis:'Urinalysis and other body-fluid questions, images, and cases',
   lab_operations:'Questions, QC, statistics, safety',
   immunology:'Questions, study outline, serology',
-  molecular:'Questions, FISH, and molecular methods',
   para_myco:'Questions, images, organism recognition'
 };
 
 const HOME_SUBJECT_COLORS={
   blood_bank:'#b93b44',clinical_chemistry:'#2f7dd1',hematology:'#c74656',
   microbiology:'#2fa66a',urinalysis:'#c8a800',lab_operations:'#6b6fd6',
-  immunology:'#7b61ff',molecular:'#0b8f91',para_myco:'#2fa66a',all:'#7b61ff',formulas:'#2f7dd1'
+  immunology:'#7b61ff',para_myco:'#2fa66a',all:'#7b61ff',formulas:'#2f7dd1'
 };
 
 const HOME_HUB_PREVIEWS=[
@@ -4721,7 +4843,7 @@ function homeSubjectCode(key,fallback){
   const short={
     blood_bank:'BB',clinical_chemistry:'CH',hematology:'HE',
     microbiology:'MI',urinalysis:'UA',lab_operations:'LO',
-    immunology:'IM',molecular:'MO',para_myco:'PM',all:'ALL',formulas:'CALC'
+    immunology:'IM',para_myco:'PM',all:'ALL',formulas:'CALC'
   };
   return short[key]||String(fallback||'?').slice(0,4).toUpperCase();
 }
@@ -4742,7 +4864,7 @@ function homeSubjectMark(key,fallback){
   const fallbackIcons={
     blood_bank:'🏥',clinical_chemistry:'⚗️',hematology:'🩸',
     microbiology:'🦠',urinalysis:'🧪',lab_operations:'📊',
-    immunology:'🔬',molecular:'🧬',para_myco:'🍄🪱',all:'🧭',formulas:'∑'
+    immunology:'🔬',para_myco:'🍄🪱',all:'🧭',formulas:'∑'
   };
   const icon=stored
     ? '<img src="'+stored+'" alt="">'
@@ -4829,7 +4951,7 @@ async function renderHome(v){
     + '<div class="home-practice-grid">' + practiceCards + '</div>'
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-section-head"><div><div class="home-section-title">Book Questions</div></div></div>'
+    + '<div class="home-section-head"><div><div class="home-section-title">Book Questions</div></div><button class="home-ascp-guide" type="button" onclick="openASCPGuideline()">See ASCP Guideline · Revised September 25, 2025</button></div>'
     + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
@@ -5262,10 +5384,11 @@ function renderSubjectView(v){
       ${appState.subject==='para_myco'&&isAdmin?`<label style="margin-left:auto;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;font-size:11px;cursor:pointer">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
     </div>
     ${appState.subject==='para_myco'?'<div style="font-size:11px;color:var(--accent);margin-bottom:12px;font-style:italic">* Per ASCP BOC 2025, Parasitology &amp; Mycology are subcategories of Microbiology.</div>':''}
+    ${appState.subject==='microbiology'?'<div style="font-size:12px;color:var(--text2);margin-bottom:12px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)">ASCP note: Microbiology includes mycobacteriology, virology, parasitology, and mycology.</div>':''}
     <div class="tabs">
       <button class="tab ${appState.subjectTab==='quiz'?'active':''}" data-tab="quiz" onclick="switchTab('quiz')">Quiz</button>
       ${STUDY_OUTLINES[appState.subject]?`<button class="tab ${appState.subjectTab==='outline'?'active':''}" data-tab="outline" onclick="switchTab('outline')">Study Outline</button>`:''}
-      ${['clinical_chemistry','immunology','molecular'].includes(appState.subject)?'':`<button class="tab ${appState.subjectTab==='images'?'active':''}" data-tab="images" onclick="switchTab('images')">Learn by Images</button>
+      ${['clinical_chemistry','immunology'].includes(appState.subject)?'':`<button class="tab ${appState.subjectTab==='images'?'active':''}" data-tab="images" onclick="switchTab('images')">Learn by Images</button>
         <button class="tab ${appState.subjectTab==='cases'?'active':''}" data-tab="cases" onclick="switchTab('cases')">Cases</button>`}
     </div>
     <div id="tab-content"></div>
@@ -5347,14 +5470,15 @@ async function renderStudyOutlineTab(el){
         <div>
           <div class="study-outline-kicker">Study Outline</div>
           <h2>${esc(outline.title)}</h2>
-          <p>Select a section to open its study window.</p>
+          <p>${esc(outline.description||'Select a section to open its study window.')}</p>
         </div>
+        <button class="btn btn-ghost btn-sm study-guideline-button" type="button" onclick="openASCPGuideline()">See ASCP Guideline<br><span style="font-size:10px;font-weight:650">Revised September 25, 2025</span></button>
       </section>
       <button class="study-ascp-card" type="button" onclick="openASCPStudyOutline('${subjectKey}')">
         <span class="study-ascp-mark">ASCP</span>
         <span>
           <span class="study-ascp-title">ASCP Examination Content Outline</span>
-          <span class="study-ascp-sub">${esc(outline.title)} · ${esc(outline.ascp.percent)} of the examination</span>
+          <span class="study-ascp-sub">${esc(outline.title)} · ${esc(outline.ascp.percent)} of the examination · Revised September 25, 2025</span>
         </span>
         <span class="study-ascp-open" aria-hidden="true">›</span>
       </button>
@@ -5498,6 +5622,36 @@ async function saveASCPStudyNote(subjectKey,key){
   if(status){status.textContent='Saved';setTimeout(()=>{status.textContent='';},1800);}
 }
 
+function openASCPGuideline(){
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!dialog||!body)return;
+  dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');
+  dialog.classList.add('ascp-guideline-modal');
+  body.innerHTML=`
+    <div class="ascp-guideline-shell">
+      <header class="ascp-guideline-head">
+        <div style="min-width:0;flex:1">
+          <div class="ascp-guideline-title">ASCP MLS Examination Content Guideline</div>
+          <div class="ascp-guideline-date">Revised ${ASCP_GUIDELINE_DATE}</div>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="${ASCP_GUIDELINE_PDF}" target="_blank" rel="noopener">Open PDF</a>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeASCPGuideline()" aria-label="Close guideline">✕</button>
+      </header>
+      <iframe class="ascp-guideline-frame" src="${ASCP_GUIDELINE_PDF}#view=FitH" title="ASCP MLS Examination Content Guideline"></iframe>
+    </div>`;
+  modal.onclick=e=>{if(e.target===modal)closeASCPGuideline();};
+  modal.classList.remove('hidden');
+}
+
+function closeASCPGuideline(){
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  if(dialog)dialog.classList.remove('ascp-guideline-modal');
+  if(modal){modal.classList.add('hidden');modal.onclick=null;}
+}
+
 async function openASCPStudyOutline(subjectKey){
   const outline=STUDY_OUTLINES[subjectKey];
   const ascp=outline?.ascp;
@@ -5608,12 +5762,13 @@ async function openCustomStudyTopic(subjectKey,id){
 function closeStudyOutlineWindow(){
   const modal=document.getElementById('condition-modal');
   const dialog=modal?.querySelector('.modal');
-  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');dialog.style.removeProperty('--study-accent');}
+  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal','ascp-guideline-modal');dialog.style.removeProperty('--study-accent');}
   if(modal){modal.classList.add('hidden');modal.onclick=null;}
 }
 
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&document.querySelector('#condition-modal .study-outline-modal'))closeStudyOutlineWindow();
+  if(event.key==='Escape'&&document.querySelector('#condition-modal .ascp-guideline-modal'))closeASCPGuideline();
 });
 
 // ─── QUIZ TAB ─────────────────────────────────────────────────────────────────
@@ -9475,7 +9630,7 @@ const SUBJECT_CASE_CONFIGS = {
     tableLabel:'UA Results',
     presetTests:['Color','Appearance','Specific Gravity','pH','Protein','Glucose','Ketones','Blood','Bilirubin','Urobilinogen','Nitrite','Leukocyte Esterase','WBC','RBC','Casts','Crystals','Bacteria','Other'],
     answerKey:'uaCaseAnswers', collapsedKey:'uaCaseCollapsed',
-    saveFn:'saveSubjectCase', label:'Urinalysis'
+    saveFn:'saveSubjectCase', label:'Urinalysis / Body Fluids'
   },
   immunology: {
     dbTable:'mlsboc_immuno_cases', tableField:'test_results',
@@ -9823,7 +9978,7 @@ function renderClassMascotVisual(subj, rightPct, wrongPct, isDone100, isCurrentW
     hematology:{type:'blood',label:'Hematology'},
     chemistry:{type:'chem',label:'Chemistry'},
     clinical_chemistry:{type:'chem',label:'Chemistry'},
-    urinalysis:{type:'urine',label:'Urinalysis'},
+    urinalysis:{type:'urine',label:'Urinalysis / Body Fluids'},
     microbiology:{type:'micro',label:'Microbiology'}
   };
   const meta=map[subj]||map.chemistry;
@@ -9899,8 +10054,7 @@ function getProgressSubjectMeta(subj){
     parasitology:{label:'Parasitology',short:'PA',accent:'#7aa23b',tool:'lens'},
     mycology:{label:'Mycology',short:'MY',accent:'#8f6ab8',tool:'spore'},
     para_myco:{label:'Para/Myco',short:'PM',accent:'#7aa23b',tool:'lens'},
-    urinalysis:{label:'Urinalysis',short:'UA',accent:'#c8a800',tool:'strip'},
-    molecular:{label:'Molecular',short:'MO',accent:'#0b8f91',tool:'scope'}
+    urinalysis:{label:'Urinalysis / Body Fluids',short:'UA',accent:'#c8a800',tool:'strip'}
   };
   return map[subj]||{label:'Quiz',short:'MLS',accent:'#2563d4',tool:'scope'};
 }
