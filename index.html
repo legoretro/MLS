@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 189598)
-Total output lines: 14187
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5487,7 +5484,3006 @@ async function saveASCPStudyNote(subjectKey,key){
   if(!field)return;
   const text=field.value.trim();
   window._ascpStudyNotes=window._ascpStudyNotes||{};
- …39598 tokens truncated…logy'){
+  const map=window._ascpStudyNotes[subjectKey]||{};
+  const current=map[key];
+  let result;
+  if(current?.id){
+    result=await sb.from('mlsboc_cases').update({scenario:text}).eq('id',current.id).select('id').single();
+  }else{
+    result=await sb.from('mlsboc_cases').insert({subject:'study_outline_notes',title:key,scenario:text,case_data:'',answer:'',group_label:subjectKey,steps:'[]',images:[],is_draft:false}).select('id').single();
+  }
+  if(result.error){alert('Save failed: '+result.error.message);return;}
+  map[key]={id:result.data?.id||current?.id||'',text};
+  window._ascpStudyNotes[subjectKey]=map;
+  if(status){status.textContent='Saved';setTimeout(()=>{status.textContent='';},1800);}
+}
+
+async function openASCPStudyOutline(subjectKey){
+  const outline=STUDY_OUTLINES[subjectKey];
+  const ascp=outline?.ascp;
+  if(!outline||!ascp)return;
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!dialog||!body)return;
+  dialog.classList.add('study-outline-modal','ascp-study-modal');
+  dialog.style.setProperty('--study-accent','#c89400');
+  body.innerHTML='<div class="empty" style="padding:34px">Loading...</div>';
+  modal.onclick=e=>{if(e.target===modal)closeStudyOutlineWindow();};
+  modal.classList.remove('hidden');
+  const savedNotes=await loadASCPStudyNotes(subjectKey);
+  const sections=ascp.sections.map(section=>{
+    const topics=section.topics.map(topic=>{
+      const outlineKey=ascpStudyNoteKey(subjectKey,section.number,topic.letter,'outline');
+      const originalOutline=ascpOutlineText(topic);
+      const outlineText=Object.prototype.hasOwnProperty.call(savedNotes,outlineKey)?savedNotes[outlineKey].text:originalOutline;
+      const outlineId='ascp-note-'+studyNoteDomId(outlineKey);
+      const outlineColumn=isAdmin
+        ?`<textarea class="ascp-outline-editor" id="${outlineId}">${esc(outlineText)}</textarea><div class="ascp-outline-actions"><span class="ascp-summary-status" id="${outlineId}-status"></span><button class="btn btn-primary btn-xs" type="button" onclick="saveASCPStudyNote('${jsAttr(subjectKey)}','${jsAttr(outlineKey)}')">Save</button></div>`
+        :`<div class="ascp-outline-readonly">${outlineText?escNL(outlineText):''}</div>`;
+      const summaryBlocks=ascpSummaryGroups(topic).map(group=>{
+        const key=ascpStudyNoteKey(subjectKey,section.number,topic.letter,group.number);
+        const saved=savedNotes[key]?.text||'';
+        const id='ascp-note-'+studyNoteDomId(key);
+        const label=group.number?`<span class="ascp-summary-number">${esc(group.number)}.</span><span>${esc(group.title)}</span>`:`<span class="ascp-summary-number">${esc(topic.letter)}.</span><span>${esc(topic.title)}</span>`;
+        return `<div class="ascp-summary-block">
+          <div class="ascp-summary-label">${label}</div>
+          ${isAdmin
+            ?`<textarea class="ascp-summary-editor" id="${id}">${esc(saved)}</textarea><div class="ascp-summary-actions"><span class="ascp-summary-status" id="${id}-status"></span><button class="btn btn-primary btn-xs" type="button" onclick="saveASCPStudyNote('${jsAttr(subjectKey)}','${jsAttr(key)}')">Save</button></div>`
+            :`<div class="ascp-summary-readonly">${saved?escNL(saved):''}</div>`}
+        </div>`;
+      }).join('');
+      return `<article class="ascp-topic-card">
+        <div class="ascp-topic-head">
+          <span class="ascp-topic-letter">${esc(topic.letter)}.</span>
+          <span class="ascp-topic-title">${esc(topic.title)}</span>
+        </div>
+        <div class="ascp-topic-body">
+          <div class="ascp-outline-column">${outlineColumn}</div>
+          <div class="ascp-summary-column">${summaryBlocks}</div>
+        </div>
+      </article>`;
+    }).join('');
+    return `<section class="ascp-section-card">
+      <div class="ascp-section-head">
+        <span class="ascp-section-number">${esc(section.number)}</span>
+        <span class="ascp-section-title">${esc(section.title)}</span>
+      </div>
+      <div class="ascp-topic-list">${topics}</div>
+    </section>`;
+  }).join('');
+  body.innerHTML=`
+    <div class="study-outline-modal-body">
+      <header class="study-window-head">
+        <span class="study-window-number">ASCP</span>
+        <div style="min-width:0;flex:1">
+          <div class="study-window-title">${esc(outline.title)} Content Outline</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow()" aria-label="Close ASCP outline">✕</button>
+      </header>
+      <div class="study-window-content">
+        <div class="ascp-outline-grid">${sections}</div>
+      </div>
+    </div>`;
+}
+async function openCustomStudyTopic(subjectKey,id){
+  const outline=STUDY_OUTLINES[subjectKey];
+  const customTopics=await loadCustomStudyTopics(subjectKey);
+  const chapter=customTopics.find(item=>String(item.id)===String(id));
+  if(!outline||!chapter)return;
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!dialog||!body)return;
+  dialog.classList.add('study-outline-modal','study-chapter-modal');
+  dialog.style.setProperty('--study-accent',outline.accent);
+  const summary=String(chapter.scenario||'').trim();
+  const citation=String(chapter.case_data||'').trim();
+  const video=studyVideoEmbedHtml(chapter.answer);
+  body.innerHTML=`
+    <div class="study-outline-modal-body">
+      <header class="study-window-head">
+        <div style="min-width:0;flex:1">
+          <div class="study-window-title">${esc(chapter.title)}</div>
+        </div>
+        ${isAdmin?`<button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow();openStudyTopicEditor('${jsAttr(subjectKey)}','${jsAttr(id)}')">Edit</button>`:''}
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow()" aria-label="Close study window">✕</button>
+      </header>
+      <div class="study-window-content">
+        ${summary||citation?`<section class="study-window-panel">
+          <h3>Quick summary</h3>
+          ${summary?`<p>${escNL(summary)}</p>`:''}
+          ${citation?`<p class="study-summary-citation">(${esc(citation)})</p>`:''}
+        </section>`:''}
+        ${video?`<section class="study-window-panel">
+          <h3>Video</h3>
+          ${video}
+        </section>`:''}
+      </div>
+    </div>`;
+  modal.onclick=e=>{if(e.target===modal)closeStudyOutlineWindow();};
+  modal.classList.remove('hidden');
+}
+
+function closeStudyOutlineWindow(){
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');dialog.style.removeProperty('--study-accent');}
+  if(modal){modal.classList.add('hidden');modal.onclick=null;}
+}
+
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&document.querySelector('#condition-modal .study-outline-modal'))closeStudyOutlineWindow();
+});
+
+// ─── QUIZ TAB ─────────────────────────────────────────────────────────────────
+async function renderQuizTab(el){
+  if(appState.quizDone){renderQuizResults(el,false);return;}
+  if(!appState.quizStarted){
+    const questions=await loadCurrentQuizQuestions();
+    const count=questions.length;
+    el.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start">
+        <div class="card">
+          <div class="section-title" style="font-size:15px">Subject Quiz</div>
+          <p class="text-muted mt-8" style="font-size:13px">${count||0} questions available. Practice only — results not saved.</p>
+          <div class="quiz-source-note">Refer to Medical Laboratory Science Review, Fifth Edition (Robert R. Harr) or the source listed on the Resources page for the book discussion.</div>
+          <div class="divider"></div>
+          <div class="form-group">
+            <label>Number of questions</label>
+            <input type="number" id="q-count" value="${Math.min(10,Math.max(count,1))}" min="1" max="${count||50}">
+          </div>
+          <button class="btn btn-primary" onclick="startSubjectQuiz()" ${count?'':'disabled'}>Start Quiz</button>
+        </div>
+        ${isAdmin?adminQuizControls():''}
+      </div>
+      ${isAdmin?renderQuizQuestionBank(questions):renderHiddenQuestionBankNote()}
+    `;
+    return;
+  }
+  if(!appState.quizQ.length){el.innerHTML='<div class="empty">No questions found for this subject.</div>';return;}
+  const q=appState.quizQ[appState.quizIdx];
+  const answered=appState.quizAns[appState.quizIdx];
+  const pct=Math.round((appState.quizIdx+1)/appState.quizQ.length*100);
+  const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
+  const textColors=['#fff','#fff','#fff','#1a2a1a'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+  const opts=['a','b','c','d'];
+  el.innerHTML=`
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('quiz')">✕ Exit</button>
+        <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${answered?'disabled title="Answered questions stay in your results."':'title="Swap this for another question from this subject."'}>Already Mastered, Replace Question</button>
+        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="quiz-mini-note">seen ${quizSeenCount(q)}x</span>
+        <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
+      </div>
+      <div class="bbq-body">
+        ${quizSourceLabel(q)?`<div class="quiz-source-label">${esc(quizSourceLabel(q))}</div>`:''}
+        <div class="bbq-question">${escNL(cleanQuestionText(q))}</div>
+        ${renderQuestionMedia(q)}
+        <div class="bbq-options">
+          ${opts.map((opt,oi)=>`
+            <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
+              " style="background:${colors[oi]};color:${textColors[oi]}" onclick="answerQ('${opt}')" ${answered?'disabled':''}>
+              <span class="bbq-opt-letter">${emojis[oi]}</span>
+              <span>${q['option_'+opt]}</span>
+            </button>`).join('')}
+        </div>
+        ${answered?`
+          <div style="text-align:left;margin-bottom:18px">
+            <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:10px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
+            ${answered!==q.correct_answer&&quizBookExplanation(q)?`<div class="explanation" style="text-align:left;max-width:none;margin:14px 0 0;white-space:pre-wrap">${escNL(quizBookExplanation(q))}</div>`:''}
+          </div>
+          <div style="text-align:left;display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap">
+            ${appState.quizIdx>0?`<button class="btn btn-ghost" onclick="qPrev()">← Prev</button>`:''}
+            ${appState.quizIdx<appState.quizQ.length-1
+              ?`<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="qNext()">Next →</button>`
+              :`<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="appState.quizDone=true;renderTab()">See Results</button>`}
+          </div>`:''}
+      </div>
+    </div>
+  `;
+}
+
+function quizSubjectKeys(){
+  return appState.subject==='para_myco'?['parasitology','mycology']:[appState.subject];
+}
+
+function subjectLabel(key){
+  const subject=SUBJECTS.find(s=>s.key===key);
+  if(subject)return subject.name;
+  if(key==='parasitology')return 'Parasitology';
+  if(key==='mycology')return 'Mycology';
+  return String(key||'').replace(/_/g,' ').replace(/\b\w/g,m=>m.toUpperCase());
+}
+
+function normalizeQuizSubjectKey(raw){
+  const key=String(raw||'').toLowerCase().trim().replace(/[\s-]+/g,'_');
+  const aliases={
+    para:'parasitology',
+    parasites:'parasitology',
+    parasite:'parasitology',
+    parasitology:'parasitology',
+    myco:'mycology',
+    fungi:'mycology',
+    fungus:'mycology',
+    mycology:'mycology'
+  };
+  const normalized=aliases[key]||key;
+  return quizSubjectKeys().includes(normalized)?normalized:null;
+}
+
+function numericQuestionMeta(q,fields,patterns){
+  for(const field of fields){
+    const value=Number(q?.[field]);
+    if(Number.isFinite(value)&&value>0)return value;
+  }
+  const text=String(q?.explanation||q?.source_note||q?.notes||'');
+  for(const pattern of patterns){
+    const match=text.match(pattern);
+    if(match){
+      const value=Number(match[1]);
+      if(Number.isFinite(value)&&value>0)return value;
+    }
+  }
+  return null;
+}
+function quizContinuousNumber(q){
+  return numericQuestionMeta(q,['continuous_question','continuous_q','continuous_number','question_number_global','global_question_number'],[/continuous question\s*(\d+)/i,/continuous q(?:uestion)?\s*#?\s*(\d+)/i]);
+}
+function quizBookQuestionNumber(q){
+  return numericQuestionMeta(q,['book_question','book_question_number','source_question','source_question_number'],[/book question\s*(\d+)/i,/source question\s*(\d+)/i]);
+}
+function quizSourceSection(q){
+  for(const field of ['book_section','source_section','section_number','book_section_number']){
+    const value=String(q?.[field]||'').trim();
+    if(/^\d+(?:\.\d+)?$/.test(value))return value;
+  }
+  const text=String(q?.explanation||q?.source_note||q?.notes||'');
+  const match=text.match(/section\s+(\d+(?:\.\d+)?)/i);
+  return match?match[1]:'';
+}
+function quizSourceLabel(q){
+  const section=quizSourceSection(q);
+  const bookQuestion=quizBookQuestionNumber(q);
+  if(section&&bookQuestion)return `Section ${section} · Book Q${bookQuestion}`;
+  if(section)return `Section ${section}`;
+  return bookQuestion?`Book Q${bookQuestion}`:'';
+}
+function quizExplanationParts(q){
+  const raw=String(q?.explanation||'').trim();
+  if(!raw)return {raw:'',text:'',sourceSuffix:''};
+  const marker='\n\nSource:';
+  const markerIndex=raw.indexOf(marker);
+  const text=(markerIndex>=0?raw.slice(0,markerIndex):raw).trim();
+  const sourceSuffix=markerIndex>=0?raw.slice(markerIndex):'';
+  return {
+    raw,
+    text:/^Refer to\s+.+?\s+for explanation\./i.test(text)?'':text,
+    sourceSuffix
+  };
+}
+function quizBookExplanation(q){
+  return quizExplanationParts(q).text;
+}
+function quizSectionSortValue(q){
+  const explicit=Number(q?.section_sort||q?.section_number||q?.book_section_sort);
+  if(Number.isFinite(explicit))return explicit;
+  const text=String(q?.explanation||q?.source_note||q?.notes||'');
+  const match=text.match(/section\s+(\d+(?:\.\d+)?)/i);
+  return match?Number(match[1]):9999;
+}
+function quizBookOrderNumber(q,i){
+  return quizContinuousNumber(q)||quizBookQuestionNumber(q)||i+1;
+}
+function sortQuestionsForAdmin(questions){
+  return [...questions].sort((a,b)=>{
+    const ca=quizContinuousNumber(a),cb=quizContinuousNumber(b);
+    if(ca!=null||cb!=null)return (ca??999999)-(cb??999999);
+    const sa=quizSectionSortValue(a),sbv=quizSectionSortValue(b);
+    if(sa!==sbv)return sa-sbv;
+    const ba=quizBookQuestionNumber(a),bb=quizBookQuestionNumber(b);
+    if(ba!=null||bb!=null)return (ba??999999)-(bb??999999);
+    return String(a.created_at||'').localeCompare(String(b.created_at||''));
+  });
+}
+async function loadCurrentQuizQuestions(){
+  const keys=quizSubjectKeys();
+  const results=await Promise.all(keys.map(key=>
+    sb.from('mlsboc_questions').select('*').eq('subject',key)
+  ));
+  return sortQuestionsForAdmin(results.flatMap((res,idx)=>(res.data||[]).map(q=>({...q,_subject:q.subject||keys[idx]}))));
+}
+
+function renderQuizQuestionBank(questions){
+  return `
+    <div class="card mt-16">
+      <div class="flex-center gap-8 mb-12 flex-wrap">
+        <div>
+          <div class="section-title" style="font-size:15px">Question Bank</div>
+          <p class="text-muted mt-4" style="font-size:12px">Admin/QC view stays in book order. Explanations are shown in red. Quizzes and exams still shuffle separately.</p>
+        </div>
+        <span class="tag tag-info ml-auto">${questions.length} total</span>
+      </div>
+      ${questions.length?`
+        <div style="display:grid;gap:10px;max-height:560px;overflow:auto;padding-right:4px">
+          ${questions.map((q,i)=>renderQuizQuestionRow(q,i)).join('')}
+        </div>
+      `:'<div class="empty" style="margin:0">No questions yet. Add one above or import a CSV.</div>'}
+    </div>
+  `;
+}
+
+function renderHiddenQuestionBankNote(){
+  return `
+    <div class="card-sm mt-16" style="font-size:13px;color:var(--text2);line-height:1.6">
+      Practice here, and for the full Q/A resource go to the resource book :D
+    </div>
+  `;
+}
+
+function renderQuizQuestionRow(q,i){
+  const correct=q.correct_answer||'a';
+  const correctText=q['option_'+correct]||'';
+  const sourceLabel=quizSourceLabel(q);
+  const explanation=quizBookExplanation(q);
+  const hasExplanation=!!explanation;
+  return `
+    <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
+      <div class="flex-center gap-8 mb-8 flex-wrap">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">#${quizBookOrderNumber(q,i)}</span>
+        ${sourceLabel?`<span class="tag tag-info">${esc(sourceLabel)}</span>`:''}
+        ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
+        <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
+        <span class="tag ${hasExplanation?'tag-success':'tag-warn'}">${hasExplanation?'Explanation added':'Explanation missing'}</span>
+        ${isAdmin?`<div class="flex gap-6 ml-auto">
+          <button class="btn btn-ghost btn-xs" onclick="openQuizQuestionEditor('${q.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteQuizQuestion('${q.id}')">Delete</button>
+        </div>`:''}
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:8px">${renderQuestionWithMedia(q)}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;font-size:12px;color:var(--text2)">
+        ${['a','b','c','d'].map(l=>`
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 9px">
+            <b style="color:${l===correct?'var(--success)':'var(--text)'}">${l.toUpperCase()}.</b> ${esc(q['option_'+l]||'')}
+          </div>`).join('')}
+      </div>
+      ${correctText?`<div style="font-size:11px;color:var(--success);margin-top:6px;font-family:var(--mono)">Correct: ${esc(correctText)}</div>`:''}
+      ${isAdmin?`
+        <div class="admin-quiz-explanation${hasExplanation?'':' missing'}">
+          <div class="admin-quiz-explanation-label">Explanation</div>
+          <div class="admin-quiz-explanation-text">${hasExplanation?escNL(explanation):'No explanation added yet. Use Edit to add one.'}</div>
+        </div>
+      `:''}
+    </div>
+  `;
+}
+
+async function openQuizQuestionEditor(id){
+  if(!isAdmin)return;
+  const modal=document.getElementById('question-edit-modal');
+  const body=document.getElementById('question-edit-modal-body');
+  if(!modal||!body)return;
+  modal.classList.remove('hidden');
+  body.innerHTML='<div class="empty" style="padding:24px">Loading question...</div>';
+  const {data:q,error}=await sb.from('mlsboc_questions').select('*').eq('id',id).single();
+  if(error||!q){
+    body.innerHTML=`<div class="modal-title">Question Editor</div><div class="text-danger mb-16">Could not load this question.</div><button class="btn btn-ghost" onclick="closeQuizQuestionEditor()">Close</button>`;
+    return;
+  }
+  const explanationParts=quizExplanationParts(q);
+  window._quizQuestionEdit={
+    id:q.id,
+    media:questionMediaUrls(q),
+    originalExplanation:explanationParts.text,
+    originalExplanationRaw:explanationParts.raw,
+    explanationSourceSuffix:explanationParts.sourceSuffix
+  };
+  const sourceLabel=quizSourceLabel(q)||'Book source retained';
+  body.innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div>
+        <div class="modal-title" style="margin-bottom:5px">Edit Question, Answer & Explanation</div>
+        <div style="font-size:12px;color:var(--text2)">${esc(subjectLabel(q.subject))} · ${esc(sourceLabel)}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="closeQuizQuestionEditor()">✕</button>
+    </div>
+    <div class="card-sm mb-16" style="font-size:12px;color:var(--text2);line-height:1.55">
+      Book section, book question number, subject, and source information remain unchanged.
+    </div>
+    <div class="form-group"><label>Question</label><textarea id="edit-quiz-question" rows="6">${esc(cleanQuestionText(q))}</textarea></div>
+    <div class="form-group">
+      <label>Images or structures</label>
+      <div id="edit-quiz-media"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+      ${['a','b','c','d'].map(letter=>`<div class="form-group"><label>Option ${letter.toUpperCase()}</label><textarea id="edit-quiz-${letter}" rows="2">${esc(q['option_'+letter]||'')}</textarea></div>`).join('')}
+    </div>
+    <div class="form-group"><label>Correct Answer</label>
+      <select id="edit-quiz-correct">
+        ${['a','b','c','d'].map(letter=>`<option value="${letter}" ${q.correct_answer===letter?'selected':''}>${letter.toUpperCase()}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Explanation</label>
+      <textarea id="edit-quiz-explanation" rows="8" placeholder="Add the book explanation for this answer.">${esc(explanationParts.text)}</textarea>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px">The saved book source stays attached automatically.</div>
+    </div>
+    <div id="edit-quiz-error" class="text-danger text-sm mb-8"></div>
+    <div class="flex gap-8 flex-wrap">
+      <button class="btn btn-ghost" onclick="closeQuizQuestionEditor()">Cancel</button>
+      <button class="btn btn-primary ml-auto" id="edit-quiz-save" onclick="saveQuizQuestionEdit()">Save Changes</button>
+    </div>`;
+  refreshQuizQuestionMediaEditor();
+}
+
+function closeQuizQuestionEditor(){
+  document.getElementById('question-edit-modal')?.classList.add('hidden');
+  window._quizQuestionEdit=null;
+}
+
+function refreshQuizQuestionMediaEditor(){
+  const el=document.getElementById('edit-quiz-media');
+  if(!el)return;
+  const media=(window._quizQuestionEdit?.media||[]).filter(Boolean);
+  el.innerHTML=`
+    ${media.length?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px">
+      ${media.map((url,i)=>`<div style="position:relative;border:1px solid var(--border);border-radius:var(--r);padding:6px;background:var(--bg3);min-height:110px;display:flex;align-items:center;justify-content:center">
+        <img src="${esc(url)}" alt="Question visual ${i+1}" style="width:100%;height:120px;object-fit:contain;background:#fff;border-radius:4px">
+        <button class="btn btn-danger btn-xs" type="button" onclick="removeQuizQuestionMedia(${i})" style="position:absolute;top:5px;right:5px">Remove</button>
+      </div>`).join('')}
+    </div>`:'<div style="font-size:12px;color:var(--text3);margin-bottom:10px">No image or structure attached.</div>'}
+    <div class="drop-zone" style="padding:16px;min-height:72px" onclick="document.getElementById('edit-quiz-media-file').click()" ondrop="handleQuizQuestionMediaDrop(event)" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+      <div style="font-size:20px;margin-bottom:3px">📷</div>
+      <div>${media.length?'Add or replace with another image/structure':'Drop an image/structure here or click to upload'}</div>
+      <input type="file" id="edit-quiz-media-file" accept="image/*" multiple style="display:none" onchange="handleQuizQuestionMediaFile(event)">
+    </div>`;
+}
+
+function removeQuizQuestionMedia(index){
+  if(!window._quizQuestionEdit)return;
+  window._quizQuestionEdit.media=(window._quizQuestionEdit.media||[]).filter((_,i)=>i!==index);
+  refreshQuizQuestionMediaEditor();
+}
+
+async function addQuizQuestionMediaFiles(files){
+  if(!window._quizQuestionEdit)return;
+  const selected=Array.from(files||[]).filter(file=>file.type&&file.type.startsWith('image/'));
+  if(!selected.length)return;
+  const media=(window._quizQuestionEdit.media||[]).filter(Boolean);
+  for(const file of selected.slice(0,4-media.length)){
+    try{media.push(await compressQuestionImageFile(file));}
+    catch(err){alert('Image upload failed: '+err.message);}
+  }
+  window._quizQuestionEdit.media=media.slice(0,4);
+  refreshQuizQuestionMediaEditor();
+}
+
+function compressQuestionImageFile(file,max=1800){
+  return new Promise((resolve,reject)=>{
+    if(!file||!file.type.startsWith('image/')){reject(new Error('Choose an image file.'));return;}
+    const reader=new FileReader();
+    reader.onload=event=>{
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+          if(w>max||h>max){const scale=Math.min(max/w,max/h);w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));}
+          const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+          ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,0,0,w,h);
+          const format=file.type==='image/png'?'image/png':'image/jpeg';
+          resolve(canvas.toDataURL(format,0.9));
+        }catch(err){reject(err);}
+      };
+      img.onerror=()=>reject(new Error('Could not read image.'));
+      img.src=event.target.result;
+    };
+    reader.onerror=()=>reject(new Error('Could not read image.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleQuizQuestionMediaFile(event){
+  addQuizQuestionMediaFiles(event.target.files);
+  event.target.value='';
+}
+
+function handleQuizQuestionMediaDrop(event){
+  event.preventDefault();event.currentTarget.classList.remove('dragover');
+  addQuizQuestionMediaFiles(event.dataTransfer.files);
+}
+
+async function saveQuizQuestionEdit(){
+  if(!isAdmin||!window._quizQuestionEdit)return;
+  const question=document.getElementById('edit-quiz-question')?.value.trim();
+  const options={};
+  ['a','b','c','d'].forEach(letter=>{options[letter]=document.getElementById('edit-quiz-'+letter)?.value.trim()||'';});
+  const correct=document.getElementById('edit-quiz-correct')?.value;
+  const explanation=document.getElementById('edit-quiz-explanation')?.value.trim()||'';
+  const errorEl=document.getElementById('edit-quiz-error');
+  if(!question||Object.values(options).some(value=>!value)||!['a','b','c','d'].includes(correct)){
+    if(errorEl)errorEl.textContent='Question, all four answer choices, and the correct answer are required.';
+    return;
+  }
+  const media=(window._quizQuestionEdit.media||[]).filter(Boolean);
+  const fullQuestion=`${media.map(url=>`[[media:${url}]]`).join('\n')}${media.length?'\n':''}${question}`;
+  const editState=window._quizQuestionEdit;
+  const explanationRaw=explanation===editState.originalExplanation
+    ? editState.originalExplanationRaw
+    : explanation
+      ? explanation+(editState.explanationSourceSuffix||'')
+      : editState.explanationSourceSuffix
+        ? 'Refer to the assigned book for explanation.'+editState.explanationSourceSuffix
+        : '';
+  const payload={
+    question:fullQuestion,
+    option_a:options.a,
+    option_b:options.b,
+    option_c:options.c,
+    option_d:options.d,
+    correct_answer:correct,
+    explanation:explanationRaw
+  };
+  const saveBtn=document.getElementById('edit-quiz-save');
+  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving...';}
+  const {error}=await sb.from('mlsboc_questions').update(payload).eq('id',window._quizQuestionEdit.id);
+  if(error){
+    if(errorEl)errorEl.textContent='Save failed: '+error.message;
+    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save Changes';}
+    return;
+  }
+  closeQuizQuestionEditor();
+  renderTab();
+}
+
+async function deleteQuizQuestion(id){
+  if(!confirm('Delete this question?'))return;
+  const {error}=await sb.from('mlsboc_questions').delete().eq('id',id);
+  if(error)alert('Delete failed: '+error.message);
+  renderTab();
+}
+
+async function startSubjectQuiz(){
+  const cnt=parseInt(document.getElementById('q-count').value)||10;
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_questions').select('*').eq('subject','parasitology'),
+      sb.from('mlsboc_questions').select('*').eq('subject','mycology')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_questions').select('*').eq('subject',appState.subject);
+    data=res.data||[];
+  }
+  if(!data||!data.length){alert('No questions found.');return;}
+  window._kqOpts={};
+  appState.quizPool=data;
+  appState.quizQ=pickQuizQuestions(data,cnt);
+  appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;
+  renderTab();
+}
+
+const QUIZ_SEEN_KEY='mlsboc_quiz_seen_counts';
+function quizQuestionKey(q){return q?.id||`${q?.subject||appState.subject||'subject'}:${cleanQuestionText(q||'').slice(0,120)}`;}
+function quizSeenCounts(){
+  try{return JSON.parse(localStorage.getItem(QUIZ_SEEN_KEY)||'{}')||{};}catch{return {};}
+}
+function saveQuizSeenCounts(counts){
+  try{localStorage.setItem(QUIZ_SEEN_KEY,JSON.stringify(counts||{}));}catch(e){}
+}
+function quizSeenCount(q){
+  const key=quizQuestionKey(q);
+  return Number(quizSeenCounts()[key]||0);
+}
+function noteQuizSeen(q){
+  const key=quizQuestionKey(q);
+  if(!key)return;
+  const counts=quizSeenCounts();
+  counts[key]=Number(counts[key]||0)+1;
+  saveQuizSeenCounts(counts);
+}
+function pickQuizQuestions(data,cnt){
+  return shuffle(data||[])
+    .sort((a,b)=>quizSeenCount(a)-quizSeenCount(b))
+    .slice(0,cnt);
+}
+function answerQ(opt){
+  if(!appState.quizAns[appState.quizIdx])noteQuizSeen(appState.quizQ[appState.quizIdx]);
+  appState.quizAns[appState.quizIdx]=opt;renderTab();
+}
+function replaceCurrentQuizQuestion(){
+  if(!appState.quizStarted||appState.quizDone||!appState.quizQ.length)return;
+  if(appState.quizAns[appState.quizIdx]){alert('This question is already answered. Replace before answering so your score stays clean.');return;}
+  const idx=appState.quizIdx;
+  const currentKey=quizQuestionKey(appState.quizQ[idx]);
+  const used=new Set(appState.quizQ.map((q,i)=>i===idx?null:quizQuestionKey(q)).filter(Boolean));
+  const candidates=(appState.quizPool||[]).filter(q=>{
+    const key=quizQuestionKey(q);
+    return key&&key!==currentKey&&!used.has(key);
+  });
+  if(!candidates.length){alert('No unused replacement questions are available for this quiz.');return;}
+  appState.quizQ[idx]=pickQuizQuestions(candidates,1)[0];
+  appState.quizAns[idx]=null;
+  renderTab();
+}
+function qNext(){appState.quizIdx++;renderTab();}
+function qPrev(){appState.quizIdx--;renderTab();}
+
+function subjectDisplayName(key){
+  if(key==='microbiology')return 'Microbiology';
+  if(key==='parasitology')return 'Parasitology';
+  if(key==='mycology')return 'Mycology';
+  const subj=SUBJECTS.find(s=>s.key===key);
+  return subj?subj.name:String(key||'Unknown').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+function renderPracticeExamSubjectReport(subjStats,totalQs){
+  const order=['blood_bank','clinical_chemistry','hematology','microbiology','parasitology','mycology','urinalysis','immunology','lab_operations'];
+  const rows=Object.entries(subjStats)
+    .map(([s,st])=>({s,...st,pct:st.total?Math.round(st.correct/st.total*100):0}))
+    .sort((a,b)=>{
+      const ai=order.indexOf(a.s),bi=order.indexOf(b.s);
+      return (ai===-1?99:ai)-(bi===-1?99:bi);
+    });
+  if(!rows.length)return '';
+  return `
+    <div class="card-sm mb-16">
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px">Practice Exam Simulator - Subject Breakdown</div>
+      <div class="practice-subject-report">
+        ${rows.map(x=>`
+          <div class="practice-subject-row">
+            <div class="practice-subject-name">${subjectDisplayName(x.s)}</div>
+            <div class="practice-subject-meta">
+              <span>${x.correct}/${x.total} correct</span>
+              <strong>${x.pct}%</strong>
+            </div>
+            <div class="practice-subject-bar"><div class="practice-subject-fill" style="width:${x.pct}%;background:${x.pct>=75?'var(--success)':x.pct>=60?'#d4a214':'var(--danger)'}"></div></div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--text3)">Subject counts reflect the questions available in this attempt (${totalQs} total).</div>
+    </div>`;
+}
+function renderQuizResults(el,isAll){
+  const qs=isAll?appState.allQ:appState.quizQ;
+  const ans=isAll?appState.allAns:appState.quizAns;
+  let correct=0,missed=[];
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;else missed.push({q,given:ans[i]});});
+  const pct=Math.round(correct/qs.length*100);
+  const timeStr=isAll?fmtTime(appState.allSeconds):'';
+  // Per-subject breakdown
+  const subjStats={};
+  qs.forEach((q,i)=>{
+    const s=q.subject||'unknown';
+    if(!subjStats[s])subjStats[s]={correct:0,total:0};
+    subjStats[s].total++;
+    if(ans[i]===q.correct_answer)subjStats[s].correct++;
+  });
+  // Merge parasitology & mycology into microbiology for suggestion display
+  const MICRO_GROUP=['microbiology','parasitology','mycology'];
+  const microCombined={correct:0,total:0,subs:[]};
+  MICRO_GROUP.forEach(k=>{if(subjStats[k]){microCombined.correct+=subjStats[k].correct;microCombined.total+=subjStats[k].total;if(k!=='microbiology'&&subjStats[k].total>0)microCombined.subs.push({k,pct:Math.round(subjStats[k].correct/subjStats[k].total*100)});}});
+  const mergedStats={};
+  Object.entries(subjStats).forEach(([s,st])=>{if(!MICRO_GROUP.includes(s))mergedStats[s]=st;});
+  if(microCombined.total>0)mergedStats['microbiology']=microCombined;
+
+  const weakSubjects=Object.entries(mergedStats)
+    .map(([s,st])=>{
+      const pct=Math.round(st.correct/st.total*100);
+      // build sub-note for micro if para/myco dragging it down
+      let subNote='';
+      if(s==='microbiology'&&st.subs&&st.subs.length){
+        const weakSubs=st.subs.filter(x=>x.pct<75);
+        if(weakSubs.length)subNote=' (particularly: '+weakSubs.map(x=>x.k+' '+x.pct+'%').join(', ')+')';
+      }
+      return {s,pct,total:st.total,correct:st.correct,subNote};
+    })
+    .filter(x=>x.pct<75&&x.total>=2)
+    .sort((a,b)=>a.pct-b.pct);
+  el.innerHTML=`
+    <div class="result-grid" style="grid-template-columns:repeat(${isAll?4:3},1fr)">
+      <div class="stat-card"><div class="stat-num" style="color:${pct>=60?'var(--success)':'var(--danger)'}">${pct}%</div><div class="stat-label">Score</div></div>
+      <div class="stat-card"><div class="stat-num text-success">${correct}</div><div class="stat-label">Correct</div></div>
+      <div class="stat-card"><div class="stat-num text-danger">${qs.length-correct}</div><div class="stat-label">Missed</div></div>
+      ${isAll?`<div class="stat-card"><div class="stat-num" style="color:var(--accent);font-size:16px">${timeStr}</div><div class="stat-label">Time</div></div>`:''}
+    </div>
+    <div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">Results are not saved. Export a PDF now if you want to keep this attempt. Available book explanations appear only with missed questions.</div>
+    ${isAll?renderPracticeExamSubjectReport(subjStats,qs.length):''}
+    ${isAll&&weakSubjects.length?`
+      <div class="card-sm mb-16" style="border-left:3px solid var(--danger)">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📌 Suggested Focus Areas</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Sections below 75% — prioritize these before your next attempt.</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${weakSubjects.map(x=>`
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:var(--text)">${x.s==='microbiology'?'Microbiology (incl. Parasitology & Mycology)':x.s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</div>
+                <div style="font-size:11px;color:var(--text3)">${x.correct}/${x.total} correct${x.subNote||''}</div>
+              </div>
+              <div style="width:120px;background:var(--bg3);border-radius:99px;height:7px;overflow:hidden">
+                <div style="width:${x.pct}%;height:100%;border-radius:99px;background:${x.pct<50?'var(--danger)':x.pct<65?'#f5a623':'#d4b800'};transition:width .4s"></div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:${x.pct<50?'var(--danger)':x.pct<65?'#f5a623':'#c8a800'};min-width:34px;text-align:right">${x.pct}%</div>
+            </div>`).join('')}
+        </div>
+      </div>`:''}
+    <div class="flex gap-8 mb-16 flex-wrap">
+      ${isAll?`<button class="btn btn-primary" onclick="startAllExam()">Retake Simulator</button>`:`<button class="btn btn-primary" onclick="switchTab('quiz')">New Quiz</button>`}
+      <button class="btn btn-warn" onclick="exportResultsPDF(${isAll?'true':'false'})">📄 Export Results PDF</button>
+      ${isAll?`<button class="btn btn-ghost btn-sm" onclick="exportFromResults()">📊 Export CSV</button>`:''}
+    </div>
+    ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
+    ${missed.map(({q,given})=>`
+      <div class="missed-item">
+        ${quizSourceLabel(q)?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text3);margin-bottom:5px">${esc(quizSourceLabel(q))}</div>`:''}
+        <div class="missed-q">${renderQuestionWithMedia(q)}</div>
+        ${q.table_data&&tblHasContent(q.table_data)?`<div style="margin:6px 0">${renderDataTable(q.table_data,{small:true})}</div>`:''}
+        <div class="missed-wrong">Your answer: ${given?esc(q['option_'+given]):'(unanswered)'}</div>
+        <div class="missed-a">Correct: ${esc(q['option_'+q.correct_answer])}</div>
+        ${quizBookExplanation(q)?`<div class="explanation" style="white-space:pre-wrap">${escNL(quizBookExplanation(q))}</div>`:''}
+      </div>`).join('')}
+  `;
+}
+
+function exportResultsPDF(isAll=false){
+  const qs=isAll?appState.allQ:appState.quizQ;
+  const ans=isAll?appState.allAns:appState.quizAns;
+  if(!qs||!qs.length){alert('No quiz results to export yet.');return;}
+  let correct=0;
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;});
+  const pct=Math.round(correct/qs.length*100);
+  const timeStr=isAll?fmtTime(appState.allSeconds):'';
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+    let y=margin;
+    const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+    const writeText=(text,opts={})=>{
+      const {size=10,bold=false,color=[30,30,30],indent=0}=opts;
+      doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
+      doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.5;});
+    };
+    doc.setFillColor(30,30,30);doc.rect(margin,y,cW,14,'F');
+    doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text(isAll?'Practice Exam Simulator Results':'MLS BOC Prep - Subject Quiz Results',margin+4,y+9);y+=18;
+    doc.setFillColor(245,245,245);doc.rect(margin,y,cW,20,'F');doc.setDrawColor(200,200,200);doc.rect(margin,y,cW,20,'S');
+    doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+    doc.text(`Score: ${correct}/${qs.length} (${pct}%)`,margin+4,y+7);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
+    doc.text(`Missed: ${qs.length-correct}   |   Date: ${new Date().toLocaleDateString()}`,margin+4,y+13);
+    if(isAll)doc.text(`Time: ${timeStr}`,margin+cW-4,y+13,{align:'right'});
+    y+=25;
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
+    doc.text('Refer to the assigned book/source for the book discussion.',margin,y);y+=8;
+    if(isAll){
+      const subjStats={};
+      qs.forEach((q,i)=>{
+        const s=q.subject||'unknown';
+        if(!subjStats[s])subjStats[s]={correct:0,total:0};
+        subjStats[s].total++;
+        if(ans[i]===q.correct_answer)subjStats[s].correct++;
+      });
+      const order=['blood_bank','clinical_chemistry','hematology','microbiology','parasitology','mycology','urinalysis','immunology','lab_operations'];
+      const rows=Object.entries(subjStats)
+        .map(([s,st])=>({s,...st,pct:st.total?Math.round(st.correct/st.total*100):0}))
+        .sort((a,b)=>{
+          const ai=order.indexOf(a.s),bi=order.indexOf(b.s);
+          return (ai===-1?99:ai)-(bi===-1?99:bi);
+        });
+      checkPage(24);
+      doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+      doc.text('Subject Breakdown',margin,y);y+=6;
+      rows.forEach(r=>{
+        checkPage(6);
+        doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(45,45,45);
+        doc.text(`${subjectDisplayName(r.s)}: ${r.correct}/${r.total} correct (${r.pct}%)`,margin+4,y);
+        y+=5;
+      });
+      y+=3;
+    }
+    qs.forEach((q,i)=>{
+      checkPage(30);
+      const given=ans[i];
+      const ok=given===q.correct_answer;
+      const sourceLabel=quizSourceLabel(q);
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...(ok?[20,120,60]:[180,40,40]));
+      doc.text(`${i+1}. ${ok?'Correct':'Missed'}${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,margin,y);y+=5;
+      writeText(cleanQuestionText(q),{size:9.5,bold:true,color:[20,20,20]});
+      doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(70,70,70);
+      checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
+      doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
+      checkPage(7);doc.text(`Correct: ${String(q['option_'+q.correct_answer]||'')}`,margin+4,y);y+=8;
+      if(!ok&&quizBookExplanation(q)){
+        writeText(`Explanation: ${quizBookExplanation(q)}`,{size:8.5,color:[70,70,90],indent:4});
+        y+=3;
+      }
+    });
+    const tot=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tot;p++){
+      doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+      doc.text((isAll?'Practice Exam Simulator Results':'MLS BOC Prep - Quiz Results')+' - Page '+p+' of '+tot,margin,pageH-8);
+      doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
+    }
+    const subject=(isAll?'practice_exam_simulator':(appState.subject||'quiz')).replace(/[^a-z0-9_-]+/gi,'_');
+    doc.save((isAll?'':'boc_')+subject+'_results_'+new Date().toISOString().slice(0,10)+'.pdf');
+  }catch(err){alert('PDF export failed: '+err.message);}
+}
+
+// ─── IMAGES TAB ───────────────────────────────────────────────────────────────
+function startImageFlashcard(items){
+  if(!items||!items.length){alert('No items to study.');return;}
+  appState.imgFlashItems=shuffle(items);
+  appState.imgFlashIdx=0;
+  appState.imgFlashFlipped=false;
+  appState.imgFlashMode=true;
+  renderTab();
+}
+
+function renderImageFlashcard(el){
+  const items=appState.imgFlashItems||[];
+  const idx=appState.imgFlashIdx;
+  const flipped=appState.imgFlashFlipped;
+  const pct=Math.round((idx+1)/items.length*100);
+
+  if(idx>=items.length){
+    el.innerHTML=`
+      <div class="bbq-overlay">
+        <div class="bbq-header">
+          <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">← Back</button>
+          <div class="ml-auto" style="color:var(--text);font-size:13px">Done!</div>
+        </div>
+        <div class="bbq-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center">
+          <div style="font-size:48px;margin-bottom:16px">🎉</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:24px">All cards reviewed!</div>
+          <div class="flex gap-8 flex-wrap" style="justify-content:center">
+            <button class="btn btn-primary" onclick="startImageFlashcard(appState.imgFlashItems)">Shuffle & Restart</button>
+            <button class="btn btn-ghost" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">Back</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const item=items[idx];
+  const imgs=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean);
+  const features=item.key_features||[];
+  const isUAFlash=appState.subject==='urinalysis';
+  const flashCategory=isUAFlash?uaCategoryLabel(item):'';
+  const notesText=isUAFlash?stripUACategoryNote(item.notes):String(item.notes||'');
+  const showNotes=appState.subject!=='hematology'&&notesText;
+
+  const frontContent=`
+    <div style="padding:20px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
+      ${imgs.length
+        ?`<div style="display:grid;grid-template-columns:${imgs.length===1?'1fr':'1fr 1fr'};gap:6px;width:100%;margin-bottom:12px">
+            ${imgs.slice(0,4).map(url=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" style="width:100%;height:${imgs.length<=2?'220px':'140px'};object-fit:contain;background:var(--bg3);border-radius:var(--r);cursor:zoom-in" alt="">`).join('')}
+          </div>`
+        :`<div style="font-size:64px;margin-bottom:20px">🖼️</div>`}
+      <div style="font-size:13px;color:var(--text);opacity:.5;text-transform:uppercase;letter-spacing:.8px;font-weight:600">What is this?</div>
+    </div>`;
+
+  const backContent=`
+    <div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:200px">
+      <div style="font-size:13px;color:var(--text);opacity:.5;margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Answer</div>
+      ${flashCategory?`<span class="tag tag-info" style="font-size:12px;margin-bottom:10px">${esc(flashCategory)}</span>`:''}
+      <div style="font-size:34px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:${features.length?'16px':'0'}">${item.name||'?'}</div>
+      ${features.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px">${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}</div>`:''}
+      ${showNotes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;max-width:480px;line-height:1.6">${esc(notesText)}</div>`:''}
+    </div>`;
+
+  const uaNav=appState.subject==='urinalysis';
+  const buildActionBar=(isFlipped)=>`
+    <div id="img-flash-bar" style="border-top:1px solid var(--border);padding:16px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
+      <button class="btn btn-ghost" style="color:var(--text);min-width:180px;font-size:15px;padding:11px 24px" onclick="window._imgFlashFlip()">
+        ${isFlipped?'↑ Flip back':'↓ Flip to answer'}
+      </button>
+      <div style="min-height:52px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+        ${uaNav
+          ?`<button class="btn btn-ghost" style="min-width:120px;font-size:15px;padding:12px 20px" ${idx<=0?'disabled':''} onclick="window._imgFlashGo(-1)">← Previous</button>
+            ${idx<items.length-1
+              ?`<button class="btn btn-primary" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="window._imgFlashGo(1)">Next →</button>`
+              :`<button class="btn btn-success" style="min-width:120px;font-size:15px;padding:12px 20px" onclick="window._imgFlashFinish()">Finish ✓</button>`}`
+          :(isFlipped
+          ?(idx<items.length-1
+            ?`<button class="btn btn-primary" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="window._imgFlashGo(1)">Next →</button>`
+            :`<button class="btn btn-success" style="min-width:180px;font-size:15px;padding:12px 28px" onclick="window._imgFlashFinish()">Finish ✓</button>`)
+          :'')}
+      </div>
+    </div>`;
+
+  const redrawFlashcard=()=>{
+    const target=document.getElementById('tab-content');
+    if(target)renderImageFlashcard(target);
+    else renderTab();
+  };
+  window._imgFlashGo=(delta)=>{
+    if(window._imgFlashNavBusy)return;
+    window._imgFlashNavBusy=true;
+    appState.imgFlashIdx=Math.max(0,Math.min(items.length-1,appState.imgFlashIdx+delta));
+    appState.imgFlashFlipped=false;
+    requestAnimationFrame(()=>{window._imgFlashNavBusy=false;redrawFlashcard();});
+  };
+  window._imgFlashFinish=()=>{
+    if(window._imgFlashNavBusy)return;
+    window._imgFlashNavBusy=true;
+    appState.imgFlashIdx=items.length;
+    appState.imgFlashFlipped=false;
+    requestAnimationFrame(()=>{window._imgFlashNavBusy=false;redrawFlashcard();});
+  };
+  window._imgFlashFlip=()=>{
+    appState.imgFlashFlipped=!appState.imgFlashFlipped;
+    const card=document.getElementById('img-flip-card');
+    if(card) card.classList.toggle('is-flipped', appState.imgFlashFlipped);
+    const oldBar=document.getElementById('img-flash-bar');
+    if(oldBar){const tmp=document.createElement('div');tmp.innerHTML=buildActionBar(appState.imgFlashFlipped);oldBar.replaceWith(tmp.firstElementChild);}
+  };
+
+  el.innerHTML=`
+    <div class="bbq-overlay">
+      <div class="bbq-header">
+        <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">✕ Exit</button>
+        <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span style="white-space:nowrap;font-size:13px;color:var(--text);font-family:var(--mono)">${idx+1} / ${items.length}</span>
+      </div>
+      <div class="bbq-body">
+        <div style="border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--bg2)">
+          <div class="flash-flip-scene">
+            <div id="img-flip-card" class="flash-flip-card${flipped?' is-flipped':''}">
+              <div class="flash-face flash-face-front">${frontContent}</div>
+              <div class="flash-face flash-face-back">${backContent}</div>
+            </div>
+          </div>
+          ${buildActionBar(flipped)}
+        </div>
+      </div>
+    </div>`;
+}
+
+async function renderImagesTab(el){
+  // Check for flashcard mode first (works across all subjects)
+  if(appState.imgFlashMode){renderImageFlashcard(el);return;}
+  if(appState.subject==='hematology'){
+    await renderHemeImages(el);
+  }else if(appState.subject==='microbiology'){
+    await renderMicroImages(el);
+  }else if(appState.subject==='urinalysis'){
+    await renderUAImages(el);
+  }else{
+    await renderGenericImages(el);
+  }
+}
+
+// Generic images (non-hematology/micro/ua) — mycology, parasitology, etc.
+async function renderGenericImages(el){
+  el.innerHTML=imageLoadingHTML();
+  let data;
+  try{
+    if(appState.subject==='para_myco'){
+      const [r1,r2]=await Promise.all([
+        fetchRowsWithRetry(()=>sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),3,true),
+        fetchRowsWithRetry(()=>sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at'),3,true)
+      ]);
+      data=[...r1,...r2];
+    }else{
+      data=await fetchRowsWithRetry(()=>sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at'),3,true);
+    }
+  }catch(e){
+    el.innerHTML=imageLoadRetryHTML('This subject','renderTab()');
+    return;
+  }
+  const valid=(data||[]).filter(img=>img.image_url);
+
+  el.innerHTML=`
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      ${valid.length?`<button class="btn btn-primary btn-sm" onclick="startGenericImgQuiz()">⚡ Image Quiz Mode</button>`:''}
+      ${valid.length?`<button class="btn btn-ghost btn-sm" onclick="startGenericFlashcard()">🃏 Flashcards</button>`:''}
+      ${isAdmin?`<div class="ml-auto">${adminImageControls()}</div>`:''}
+    </div>
+    ${!data||!data.length?'<div class="empty">No images yet for this subject.</div>':''}
+    <div class="condition-grid">
+      ${(data||[]).map(img=>`
+        <div class="condition-card">
+          <div class="condition-imgs">
+            ${img.image_url
+              ?`<img src="${esc(img.image_url)}" alt="${esc(img.title)}" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="retryImageLoad(this)">`
+              :`<div class="img-ph">🖼️</div>`}
+          </div>
+          <div class="condition-body">
+            <div class="condition-name">${img.title}</div>
+            ${img.description?`<div class="condition-features">${img.description.substring(0,80)}</div>`:''}
+            ${img.is_draft?`<span class="draft-badge">Draft</span>`:''}
+            ${isAdmin?`<div class="flex gap-8 mt-8">
+              ${img.is_draft?`<button class="btn btn-success btn-xs" onclick="publishImage('${img.id}')">Publish</button>`:''}
+              <button class="btn btn-danger btn-xs" onclick="deleteImage('${img.id}')">Delete</button>
+            </div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+async function startGenericImgQuiz(){
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),
+      sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+    data=res.data||[];
+  }
+  const valid=(data||[]).filter(img=>img.image_url).map(img=>({
+    id:img.id, name:img.title, key_features:img.description?[img.description]:[], notes:'', images:[img.image_url]
+  }));
+  if(!valid.length){alert('No images to quiz on yet.');return;}
+  // Reuse heme quiz infrastructure via appState
+  appState.hemeImgMode='quiz';
+  window._kqOpts={};
+  appState.hemeQuizItems=shuffle(valid);
+  appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+  renderTab();
+}
+
+async function startGenericFlashcard(){
+  let data;
+  if(appState.subject==='para_myco'){
+    const [r1,r2]=await Promise.all([
+      sb.from('mlsboc_images').select('*').eq('subject','parasitology').order('created_at'),
+      sb.from('mlsboc_images').select('*').eq('subject','mycology').order('created_at')
+    ]);
+    data=[...(r1.data||[]),...(r2.data||[])];
+  }else{
+    const res=await sb.from('mlsboc_images').select('*').eq('subject',appState.subject).order('created_at');
+    data=res.data||[];
+  }
+  const valid=(data||[]).filter(img=>img.image_url).map(img=>({
+    id:img.id, name:img.title, key_features:img.description?[img.description]:[], notes:'', images:[img.image_url]
+  }));
+  if(!valid.length){alert('No images to study yet.');return;}
+  startImageFlashcard(valid);
+}
+
+// ─── URINALYSIS IMAGES — categorized list with bulk upload + quiz ─────────────
+const UA_IMAGE_SECTIONS=[
+  'Macroscopic Color / Clarity',
+  'Reagent Strip',
+  'Cells',
+  'Casts',
+  'Acidic Crystals',
+  'Alkaline Crystals',
+  'Microscopic Miscellaneous',
+  'Needs Review'
+];
+const UA_CAT_META_RE=/^\s*\[\[UA_CATEGORY:([^\]]+)\]\]\s*\n?/i;
+function normalizeUASection(v){
+  const raw=String(v||'').trim();
+  const val=raw.toLowerCase();
+  const found=UA_IMAGE_SECTIONS.find(section=>section.toLowerCase()===val);
+  if(found)return found;
+  if(val==='cells'||val==='cell'||val==='microscopic cells')return 'Cells';
+  if(val==='casts'||val==='cast'||val==='microscopic casts')return 'Casts';
+  if(val==='acid crystals'||val==='acidic crystals'||val==='microscopic crystals - acidic')return 'Acidic Crystals';
+  if(val==='alkaline crystals'||val==='basic crystals'||val==='microscopic crystals - alkaline')return 'Alkaline Crystals';
+  if(val==='misc'||val==='miscellaneous'||val==='microscopic miscellaneous')return 'Microscopic Miscellaneous';
+  if(val==='macroscopic'||val==='color'||val==='clarity')return 'Macroscopic Color / Clarity';
+  if(val==='strip'||val==='dipstick'||val==='reagent')return 'Reagent Strip';
+  if(val==='normal'||val==='normal findings')return 'Microscopic Miscellaneous';
+  return raw;
+}
+function uaSectionOptions(extra=[]){
+  const options=[...UA_IMAGE_SECTIONS,...(window._uaCustomSections||[]),...extra]
+    .map(normalizeUASection)
+    .filter(Boolean);
+  const seen=new Set();
+  return options.filter(section=>{
+    const key=section.toLowerCase();
+    if(seen.has(key))return false;
+    seen.add(key);
+    return true;
+  });
+}
+function rememberUACustomSections(items=[]){
+  const builtIns=new Set(UA_IMAGE_SECTIONS.map(section=>section.toLowerCase()));
+  const custom=new Set(window._uaCustomSections||[]);
+  (items||[]).forEach(item=>{
+    const section=uaSectionKey(item);
+    if(section&&!builtIns.has(section.toLowerCase()))custom.add(section);
+  });
+  window._uaCustomSections=[...custom].sort((a,b)=>a.localeCompare(b));
+}
+function readUASectionFromControls(prefix){
+  const custom=document.getElementById(`${prefix}-custom-section`)?.value.trim();
+  const selected=document.getElementById(`${prefix}-section`)?.value;
+  return normalizeUASection(custom||selected)||'Needs Review';
+}
+function normalizeUACatType(v){
+  const val=String(v||'').trim().toLowerCase();
+  if(val==='normal')return 'Normal';
+  if(val==='abnormal')return 'Abnormal';
+  return '';
+}
+function normalizeUAPh(v){
+  const val=String(v||'').trim().toLowerCase();
+  if(val==='acidic'||val==='acid')return 'Acidic';
+  if(val==='alkaline'||val==='basic')return 'Alkaline';
+  return 'Unspecified';
+}
+function stripUACategoryNote(notes){
+  return String(notes||'').replace(UA_CAT_META_RE,'').trim();
+}
+function parseUACategoryNote(notes){
+  const match=String(notes||'').match(UA_CAT_META_RE);
+  if(!match)return null;
+  const parts=match[1].split('|').map(p=>p.trim()).filter(Boolean);
+  if(parts.length===1){
+    return {
+      section:normalizeUASection(parts[0]),
+      type:'Abnormal',
+      ph:'Unspecified'
+    };
+  }
+  if(parts.length>=3){
+    return {
+      section:normalizeUASection(parts[0]),
+      type:normalizeUACatType(parts[1])||'Abnormal',
+      ph:normalizeUAPh(parts[2])
+    };
+  }
+  if(parts.length===2){
+    return {
+      section:'',
+      type:normalizeUACatType(parts[0])||'Abnormal',
+      ph:normalizeUAPh(parts[1])
+    };
+  }
+  return null;
+}
+function uaTextForGuess(item){
+  return [
+    item?.name,
+    stripUACategoryNote(item?.notes)
+  ].join(' ').toLowerCase();
+}
+function inferUACategory(item){
+  const notes=String(item?.notes||'');
+  const stored=parseUACategoryNote(notes);
+  const text=uaTextForGuess(item);
+  const compact=text.replace(/[^a-z0-9]+/g,' ');
+  const ph=/alkaline|basic|ammonium biurate|triple phosphate|struvite|calcium carbonate|phosphate/.test(text)
+    ?'Alkaline'
+    :(/acidic|acid urine|uric acid|cystine|calcium oxalate/.test(text)?'Acidic':'Unspecified');
+  const type=/\bnormal\b|normal finding|normal sediment|hyaline cast/.test(text)?'Normal':'Abnormal';
+  let section='';
+  if(stored?.section)section=stored.section;
+  else if(/cast|cylindr|hyaline/.test(compact)){
+    section='Casts';
+  }else if(/crystal|amorphous|uric acid|cystine|calcium oxalate|tyrosine|leucine|cholesterol|sulfonamide|triple phosphate|struvite|ammonium biurate|calcium carbonate|phosphate/.test(compact)){
+    section=ph==='Alkaline'?'Alkaline Crystals':'Acidic Crystals';
+  }else if(/\brbc\b|red blood|wbc|white blood|epithelial|squamous|transitional|renal tubular|rte|oval fat|fat body|clue cell/.test(compact)){
+    section='Cells';
+  }else if(/bacteria|bacterial|yeast|fung|mucus|sperm|trichomonas|parasite|artifact|contaminant|fecal|pollen|fiber|starch|oil droplet|bubble|hemosiderin|schisto|nematode|larva/.test(compact)){
+    section='Microscopic Miscellaneous';
+  }else if(/color|clarity|clear|cloudy|turbid|foam|odor|yellow|orange|red|brown|black|green|blue|amber|port wine|appearance/.test(compact)){
+    section='Macroscopic Color / Clarity';
+  }else if(/reagent|dipstick|bilirubin|urobilinogen|glucose|ketone|protein|nitrite|leukocyte|leu|specific gravity|sg\b|ph\b|blood pad|strip/.test(compact)){
+    section='Reagent Strip';
+  }else{
+    section='Needs Review';
+  }
+  return {section,type:stored?.type||type,ph:stored?.ph||ph};
+}
+function composeUANotesWithCategory(notes,section,type,ph){
+  const clean=stripUACategoryNote(notes);
+  const safeSection=normalizeUASection(section)||'Needs Review';
+  return `[[UA_CATEGORY:${safeSection}]]${clean?`\n${clean}`:''}`;
+}
+function uaTypePhKey(item){
+  const cat=inferUACategory(item);
+  return `${cat.type}|${cat.ph}`;
+}
+function uaSectionKey(item){
+  return inferUACategory(item).section||'Needs Review';
+}
+function uaCategoryLabel(item){
+  const cat=inferUACategory(item);
+  return cat.section;
+}
+function uaSearchText(item){
+  return [
+    item?.name,
+    uaCategoryLabel(item),
+    ...(item?.key_features||[]),
+    stripUACategoryNote(item?.notes)
+  ].join(' ').toLowerCase();
+}
+function uaImageCardHTML(img){
+  return `
+    <div class="condition-card ua-item" data-name="${esc(uaSearchText(img))}" onclick="openUAImage('${img.id}')">
+      <div class="ua-single-img">${buildUAThumbs(img)}</div>
+      <div class="condition-body">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <span class="tag tag-info" style="font-size:10px">${esc(uaCategoryLabel(img))}</span>
+        </div>
+        <div class="condition-name">${esc(img.name||'')}</div>
+        ${img.key_features&&img.key_features.length?`<div class="condition-features">${(img.key_features||[]).slice(0,3).map(esc).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
+        ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-xs" onclick="openUAEditModal('${img.id}')">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteUAImage('${img.id}')">Delete</button>
+        </div>`:''}
+      </div>
+    </div>`;
+}
+function uaCategoryControls(prefix,item={}){
+  const cat=inferUACategory(item);
+  const options=uaSectionOptions([cat.section]);
+  return `
+    <div class="form-grid" style="grid-template-columns:1fr;gap:10px">
+      <div class="form-group">
+        <label>Chart Category</label>
+        <select id="${prefix}-section">
+          ${options.map(v=>`<option value="${v}" ${cat.section===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+        <input type="text" id="${prefix}-custom-section" value="" placeholder="+ New chart category name" style="margin-top:8px;font-size:13px">
+      </div>
+    </div>`;
+}
+function uaSortItems(items){
+  const sectionRank=Object.fromEntries(UA_IMAGE_SECTIONS.map((name,i)=>[name,i]));
+  return [...(items||[])].sort((a,b)=>{
+    const ca=inferUACategory(a),cb=inferUACategory(b);
+    return (sectionRank[ca.section]??99)-(sectionRank[cb.section]??99)
+      ||String(a.name||'').localeCompare(String(b.name||''));
+  });
+}
+function groupedUAImages(items){
+  const groups={};
+  uaSortItems(items).forEach(item=>{
+    const key=uaSectionKey(item);
+    if(!groups[key])groups[key]=[];
+    groups[key].push(item);
+  });
+  return groups;
+}
+function groupedUASections(items){
+  const groups={};
+  uaSortItems(items).forEach(item=>{
+    const key=uaSectionKey(item);
+    if(!groups[key])groups[key]=[];
+    groups[key].push(item);
+  });
+  return groups;
+}
+function invalidateUACaches(id=null){
+  window._uaCache=null;
+  window._uaMetaCache=null;
+  window._uaCacheLoadFailed=false;
+  window._uaMetaCacheLoadFailed=false;
+  if(id&&window._uaImageCacheById)delete window._uaImageCacheById[String(id)];
+  if(!id)window._uaImageCacheById={};
+}
+async function getUAMetaItems(force=false){
+  if(!force&&Array.isArray(window._uaMetaCache)&&!window._uaMetaCacheLoadFailed)return window._uaMetaCache;
+  try{
+    window._uaMetaCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_ua_images').select('id,name,key_features,notes').order('name'),3,true);
+    window._uaMetaCacheLoadFailed=false;
+  }catch(e){
+    window._uaMetaCacheLoadFailed=true;
+    if(!Array.isArray(window._uaMetaCache))throw e;
+  }
+  return window._uaMetaCache||[];
+}
+async function getUAItemsWithImages(items){
+  window._uaImageCacheById=window._uaImageCacheById||{};
+  const ids=[...(items||[])].map(item=>String(item.id)).filter(Boolean);
+  const missing=ids.filter(id=>!Object.prototype.hasOwnProperty.call(window._uaImageCacheById,id));
+  for(let i=0;i<missing.length;i+=20){
+    const chunk=missing.slice(i,i+20);
+    if(!chunk.length)continue;
+    const rows=await fetchRowsWithRetry(()=>sb.from('mlsboc_ua_images').select('id,images').in('id',chunk),2,false);
+    rows.forEach(row=>{window._uaImageCacheById[String(row.id)]=row.images||[];});
+    chunk.forEach(id=>{
+      if(!Object.prototype.hasOwnProperty.call(window._uaImageCacheById,id))window._uaImageCacheById[id]=[];
+    });
+  }
+  return (items||[]).map(item=>({...item,images:window._uaImageCacheById[String(item.id)]||[]}));
+}
+function setUAImageSection(section){
+  window._uaSearchQuery='';
+  window._uaFilteredMeta=[];
+  window._uaImageSection=normalizeUASection(section)||section;
+  renderTab();
+}
+function clearUASearch(){
+  window._uaSearchQuery='';
+  window._uaFilteredMeta=[];
+  renderTab();
+}
+function uaSearchModeHTML(query,count=null,loading=false){
+  const countText=typeof count==='number'
+    ?`<strong>${count}</strong> all-category result${count===1?'':'s'}`
+    :'all UA images';
+  return `<div class="card-sm" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:color-mix(in srgb,var(--accent) 8%,var(--bg2));border-color:color-mix(in srgb,var(--accent) 28%,var(--border));margin-bottom:18px">
+    <span class="tag tag-info" style="font-size:11px">All categories search</span>
+    <span style="font-size:13px;color:var(--text);font-weight:600">${loading?'Please wait while I load all UA categories...':`Searching ${countText} for "${esc(query)}"`}</span>
+    <span style="font-size:12px;color:var(--text2)">Name, chart category, key features, and notes are included.</span>
+    <button class="btn btn-ghost btn-xs ml-auto" onclick="clearUASearch()">Clear search</button>
+  </div>`;
+}
+async function renderUAImages(el){
+  if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
+  // Show skeleton immediately
+  el.innerHTML=imageLoadingHTML();
+  let all=[];
+  try{
+    all=uaSortItems(await getUAMetaItems());
+  }catch(e){
+    el.innerHTML=imageLoadRetryHTML('Urinalysis','invalidateUACaches();renderTab()');
+    return;
+  }
+  rememberUACustomSections(all);
+  window._uaAllMeta=all;
+  const sectionGroups=groupedUASections(all);
+  const sectionOrder=uaSectionOptions(Object.keys(sectionGroups)).filter(section=>sectionGroups[section]?.length);
+  const activeSection=sectionOrder.includes(window._uaImageSection)?window._uaImageSection:(sectionOrder[0]||UA_IMAGE_SECTIONS[0]);
+  window._uaImageSection=activeSection;
+  let activeItems=[];
+  const searchQuery=String(window._uaSearchQuery||'').trim();
+  let filteredMeta=[];
+  try{
+    if(searchQuery){
+      const q=searchQuery.toLowerCase();
+      filteredMeta=uaSortItems(all.filter(item=>uaSearchText(item).includes(q)));
+      window._uaFilteredMeta=filteredMeta;
+      activeItems=await getUAItemsWithImages(filteredMeta);
+    }else{
+      window._uaFilteredMeta=[];
+      activeItems=await getUAItemsWithImages(sectionGroups[activeSection]||[]);
+    }
+  }catch(e){
+    el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaImageCacheById={};renderTab()');
+    return;
+  }
+
+  el.innerHTML=`
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="startUAQuiz()">⚡ Image Quiz Mode</button>
+      <button class="btn btn-ghost btn-sm" onclick="startUAFlashcard()">🃏 Flashcards</button>
+      <button class="btn btn-ghost btn-sm" onclick="openUAExportModal()">📄 Export</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportUABlankPhotoTest()">Blank Photo Test</button>
+      ${searchQuery?`<button class="btn btn-success btn-sm" onclick="exportUAFilteredPDF()">📄 Export Filtered (${filteredMeta.length})</button>`:''}
+      ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddUAImageModal()">+ Add Image</button>`:''}
+    </div>
+    <div style="position:relative;margin-bottom:20px">
+      <input type="text" id="ua-search" value="${esc(searchQuery)}" placeholder="Search all UA findings by name, feature, or category..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterUAItems(this.value)">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+    </div>
+    <div id="ua-search-status" style="font-size:12px;color:var(--text2);margin:-10px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span id="ua-search-status-text">${searchQuery?`Showing ${activeItems.length} all-category result${activeItems.length===1?'':'s'} for "${esc(searchQuery)}".`:'Search uses all UA categories, not just the selected tab.'}</span>
+      <span id="ua-filtered-export-inline">${searchQuery&&filteredMeta.length?`<button class="btn btn-success btn-xs" onclick="exportUAFilteredPDF()">Export Filtered</button>`:''}</span>
+    </div>
+    <div id="ua-filter-mode">
+      ${searchQuery
+        ?uaSearchModeHTML(searchQuery,activeItems.length,false)
+        :`<div class="ua-mini-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+          ${sectionOrder.map(section=>`
+            <button class="btn ${activeSection===section?'btn-primary':'btn-ghost'} btn-sm" onclick="setUAImageSection('${jsAttr(section)}')" style="font-size:12px">
+              ${esc(section)} <span style="opacity:.75">(${sectionGroups[section].length})</span>
+            </button>`).join('')}
+        </div>`}
+    </div>
+    ${!all.length?'<div class="empty">No urinalysis images loaded yet. Try this tab again before adding new images.</div>':''}
+    <div id="ua-items-body">
+      <div class="condition-grid">
+        ${activeItems.map(uaImageCardHTML).join('')}
+      </div>
+    </div>
+    ${isAdmin?`<div class="mt-16">${adminUAImageControls()}</div>`:''}
+  `;
+}
+
+function renderUAItemGrid(items,message=''){
+  const body=document.getElementById('ua-items-body');
+  if(!body)return;
+  body.innerHTML=`
+    ${message?`<div style="font-size:12px;color:var(--text2);margin-bottom:12px">${message}</div>`:''}
+    <div class="condition-grid">
+      ${(items||[]).map(uaImageCardHTML).join('')}
+    </div>
+    ${!(items||[]).length?'<div class="empty">No matching UA findings.</div>':''}`;
+}
+function filterUAItems(query){
+  const q=String(query||'').trim();
+  window._uaSearchQuery=q;
+  clearTimeout(window._uaSearchTimer);
+  window._uaSearchTimer=setTimeout(async()=>{
+    const status=document.getElementById('ua-search-status-text')||document.getElementById('ua-search-status');
+    const exportSlot=document.getElementById('ua-filtered-export-inline');
+    if(!q){
+      window._uaFilteredMeta=[];
+      renderTab();
+      return;
+    }
+    if(status)status.textContent='Please wait while I load all UA categories for this search...';
+    if(exportSlot)exportSlot.innerHTML='';
+    const filterMode=document.getElementById('ua-filter-mode');
+    if(filterMode)filterMode.innerHTML=uaSearchModeHTML(q,null,true);
+    const body=document.getElementById('ua-items-body');
+    if(body)body.innerHTML=imageLoadingHTML();
+    try{
+      const all=uaSortItems(await getUAMetaItems());
+      rememberUACustomSections(all);
+      window._uaAllMeta=all;
+      const lower=q.toLowerCase();
+      const filtered=uaSortItems(all.filter(item=>uaSearchText(item).includes(lower)));
+      window._uaFilteredMeta=filtered;
+      const withImages=await getUAItemsWithImages(filtered);
+      if(status)status.textContent=`Showing ${withImages.length} all-category result${withImages.length===1?'':'s'} for "${q}".`;
+      if(exportSlot)exportSlot.innerHTML=filtered.length?'<button class="btn btn-success btn-xs" onclick="exportUAFilteredPDF()">Export Filtered</button>':'';
+      if(filterMode)filterMode.innerHTML=uaSearchModeHTML(q,withImages.length,false);
+      renderUAItemGrid(withImages);
+    }catch(e){
+      if(status)status.textContent='Search failed. Try again or refresh once.';
+      if(exportSlot)exportSlot.innerHTML='';
+      if(body)body.innerHTML=imageLoadRetryHTML('Urinalysis','filterUAItems(document.getElementById("ua-search")?.value||"")');
+    }
+  },220);
+}
+
+async function openUAExportModal(){
+  const items=await getUAMetaItems();
+  if(!items||!items.length){alert('No images to export.');return;}
+  window._uaExportItems=uaSortItems(items);
+  rememberUACustomSections(window._uaExportItems);
+  const groups=groupedUASections(window._uaExportItems);
+  const groupOrder=uaSectionOptions(Object.keys(groups)).filter(section=>groups[section]?.length);
+  const filteredCount=(window._uaFilteredMeta||[]).length;
+  const filteredQuery=String(window._uaSearchQuery||'').trim();
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export UA Findings to PDF</div>
+      <button class="btn btn-primary btn-sm ml-auto" onclick="exportUABlankPhotoTest()">Blank Photo Test: All Images</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    ${filteredQuery?`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;font-size:13px">
+      <span><strong>Filtered search:</strong> ${esc(filteredQuery)} <span style="color:var(--text3)">(${filteredCount})</span></span>
+      <button class="btn btn-success btn-sm ml-auto" onclick="exportUAFilteredPDF()">Export Filtered Results</button>
+    </div>`:''}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;font-size:13px">
+      <div>
+        <strong>Blank Photo Test</strong>
+        <div style="color:var(--text2);font-size:12px;margin-top:2px">Randomizes every UA image from every section. Photo pages have numbers and blank answer lines; the answer key prints at the end.</div>
+      </div>
+      <button class="btn btn-primary btn-sm ml-auto" onclick="exportUABlankPhotoTest()">Export All-Images Test</button>
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;cursor:pointer;font-size:13px">
+      <input type="checkbox" id="ua-exp-features" checked style="width:16px;height:16px;flex-shrink:0">
+      <span><strong>Include key features</strong> in the PDF</span>
+    </label>
+    <div style="font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Export whole categories</div>
+    <div class="flex gap-8 mb-12 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-group').forEach(c=>c.checked=true)">Select Categories</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-group').forEach(c=>c.checked=false)">Clear Categories</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:16px">
+      ${groupOrder.map(key=>{
+        return `<label style="display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:12px">
+          <input type="checkbox" class="ua-exp-group" data-group="${esc(key)}" checked style="width:16px;height:16px;flex-shrink:0">
+          <span><strong>${esc(key)}</strong> <span style="color:var(--text3)">(${groups[key].length})</span></span>
+        </label>`;
+      }).join('')}
+    </div>
+    <div style="font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Or choose independently</div>
+    <div class="flex gap-8 mb-12 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=true)">Select All Items</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.ua-exp-cb').forEach(c=>c.checked=false)">Deselect Items</button>
+    </div>`;
+  window._uaExportItems.forEach(img=>{
+    html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
+      <input type="checkbox" class="ua-exp-cb" data-id="${img.id}" style="width:16px;height:16px;flex-shrink:0">
+      <span style="font-weight:600">${esc(img.name||'')}</span>
+      <span class="tag tag-info" style="font-size:10px;margin-left:auto">${esc(uaCategoryLabel(img))}</span>
+    </label>`;
+  });
+  html+=`<div class="flex gap-8 mt-20"><button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" onclick="generateUAPDF()">📄 Generate PDF</button></div>`;
+  document.getElementById('condition-modal-body').innerHTML=html;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function generateUAPDF(){
+  if(window._uaExportBusy)return;
+  const ids=[...document.querySelectorAll('.ua-exp-cb:checked')].map(cb=>cb.dataset.id);
+  const selectedGroups=[...document.querySelectorAll('.ua-exp-group:checked')].map(cb=>cb.dataset.group);
+  const includeFeatures=!!document.getElementById('ua-exp-features')?.checked;
+  const source=Array.isArray(window._uaExportItems)?window._uaExportItems:[];
+  const selectedMap=new Map();
+  source.forEach(item=>{
+    if(ids.includes(String(item.id))||selectedGroups.includes(uaSectionKey(item)))selectedMap.set(String(item.id),item);
+  });
+  const orderedMeta=uaSortItems([...selectedMap.values()]);
+  if(!orderedMeta.length){alert('Select at least one category or image.');return;}
+  window._uaExportBusy=true;
+  const btn=document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+  try{
+    await new Promise(r=>setTimeout(r,30));
+    const ordered=await getUAItemsWithImages(orderedMeta);
+    await generateUAGroupedImagePDF(ordered,'Urinalysis Findings','urinalysis_findings.pdf',{includeFeatures});
+  }catch(err){
+    alert('PDF failed: '+err.message);
+    if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
+  }finally{
+    window._uaExportBusy=false;
+  }
+}
+
+async function exportUAFilteredPDF(){
+  const query=String(window._uaSearchQuery||'').trim();
+  const source=Array.isArray(window._uaFilteredMeta)?window._uaFilteredMeta:[];
+  if(!query||!source.length){alert('Search first, then export filtered results.');return;}
+  if(window._uaExportBusy)return;
+  window._uaExportBusy=true;
+  const btn=[...document.querySelectorAll('button')].find(b=>/Export Filtered/.test(b.textContent||''));
+  const originalText=btn?.textContent||'📄 Export Filtered';
+  if(btn){btn.textContent='Generating filtered PDF...';btn.disabled=true;}
+  try{
+    const ordered=await getUAItemsWithImages(uaSortItems(source));
+    const safe=query.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'search';
+    await generateUAGroupedImagePDF(ordered,`Urinalysis Findings - ${query}`,`urinalysis_filtered_${safe}.pdf`,{includeFeatures:true});
+  }catch(err){
+    alert('Filtered PDF failed: '+err.message);
+    if(btn){btn.textContent='📄 Export Filtered';btn.disabled=false;}
+  }finally{
+    window._uaExportBusy=false;
+    if(btn){btn.textContent=originalText;btn.disabled=false;}
+  }
+}
+
+async function exportUABlankPhotoTest(){
+  if(window._uaExportBusy)return;
+  window._uaExportBusy=true;
+  const btn=[...document.querySelectorAll('button')].find(b=>/Blank Photo Test|Export All-Images Test/.test(b.textContent||''));
+  const originalText=btn?.textContent||'Blank Photo Test';
+  if(btn){btn.textContent='Loading all UA images...';btn.disabled=true;}
+  try{
+    const allMeta=uaSortItems(await getUAMetaItems());
+    rememberUACustomSections(allMeta);
+    const allItems=await getUAItemsWithImages(allMeta);
+    const entries=[];
+    allItems.forEach(item=>{
+      imageEntryList(item.images).forEach((entry,imgIndex)=>{
+        const src=imageEntrySrc(entry);
+        if(src)entries.push({item,src,imgIndex});
+      });
+    });
+    if(!entries.length){alert('No UA images found to export.');return;}
+    await generateUABlankPhotoTestPDF(shuffle(entries),'UA Blank Photo Test','ua_blank_photo_test_all_images.pdf');
+  }catch(err){
+    alert('Blank photo test export failed: '+err.message);
+  }finally{
+    window._uaExportBusy=false;
+    if(btn){btn.textContent=originalText;btn.disabled=false;}
+  }
+}
+Object.assign(window,{
+  setUAImageSection,
+  clearUASearch,
+  filterUAItems,
+  openUAExportModal,
+  generateUAPDF,
+  exportUAFilteredPDF,
+  exportUABlankPhotoTest
+});
+
+function buildUAThumbs(img){
+  const imgs=imageEntryList(img.images).filter(entry=>imageEntrySrc(entry));
+  if(imgs[0]) return `<img src="${esc(imageEntrySrc(imgs[0]))}" alt="" style="width:100%;height:100%;object-fit:contain;background:var(--bg3)" onerror="retryImageLoad(this)">`;
+  return `<div class="img-ph" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div>`;
+}
+
+function openUAImage(id){
+  sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=imageEntryList(data.images).filter(entry=>imageEntrySrc(entry));
+    const firstSrc=imageEntrySrc(imgs[0]);
+    const features=data.key_features||[];
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div class="section-title" style="font-size:16px">${esc(data.name||'')}</div>
+        <div class="flex gap-6 ml-auto">
+          ${isAdmin?`<button class="btn btn-ghost btn-xs" onclick="document.getElementById('condition-modal').classList.add('hidden');openUAEditModal('${data.id}')">Edit</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+        </div>
+      </div>
+      ${firstSrc?`<img src="${esc(firstSrc)}" onclick="openImgViewer('${jsAttr(firstSrc)}')" onerror="retryImageLoad(this)" style="width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3);margin-bottom:16px" alt="">`:'<div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px">🧪</div>'}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span class="tag tag-info">${esc(uaCategoryLabel(data))}</span></div>
+      ${features.length?`
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          ${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}
+        </div>`:'<div style="color:var(--text3);font-size:13px;margin-bottom:12px">No key features added yet.</div>'}
+      ${stripUACategoryNote(data.notes)?`<div class="explanation">${esc(stripUACategoryNote(data.notes))}</div>`:''}
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+function openUAEditModal(id){
+  sb.from('mlsboc_ua_images').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=imageEntryList(data.images).filter(entry=>imageEntrySrc(entry));
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div style="font-size:16px;font-weight:600">Edit UA Finding</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Name / Condition</label>
+        <input type="text" id="uaedit-name" value="${esc(data.name||'')}" placeholder="e.g. RBC Cast" style="font-size:15px">
+      </div>
+      <div class="form-group">
+        <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
+        <textarea id="uaedit-features" style="min-height:90px" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome">${esc((data.key_features||[]).join('\n'))}</textarea>
+      </div>
+      ${uaCategoryControls('uaedit',data)}
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <textarea id="uaedit-notes" style="min-height:60px">${esc(stripUACategoryNote(data.notes))}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Image <span style="font-size:11px;color:var(--text3)">(one image per finding)</span></label>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          ${imgs[0]?`<img src="${esc(imageEntrySrc(imgs[0]))}" onerror="retryImageLoad(this)" style="height:100px;max-width:160px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3)">`:
+            `<div style="height:100px;width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div>`}
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+            ${imgs[0]?'Replace Image':'Upload Image'}
+            <input type="file" accept="image/*" style="display:none" onchange="handleUASingleImgUpload(event,'${data.id}')">
+          </label>
+          ${imgs[0]?`<button class="btn btn-danger btn-xs" onclick="clearUAImage('${data.id}')">Remove</button>`:''}
+        </div>
+      </div>
+      <div class="flex gap-8 mt-8">
+        <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUAEdit('${data.id}')">Save Changes</button>
+      </div>
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+async function saveUAEdit(id){
+  const name=document.getElementById('uaedit-name')?.value.trim();
+  if(!name){alert('Name is required.');return;}
+  const featText=document.getElementById('uaedit-features')?.value||'';
+  const notes=document.getElementById('uaedit-notes')?.value.trim()||'';
+  const section=readUASectionFromControls('uaedit');
+  const type=document.getElementById('uaedit-type')?.value||'Abnormal';
+  const ph=document.getElementById('uaedit-ph')?.value||'Unspecified';
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  const {error}=await sb.from('mlsboc_ua_images').update({name,key_features:features,notes:composeUANotesWithCategory(notes,section,type,ph)}).eq('id',id);invalidateUACaches(id);
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  renderTab();
+}
+
+async function handleUASingleImgUpload(e,id){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    await sb.from('mlsboc_ua_images').update({images:[ev.target.result]}).eq('id',id);invalidateUACaches(id);
+    openUAEditModal(id);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function clearUAImage(id){
+  if(!confirm('Remove the image?'))return;
+  await sb.from('mlsboc_ua_images').update({images:[]}).eq('id',id);invalidateUACaches(id);
+  openUAEditModal(id);
+}
+
+function buildUAImageEditor(item){
+  const imgs=imageEntryList(item.images);
+  return `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      ${[0,1,2,3].map(i=>`
+        <div class="drop-zone" id="uadz-${item.id}-${i}"
+          ondrop="handleUAImgDrop(event,'${item.id}',${i})"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('uaimg-${item.id}-${i}').click()"
+        >
+          ${imageEntrySrc(imgs[i])?`<img src="${esc(imageEntrySrc(imgs[i]))}" onerror="retryImageLoad(this)" style="width:100%;height:80px;object-fit:cover;border-radius:4px">`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+          <input type="file" accept="image/*" id="uaimg-${item.id}-${i}" style="display:none" onchange="handleUAImgFile(event,'${item.id}',${i})">
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
+  `;
+}
+
+async function handleUAImgFile(e,itemId,slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const {data}=await sb.from('mlsboc_ua_images').select('images').eq('id',itemId).single();
+    const imgs=[...imageEntryList(data?.images)];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=ev.target.result;
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);invalidateUACaches(itemId);
+    openUAImage(itemId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleUAImgDrop(e,itemId,slot){
+  e.preventDefault();e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const {data}=await sb.from('mlsboc_ua_images').select('images').eq('id',itemId).single();
+    const imgs=[...imageEntryList(data?.images)];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=ev.target.result;
+    await sb.from('mlsboc_ua_images').update({images:imgs}).eq('id',itemId);invalidateUACaches(itemId);
+    openUAImage(itemId);
+  };
+  reader.readAsDataURL(file);
+}
+
+function adminUAImageControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Admin: Add UA Image Entry</div>
+      <div class="form-group"><label>Name</label><input type="text" id="ua-name" placeholder="e.g. RBC Cast"></div>
+      <div class="form-group"><label>Key Features (one per line)</label><textarea id="ua-features" placeholder="Glomerulonephritis&#10;Dysmorphic RBCs&#10;Nephritic syndrome"></textarea></div>
+      ${uaCategoryControls('uaadd',{notes:'[[UA_CATEGORY:Needs Review|Abnormal|Unspecified]]'})}
+      <div class="form-group"><label>Notes (optional)</label><textarea id="ua-notes" style="min-height:60px"></textarea></div>
+      <div class="form-group">
+        <label>Bulk Image Drop — drag multiple images at once</label>
+        <div class="drop-zone" id="ua-bulk-dz"
+          ondrop="handleUABulkDrop(event)"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          onclick="document.getElementById('ua-bulk-file').click()"
+          style="min-height:80px">
+          <div style="font-size:28px;margin-bottom:4px">📁</div>
+          <div>Drop multiple images here — each becomes a new entry</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Filename becomes the name. Edit title/features after.</div>
+          <input type="file" id="ua-bulk-file" accept="image/*" multiple style="display:none" onchange="handleUABulkFile(event)">
+        </div>
+      </div>
+      <div id="ua-bulk-queue" style="margin-bottom:12px"></div>
+      <div class="flex gap-8 flex-wrap">
+        <button class="btn btn-primary btn-sm" onclick="adminAddUAImage()">Add Single Entry</button>
+      </div>
+    </div>`;
+}
+
+function showAddUAImageModal(){
+  const el=document.getElementById('ua-bulk-queue');if(el)el.innerHTML='';
+  renderTab();
+}
+
+async function adminAddUAImage(){
+  const name=document.getElementById('ua-name')?.value.trim();
+  const featText=document.getElementById('ua-features')?.value||'';
+  const notes=document.getElementById('ua-notes')?.value.trim();
+  const section=readUASectionFromControls('uaadd');
+  const type=document.getElementById('uaadd-type')?.value||'Abnormal';
+  const ph=document.getElementById('uaadd-ph')?.value||'Unspecified';
+  if(!name){alert('Name required.');return;}
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:features,notes:composeUANotesWithCategory(notes||'',section,type,ph),images:[]});invalidateUACaches();
+  if(error){alert('Error: '+error.message);return;}
+  document.getElementById('ua-name').value='';
+  document.getElementById('ua-features').value='';
+  document.getElementById('ua-notes').value='';
+  renderTab();
+}
+
+async function handleUABulkFile(e){
+  const files=Array.from(e.target.files);
+  await processUABulkFiles(files);
+}
+
+async function handleUABulkDrop(e){
+  e.preventDefault();e.currentTarget.classList.remove('dragover');
+  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  if(!files.length)return;
+  await processUABulkFiles(files);
+}
+
+async function processUABulkFiles(files){
+  const queueEl=document.getElementById('ua-bulk-queue');
+  if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:8px">Adding ${files.length} image(s)...</div>`;
+  let done=0;
+  for(const file of files){
+    const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+    const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+    const guess=inferUACategory({name,key_features:[],notes:''});
+    const chosen=readUASectionFromControls('uaadd');
+    const chosenSection=chosen&&chosen!=='Needs Review'?chosen:guess.section;
+    const {error}=await sb.from('mlsboc_ua_images').insert({name,key_features:[],notes:composeUANotesWithCategory('',chosenSection,guess.type,guess.ph),images:[dataUrl]});
+    if(!error)done++;
+  }
+  if(queueEl)queueEl.innerHTML=`<div style="font-size:12px;color:var(--success)">✓ Added ${done} of ${files.length} images. You can edit names/features by clicking each card.</div>`;
+  invalidateUACaches();
+  renderTab();
+}
+
+async function deleteUAImage(id){
+  if(!confirm('Delete this image entry?'))return;
+  await sb.from('mlsboc_ua_images').delete().eq('id',id);invalidateUACaches(id);
+  renderTab();
+}
+
+async function startUAQuiz(forceNew=false){
+  // Resume if in progress
+  if(!forceNew && appState.uaImgMode==='quiz' && appState.uaQuizItems&&appState.uaQuizItems.length && !appState.uaQuizDone && appState.uaQuizIdx>0){
+    renderTab();return;
+  }
+  if(!forceNew && appState.uaQuizItems&&appState.uaQuizItems.length && !appState.uaQuizDone && appState.uaQuizIdx>0){
+    appState.uaImgMode='quiz';
+    window._uaShowResume=true;
+    renderTab();return;
+  }
+  if(!window._uaCache){
+    try{
+      const meta=await getUAMetaItems();
+      window._uaCache=await getUAItemsWithImages(meta);
+    }catch(e){}
+  }
+  const valid=(window._uaCache||[]).filter(o=>imageEntryList(o.images).some(entry=>imageEntrySrc(entry)));
+  if(!valid.length){alert('No images to quiz on yet.');return;}
+  appState.uaImgMode='quiz';
+  window._uaShowResume=false;
+  window._kqOpts={};appState.uaQuizItems=shuffle(valid);
+  appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
+  renderTab();
+}
+
+function renderUAImageQuiz(el){
+  // Show resume prompt if returning mid-quiz
+  if(appState.uaQuizIdx>0 && !appState.uaQuizDone && window._uaShowResume){
+    window._uaShowResume=false;
+    el.innerHTML=`
+      <div class="bbq-overlay">
+        <div class="bbq-header"><button class="btn btn-ghost btn-sm" onclick="appState.uaImgMode='browse';renderTab()">← Back</button></div>
+        <div class="bbq-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center">
+          <div style="font-size:36px;margin-bottom:16px">🧪</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">UA Image Quiz</div>
+          <div style="font-size:14px;color:var(--text2);margin-bottom:28px">You're on image ${appState.uaQuizIdx+1} of ${appState.uaQuizItems.length}</div>
+          <div class="flex gap-12 flex-wrap" style="justify-content:center">
+            <button class="btn btn-primary" style="font-size:15px;padding:12px 28px" onclick="window._uaShowResume=false;renderTab()">Resume →</button>
+            <button class="btn btn-ghost" style="font-size:15px;padding:12px 28px" onclick="startUAQuiz(true)">Restart</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+  renderKahootImageQuiz(el,{
+    items:appState.uaQuizItems,
+    idx:appState.uaQuizIdx,
+    ans:appState.uaQuizAns,
+    done:appState.uaQuizDone,
+    prompt:'What is this urinalysis finding?',
+    placeholder:'🧪',
+    onAnswer:id=>{appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();},
+    onPrev:()=>{appState.uaQuizIdx=Math.max(0,appState.uaQuizIdx-1);renderTab();},
+    onNext:()=>{appState.uaQuizIdx++;renderTab();},
+    onDone:()=>{appState.uaQuizDone=true;renderTab();},
+    onRetry:()=>startUAQuiz(true),
+    onExit:()=>{appState.uaImgMode='browse';appState.uaQuizDone=false;renderTab();},
+    onRetryWrong:(wrongItems)=>{
+      if(!wrongItems.length)return;
+      window._kqOpts={};appState.uaQuizItems=shuffle(wrongItems);
+      appState.uaQuizIdx=0;appState.uaQuizAns=[];appState.uaQuizDone=false;
+      renderTab();
+    }
+  });
+}
+
+function answerUAImgQ(id){appState.uaQuizAns[appState.uaQuizIdx]=id;renderTab();}
+function uaQuizNext(){appState.uaQuizIdx++;renderTab();}
+
+// ─── SHARED KAHOOT IMAGE QUIZ RENDERER ───────────────────────────────────────
+function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onPrev,onNext,onDone,onRetry,onExit,onRetryWrong}){
+  const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
+  const textColors=['#fff','#fff','#fff','#1a2a1a'];
+  const emojis=['🔴','🔵','🟡','🟢'];
+
+  if(done){
+    let correct=0;
+    const missed=[];
+    items.forEach((o,i)=>{
+      if(ans[i]===o.id)correct++;
+      else missed.push({item:o,givenId:ans[i]});
+    });
+    const pct=Math.round(correct/items.length*100);
+    let reviewHtml='';
+    items.forEach((o,i)=>{
+      const wasCorrect=ans[i]===o.id;
+      const chosen=items.find(x=>x.id===ans[i]);
+      reviewHtml+='<div style="background:var(--bg2);border:1px solid '+(wasCorrect?'var(--border)':'#f0647433')+';border-radius:var(--r);padding:14px 16px;margin-bottom:8px">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">'+o.name+'</div>'
+        +(wasCorrect
+          ?'<div style="font-size:12px;color:var(--success)">✓ Correct</div>'
+          :'<div style="font-size:12px;color:var(--danger)">✗ Your answer: '+(chosen?chosen.name:'(none)')+'</div>'
+          +'<div style="font-size:12px;color:var(--success);margin-top:2px">Correct: '+o.name+'</div>')
+        +(o.key_features&&o.key_features.length?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">'+o.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>':'')
+        +'</div>';
+    });
+
+    const exportMissedFn=()=>{
+      if(!missed.length){alert('No missed items.');return;}
+      try{
+        const {jsPDF}=window.jspdf;
+        const doc=new jsPDF({unit:'mm',format:'a4'});
+        const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=18,cW=pageW-margin*2;
+        let y=margin;
+        const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
+        doc.setFillColor(210,210,210);doc.rect(margin,y,cW,10,'F');
+        doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+        doc.text('Missed Items',(pageW/2),y+7,{align:'center'});y+=16;
+        missed.forEach(({item:o,givenId},i)=>{
+          checkPage(20);
+          const given=items.find(x=>x.id===givenId);
+          doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
+          doc.splitTextToSize(`${i+1}. ${o.name}`,cW).forEach(l=>{checkPage();doc.text(l,margin,y);y+=5.5;});
+          if(given){doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(160,40,40);doc.text(`Your answer: ${given.name}`,margin+4,y);y+=5;}
+          if(o.key_features&&o.key_features.length){doc.setFontSize(9);doc.setTextColor(60,60,60);doc.text(`Features: ${o.key_features.join(', ')}`,margin+4,y);y+=5;}
+          y+=3;
+        });
+        const total=doc.internal.getNumberOfPages();
+        for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(`MLS BOC Prep — Missed Items · Page ${p} of ${total}`,margin,pageH-8);}
+        doc.save('missed_images.pdf');
+      }catch(err){alert('PDF export failed: '+err.message);}
+    };
+    window._kqExportMissed=exportMissedFn;
+    window._kqRetryWrong=onRetryWrong?()=>onRetryWrong(missed.map(m=>m.item)):null;
+
+    el.innerHTML='<div class="bbq-overlay"><div class="bbq-header">'
+      +'<button class="btn btn-ghost btn-sm" onclick="('+onExit.toString()+')()">← Back</button>'
+      +'<div class="ml-auto" style="color:var(--text);font-size:13px;font-family:var(--mono)">Quiz Complete</div>'
+      +'</div><div class="bbq-body">'
+      +'<div style="text-align:center;padding:24px 0 28px">'
+      +'<div style="font-size:48px;margin-bottom:8px">'+(pct>=80?'🏆':pct>=60?'✅':'📚')+'</div>'
+      +'<div class="bbq-score-big">'+pct+'%</div>'
+      +'<div style="font-size:16px;color:var(--text2)">'+correct+' of '+items.length+' correct</div>'
+      +'</div>'
+      +'<div class="result-grid" style="margin-bottom:24px">'
+      +'<div class="stat-card"><div class="stat-num text-success">'+correct+'</div><div class="stat-label">Correct</div></div>'
+      +'<div class="stat-card"><div class="stat-num text-danger">'+(items.length-correct)+'</div><div class="stat-label">Missed</div></div>'
+      +'<div class="stat-card"><div class="stat-num" style="color:var(--accent)">'+pct+'%</div><div class="stat-label">Score</div></div>'
+      +'</div>'
+      +'<div class="flex gap-8 mb-20 flex-wrap">'
+      +'<button class="btn btn-primary" onclick="('+onRetry.toString()+')()">🔄 Retry All</button>'
+      +(missed.length&&window._kqRetryWrong?'<button class="btn btn-warn" onclick="window._kqRetryWrong()">⚡ Retry Wrong Only ('+missed.length+')</button>':'')
+      +(missed.length?'<button class="btn btn-ghost btn-sm" onclick="window._kqExportMissed()">📥 Export Missed</button>':'')
+      +'<button class="btn btn-ghost" onclick="('+onExit.toString()+')()">Back</button>'
+      +'</div>'
+      +(missed.length?'<div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Review</div>'+reviewHtml:'<div style="color:var(--success);font-weight:600;text-align:center;font-size:18px">Perfect score! 🎉</div>')
+      +'</div></div>';
+    return;
+  }
+
+  const item=items[idx];
+  const answered=ans[idx]!==undefined;
+  const chosen=ans[idx];
+  const imgs=imageEntryList(item.images).map(imageEntrySrc).filter(Boolean);
+  const pct=Math.round((idx+1)/items.length*100);
+  const pool=items.filter(x=>x.id!==item.id);
+  const wrongItems=shuffle(pool).slice(0,Math.min(3,pool.length));
+  // Store shuffled opts per question so they don't re-shuffle on re-render
+  if(!window._kqOpts)window._kqOpts={};
+  const optKey=item.id+'_'+idx;
+  if(!window._kqOpts[optKey])window._kqOpts[optKey]=shuffle([item,...wrongItems]);
+  const opts=window._kqOpts[optKey];
+
+  const imgsHtml=imgs.length
+    ?'<div style="display:grid;grid-template-columns:'+(imgs.length===1?'1fr':'1fr 1fr')+';gap:6px;margin-bottom:16px">'
+      +imgs.slice(0,4).map(url=>'<img src="'+esc(url)+'" onclick="openImgViewer(\''+jsAttr(url)+'\')" onerror="retryImageLoad(this)" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
+    :'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:12px">'+placeholder+'</div>';
+
+  const optsHtml=opts.map((o,oi)=>{
+    let extra='';
+    if(answered){
+      if(o.id===item.id)extra=' correct-ans';
+      else if(o.id===chosen&&chosen!==item.id)extra=' wrong-ans';
+    }
+    return '<button class="bbq-opt'+extra+'" style="background:'+colors[oi]+';color:'+textColors[oi]+'" onclick="('+onAnswer.toString()+')(\''+o.id+'\')" '+(answered?'disabled':'')+'>'
+      +'<span class="bbq-opt-letter">'+emojis[oi]+'</span><span>'+o.name+'</span></button>';
+  }).join('');
+
+  const feedbackHtml=answered?'<div style="text-align:center;margin-bottom:16px">'
+    +'<div style="font-size:20px;font-weight:800;color:'+(chosen===item.id?'var(--success)':'var(--danger)')+';margin-bottom:6px">'+(chosen===item.id?'✓ Correct!':'✗ Incorrect — '+item.name)+'</div>'
+    +(item.key_features&&item.key_features.length?'<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px">'+item.key_features.map(f=>'<span class="tag tag-info">'+f+'</span>').join('')+'</div>':'')
+    +'</div>'
+    +'<div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">'
+    +(idx>0&&onPrev?'<button class="btn btn-ghost" style="font-size:15px;padding:12px 24px" onclick="('+onPrev.toString()+')()">← Prev</button>':'')
+    +(idx<items.length-1
+      ?'<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="('+onNext.toString()+')()">Next →</button>'
+      :'<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="('+onDone.toString()+')()">See Results</button>')
+    +'</div>':'';
+
+  el.innerHTML='<div class="bbq-overlay">'
+    +'<div class="bbq-header">'
+    +'<button class="btn btn-ghost btn-sm" onclick="('+onExit.toString()+')()">✕ Exit</button>'
+    +'<div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+    +'<span class="question-num" style="white-space:nowrap">'+(idx+1)+' / '+items.length+'</span>'
+    +'</div>'
+    +'<div class="bbq-body">'
+    +'<p style="font-size:13px;color:var(--text3);text-align:center;margin-bottom:12px">'+prompt+'</p>'
+    +imgsHtml
+    +'<div class="bbq-options">'+optsHtml+'</div>'
+    +feedbackHtml
+    +'</div></div>';
+}
+
+// Hematology images — folder system
+function hemeDefaultConditions(){
+  return HEME_DEFAULT_CONDITIONS.map(item=>({
+    ...item,
+    images:item.images||[],
+    notes:item.notes||'',
+    key_features:[...(item.key_features||[])]
+  }));
+}
+
+function hemeConditionsOrDefaults(data){
+  return Array.isArray(data)&&data.length?data:hemeDefaultConditions();
+}
+
+function normalizeHemeFolderKey(key){
+  const map={
+    reactive_physiologic:'reactive',
+    non_malignant_morphologic:'non_malignant',
+    chronic_leukemias:'malignancies_chronic',
+    acute_leukemias:'malignancies_acute',
+    other_malignancies:'malignancies_other'
+  };
+  return map[key]||key||'non_malignant';
+}
+
+function hemeFolderLabel(key){
+  const normalized=normalizeHemeFolderKey(key);
+  const folderDef=HEME_FOLDERS.find(x=>x.key===normalized);
+  return folderDef?folderDef.name:normalized;
+}
+
+function hemeFolderFromType(type,name){
+  const t=String(type||'').toLowerCase();
+  const n=String(name||'').toLowerCase();
+  if(t.includes('acute leukemia')||n.includes('acute'))return 'malignancies_acute';
+  if(t.includes('hemolytic anemia')||t.includes('non-hemolytic anemia')||t==='anemia'||n.includes('anemia')||n.includes('thalassemia'))return 'anemias';
+  if(n.includes('malaria')||n.includes('bacteria')||n.includes('spirochete')||n.includes('viral'))return 'infectious';
+  if(n.includes('leukemoid')||n.includes('reactive')||n.includes('kiddie'))return 'reactive';
+  if(n.includes('pelger')||n.includes('platelet')||n.includes('nrbc'))return 'non_malignant';
+  if(t.includes('lymphoproliferative')){
+    if(n.includes('myeloma')||n.includes('plasma')||n.includes('sezary'))return 'malignancies_other';
+    return 'malignancies_chronic';
+  }
+  if(t.includes('myeloproliferative')||t.includes('myelodysplastic'))return 'malignancies_chronic';
+  return 'non_malignant';
+}
+
+async function renderHemeImages(el){
+  if(appState.hemeImgMode==='quiz'){
+    renderHemeImageQuiz(el);return;
+  }
+  // Show skeleton immediately
+  el.innerHTML=imageLoadingHTML();
+  if(!Array.isArray(window._hemeCondsCache)||window._hemeCondsLoadFailed||window._hemeCondsCache.length===0){
+    try{
+      const rows=await fetchRowsWithRetry(()=>sb.from('mlsboc_heme_conditions').select('*').order('name'),3,true);
+      window._hemeCondsCache=hemeConditionsOrDefaults(rows);
+      window._hemeCondsLoadFailed=false;
+    }catch(e){
+      window._hemeCondsLoadFailed=true;
+      if(!Array.isArray(window._hemeCondsCache)||!window._hemeCondsCache.length){
+        el.innerHTML=imageLoadRetryHTML('Hematology','window._hemeCondsCache=null;window._hemeCondsLoadFailed=false;renderTab()');
+        return;
+      }
+    }
+  }
+  // Flat view — load all conditions, group by folder inline
+  const allConditions=window._hemeCondsCache||[];
+  const _dummy=null; // placeholder to avoid unused var warning
+  const conditions=allConditions||[];
+
+  // Group by folder preserving HEME_FOLDER_GROUPS order
+  const byFolder={};
+  conditions.forEach(c=>{
+    const folder=normalizeHemeFolderKey(c.folder);
+    if(!byFolder[folder])byFolder[folder]=[];
+    byFolder[folder].push(c);
+  });
+  const allFolderKeys=HEME_FOLDER_GROUPS.flatMap(g=>g.keys);
+  // also catch any folder key not in the predefined list
+  Object.keys(byFolder).forEach(k=>{ if(!allFolderKeys.includes(k))allFolderKeys.push(k); });
+
+  // Build flat condition list for export checkbox tracking
+  window._hemeAllConditions=conditions;
+
+  el.innerHTML=`
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="startHemeQuiz()">⚡ Image Quiz Mode</button>
+      <button class="btn btn-ghost btn-sm" onclick="startHemeFlashcard()">🃏 Flashcards</button>
+      <button class="btn btn-ghost btn-sm" onclick="openHemeExportModal()">📄 Export</button>
+      ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddConditionModal(null)">+ Add Condition</button>`:''}
+    </div>
+    <div style="position:relative;margin-bottom:20px">
+      <input type="text" id="heme-search" placeholder="Search conditions..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterHemeConditions(this.value)">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+    </div>
+    <div id="heme-conditions-body">
+      ${allFolderKeys.map(fkey=>{
+        const folderDef=HEME_FOLDERS.find(x=>x.key===fkey);
+        const folderLabel=folderDef?folderDef.name:fkey;
+        const items=byFolder[fkey]||[];
+        if(!items.length)return '';
+        return `
+          <div class="heme-section mb-24" data-folder="${fkey}">
+            <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${folderLabel} <span style="font-weight:400;font-size:11px">(${items.length})</span></div>
+            <div class="condition-grid">
+              ${items.map(c=>{
+                const features=(c.key_features||[]).filter(Boolean);
+                const missing=!features.length;
+                return `
+                <div class="condition-card heme-item ${missing?'heme-missing-features':''}" data-name="${esc((c.name||'').toLowerCase())}" onclick="openCondition('${c.id}')">
+                  <div class="condition-imgs">${buildConditionThumbs(c)}</div>
+                  <div class="condition-body">
+                    <div class="condition-name">${esc(c.name||'')}</div>
+                    ${features.length?`<div class="condition-features">${features.slice(0,3).map(esc).join(' · ')}</div>`:`<div class="condition-features heme-missing-text">Key features blank</div>`}
+                    ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                      <button class="btn btn-danger btn-xs" onclick="deleteCondition('${c.id}')">Delete</button>
+                    </div>`:''}
+                  </div>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+      }).join('')}
+      ${conditions.length===0?'<div class="empty">No hematology conditions loaded yet. Try this tab again before adding new images.</div>':''}
+    </div>
+    ${isAdmin?`<div class="mt-16">${adminHemeImageControls()}</div>`:''}
+  `;
+}
+
+function filterHemeConditions(query){
+  const q=query.toLowerCase().trim();
+  document.querySelectorAll('.heme-item').forEach(card=>{
+    const name=card.dataset.name||'';
+    card.style.display=(!q||name.includes(q))?'':'none';
+  });
+  // Hide empty sections
+  document.querySelectorAll('.heme-section').forEach(section=>{
+    const visible=[...section.querySelectorAll('.heme-item')].some(c=>c.style.display!=='none');
+    section.style.display=visible?'':'none';
+  });
+}
+
+async function openHemeExportModal(){
+  let conditions=[];
+  try{
+    const res=await sb.from('mlsboc_heme_conditions').select('*').order('name');
+    conditions=hemeConditionsOrDefaults(res.data||[]);
+  }catch(error){
+    conditions=hemeDefaultConditions();
+  }
+  if(!conditions||!conditions.length){alert('No conditions to export.');return;}
+
+  const byFolder={};
+  conditions.forEach(c=>{
+    const folder=normalizeHemeFolderKey(c.folder);
+    if(!byFolder[folder])byFolder[folder]=[];
+    byFolder[folder].push(c);
+  });
+
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export Conditions to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select conditions to include in the PDF.</div>
+    <div class="flex gap-8 mb-16 flex-wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.heme-exp-cb').forEach(c=>c.checked=true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.heme-exp-cb').forEach(c=>c.checked=false)">Deselect All</button>
+    </div>`;
+
+  HEME_FOLDER_GROUPS.flatMap(g=>g.keys).concat(Object.keys(byFolder).filter(k=>!HEME_FOLDER_GROUPS.flatMap(g=>g.keys).includes(k))).forEach(fkey=>{
+    const items=byFolder[fkey];if(!items||!items.length)return;
+    const folderDef=HEME_FOLDERS.find(x=>x.key===fkey);
+    html+=`<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:12px">${folderDef?folderDef.name:fkey}</div>`;
+    items.forEach(c=>{
+      html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px">
+        <input type="checkbox" class="heme-exp-cb" data-id="${c.id}" checked style="width:16px;height:16px;flex-shrink:0">
+        <span style="font-weight:600">${c.name}</span>
+        ${c.key_features&&c.key_features.length?`<span style="font-size:11px;color:var(--text3);margin-left:auto">${c.key_features.slice(0,2).join(' · ')}</span>`:''}
+      </label>`;
+    });
+  });
+
+  html+=`
+    <div class="flex gap-8 mt-20 flex-wrap">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="generateHemeConditionsPDF()">📄 Generate PDF</button>
+    </div>`;
+
+  document.getElementById('condition-modal-body').innerHTML=html;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function generateHemeConditionsPDF(){
+  const selectedIds=[...document.querySelectorAll('.heme-exp-cb:checked')].map(cb=>cb.dataset.id);
+  if(!selectedIds.length){alert('Select at least one condition.');return;}
+  const btn=document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+  try{
+    let all=window._hemeAllConditions||window._hemeCondsCache||[];
+    if(!all.length){
+      try{
+        const res=await sb.from('mlsboc_heme_conditions').select('*').in('id',selectedIds);
+        all=hemeConditionsOrDefaults(res.data||[]);
+      }catch(error){
+        all=hemeDefaultConditions();
+      }
+    }
+    if(!all||!all.length){alert('Could not load conditions.');return;}
+    const {jsPDF}=window.jspdf;
+    const ordered=selectedIds.map(id=>all.find(item=>item.id===id)).filter(Boolean);
+
+    await generateImageSectionPDF(ordered,'Hematology Conditions','hematology_conditions.pdf',{
+      showImageMeta:true,
+      imageFrame:false,
+      imagePadding:0,
+      imageMetaPosition:'overlay',
+      showCategory:true,
+      missingFeaturesText:'No key features need to add'
+    });
+  }catch(err){
+    console.error(err);alert('PDF generation failed: '+err.message);
+    if(btn){btn.textContent='📄 Generate PDF';btn.disabled=false;}
+  }
+}
+
+function buildConditionThumbs(c){
+  const imgs=imageEntryList(c.images);
+  const slots=4;
+  let html='';
+  for(let i=0;i<slots;i++){
+    const src=imageEntrySrc(imgs[i]);
+    if(src) html+=`<div class="heme-thumb-wrap"><img src="${esc(src)}" alt="" onerror="retryImageLoad(this)"><span class="heme-img-meta">${esc(hemeImageLabel(imgs[i],i))}</span></div>`;
+    else html+=`<div class="img-ph">${i===0?'🖼️':''}</div>`;
+  }
+  return html;
+}
+
+function openCondition(id){
+  // Show modal
+  const cached=(window._hemeCondsCache||hemeDefaultConditions()).find(item=>String(item.id)===String(id));
+  const openWithData=(data)=>{
+    if(!data)return;
+    const imgs=imageEntryList(data.images).map((entry,index)=>({entry,index})).filter(x=>imageEntrySrc(x.entry));
+    const features=(data.key_features||[]).filter(Boolean);
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div class="section-title" style="font-size:16px">${esc(data.name||'')}</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      ${imgs.length?`
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.length,2)},1fr);gap:8px;margin-bottom:16px">
+          ${imgs.map(({entry,index})=>{
+            const src=imageEntrySrc(entry);
+            return `<div class="heme-img-wrap"><img src="${esc(src)}" onclick="openImgViewer('${jsAttr(src)}')" alt="" onerror="retryImageLoad(this)"><span class="heme-img-meta">${esc(hemeImageLabel(entry,index))}</span></div>`;
+          }).join('')}
+        </div>`:''}
+      ${features.length?`
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Key Features</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          ${features.map(f=>`<span class="tag tag-info">${esc(f)}</span>`).join('')}
+        </div>`:`<div class="condition-features heme-missing-text" style="margin-bottom:16px">Key features blank</div>`}
+      ${isAdmin?`
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Edit title and key features</div>
+        ${buildConditionDetailsEditor(data)}
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Admin: Update images, magnification, and PB/BM label</div>
+        ${buildConditionImageEditor(data)}
+      `:''}
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  };
+  if(cached&&String(cached.id).startsWith('heme-default-')){openWithData(cached);return;}
+  sb.from('mlsboc_heme_conditions').select('*').eq('id',id).single().then(({data})=>{
+    openWithData(data||cached);
+  }).catch(()=>openWithData(cached));
+}
+
+function buildConditionDetailsEditor(condition){
+  const id=condition.id;
+  const features=(condition.key_features||[]).filter(Boolean).join('\n');
+  return `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="heme-edit-name-${id}" value="${esc(condition.name||'')}" placeholder="Condition title">
+      </div>
+      <div class="form-group">
+        <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
+        <textarea id="heme-edit-features-${id}" style="min-height:90px" placeholder="Feature 1&#10;Feature 2">${esc(features)}</textarea>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveHemeConditionDetails('${id}')">Save Title & Key Features</button>
+    </div>
+  `;
+}
+
+function buildConditionImageEditor(condition){
+  const imgs=imageEntryList(condition.images);
+  return `
+    <div class="drop-zone heme-bulk-zone" id="dz-${condition.id}-bulk"
+      ondrop="handleConditionBulkImgDrop(event,'${condition.id}')"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      onclick="document.getElementById('cimg-${condition.id}-bulk').click()"
+    >
+      <div>
+        <div style="font-size:22px;margin-bottom:4px">📁</div>
+        <div style="font-weight:700;color:var(--text2)">Add up to 4 images at once</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">They fill slots 1-4 in order: 50x PB, then 100x PB.</div>
+      </div>
+      <input type="file" accept="image/*" multiple id="cimg-${condition.id}-bulk" style="display:none" onchange="handleConditionBulkImgFile(event,'${condition.id}')">
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      ${[0,1,2,3].map(i=>{
+        const entry=imgs[i];
+        const src=imageEntrySrc(entry);
+        const mag=imageEntryMag(entry,i);
+        const specimen=imageEntrySpecimen(entry,i);
+        return `
+        <div class="heme-slot-tile">
+          <div class="drop-zone" id="dz-${condition.id}-${i}"
+            ondrop="handleConditionImgDrop(event,'${condition.id}',${i})"
+            ondragover="event.preventDefault();this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')"
+            onclick="document.getElementById('cimg-${condition.id}-${i}').click()"
+          >
+          ${src?`<div class="heme-editor-img-wrap"><img src="${esc(src)}" style="width:100%;height:80px;object-fit:cover;border-radius:4px" onerror="retryImageLoad(this)"><span class="heme-img-meta">${esc(hemeImageLabel(entry,i))}</span></div>`:`<div style="font-size:24px;margin-bottom:4px">📷</div><div>Slot ${i+1}</div>`}
+            <input type="file" accept="image/*" id="cimg-${condition.id}-${i}" style="display:none" onchange="handleConditionImgFile(event,'${condition.id}',${i})">
+          </div>
+          <div class="heme-slot-meta">
+            <input type="text" value="${esc(mag)}" placeholder="${i===0?'50x':'100x'}" aria-label="Magnification" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'mag',this.value)">
+            <select aria-label="Specimen" onclick="event.stopPropagation()" onchange="updateConditionImageMeta('${condition.id}',${i},'specimen',this.value)">
+              <option value="PB" ${specimen==='PB'?'selected':''}>PB</option>
+              <option value="BM" ${specimen==='BM'?'selected':''}>BM</option>
+            </select>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">Done</button>
+  `;
+}
+
+async function handleConditionImgFile(e, conditionId, slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+    const imgs=[...imageEntryList(data?.images)];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
+    await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+    window._hemeCondsCache=null;
+    openCondition(conditionId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleConditionImgDrop(e, conditionId, slot){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const files=Array.from(e.dataTransfer.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(files.length>1){await handleConditionBulkFiles(files,conditionId,slot);return;}
+  const file=files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+    const imgs=[...imageEntryList(data?.images)];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
+    await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+    window._hemeCondsCache=null;
+    openCondition(conditionId);
+  };
+  reader.readAsDataURL(file);
+}
+
+function readHemeImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=ev=>resolve(ev.target.result);
+    reader.onerror=()=>reject(reader.error||new Error('Could not read image'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleConditionBulkImgFile(e,conditionId){
+  const files=Array.from(e.target.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(files.length)await handleConditionBulkFiles(files,conditionId,0);
+  e.target.value='';
+}
+
+async function handleConditionBulkImgDrop(e,conditionId){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const files=Array.from(e.dataTransfer.files||[]).filter(file=>file.type.startsWith('image/'));
+  if(files.length)await handleConditionBulkFiles(files,conditionId,0);
+}
+
+async function handleConditionBulkFiles(files,conditionId,startSlot=0){
+  const imageFiles=files.filter(file=>file&&file.type.startsWith('image/')).slice(0,4-startSlot);
+  if(!imageFiles.length)return;
+  const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+  const imgs=[...imageEntryList(data?.images)];
+  while(imgs.length<4)imgs.push(null);
+  for(let i=0;i<imageFiles.length;i++){
+    const slot=startSlot+i;
+    const dataUrl=await readHemeImageFile(imageFiles[i]);
+    imgs[slot]=hemeImageEntry(dataUrl,imgs[slot],slot);
+  }
+  await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+  window._hemeCondsCache=null;
+  openCondition(conditionId);
+}
+
+async function saveHemeConditionDetails(conditionId){
+  const name=document.getElementById(`heme-edit-name-${conditionId}`)?.value.trim();
+  const featText=document.getElementById(`heme-edit-features-${conditionId}`)?.value||'';
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!name){alert('Title is required.');return;}
+  const {error}=await sb.from('mlsboc_heme_conditions').update({name,key_features:features}).eq('id',conditionId);
+  if(error){alert('Save failed: '+error.message);return;}
+  window._hemeCondsCache=null;
+  openCondition(conditionId);
+  renderTab();
+}
+
+async function updateConditionImageMeta(conditionId,slot,field,value){
+  const {data}=await sb.from('mlsboc_heme_conditions').select('images').eq('id',conditionId).single();
+  const imgs=[...imageEntryList(data?.images)];
+  while(imgs.length<=slot)imgs.push(null);
+  const current=imgs[slot];
+  const next=typeof current==='object'&&current?{...current}:{url:imageEntrySrc(current),mag:imageEntryMag(current,slot),specimen:imageEntrySpecimen(current,slot)};
+  if(field==='specimen')next.specimen=String(value||'PB').toUpperCase()==='BM'?'BM':'PB';
+  else next.mag=String(value||'100x').trim()||'100x';
+  imgs[slot]=next;
+  await sb.from('mlsboc_heme_conditions').update({images:imgs}).eq('id',conditionId);
+  window._hemeCondsCache=null;
+  openCondition(conditionId);
+}
+
+function openHemeFolder(key){
+  appState.hemeImgPage=key;
+  renderTab();
+}
+
+// Hematology image quiz
+async function startHemeQuiz(){
+  let data=[];
+  try{const res=await sb.from('mlsboc_heme_conditions').select('*').not('images','is',null);data=hemeConditionsOrDefaults(res.data||[]);}
+  catch(error){data=hemeDefaultConditions();}
+  const valid=(data||[]).filter(hasUsableImages);
+  if(!valid.length){alert('No conditions with images to quiz on yet.');return;}
+  appState.hemeImgMode='quiz';
+  window._kqOpts={};appState.hemeQuizItems=shuffle(valid);
+  appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+  renderTab();
+}
+
+async function startHemeFlashcard(){
+  if(!window._hemeCondsCache){try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=hemeConditionsOrDefaults(r.data||[]);}catch(e){window._hemeCondsCache=hemeDefaultConditions();}}
+  if(!window._hemeCondsCache||!window._hemeCondsCache.length){alert('No conditions to study yet.');return;}
+  startImageFlashcard(window._hemeCondsCache);
+}
+
+async function startMicroFlashcard(){
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  const data=window._microOrgsCache||[];
+  if(!data.length){alert('No organisms to study yet.');return;}
+  startImageFlashcard(data);
+}
+
+async function startUAFlashcard(){
+  if(!window._uaCache){
+    try{
+      const meta=await getUAMetaItems();
+      window._uaCache=await getUAItemsWithImages(meta);
+    }catch(e){}
+  }
+  const valid=(window._uaCache||[]).filter(o=>imageEntryList(o.images).some(entry=>imageEntrySrc(entry)));
+  if(!valid.length){alert('No images to study yet.');return;}
+  startImageFlashcard(valid);
+}
+
+async function startHemeQuizFolder(folder){
+  let data=[];
+  try{const res=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',folder);data=hemeConditionsOrDefaults(res.data||[]).filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
+  catch(error){data=hemeDefaultConditions().filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
+  const valid=(data||[]).filter(hasUsableImages);
+  if(!valid.length){alert('No conditions with images in this folder yet.');return;}
+  appState.hemeImgMode='quiz';
+  window._kqOpts={};appState.hemeQuizItems=shuffle(valid);
+  appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+  appState.hemeImgPage=folder;
+  renderTab();
+}
+
+function renderHemeImageQuiz(el){
+  renderKahootImageQuiz(el,{
+    items:appState.hemeQuizItems,
+    idx:appState.hemeQuizIdx,
+    ans:appState.hemeQuizAns,
+    done:appState.hemeQuizDone,
+    prompt:'What condition does this represent?',
+    placeholder:'🖼️',
+    onAnswer:id=>{appState.hemeQuizAns[appState.hemeQuizIdx]=id;renderTab();},
+    onPrev:()=>{appState.hemeQuizIdx=Math.max(0,appState.hemeQuizIdx-1);renderTab();},
+    onNext:()=>{appState.hemeQuizIdx++;renderTab();},
+    onDone:()=>{appState.hemeQuizDone=true;renderTab();},
+    onRetry:()=>startHemeQuiz(),
+    onExit:()=>{appState.hemeImgMode='browse';appState.hemeImgPage=null;appState.hemeQuizDone=false;renderTab();},
+    onRetryWrong:(wrongItems)=>{
+      if(!wrongItems.length)return;
+      window._kqOpts={};appState.hemeQuizItems=shuffle(wrongItems);
+      appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
+      renderTab();
+    }
+  });
+}
+
+function answerHemeImgQ(id){
+  appState.hemeQuizAns[appState.hemeQuizIdx]=id;
+  renderTab();
+}
+
+function hemeQuizNext(){appState.hemeQuizIdx++;renderTab();}
+
+// ─── MICROBIOLOGY IMAGES — folder system (mirrors hematology) ─────────────────
+async function renderMicroImages(el){
+  if(appState.microImgMode==='quiz'){renderMicroImageQuiz(el);return;}
+  el.innerHTML=imageLoadingHTML();
+
+  // Flat view — cache organisms to avoid refetch on tab switch
+  if(!Array.isArray(window._microOrgsCache)||window._microOrgsLoadFailed||window._microOrgsCache.length===0){
+    try{
+      window._microOrgsCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_micro_organisms').select('*').order('name'),3,true);
+      window._microOrgsLoadFailed=false;
+    }catch(e){
+      window._microOrgsLoadFailed=true;
+      if(!Array.isArray(window._microOrgsCache)||!window._microOrgsCache.length){
+        el.innerHTML=imageLoadRetryHTML('Microbiology','window._microOrgsCache=null;window._microOrgsLoadFailed=false;renderTab()');
+        return;
+      }
+    }
+  }
+  const all=window._microOrgsCache||[];
+  const byFolder={};
+  all.forEach(o=>{const f=o.folder||'misc';if(!byFolder[f])byFolder[f]=[];byFolder[f].push(o);});
+
+  const folderOrder=MICRO_FOLDER_GROUPS.flatMap(g=>g.keys);
+  Object.keys(byFolder).forEach(k=>{if(!folderOrder.includes(k))folderOrder.push(k);});
+
+  el.innerHTML=`
+    <div class="flex-center gap-8 mb-16 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="startMicroQuiz()">⚡ Image Quiz Mode</button>
+      <button class="btn btn-ghost btn-sm" onclick="startMicroFlashcard()">🃏 Flashcards</button>
+      <button class="btn btn-ghost btn-sm" onclick="openMicroExportModal()">📄 Export</button>
+      ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="showAddOrganismModal(null)">+ Add Organism</button>`:''}
+    </div>
+    <div style="position:relative;margin-bottom:20px">
+      <input type="text" id="micro-search" placeholder="Search organisms..." style="width:100%;padding:10px 16px 10px 36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px" oninput="filterMicroItems(this.value)">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+    </div>
+    <div id="micro-items-body">
+      ${folderOrder.map(fkey=>{
+        const folderDef=MICRO_FOLDERS.find(x=>x.key===fkey);
+        const label=folderDef?folderDef.name:fkey;
+        const items=byFolder[fkey]||[];
+        if(!items.length)return '';
+        return `
+          <div class="micro-section mb-24" data-folder="${fkey}">
+            <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${label} <span style="font-weight:400;font-size:11px">(${items.length})</span></div>
+            <div class="condition-grid">
+              ${items.map(o=>`
+                <div class="condition-card micro-item" data-name="${esc(o.name.toLowerCase())}" onclick="openOrganism('${o.id}')">
+                  <div class="condition-imgs">${buildOrganismThumbs(o)}</div>
+                  <div class="condition-body">
+                    <div class="condition-name">${o.name}</div>
+                    ${o.key_features&&o.key_features.length?`<div class="condition-features">${(o.key_features||[]).slice(0,3).join(' · ')}</div>`:'<div class="condition-features" style="color:var(--text3);font-style:italic">No features yet</div>'}
+                    ${isAdmin?`<div class="flex gap-6 mt-8" onclick="event.stopPropagation()">
+                      <button class="btn btn-ghost btn-xs" onclick="openOrganismEditModal('${o.id}')">Edit</button>
+                      <button class="btn btn-danger btn-xs" onclick="deleteOrganism('${o.id}')">Delete</button>
+                    </div>`:''}
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }).join('')}
+      ${all.length===0?'<div class="empty">No microbiology images loaded yet. Try this tab again before adding new images.</div>':''}
+    </div>
+    ${isAdmin?`<div class="mt-16">${adminMicroImageControls()}</div>`:''}
+  `;
+  // Clear the cache entry if it seems stale (will refetch next time)
+  if(!all.length) window._microOrgsCache=null;
+}
+
+function filterMicroItems(query){
+  const q=query.toLowerCase().trim();
+  document.querySelectorAll('.micro-item').forEach(card=>{
+    card.style.display=(!q||card.dataset.name.includes(q))?'':'none';
+  });
+  document.querySelectorAll('.micro-section').forEach(section=>{
+    const visible=[...section.querySelectorAll('.micro-item')].some(c=>c.style.display!=='none');
+    section.style.display=visible?'':'none';
+  });
+}
+
+async function openMicroExportModal(){
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  const all=window._microOrgsCache||[];
+  if(!all.length){alert('No organisms to export.');return;}
+  const byFolder={};
+  all.forEach(o=>{if(!byFolder[o.folder])byFolder[o.folder]=[];byFolder[o.folder].push(o);});
+  let html=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:16px;font-weight:600">Export Organisms to PDF</div>
+      <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="flex gap-8 mb-12"><button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.micro-exp-cb').forEach(c=>c.checked=true)">Select All</button><button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.micro-exp-cb').forEach(c=>c.checked=false)">Deselect All</button></div>`;
+  MICRO_FOLDER_GROUPS.flatMap(g=>g.keys).forEach(fkey=>{
+    const items=byFolder[fkey];if(!items||!items.length)return;
+    const fd=MICRO_FOLDERS.find(x=>x.key===fkey);
+    html+=`<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:8px;margin-top:12px">${fd?fd.name:fkey}</div>`;
+    items.forEach(o=>{
+      html+=`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px;cursor:pointer;font-size:13px"><input type="checkbox" class="micro-exp-cb" data-id="${o.id}" checked style="width:16px;height:16px;flex-shrink:0"><span style="font-weight:600">${o.name}</span></label>`;
+    });
+  });
+  html+=`<div class="flex gap-8 mt-20"><button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" onclick="generateMicroPDF()">📄 Generate PDF</button></div>`;
+  document.getElementById('condition-modal-body').innerHTML=html;
+  document.getElementById('condition-modal').classList.remove('hidden');
+}
+
+async function generateMicroPDF(){
+  const ids=[...document.querySelectorAll('.micro-exp-cb:checked')].map(cb=>cb.dataset.id);
+  if(!ids.length){alert('Select at least one.');return;}
+  const btn=document.querySelector('#condition-modal-body .btn-primary');
+  if(btn){btn.textContent='Generating...';btn.disabled=true;}
+  try{
+    const rawAll=(window._microOrgsCache||[]).filter(o=>ids.includes(o.id));
+    // Normalize micro organisms to match shared PDF format
+    const all=rawAll.map(o=>({name:o.name,key_features:o.key_features||[],notes:o.notes||'',images:imageEntryList(o.images)}));
+    // Use shared generator
+    await generateImageSectionPDF(all,'Microbiology Organisms','microbiology_organisms.pdf');
+    return;
+    const {jsPDF}=window.jspdf;
+    // Landscape A4 for 2x2 grid of images
+    const doc=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
+    const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
+    const margin=12,gap=8;
+    const cellW=(pageW-margin*2-gap)/2;
+    const cellH=(pageH-margin*2-gap)/2;
+    const getImgDims=(src)=>new Promise(res=>{const img=new Image();img.onload=()=>res({w:img.naturalWidth||4,h:img.naturalHeight||3});img.onerror=()=>res({w:4,h:3});img.src=src;});
+    let first=true;
+    for(const o of (all||[])){
+      if(!first)doc.addPage();first=false;
+      // Organism name header
+      doc.setFillColor(30,30,30);doc.rect(margin,margin,pageW-margin*2,10,'F');
+      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+      doc.text(o.name,margin+4,margin+7);
+      // Key features on same line if space
+      if(o.key_features&&o.key_features.length){
+        doc.setFontSize(9);doc.setFont('helvetica','normal');
+        const feat=o.key_features.slice(0,4).join(' | ');
+        doc.text(feat,margin+4,margin+14);
+      }
+      const imgY=margin+18;
+      const imgs=(o.images||[]).filter(Boolean).slice(0,4);
+      for(let i=0;i<4;i++){
+        const col=i%2,row=Math.floor(i/2);
+        const x=margin+col*(cellW+gap);
+        const y=imgY+row*(cellH+gap);
+        // Draw cell border (empty placeholder)
+        doc.setDrawColor(200,200,200);doc.setLineWidth(0.3);
+        doc.rect(x,y,cellW,cellH,'S');
+        if(imgs[i]){
+          try{
+            let dims={w:4,h:3};
+            try{dims=await getImgDims(imgs[i]);}catch(e){}
+            // Fit image inside cell preserving aspect ratio (no crop, no distort)
+            const imgAr=dims.w/dims.h;
+            const cellAr=cellW/cellH;
+            let dw,dh;
+            if(imgAr>cellAr){dw=cellW;dh=cellW/imgAr;}
+            else{dh=cellH;dw=cellH*imgAr;}
+            const ox=x+(cellW-dw)/2;
+            const oy=y+(cellH-dh)/2;
+            const fmt=imgs[i].startsWith('data:image/png')?'PNG':'JPEG';
+            doc.addImage(imgs[i],fmt,ox,oy,dw,dh,'','NONE');
+          }catch(e){}
+        }else{
+          // Empty cell label
+          doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,180,180);
+          doc.text('(no image)',x+cellW/2,y+cellH/2,{align:'center'});
+        }
+      }
+    }
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
+      doc.text('MLS BOC Prep - Microbiology | Page '+p+' of '+total,margin,pageH-5);
+    }
+    doc.save('microbiology_organisms.pdf');
+    document.getElementById('condition-modal').classList.add('hidden');
+  }catch(err){alert('PDF failed: '+err.message);if(btn){btn.textContent='Generate PDF';btn.disabled=false;}}
+}
+
+function openMicroFolder(key){appState.microImgPage=key;renderTab();}
+
+function buildOrganismThumbs(o){
+  const imgs=imageEntryList(o.images);
+  const slots=4;let html='';
+  for(let i=0;i<slots;i++){
+    const src=imageEntrySrc(imgs[i]);
+    if(src)html+=`<img src="${esc(src)}" alt="" onerror="retryImageLoad(this)">`;
+    else html+=`<div class="img-ph">${i===0?'🔬':''}</div>`;
+  }
+  return html;
+}
+
+function openOrganism(id){
+  sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=imageEntryList(data.images);
+    const features=data.key_features||[];
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div class="section-title" style="font-size:16px">${data.name}</div>
+        <div class="flex gap-6 ml-auto">
+          ${isAdmin?`<button class="btn btn-ghost btn-xs" onclick="document.getElementById('condition-modal').classList.add('hidden');openOrganismEditModal('${data.id}')">Edit</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+        </div>
+      </div>
+      ${imgs.filter(Boolean).length?`
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(imgs.filter(Boolean).length,2)},1fr);gap:8px;margin-bottom:16px">
+          ${imgs.map(imageEntrySrc).filter(Boolean).map(url=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" onerror="retryImageLoad(this)" style="width:100%;height:200px;object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)">`).join('')}
+        </div>`:'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:12px">🔬</div>'}
+      ${features.length?`
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Key Features</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          ${features.map(f=>`<span class="tag tag-info">${f}</span>`).join('')}
+        </div>`:'<div style="color:var(--text3);font-size:13px;margin-bottom:12px">No key features added yet.</div>'}
+      ${data.notes?`<div class="explanation">${data.notes}</div>`:''}
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+function openOrganismEditModal(id){
+  sb.from('mlsboc_micro_organisms').select('*').eq('id',id).single().then(({data})=>{
+    if(!data)return;
+    const imgs=imageEntryList(data.images);
+    document.getElementById('condition-modal-body').innerHTML=`
+      <div class="flex-center gap-8 mb-16">
+        <div style="font-size:16px;font-weight:600">Edit Organism</div>
+        <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="oedit-name" value="${esc(data.name||'')}" placeholder="e.g. S. aureus" style="font-size:15px">
+      </div>
+      <div class="form-group">
+        <label>Key Features <span style="font-size:11px;color:var(--text3)">(one per line)</span></label>
+        <textarea id="oedit-features" style="min-height:90px" placeholder="Coagulase positive&#10;Beta-hemolytic&#10;Gram positive cocci">${(data.key_features||[]).join('\n')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <textarea id="oedit-notes" style="min-height:60px">${data.notes||''}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Gram Stain Group</label>
+        <select id="oedit-folder">
+          ${['gram_positive','gram_negative'].map(k=>`<option value="${k}" ${data.folder===k?'selected':''}>${k==='gram_positive'?'Gram Positive':'Gram Negative'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Images <span style="font-size:11px;color:var(--text3)">(up to 4 — click or drag)</span></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[0,1,2,3].map(i=>`
+            <div class="drop-zone" id="odz-${data.id}-${i}"
+              ondrop="handleOrganismImgDrop(event,'${data.id}',${i})"
+              ondragover="event.preventDefault();this.classList.add('dragover')"
+              ondragleave="this.classList.remove('dragover')"
+              onclick="document.getElementById('oimg-${data.id}-${i}').click()"
+              style="min-height:90px">
+              ${imgs[i]?`<img src="${imgs[i]}" style="width:100%;height:80px;object-fit:contain;border-radius:4px;background:var(--bg3)">`:`<div style="font-size:22px;margin-bottom:4px">📷</div><div style="font-size:12px">Slot ${i+1}</div>`}
+              <input type="file" accept="image/*" id="oimg-${data.id}-${i}" style="display:none" onchange="handleOrganismImgFile(event,'${data.id}',${i})">
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="flex gap-8 mt-8">
+        <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveOrganismEdit('${data.id}')">Save Changes</button>
+      </div>
+    `;
+    document.getElementById('condition-modal').classList.remove('hidden');
+  });
+}
+
+async function saveOrganismEdit(id){
+  const name=document.getElementById('oedit-name')?.value.trim();
+  if(!name){alert('Name is required.');return;}
+  const featText=document.getElementById('oedit-features')?.value||'';
+  const notes=document.getElementById('oedit-notes')?.value.trim()||'';
+  const folder=document.getElementById('oedit-folder')?.value||'gram_positive';
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  const {error}=await sb.from('mlsboc_micro_organisms').update({name,key_features:features,notes,folder}).eq('id',id);window._microOrgsCache=null;
+  if(error){alert('Save failed: '+error.message);return;}
+  document.getElementById('condition-modal').classList.add('hidden');
+  renderTab();
+}
+
+// handleOrganismImgFile and handleOrganismImgDrop reopen edit modal so slots refresh
+
+
+async function handleOrganismImgFile(e,orgId,slot){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_micro_organisms').select('images').eq('id',orgId).single();
+    const imgs=[...imageEntryList(data?.images)];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
+    openOrganismEditModal(orgId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleOrganismImgDrop(e,orgId,slot){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const dataUrl=ev.target.result;
+    const {data}=await sb.from('mlsboc_micro_organisms').select('images').eq('id',orgId).single();
+    const imgs=[...imageEntryList(data?.images)];
+    while(imgs.length<=slot)imgs.push(null);
+    imgs[slot]=dataUrl;
+    await sb.from('mlsboc_micro_organisms').update({images:imgs}).eq('id',orgId);
+    openOrganismEditModal(orgId);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function startMicroQuiz(){
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  const valid=(window._microOrgsCache||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No organisms with images to quiz on yet.');return;}
+  appState.microImgMode='quiz';
+  window._kqOpts={};appState.microQuizItems=shuffle(valid);
+  appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+  renderTab();
+}
+
+async function startMicroQuizFolder(folder){
+  const {data}=await sb.from('mlsboc_micro_organisms').select('*').eq('folder',folder);
+  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!valid.length){alert('No organisms with images in this folder yet.');return;}
+  appState.microImgMode='quiz';
+  window._kqOpts={};appState.microQuizItems=shuffle(valid);
+  appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+  appState.microImgPage=folder;
+  renderTab();
+}
+
+function renderMicroImageQuiz(el){
+  renderKahootImageQuiz(el,{
+    items:appState.microQuizItems,
+    idx:appState.microQuizIdx,
+    ans:appState.microQuizAns,
+    done:appState.microQuizDone,
+    prompt:'Identify this organism.',
+    placeholder:'🔬',
+    onAnswer:id=>{appState.microQuizAns[appState.microQuizIdx]=id;renderTab();},
+    onPrev:()=>{appState.microQuizIdx=Math.max(0,appState.microQuizIdx-1);renderTab();},
+    onNext:()=>{appState.microQuizIdx++;renderTab();},
+    onDone:()=>{appState.microQuizDone=true;renderTab();},
+    onRetry:()=>startMicroQuiz(),
+    onExit:()=>{appState.microImgMode='browse';appState.microImgPage=null;appState.microQuizDone=false;renderTab();},
+    onRetryWrong:(wrongItems)=>{
+      if(!wrongItems.length)return;
+      window._kqOpts={};appState.microQuizItems=shuffle(wrongItems);
+      appState.microQuizIdx=0;appState.microQuizAns=[];appState.microQuizDone=false;
+      renderTab();
+    }
+  });
+}
+
+function answerMicroImgQ(id){appState.microQuizAns[appState.microQuizIdx]=id;renderTab();}
+function microQuizNext(){appState.microQuizIdx++;renderTab();}
+
+function adminMicroImageControls(){
+  return `
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:16px">Admin: Add Organism</div>
+      <button class="btn btn-primary" onclick="showAddOrganismModal(null)">+ Add New Organism</button>
+      <div class="divider"></div>
+      <label class="btn btn-ghost" style="cursor:pointer;display:inline-flex">Bulk CSV Upload
+        <input type="file" accept=".csv" style="display:none" onchange="adminBulkOrganisms(event)">
+      </label>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="dlCSV([['name','folder','key_features','notes'],['Staphylococcus aureus','gpc_clusters','Coagulase positive; Beta-hemolytic; Catalase positive','Golden colonies on BAP']],'organisms_template.csv')">Download Template</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">CSV: name, folder (gpc_clusters/gnr_enteric/etc.), key_features (semicolon-separated), notes. Images added separately via drag & drop.</div>
+    </div>`;
+}
+
+function showAddOrganismModal(folder){
+  const modal=document.getElementById('condition-modal');
+  document.getElementById('condition-modal-body').innerHTML=`
+    <div class="modal-title">Add Organism</div>
+    <div class="form-group"><label>Name</label><input type="text" id="org-name"></div>
+    <div class="form-group"><label>Folder</label>
+      <select id="org-folder">
+        ${MICRO_FOLDERS.map(f=>`<option value="${f.key}" ${folder===f.key?'selected':''}>${f.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Key Features (one per line)</label><textarea id="org-features" placeholder="Coagulase positive&#10;Beta-hemolytic&#10;Catalase positive"></textarea></div>
+    <div class="form-group"><label>Notes</label><textarea id="org-notes"></textarea></div>
+    <div class="flex gap-8 mt-8">
+      <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" onclick="adminAddOrganism()">Add Organism</button>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+async function adminAddOrganism(){
+  const name=document.getElementById('org-name')?.value.trim();
+  const folder=document.getElementById('org-folder')?.value;
+  const featText=document.getElementById('org-features')?.value||'';
+  const notes=document.getElementById('org-notes')?.value.trim();
+  const features=featText.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!name||!folder){alert('Name and folder required.');return;}
+  const {error}=await sb.from('mlsboc_micro_organisms').insert({name,folder,key_features:features,notes:notes||'',images:[]});window._microOrgsCache=null;
+  if(error)alert('Error: '+error.message);
+  else{document.getElementById('condition-modal').classList.add('hidden');renderTab();}
+}
+
+async function adminBulkOrganisms(e){
+  const rows=parseCSV(await e.target.files[0].text());
+  for(const r of rows){
+    if(!r[0])continue;
+    const features=(r[2]||'').split(';').map(x=>x.trim()).filter(Boolean);
+    try{await sb.from('mlsboc_micro_organisms').insert({name:r[0],folder:r[1]||'misc',key_features:features,notes:r[3]||'',images:[]});}catch(e){}
+  }
+  renderTab();
+}
+
+async function deleteOrganism(id){
+  if(!confirm('Delete this organism?'))return;
+  await sb.from('mlsboc_micro_organisms').delete().eq('id',id);
+  renderTab();
+}
+async function renderCasesTab(el){
+  if(appState.subject==='microbiology'){
     await renderMicroCases(el);
   }else if(appState.subject==='blood_bank'){
     await renderBloodBankCases(el);
