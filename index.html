@@ -144,16 +144,16 @@ select option{background:var(--bg3)}
 .home-practice-card.exam-feature::before{inset:-34% -9% auto auto;width:300px;height:300px;background:rgba(255,255,255,.20)}
 .home-practice-card.exam-feature::after{width:92px;height:92px;border-radius:26px;right:28px;bottom:28px;background:rgba(255,255,255,.18)}
 .home-practice-card.exam-feature .home-practice-icon{width:62px;height:62px;border-radius:20px;font-size:31px;margin-bottom:26px}
-.home-practice-card.exam-feature .home-practice-title{font-size:36px;max-width:600px;margin-bottom:12px}
-.home-practice-card.exam-feature .home-practice-sub{font-size:16px;line-height:1.42;max-width:720px}
-.home-practice-card.exam-feature .home-practice-meta{font-size:15px;margin-top:28px;color:rgba(255,255,255,.86)}
-.home-practice-card.reference-compact{min-height:190px;padding:20px;background:linear-gradient(135deg,#2f7dd1 0%,#2369b4 100%);box-shadow:0 15px 30px rgba(35,105,180,.18)}
+.home-practice-card.exam-feature .home-practice-title{font-size:40px;max-width:720px;margin-bottom:14px}
+.home-practice-card.exam-feature .home-practice-sub{font-size:18px;line-height:1.42;max-width:800px}
+.home-practice-card.exam-feature .home-practice-meta{font-size:16px;margin-top:28px;color:rgba(255,255,255,.88)}
+.home-practice-card.reference-compact{min-height:270px;padding:26px;background:linear-gradient(135deg,#2f7dd1 0%,#2369b4 100%);box-shadow:0 15px 30px rgba(35,105,180,.18)}
 .home-practice-card.reference-compact::before{width:170px;height:170px}
 .home-practice-card.reference-compact::after{width:58px;height:58px;border-radius:16px}
 .home-practice-card.reference-compact .home-practice-icon{width:44px;height:44px;font-size:22px;margin-bottom:14px}
-.home-practice-card.reference-compact .home-practice-title{font-size:20px;max-width:320px}
-.home-practice-card.reference-compact .home-practice-sub{font-size:12px;max-width:330px}
-.home-practice-card.reference-compact .home-practice-meta{font-size:11px}
+.home-practice-card.reference-compact .home-practice-title{font-size:27px;max-width:360px}
+.home-practice-card.reference-compact .home-practice-sub{font-size:15px;line-height:1.45;max-width:360px}
+.home-practice-card.reference-compact .home-practice-meta{font-size:14px}
 .home-practice-icon{position:relative;z-index:1;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.26);font-size:23px;font-weight:900;margin-bottom:18px}
 .home-practice-title{position:relative;z-index:1;font-size:22px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:8px;max-width:420px}
 .home-practice-sub{position:relative;z-index:1;font-size:13px;line-height:1.4;color:rgba(255,255,255,.83);max-width:520px}
@@ -205,6 +205,7 @@ select option{background:var(--bg3)}
 .exam-sim-start h2{font-size:28px;margin:0 0 10px;color:#111827}
 .exam-sim-start p{font-size:15px;line-height:1.55;color:#374151;margin:8px 0}
 .exam-sim-coverage-note{background:#fff3b8;border:1px solid #e7c85c;border-left:4px solid #d4a900;border-radius:6px;padding:10px 12px;color:#5f4b00!important;font-weight:700}
+.exam-sim-footnote{margin:12px 0 4px!important;color:#6b7280!important;font-size:11px!important;line-height:1.45!important}
 .exam-sim-weight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 18px;margin:18px 0}
 .exam-sim-weight-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e5e7eb;padding:6px 0;font-size:13px;color:#1f2937}
 .exam-sim-weight-row span:last-child{margin-left:auto;color:#4b5563}
@@ -300,30 +301,33 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-sheet{display:grid;gap:8px;min-width:0}
-.formula-category{--category-color:#2f7dd1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid}
+.formula-sheet{display:block;column-count:2;column-gap:8px;min-width:0}
+.formula-category{--category-color:#2f7dd1;display:inline-block;width:100%;margin:0 0 8px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
 .formula-category-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.2;text-transform:uppercase;letter-spacing:.04em}
 .formula-category-head::before{content:'';width:4px;height:18px;border-radius:2px;background:var(--category-color)}
-.calc-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:0;align-items:stretch}
-.calc-card{background:var(--bg2);border:0;border-left:3px solid color-mix(in srgb,var(--category-color,#2f7dd1) 72%,var(--border2));border-bottom:1px solid var(--border);padding:8px 10px;min-width:0;min-height:0;break-inside:avoid;page-break-inside:avoid;display:block;width:auto}
-.calc-card:nth-child(odd){border-right:1px solid var(--border)}
-.calc-card-head{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
-.calc-card-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.2;overflow-wrap:anywhere}
-.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 8px;min-width:0;max-width:100%}
-.calc-equation-label{font-size:11px;font-weight:850;color:var(--text3);white-space:normal;text-transform:uppercase;letter-spacing:.035em}
-.calc-equals{font-size:16px;font-weight:850;color:var(--text)}
-.calc-equation-text{font-family:var(--mono);font-size:14px;font-weight:800;color:var(--text);line-height:1.25;overflow-wrap:anywhere;min-width:0}
-.calc-expression{display:flex;align-items:center;justify-content:flex-start;gap:5px;flex-wrap:wrap;min-width:0;max-width:100%;font-family:var(--mono);font-size:14px;font-weight:800;color:var(--text);line-height:1.2}
-.calc-expression-line{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0;max-width:100%}
+.calc-table-head{display:grid;grid-template-columns:minmax(120px,42%) minmax(0,58%);background:var(--bg3);border-bottom:1px solid var(--border2);padding:5px 8px;color:var(--text2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.calc-table-head span:last-child{text-align:right}
+.calc-category-grid{display:block;padding:0}
+.calc-card{display:grid;grid-template-columns:minmax(120px,42%) minmax(0,58%);align-items:center;background:var(--bg2);border:0;border-bottom:1px solid var(--border);padding:5px 8px;min-width:0;min-height:0;break-inside:avoid;page-break-inside:avoid;width:100%}
+.calc-card:last-child{border-bottom:0}
+.calc-card:nth-child(even){background:color-mix(in srgb,var(--text) 1.8%,var(--bg2))}
+.calc-card-head{display:flex;align-items:center;gap:5px;margin:0;padding-right:8px;min-width:0}
+.calc-card-title{font-size:13px;font-weight:750;color:var(--text);line-height:1.2;overflow-wrap:anywhere}
+.calc-formula-board{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap;background:transparent;border:0;border-radius:0;padding:0;min-width:0;max-width:100%;text-align:right}
+.calc-equation-label{display:none}
+.calc-equals{display:none}
+.calc-equation-text{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--text);line-height:1.2;overflow-wrap:anywhere;min-width:0;text-align:right}
+.calc-expression{display:flex;align-items:center;justify-content:flex-end;gap:4px;flex-wrap:wrap;min-width:0;max-width:100%;font-family:var(--mono);font-size:13px;font-weight:800;color:var(--text);line-height:1.15}
+.calc-expression-line{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap;min-width:0;max-width:100%}
 .calc-inline-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:stretch;min-width:44px;max-width:100%;vertical-align:middle;color:inherit}
-.calc-inline-fraction-top,.calc-inline-fraction-bottom{font-family:var(--mono);font-size:13px;font-weight:850;color:inherit;padding:1px 6px;text-align:center;line-height:1.15;white-space:normal;overflow-wrap:anywhere}
+.calc-inline-fraction-top,.calc-inline-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:850;color:inherit;padding:1px 5px;text-align:center;line-height:1.1;white-space:normal;overflow-wrap:anywhere}
 .calc-inline-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
-.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:140px;max-width:100%;color:var(--text)}
-.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:14px;font-weight:850;color:inherit;padding:2px 8px;text-align:center;line-height:1.15;white-space:normal;overflow-wrap:anywhere;width:100%}
+.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:105px;max-width:100%;color:var(--text)}
+.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:850;color:inherit;padding:1px 6px;text-align:center;line-height:1.1;white-space:normal;overflow-wrap:anywhere;width:100%}
 .calc-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
-.calc-support-note{margin-top:4px;font-size:12px;color:var(--text2);line-height:1.3}
-.rr-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start;min-width:0}
-.rr-category-card{--category-color:#2f7dd1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid}
+.calc-support-note{display:none}
+.rr-category-grid{display:block;column-count:2;column-gap:8px;min-width:0}
+.rr-category-card{--category-color:#2f7dd1;display:inline-block;width:100%;margin:0 0 8px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
 .rr-category-card .formula-category-head{padding:8px 12px}
 .rr-table-wrap{overflow:visible}
 .rr-table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed}
@@ -336,8 +340,8 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
-@media(max-width:900px){.calc-category-grid,.rr-category-grid{grid-template-columns:1fr}.calc-card:nth-child(odd){border-right:0}}
-@media(max-width:520px){.calc-card{padding:7px 8px}.calc-formula-board{align-items:center}.calc-fraction{min-width:120px}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
+@media(max-width:900px){.formula-sheet,.rr-category-grid{column-count:1}}
+@media(max-width:520px){.calc-card,.calc-table-head{grid-template-columns:minmax(105px,40%) minmax(0,60%)}.calc-card{padding:5px 7px}.calc-formula-board{align-items:center}.calc-fraction{min-width:88px}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
 /* Quiz */
 .admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
@@ -974,18 +978,19 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .modal-overlay{position:fixed;inset:0;background:#000a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:20px}
-.modal.study-outline-modal{max-width:1180px;padding:0;overflow:hidden}
-.study-outline-modal-body{max-height:88vh;overflow-y:auto}
-.study-window-head{position:relative;display:flex;align-items:center;gap:18px;padding:24px 28px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.modal.study-outline-modal{width:min(1560px,calc(100vw - 24px));max-width:none;max-height:94vh;padding:0;overflow:hidden}
+.study-outline-modal-body{max-height:94vh;overflow-y:auto}
+.study-window-head{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;gap:14px;padding:18px 22px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.study-window-head>.btn{flex:0 0 auto}
 .study-window-number{display:inline-flex;align-items:center;justify-content:center;min-width:54px;height:32px;padding:0 10px;border-radius:999px;background:color-mix(in srgb,var(--study-accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--study-accent) 36%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:12px;font-weight:700}
-.study-window-title{font-size:20px;font-weight:700;line-height:1.25;color:var(--text)}
-.study-window-content{padding:26px 28px 32px;display:grid;gap:18px}
+.study-window-title{font-size:23px;font-weight:750;line-height:1.2;color:var(--text);overflow-wrap:anywhere}
+.study-window-content{padding:20px 22px 24px;display:grid;grid-template-columns:1fr;gap:14px}
 .study-window-panel{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
 .study-window-panel h3{margin:0 0 9px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
 .study-window-panel p{margin:0;color:var(--text2);font-size:13px;line-height:1.65}
 .study-topic-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
 .study-topic{padding:5px 9px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:11px}
-.study-video-slot{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1.5px dashed color-mix(in srgb,var(--study-accent) 45%,var(--border));border-radius:var(--r2);background:var(--bg2);color:var(--text2);font-size:13px;line-height:1.55;overflow:hidden}
+.study-video-slot{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;text-align:center;padding:0;border:1px solid var(--border);border-radius:var(--r2);background:var(--bg2);color:var(--text2);font-size:13px;line-height:1.55;overflow:hidden}
 .study-video-slot iframe{width:100%;height:100%;border:0;border-radius:calc(var(--r2) - 3px)}
 .study-outline-shell{--study-accent:var(--accent);max-width:1080px;margin:0 auto}
 .study-outline-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 22px;margin-bottom:16px;border-radius:var(--r2);border:1px solid color-mix(in srgb,var(--study-accent) 34%,var(--border));background:linear-gradient(135deg,color-mix(in srgb,var(--study-accent) 12%,var(--bg2)),var(--bg2))}
@@ -993,11 +998,15 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .study-outline-hero h2{margin:0 0 8px;font-size:26px;color:var(--text)}
 .study-outline-hero p{margin:0;max-width:720px;color:var(--text2);font-size:17px;line-height:1.55}
 .study-embed-note{flex:0 0 auto;padding:7px 10px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:10px;white-space:nowrap}
-.study-outline-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.study-chapter-card{appearance:none;width:100%;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);cursor:pointer;transition:background .14s ease,border-color .14s ease,transform .14s ease}
+.study-outline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.study-chapter-wrap{position:relative;min-width:0}
+.study-chapter-card{appearance:none;width:100%;min-height:58px;display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:10px 12px;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);cursor:pointer;transition:background .14s ease,border-color .14s ease,transform .14s ease}
 .study-chapter-card:hover{background:color-mix(in srgb,var(--study-accent) 5%,var(--bg2));border-color:color-mix(in srgb,var(--study-accent) 55%,var(--border));transform:translateY(-2px)}
-.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:46px;height:34px;padding:0 10px;border-radius:8px;background:color-mix(in srgb,var(--study-accent) 12%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:15px;font-weight:850}
-.study-chapter-title{font-size:17px;font-weight:750;line-height:1.3;color:var(--text)}
+.study-chapter-number{display:flex;align-items:center;justify-content:center;min-width:28px;height:24px;padding:0 6px;border-radius:6px;background:color-mix(in srgb,var(--study-accent) 12%,transparent);color:var(--study-accent);font-family:var(--mono);font-size:11px;font-weight:850}
+.study-chapter-title{font-size:13px;font-weight:750;line-height:1.25;color:var(--text);overflow-wrap:anywhere}
+.study-chapter-admin{display:flex;gap:5px;margin-top:5px}
+.study-outline-actions{display:flex;align-items:center;justify-content:flex-end;margin:0 0 10px}
+.study-custom-empty{min-height:8px}
 .study-bibliography{margin-top:16px;border:1px solid var(--border);border-radius:var(--r2);background:var(--bg2);overflow:hidden}
 .study-bibliography summary{cursor:pointer;padding:17px 19px;font-size:15px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;justify-content:space-between}
 .study-bibliography summary::-webkit-details-marker{display:none}
@@ -1023,7 +1032,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .ascp-topic-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:14px}
 .ascp-topic-letter{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:31px;border-radius:9px;background:#f4c8422b;border:1px solid #c8940066;color:#a87600;font-family:var(--mono);font-size:13px;font-weight:900}
 .ascp-topic-title{padding-top:3px;font-size:16px;font-weight:800;line-height:1.45;color:var(--text)}
-.ascp-topic-body{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(280px,.88fr);gap:20px;align-items:start}
+.ascp-topic-body{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
 .ascp-outline-column{min-width:0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)}
 .ascp-outline-lines{display:grid;gap:7px;color:var(--text2);font-size:14px;line-height:1.58}
 .ascp-outline-line.level-2{padding-left:22px}
@@ -1043,22 +1052,21 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .ascp-summary-status{font-size:11px;color:var(--success)}
 .study-summary-citation{margin-top:12px!important;padding-top:11px;border-top:1px solid var(--border);color:var(--text3)!important;font-size:11px!important;line-height:1.5!important;font-style:italic}
 .study-empty-area{min-height:74px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
-.study-video-slot.is-empty{min-height:220px;color:transparent}
-.modal.study-outline-modal.study-chapter-modal{width:min(1460px,calc(100vw - 28px));height:94vh;max-width:none;max-height:94vh}
-.study-chapter-modal .study-outline-modal-body{height:100%;max-height:94vh;overflow-y:auto}
-.study-chapter-modal .study-window-head{padding:25px 32px}
-.study-chapter-modal .study-window-number{min-width:62px;height:40px;font-size:16px}
-.study-chapter-modal .study-window-title{font-size:28px}
-.study-chapter-modal .study-window-content{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:22px 28px 28px}
-.study-chapter-modal .study-window-panel{padding:22px}
+.modal.study-outline-modal.study-chapter-modal{width:min(1560px,calc(100vw - 24px));max-width:none;max-height:94vh}
+.study-chapter-modal .study-outline-modal-body{max-height:94vh;overflow-y:auto}
+.study-chapter-modal .study-window-head{padding:18px 22px}
+.study-chapter-modal .study-window-number{min-width:50px;height:34px;font-size:13px}
+.study-chapter-modal .study-window-title{font-size:23px}
+.study-chapter-modal .study-window-content{grid-template-columns:1fr;gap:14px;padding:20px 22px 24px}
+.study-chapter-modal .study-window-panel{padding:18px}
 .study-chapter-modal .study-window-panel h3{font-size:16px;margin-bottom:12px}
 .study-chapter-modal .study-window-panel p{font-size:17px;line-height:1.6}
 .study-chapter-modal .study-summary-citation{font-size:14px!important}
-.study-chapter-modal .study-video-slot{font-size:16px}
+.study-chapter-modal .study-video-slot{font-size:15px}
 .quiz-mastered-replace{white-space:nowrap!important;background:#ffd84d!important;border-color:#c89b00!important;color:#3b2d00!important;font-size:13px!important;font-weight:850!important;box-shadow:0 4px 12px rgba(177,133,0,.22)!important}
 .quiz-mastered-replace:hover:not(:disabled){background:#ffca1f!important;border-color:#a97d00!important}
 .quiz-mastered-replace:disabled{background:#e9dfae!important;border-color:#c9bd84!important;color:#80754a!important;box-shadow:none!important}
-@media(max-width:900px){.study-outline-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){
   .study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ascp-outline-grid,.ascp-topic-body{grid-template-columns:1fr}
@@ -1069,7 +1077,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
   .study-chapter-modal .study-window-content{grid-template-columns:1fr;padding-left:17px;padding-right:17px}
   .study-chapter-modal .study-window-title{font-size:23px}
 }
-@media(max-width:420px){.study-outline-grid{grid-template-columns:1fr 1fr}.study-chapter-card{padding:12px}.study-chapter-title{font-size:15px}}
+@media(max-width:420px){.study-outline-grid{grid-template-columns:1fr}.study-chapter-card{padding:9px 10px}.study-chapter-title{font-size:13px}}
 .hidden{display:none!important}
 .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .breadcrumb-sep{color:var(--text3)}
@@ -4785,7 +4793,7 @@ async function renderHome(v){
   }).join('');
 
   const practiceCards=[
-    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'Questions from the Subject Card banks, based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr.<br>Uses BOC-style subject weighting. Practice only.',metaId:'cnt-all',meta:'Calculating BOC-style practice mix...',onclick:'goAll()'}),
+    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'Questions from <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr.<br>A fixed BOC-style weighted practice mix. It is not adaptive.',metaId:'cnt-all',meta:'Calculating BOC-style practice mix...',onclick:'goAll()'}),
     homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'',title:'Calculations / Reference Ranges',desc:'Formula sheets and conventional-unit ranges for quick review.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
@@ -4819,7 +4827,7 @@ async function renderHome(v){
     + '<div class="home-practice-grid">' + practiceCards + '</div>'
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div><div class="home-section-sub">Start with a subject, then practice or review images.</div></div></div>'
+    + '<div class="home-section-head"><div><div class="home-section-title">Book Questions</div></div></div>'
     + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
@@ -5295,21 +5303,41 @@ function switchTab(tab){
 async function renderTab(){
   const el=document.getElementById('tab-content');if(!el)return;
   if(appState.subjectTab==='quiz')await renderQuizTab(el);
-  else if(appState.subjectTab==='outline')renderStudyOutlineTab(el);
+  else if(appState.subjectTab==='outline')await renderStudyOutlineTab(el);
   else if(appState.subjectTab==='images')await renderImagesTab(el);
   else if(appState.subjectTab==='cases')await renderCasesTab(el);
   requestAnimationFrame(syncQuizShell);
 }
 
-function renderStudyOutlineTab(el){
+async function loadCustomStudyTopics(subjectKey,force=false){
+  window._customStudyTopics=window._customStudyTopics||{};
+  if(!force&&window._customStudyTopics[subjectKey])return window._customStudyTopics[subjectKey];
+  let rows=[];
+  try{
+    let result=await sb.from('mlsboc_cases').select('id,title,scenario,case_data,answer,created_at').eq('subject','study_outline_topic').eq('group_label',subjectKey).order('created_at',{ascending:true});
+    if(result.error)result=await sb.from('mlsboc_cases').select('id,title,scenario,case_data,answer').eq('subject','study_outline_topic').eq('group_label',subjectKey).order('title',{ascending:true});
+    if(result.error)throw result.error;
+    rows=result.data||[];
+  }catch(e){console.warn('Study topics could not be loaded:',e);}
+  window._customStudyTopics[subjectKey]=rows;
+  return rows;
+}
+
+async function renderStudyOutlineTab(el){
   const subjectKey=appState.subject;
   const outline=STUDY_OUTLINES[subjectKey];
   if(!outline){el.innerHTML='<div class="empty">No study outline is available for this subject.</div>';return;}
-  const cards=outline.chapters.map((chapter,index)=>`
-    <button class="study-chapter-card" type="button" onclick="openStudyOutlineChapter('${subjectKey}',${index})">
-      <span class="study-chapter-number">${index+1}</span>
-      <span class="study-chapter-title">${esc(chapter.title)}</span>
-    </button>`).join('');
+  el.innerHTML='<div class="empty" style="padding:26px">Loading...</div>';
+  const customTopics=await loadCustomStudyTopics(subjectKey);
+  if(appState.subject!==subjectKey||appState.subjectTab!=='outline')return;
+  const cards=customTopics.map((topic,index)=>`
+    <div class="study-chapter-wrap">
+      <button class="study-chapter-card" type="button" onclick="openCustomStudyTopic('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">
+        <span class="study-chapter-number">${index+1}</span>
+        <span class="study-chapter-title">${esc(topic.title)}</span>
+      </button>
+      ${isAdmin?`<div class="study-chapter-admin"><button class="btn btn-ghost btn-xs" type="button" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">Edit</button><button class="btn btn-danger btn-xs" type="button" onclick="deleteStudyTopic('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">Delete</button></div>`:''}
+    </div>`).join('');
   const bibliography=outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('');
   el.innerHTML=`
     <div class="study-outline-shell" style="--study-accent:${outline.accent}">
@@ -5328,7 +5356,8 @@ function renderStudyOutlineTab(el){
         </span>
         <span class="study-ascp-open" aria-hidden="true">›</span>
       </button>
-      <div class="study-outline-grid">${cards}</div>
+      ${isAdmin?`<div class="study-outline-actions"><button class="btn btn-primary btn-sm" type="button" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','')">+ Add Study Topic</button></div>`:''}
+      ${cards?`<div class="study-outline-grid">${cards}</div>`:'<div class="study-custom-empty"></div>'}
       <details class="study-bibliography">
         <summary>Source bibliography (${outline.bibliography.length} books)</summary>
         <div class="study-bibliography-body">
@@ -5336,6 +5365,55 @@ function renderStudyOutlineTab(el){
         </div>
       </details>
     </div>`;
+}
+
+async function openStudyTopicEditor(subjectKey,id){
+  if(!isAdmin)return;
+  const outline=STUDY_OUTLINES[subjectKey];
+  const topics=await loadCustomStudyTopics(subjectKey);
+  const topic=topics.find(item=>String(item.id)===String(id))||{title:'',scenario:'',case_data:'',answer:''};
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal?.querySelector('.modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!dialog||!body)return;
+  dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');
+  body.innerHTML=`
+    <div class="flex-center gap-8 mb-16"><div class="modal-title" style="margin:0">${id?'Edit':'Add'} Study Topic</div><button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button></div>
+    <div class="form-group"><label>Topic title</label><input id="study-topic-title" value="${esc(topic.title||'')}"></div>
+    <div class="form-group"><label>Quick summary</label><textarea id="study-topic-summary" rows="8">${esc(topic.scenario||'')}</textarea></div>
+    <div class="form-group"><label>Book resource and page citation</label><input id="study-topic-citation" value="${esc(topic.case_data||'')}"></div>
+    <div class="form-group"><label>Video URL to embed</label><input id="study-topic-video" value="${esc(topic.answer||'')}" placeholder="YouTube or Vimeo URL"></div>
+    <div class="flex gap-8 mt-16"><button class="btn btn-ghost" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" type="button" onclick="saveStudyTopic('${jsAttr(subjectKey)}','${jsAttr(id||'')}')">Save Topic</button></div>`;
+  dialog.style.setProperty('--study-accent',outline?.accent||'var(--accent)');
+  modal.classList.remove('hidden');
+}
+
+async function saveStudyTopic(subjectKey,id){
+  if(!isAdmin)return;
+  const title=document.getElementById('study-topic-title')?.value.trim()||'';
+  if(!title){alert('Add a topic title.');return;}
+  const payload={
+    subject:'study_outline_topic',group_label:subjectKey,title,
+    scenario:document.getElementById('study-topic-summary')?.value.trim()||'',
+    case_data:document.getElementById('study-topic-citation')?.value.trim()||'',
+    answer:document.getElementById('study-topic-video')?.value.trim()||'',
+    steps:'[]',images:[],is_draft:false
+  };
+  const result=id
+    ?await sb.from('mlsboc_cases').update(payload).eq('id',id)
+    :await sb.from('mlsboc_cases').insert(payload);
+  if(result.error){alert('Save failed: '+result.error.message);return;}
+  await loadCustomStudyTopics(subjectKey,true);
+  document.getElementById('condition-modal').classList.add('hidden');
+  renderTab();
+}
+
+async function deleteStudyTopic(subjectKey,id){
+  if(!isAdmin||!confirm('Delete this study topic?'))return;
+  const result=await sb.from('mlsboc_cases').delete().eq('id',id);
+  if(result.error){alert('Delete failed: '+result.error.message);return;}
+  await loadCustomStudyTopics(subjectKey,true);
+  renderTab();
 }
 
 function externalStudyVideoEmbedUrl(url){
@@ -5348,8 +5426,8 @@ function externalStudyVideoEmbedUrl(url){
       const id=parsed.pathname.split('/').filter(Boolean)[0];
       return id?`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:'';
     }
-    if(host==='youtube.com'||host==='m.youtube.com'){
-      const id=parsed.searchParams.get('v')||(parsed.pathname.match(/^\/embed\/([^/]+)/)||[])[1];
+    if(host==='youtube.com'||host==='m.youtube.com'||host==='youtube-nocookie.com'){
+      const id=parsed.searchParams.get('v')||(parsed.pathname.match(/^\/(?:embed|shorts)\/([^/]+)/)||[])[1];
       return id?`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`:'';
     }
     if(host==='vimeo.com'||host==='player.vimeo.com'){
@@ -5363,7 +5441,7 @@ function externalStudyVideoEmbedUrl(url){
 function studyVideoEmbedHtml(url){
   const embedUrl=externalStudyVideoEmbedUrl(url);
   if(embedUrl)return `<div class="study-video-slot" style="padding:0"><iframe src="${esc(embedUrl)}" title="Study video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
-  return '<div class="study-video-slot is-empty" aria-label="Video"></div>';
+  return '';
 }
 
 function ascpOutlineText(topic){
@@ -5426,7 +5504,7 @@ async function openASCPStudyOutline(subjectKey){
   const dialog=modal?.querySelector('.modal');
   const body=document.getElementById('condition-modal-body');
   if(!modal||!dialog||!body)return;
-  dialog.classList.add('study-outline-modal');
+  dialog.classList.add('study-outline-modal','ascp-study-modal');
   dialog.style.setProperty('--study-accent','#c89400');
   body.innerHTML='<div class="empty" style="padding:34px">Loading...</div>';
   modal.onclick=e=>{if(e.target===modal)closeStudyOutlineWindow();};
@@ -5486,9 +5564,10 @@ async function openASCPStudyOutline(subjectKey){
       </div>
     </div>`;
 }
-function openStudyOutlineChapter(subjectKey,index){
+async function openCustomStudyTopic(subjectKey,id){
   const outline=STUDY_OUTLINES[subjectKey];
-  const chapter=outline?.chapters?.[index];
+  const customTopics=await loadCustomStudyTopics(subjectKey);
+  const chapter=customTopics.find(item=>String(item.id)===String(id));
   if(!outline||!chapter)return;
   const modal=document.getElementById('condition-modal');
   const dialog=modal?.querySelector('.modal');
@@ -5496,35 +5575,28 @@ function openStudyOutlineChapter(subjectKey,index){
   if(!modal||!dialog||!body)return;
   dialog.classList.add('study-outline-modal','study-chapter-modal');
   dialog.style.setProperty('--study-accent',outline.accent);
-  const summary=chapter.summary
-    ?`<p>${escNL(chapter.summary)}</p>`
-    :'<div class="study-empty-area" aria-label="Quick summary"></div>';
-  const source=chapter.citation?`<p class="study-summary-citation">(${esc(chapter.citation)})</p>`:'';
-  const topics=chapter.topics?.length?`
-        <section class="study-window-panel">
-          <h3>What to study</h3>
-          <div class="study-topic-list">${chapter.topics.map(topic=>`<span class="study-topic">${esc(topic)}</span>`).join('')}</div>
-        </section>`:'';
+  const summary=String(chapter.scenario||'').trim();
+  const citation=String(chapter.case_data||'').trim();
+  const video=studyVideoEmbedHtml(chapter.answer);
   body.innerHTML=`
     <div class="study-outline-modal-body">
       <header class="study-window-head">
-        <span class="study-window-number">${index+1}</span>
         <div style="min-width:0;flex:1">
           <div class="study-window-title">${esc(chapter.title)}</div>
         </div>
+        ${isAdmin?`<button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow();openStudyTopicEditor('${jsAttr(subjectKey)}','${jsAttr(id)}')">Edit</button>`:''}
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeStudyOutlineWindow()" aria-label="Close study window">✕</button>
       </header>
       <div class="study-window-content">
-        ${topics}
-        <section class="study-window-panel">
+        ${summary||citation?`<section class="study-window-panel">
           <h3>Quick summary</h3>
-          ${summary}
-          ${source}
-        </section>
-        <section class="study-window-panel">
+          ${summary?`<p>${escNL(summary)}</p>`:''}
+          ${citation?`<p class="study-summary-citation">(${esc(citation)})</p>`:''}
+        </section>`:''}
+        ${video?`<section class="study-window-panel">
           <h3>Video</h3>
-          ${studyVideoEmbedHtml(chapter.videoUrl)}
-        </section>
+          ${video}
+        </section>`:''}
       </div>
     </div>`;
   modal.onclick=e=>{if(e.target===modal)closeStudyOutlineWindow();};
@@ -5534,7 +5606,7 @@ function openStudyOutlineChapter(subjectKey,index){
 function closeStudyOutlineWindow(){
   const modal=document.getElementById('condition-modal');
   const dialog=modal?.querySelector('.modal');
-  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal');dialog.style.removeProperty('--study-accent');}
+  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');dialog.style.removeProperty('--study-accent');}
   if(modal){modal.classList.add('hidden');modal.onclick=null;}
 }
 
@@ -11354,6 +11426,7 @@ function renderCalcTab(cats,all){
   return `<div class="formula-sheet">${Object.entries(cats).map(([cat,items])=>`
     <section class="formula-category" style="--category-color:${formulaCategoryColor(cat)}">
       <div class="formula-category-head">${esc(cat)}</div>
+      <div class="calc-table-head"><span>Calculation</span><span>Formula</span></div>
       <div class="calc-category-grid">
         ${items.map(f=>renderCalcCard(f)).join('')}
       </div>
@@ -11410,8 +11483,6 @@ function renderCalcCard(f){
       ${displaySpec?calcDisplaySpecHtml(displaySpec):''}
       ${!displaySpec&&hasFraction?`
         <div class="calc-formula-board">
-          <div class="calc-equation-label">${esc(label)}</div>
-          <div class="calc-equals">=</div>
           <div class="calc-fraction" aria-label="${esc((f.numerator||'')+' divided by '+(f.denominator||''))}">
             <div class="calc-fraction-top">${esc(f.numerator||'...')}</div>
             <div class="calc-fraction-bottom">${esc(f.denominator||'...')}</div>
@@ -11908,10 +11979,9 @@ async function renderAllStart(v){
     </div>
     <div class="exam-sim-start">
       <h2>Practice Exam Simulator</h2>
-      <p><strong>${plannedTotal} timed practice questions drawn from the loaded Subject Card question banks.</strong></p>
-      <p>Questions are based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr. The subject mix mimics BOC-style weighting for practice only and is not an official BOC exam.</p>
-      <p class="exam-sim-coverage-note">Coverage note: Book Sections 9–10 were not added to this practice exam.</p>
-      <p>Answer in order. Feedback stays hidden during the exam, and back review unlocks only after all questions are answered.</p>
+      <p><strong>${plannedTotal} timed practice questions from <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr.</strong></p>
+      <p>The subject mix mimics BOC-style weighting for practice only.</p>
+      <p>This is a fixed weighted mix of questions. It does not adapt to your performance or change difficulty as you progress.</p>
       <p class="exam-sim-coverage-note">Results are not saved. Export your report before starting another exam.</p>
       <div class="divider"></div>
       <div class="exam-sim-weight-grid">
@@ -11922,6 +11992,7 @@ async function renderAllStart(v){
           </div>`).join('')}
       </div>
       <button class="btn btn-primary" onclick="startAllExam()" ${plannedTotal?'':'disabled'}>Start ${plannedTotal}-Question Practice Exam</button>
+      <p class="exam-sim-footnote">Coverage note: Book Sections 9–10 were not added to this practice exam.</p>
     </div>
   `;
 }
