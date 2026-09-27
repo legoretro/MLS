@@ -300,39 +300,44 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-sheet{display:grid;gap:12px}
+.formula-sheet{display:grid;gap:8px;min-width:0}
 .formula-category{--category-color:#2f7dd1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid}
-.formula-category-head{display:flex;align-items:center;gap:8px;padding:8px 12px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:15px;font-weight:850;line-height:1.25;text-transform:uppercase;letter-spacing:.045em}
+.formula-category-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.2;text-transform:uppercase;letter-spacing:.04em}
 .formula-category-head::before{content:'';width:4px;height:18px;border-radius:2px;background:var(--category-color)}
-.calc-category-grid{column-count:2;column-gap:0;padding:0;align-items:start}
-.calc-card{background:var(--bg2);border:0;border-left:3px solid color-mix(in srgb,var(--category-color,#2f7dd1) 72%,var(--border2));border-bottom:1px solid var(--border);border-radius:0;padding:9px 12px;min-width:0;break-inside:avoid;page-break-inside:avoid;display:inline-block;width:100%;vertical-align:top}
-.calc-card:nth-last-child(-n+2){border-bottom-color:transparent}
-.calc-card-head{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.calc-card-title{font-size:17px;font-weight:800;color:var(--text);line-height:1.25}
-.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:7px 9px;min-width:0}
-.calc-equation-label{font-size:12px;font-weight:850;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
-.calc-equals{font-size:18px;font-weight:850;color:var(--text)}
-.calc-equation-text{font-family:var(--mono);font-size:17px;font-weight:800;color:var(--text);line-height:1.3;overflow-wrap:anywhere;min-width:0}
-.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:180px;max-width:100%;color:var(--text)}
-.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:16px;font-weight:850;color:inherit;padding:3px 10px;text-align:center;line-height:1.2;white-space:normal;overflow-wrap:anywhere;width:100%}
+.calc-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:0;align-items:stretch}
+.calc-card{background:var(--bg2);border:0;border-left:3px solid color-mix(in srgb,var(--category-color,#2f7dd1) 72%,var(--border2));border-bottom:1px solid var(--border);padding:8px 10px;min-width:0;min-height:0;break-inside:avoid;page-break-inside:avoid;display:block;width:auto}
+.calc-card:nth-child(odd){border-right:1px solid var(--border)}
+.calc-card-head{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
+.calc-card-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.2;overflow-wrap:anywhere}
+.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 8px;min-width:0;max-width:100%}
+.calc-equation-label{font-size:11px;font-weight:850;color:var(--text3);white-space:normal;text-transform:uppercase;letter-spacing:.035em}
+.calc-equals{font-size:16px;font-weight:850;color:var(--text)}
+.calc-equation-text{font-family:var(--mono);font-size:14px;font-weight:800;color:var(--text);line-height:1.25;overflow-wrap:anywhere;min-width:0}
+.calc-expression{display:flex;align-items:center;justify-content:flex-start;gap:5px;flex-wrap:wrap;min-width:0;max-width:100%;font-family:var(--mono);font-size:14px;font-weight:800;color:var(--text);line-height:1.2}
+.calc-expression-line{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0;max-width:100%}
+.calc-inline-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:stretch;min-width:44px;max-width:100%;vertical-align:middle;color:inherit}
+.calc-inline-fraction-top,.calc-inline-fraction-bottom{font-family:var(--mono);font-size:13px;font-weight:850;color:inherit;padding:1px 6px;text-align:center;line-height:1.15;white-space:normal;overflow-wrap:anywhere}
+.calc-inline-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
+.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:140px;max-width:100%;color:var(--text)}
+.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:14px;font-weight:850;color:inherit;padding:2px 8px;text-align:center;line-height:1.15;white-space:normal;overflow-wrap:anywhere;width:100%}
 .calc-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
-.calc-support-note{margin-top:5px;font-size:13px;color:var(--text2);line-height:1.35}
-.rr-category-grid{display:grid;grid-template-columns:repeat(2,minmax(340px,1fr));gap:10px;align-items:start}
+.calc-support-note{margin-top:4px;font-size:12px;color:var(--text2);line-height:1.3}
+.rr-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start;min-width:0}
 .rr-category-card{--category-color:#2f7dd1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid}
 .rr-category-card .formula-category-head{padding:8px 12px}
 .rr-table-wrap{overflow:visible}
 .rr-table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed}
-.rr-table th{background:var(--bg3);border:0;border-bottom:1px solid var(--border2);padding:6px 10px;text-align:left;font-weight:800;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+.rr-table th{background:var(--bg3);border:0;border-bottom:1px solid var(--border2);padding:5px 8px;text-align:left;font-weight:800;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
 .rr-table th:last-child{text-align:right}
-.rr-table td{border:0;border-bottom:1px solid var(--border);padding:6px 10px;font-size:14px;color:var(--text);line-height:1.2;vertical-align:middle}
+.rr-table td{border:0;border-bottom:1px solid var(--border);padding:5px 8px;font-size:13px;color:var(--text);line-height:1.2;vertical-align:middle;overflow-wrap:anywhere}
 .rr-table tr:last-child td{border-bottom:0}
 .rr-table tr:nth-child(even) td{background:color-mix(in srgb,var(--text) 1.8%,var(--bg2))}
 .rr-table .rr-analyte{font-weight:750;width:49%}
-.rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:14px;font-weight:850;color:var(--text);white-space:nowrap}
-.rr-table .rr-unit{font-size:11px;color:var(--text3);margin-left:4px;font-weight:650}
+.rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
+.rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
-@media(max-width:900px){.calc-category-grid{column-count:1}.rr-category-grid{grid-template-columns:1fr}}
-@media(max-width:520px){.calc-card{padding:12px}.calc-formula-board{align-items:flex-start}.calc-fraction{min-width:135px}.rr-table td{padding:7px 8px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
+@media(max-width:900px){.calc-category-grid,.rr-category-grid{grid-template-columns:1fr}.calc-card:nth-child(odd){border-right:0}}
+@media(max-width:520px){.calc-card{padding:7px 8px}.calc-formula-board{align-items:center}.calc-fraction{min-width:120px}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
 /* Quiz */
 .admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
@@ -11355,11 +11360,44 @@ function renderCalcTab(cats,all){
     </section>`).join('')}</div>`;
 }
 
+function calcFractionSpec(top,bottom){return {top:String(top||''),bottom:String(bottom||'')};}
+function calcTextSpec(text){return {text:String(text||'')};}
+function calcDisplaySpec(f){
+  const name=String(f?.name||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  if(name.includes('calculated serum osmolality'))return [[
+    calcTextSpec('2(Na+) +'),calcFractionSpec('glucose','18'),calcTextSpec('+'),calcFractionSpec('BUN','2.8')
+  ]];
+  if(name.includes('ldl cholesterol'))return [[
+    calcTextSpec('LDL = total cholesterol − HDL −'),calcFractionSpec('triglycerides','5')
+  ]];
+  if(name.includes('absolute cell count'))return [[
+    calcTextSpec('Absolute count ='),calcFractionSpec('WBC count × differential percent','100')
+  ]];
+  if(name.includes('body fluid wbc correction'))return [[
+    calcTextSpec('Corrected WBC = observed fluid WBC −'),calcFractionSpec('blood WBC × fluid RBC','blood RBC')
+  ]];
+  if(name.includes('dilution')&&name.includes('concentration'))return [[
+    calcTextSpec('C1V1 = C2V2   |   Dilution factor ='),calcFractionSpec('total volume','sample volume')
+  ]];
+  return null;
+}
+function calcExplanatorySteps(f){
+  return (Array.isArray(f?.steps)?f.steps:[]).map(String).filter(step=>step.trim()&&!/[=\/]/.test(step));
+}
+function calcInlineFractionHtml(part){
+  return `<span class="calc-inline-fraction" aria-label="${esc(part.top)} divided by ${esc(part.bottom)}"><span class="calc-inline-fraction-top">${esc(part.top)}</span><span class="calc-inline-fraction-bottom">${esc(part.bottom)}</span></span>`;
+}
+function calcDisplaySpecHtml(spec){
+  if(!spec)return '';
+  return `<div class="calc-formula-board"><div class="calc-expression">${spec.map(line=>`<div class="calc-expression-line">${line.map(part=>part.top!==undefined?calcInlineFractionHtml(part):`<span>${esc(part.text)}</span>`).join('')}</div>`).join('')}</div></div>`;
+}
+
 function renderCalcCard(f){
   const steps=(f.steps||[]).filter(Boolean).map(String);
   const hasFraction=!!(f.numerator||f.denominator);
+  const displaySpec=calcDisplaySpec(f);
   const label=f.result_label||f.name;
-  const support=[...(hasFraction?steps:[]),String(f.notes||'').trim()].filter(Boolean);
+  const support=[...(hasFraction?calcExplanatorySteps(f):[]),String(f.notes||'').trim()].filter(Boolean);
   return `
     <article class="calc-card">
       <div class="calc-card-head">
@@ -11369,7 +11407,8 @@ function renderCalcCard(f){
           <button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>
         </div>`:''}
       </div>
-      ${hasFraction?`
+      ${displaySpec?calcDisplaySpecHtml(displaySpec):''}
+      ${!displaySpec&&hasFraction?`
         <div class="calc-formula-board">
           <div class="calc-equation-label">${esc(label)}</div>
           <div class="calc-equals">=</div>
@@ -11379,7 +11418,7 @@ function renderCalcCard(f){
           </div>
           ${f.multiplier?`<div class="calc-equation-text">x ${esc(f.multiplier)}</div>`:''}
         </div>`:''}
-      ${!hasFraction&&steps.length?`
+      ${!displaySpec&&!hasFraction&&steps.length?`
         <div class="calc-formula-board">
           <div class="calc-equation-text">${steps.map(esc).join('<br>')}</div>
         </div>`:''}
@@ -11577,6 +11616,43 @@ function fitPdfText(doc,text,maxWidth,startSize,minSize=5.2){
   return size;
 }
 
+function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
+  if(!spec?.length)return false;
+  spec.forEach((line,lineIndex)=>{
+    let fontSize=8.4;
+    const gap=1.35;
+    const pdfText=value=>String(value||'').replace(/−/g,'-').replace(/×/g,'x');
+    const measure=()=>{
+      doc.setFont('courier','bold');doc.setFontSize(fontSize);
+      return line.map(part=>part.top!==undefined
+        ?Math.max(doc.getTextWidth(pdfText(part.top)),doc.getTextWidth(pdfText(part.bottom)))+2.2
+        :doc.getTextWidth(pdfText(part.text))).reduce((sum,width)=>sum+width,0)+gap*Math.max(0,line.length-1);
+    };
+    let total=measure();
+    if(total>maxWidth){fontSize=Math.max(5.9,fontSize*(maxWidth/total));total=measure();}
+    let cursor=x;
+    const midY=y+lineIndex*7.2;
+    line.forEach((part,index)=>{
+      doc.setFont('courier','bold');doc.setFontSize(fontSize);doc.setTextColor(30,39,55);
+      if(part.top!==undefined){
+        const top=pdfText(part.top),bottom=pdfText(part.bottom);
+        const width=Math.max(doc.getTextWidth(top),doc.getTextWidth(bottom))+2.2;
+        const center=cursor+width/2;
+        doc.text(top,center,midY-1.45,{align:'center'});
+        doc.text(bottom,center,midY+3.15,{align:'center'});
+        doc.setDrawColor(...color);doc.setLineWidth(.42);doc.line(cursor,midY,cursor+width,midY);
+        cursor+=width;
+      }else{
+        const text=pdfText(part.text);
+        doc.text(text,cursor,midY+.8);
+        cursor+=doc.getTextWidth(text);
+      }
+      if(index<line.length-1)cursor+=gap;
+    });
+  });
+  return true;
+}
+
 function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
   const items=calcData||[];
   const cW=pageW-margin*2;
@@ -11612,7 +11688,10 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
     fitPdfText(doc,String(f.category||''),26,6.8,5.3);
     doc.text(String(f.category||''),x+colW-2.5,y+4.9,{align:'right'});
 
-    if(f.numerator||f.denominator){
+    const displaySpec=calcDisplaySpec(f);
+    if(displaySpec){
+      drawCalcDisplaySpec(doc,displaySpec,x+3.2,y+12.2,colW-6.4,color);
+    }else if(f.numerator||f.denominator){
       const label=String(f.result_label||f.name||'');
       const numerator=String(f.numerator||'...');
       const denominator=String(f.denominator||'...');
@@ -11655,7 +11734,7 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
     }
 
     const noteParts=[];
-    if(f.numerator||f.denominator)noteParts.push(...(f.steps||[]).filter(Boolean));
+    if(f.numerator||f.denominator)noteParts.push(...calcExplanatorySteps(f));
     if(f.notes)noteParts.push(String(f.notes));
     if(noteParts.length){
       const note=noteParts.join(' - ');
