@@ -2279,7 +2279,6 @@ function renderStart(){
             <div class="door-alert">Doors opening</div>
           </div>
           <div class="unit-summary">
-            <div class="eyebrow">${esc(unit.unitName)}</div>
             <h2>${esc(unit.department)}</h2>
             <p>${esc(countCopy)}</p>
           </div>
@@ -2354,7 +2353,7 @@ function renderRoom(item){
         <p>Review the clipboard, choose a diagnosis, and close the case.</p>
       </div>
       <div class="stage-actions">
-        <button class="game-btn ghost" type="button" onclick="closeChart()">← Department Hallway</button>
+        <button class="game-btn ghost" type="button" onclick="closeChart()">← ${esc(unit.department)}</button>
         <button class="game-btn ghost" type="button" onclick="backToUnits()">Departments</button>
         <button class="game-btn warn" type="button" onclick="resetWholeGame()">Reset Game</button>
       </div>
