@@ -986,6 +986,314 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item{
   border-color:var(--line);
 }
 html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6ff}
+
+/* Immersive hospital game screens */
+#gameRoot:empty{display:none}
+.game-stage{
+  position:relative;
+  margin-top:22px;
+  border:1px solid #33405e;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 28px 70px rgba(8,13,27,.28);
+  isolation:isolate;
+  animation:stageArrive .42s ease both;
+}
+@keyframes stageArrive{
+  from{opacity:0;transform:translateY(18px) scale(.99)}
+  to{opacity:1;transform:none}
+}
+.stage-topbar{
+  position:relative;
+  z-index:8;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  background:rgba(13,18,31,.92);
+  color:#f7f9ff;
+  backdrop-filter:blur(12px);
+}
+.stage-kicker{font-size:.7rem;font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:#f2d96a}
+.stage-topbar h2{margin:3px 0 0;color:#fff;font-size:1.35rem}
+.stage-topbar p{margin:3px 0 0;color:#bfc8df;font-size:.82rem}
+.stage-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.stage-actions .game-btn{padding:9px 13px}
+.stage-path{
+  position:relative;
+  z-index:8;
+  display:flex;
+  gap:7px;
+  align-items:center;
+  padding:10px 18px;
+  background:#101626;
+  color:#aeb8d2;
+  border-bottom:1px solid #2f3953;
+  font-size:.76rem;
+  font-weight:850;
+  letter-spacing:.03em;
+}
+.stage-path strong{color:#f2d96a}
+.stage-path span[aria-hidden="true"]{color:#65708c}
+
+.lobby-stage{
+  padding-bottom:20px;
+  background:
+    radial-gradient(circle at 50% 0,rgba(255,238,135,.2),transparent 25rem),
+    linear-gradient(180deg,#283249 0 24%,#dfe7ef 24% 76%,#aeb8c7 76% 100%);
+}
+.hospital-lobby{
+  position:relative;
+  min-height:330px;
+  padding:32px 30px 110px;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg,transparent 49.4%,rgba(255,255,255,.15) 49.4% 50.6%,transparent 50.6%),
+    linear-gradient(180deg,rgba(208,222,236,.98),rgba(241,245,249,.98));
+}
+.hospital-lobby::after{
+  content:"";
+  position:absolute;
+  left:-8%;right:-8%;bottom:-94px;height:200px;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 84px,rgba(58,73,101,.18) 84px 86px),
+    repeating-linear-gradient(0deg,transparent 0 54px,rgba(58,73,101,.18) 54px 56px),
+    linear-gradient(180deg,#dce4ec,#a7b2c1);
+  transform:perspective(400px) rotateX(56deg);
+  transform-origin:bottom;
+}
+.lobby-sign{
+  position:relative;
+  z-index:2;
+  width:max-content;
+  max-width:100%;
+  margin:0 auto;
+  padding:12px 26px;
+  border:2px solid #a9b4c4;
+  border-radius:12px;
+  background:linear-gradient(180deg,#26334a,#172033);
+  color:#fff;
+  text-align:center;
+  box-shadow:0 12px 24px rgba(19,28,48,.22),inset 0 1px 0 rgba(255,255,255,.15);
+}
+.lobby-sign strong{display:block;font-size:1.35rem;letter-spacing:.08em;text-transform:uppercase}
+.lobby-sign span{display:block;margin-top:3px;color:#f2d96a;font-size:.8rem;font-weight:850}
+.lobby-clock{
+  position:absolute;right:34px;top:35px;z-index:2;width:52px;height:52px;border-radius:50%;
+  border:5px solid #59667c;background:#fff;box-shadow:0 8px 16px rgba(21,30,48,.2);
+}
+.lobby-clock::before{content:"";position:absolute;left:22px;top:9px;width:3px;height:16px;background:#283249;transform-origin:bottom;transform:rotate(18deg)}
+.lobby-clock::after{content:"";position:absolute;left:22px;top:22px;width:14px;height:3px;background:#283249;transform-origin:left;transform:rotate(15deg)}
+.reception-desk{
+  position:absolute;z-index:3;left:50%;bottom:34px;width:min(580px,72%);height:92px;transform:translateX(-50%);
+  border-radius:22px 22px 8px 8px;border:3px solid #7c5b2f;
+  background:linear-gradient(180deg,#cfa768 0 14%,#986a35 14% 100%);
+  box-shadow:0 18px 30px rgba(23,30,47,.24),inset 0 1px 0 #ffe5ad;
+}
+.reception-desk::before{
+  content:"PATIENT SERVICES";position:absolute;left:50%;top:31px;transform:translateX(-50%);
+  padding:8px 15px;border:2px solid #ead8a8;border-radius:7px;background:#20304a;color:#fff5be;
+  font-size:.76rem;font-weight:950;letter-spacing:.12em;white-space:nowrap;
+}
+.reception-bell{
+  position:absolute;z-index:4;left:calc(50% + 198px);bottom:124px;width:31px;height:20px;border-radius:24px 24px 5px 5px;
+  background:linear-gradient(180deg,#fff7bd,#bd941f);border:2px solid #826700;box-shadow:0 4px 0 rgba(0,0,0,.12);
+}
+.reception-bell::before{content:"";position:absolute;left:11px;top:-8px;width:7px;height:8px;border-radius:50% 50% 0 0;background:#c9a633}
+.lobby-copy{
+  position:relative;z-index:4;margin:-1px 0 0;padding:18px 24px;text-align:center;
+  background:#101626;color:#dce3f4;border-top:1px solid #35405e;border-bottom:1px solid #35405e;
+}
+.lobby-copy strong{display:block;color:#fff;font-size:1.15rem}
+.lobby-copy span{display:block;margin-top:4px;color:#b9c2d8;font-size:.9rem}
+.lobby-stage .unit-grid{grid-template-columns:repeat(3,minmax(0,1fr));padding:20px;margin:0;background:#0d1220;gap:16px}
+.lobby-stage .unit-card{
+  min-height:394px;padding:15px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;
+  border-color:#3b4662;background:linear-gradient(180deg,#1d2639,#141b2b);color:#f7f9ff;box-shadow:0 18px 30px rgba(0,0,0,.18);
+}
+.lobby-stage .unit-card:hover{transform:translateY(-5px);border-color:#e1c642;box-shadow:0 24px 44px rgba(0,0,0,.3)}
+.lobby-stage .unit-card:hover .unit-door.left{transform:translateX(-9%)}
+.lobby-stage .unit-card:hover .unit-door.right{transform:translateX(9%)}
+.lobby-stage .unit-summary{text-align:center}
+.lobby-stage .unit-card h2{color:#fff;font-size:1.03rem;line-height:1.25}
+.lobby-stage .unit-card p{color:#bbc5dc}
+.lobby-stage .department-entry{width:100%;min-height:208px;margin-bottom:2px}
+.lobby-stage .progress-track{width:100%;margin-top:auto;background:#303a51;border-color:#46516d}
+.lobby-stage .progress-copy{width:100%;color:#c6cfe2;text-align:center}
+.enter-unit-label{display:inline-flex;align-items:center;justify-content:center;align-self:center;margin-top:1px;padding:7px 12px;border-radius:999px;background:#f2d96a;color:#322900;font-size:.72rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+.lobby-stage .answer-key-panel{margin:0 20px;background:#151d2e;border-color:#35405e;box-shadow:none}
+.lobby-stage .answer-key-panel summary{color:#fff}
+.lobby-stage .answer-key-grid{background:#0d1220;border-top-color:#35405e}
+
+.hallway-stage{
+  min-height:720px;
+  background:#0d1220;
+}
+.hallway-perspective{
+  position:relative;min-height:610px;padding:46px 26px 150px;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% -5%,rgba(255,245,183,.35),transparent 12rem),
+    linear-gradient(90deg,#1b2637 0 7%,#dce4ea 7% 93%,#1b2637 93% 100%);
+}
+.hallway-perspective::before{
+  content:"";position:absolute;left:7%;right:7%;top:0;height:54px;
+  background:repeating-linear-gradient(90deg,#bcc6d3 0 80px,#e8edf3 80px 160px);border-bottom:5px solid #7c8798;
+}
+.hallway-perspective::after{
+  content:"";position:absolute;z-index:0;left:-12%;right:-12%;bottom:-92px;height:250px;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 92px,rgba(42,53,73,.25) 92px 95px),
+    repeating-linear-gradient(0deg,transparent 0 58px,rgba(42,53,73,.25) 58px 61px),
+    linear-gradient(180deg,#c6d0da,#79889b);
+  transform:perspective(420px) rotateX(55deg);transform-origin:bottom;
+}
+.hallway-unit-sign{
+  position:relative;z-index:3;width:max-content;max-width:calc(100% - 30px);margin:0 auto 30px;padding:12px 22px;
+  border:2px solid #718099;border-radius:12px;background:#172136;color:#fff;text-align:center;box-shadow:0 12px 24px rgba(20,29,47,.25);
+}
+.hallway-unit-sign strong{display:block;color:#f2d96a;font-size:.75rem;letter-spacing:.17em;text-transform:uppercase}
+.hallway-unit-sign span{display:block;margin-top:3px;font-size:1.15rem;font-weight:950}
+.hallway-stage .room-panel{position:relative;z-index:2;margin:0;background:transparent;border:0;box-shadow:none;padding:0}
+.hallway-stage .room-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.hallway-stage .room-card{
+  min-height:282px;padding:12px 12px 16px;border:2px solid #9ca8b8;border-radius:12px;
+  background:linear-gradient(180deg,#e7edf3,#c9d3dd);box-shadow:0 18px 25px rgba(21,29,45,.24);text-align:center;
+}
+.hallway-stage .room-card:hover{transform:translateY(-5px);border-color:#b59112;box-shadow:0 24px 34px rgba(21,29,45,.32)}
+.hallway-stage .room-card .room-door{top:46px;width:112px;height:154px}
+.hallway-stage .room-card.door-opening .room-door{transform:translateX(-50%) rotateY(-68deg);transform-origin:left center}
+.hallway-stage .room-card.door-opening{border-color:#e1c642;box-shadow:0 0 0 7px rgba(225,198,66,.2),0 24px 34px rgba(21,29,45,.32)}
+.hallway-stage .room-card h3{margin:180px 0 2px;color:#20293b}
+.hallway-stage .room-card p{color:#59657a}
+.hallway-stage .room-number{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#172136;color:#f2d96a;border-color:#172136}
+.hallway-stage .closed-stamp{bottom:47px;right:50%;transform:translateX(50%) rotate(-6deg);white-space:nowrap}
+.room-review-label{display:block;margin-top:8px;color:#8f2432;font-size:.72rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em}
+.hallway-progress{position:relative;z-index:3;margin:26px auto 0;width:min(720px,100%);padding:12px 15px;border-radius:16px;background:#111a2b;color:#dce3f3;box-shadow:0 12px 24px rgba(0,0,0,.2)}
+.hallway-progress .progress-track{margin-top:0;background:#2d3851;border-color:#43506b}
+.hallway-progress .progress-copy{margin:8px 0 0;color:#dce3f3;text-align:center}
+
+.patient-room-stage{background:#111827}
+.patient-room-scene{
+  position:relative;min-height:760px;padding:74px 32px 56px;overflow:hidden;
+  background:
+    linear-gradient(90deg,transparent 0 71%,rgba(135,184,209,.26) 71% 72%,transparent 72%),
+    linear-gradient(180deg,#dce8ec 0 66%,#8e9ca9 66% 100%);
+}
+.patient-room-scene::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:42px;border-bottom:5px solid #8e9aa8;
+  background:repeating-linear-gradient(90deg,#eaf0f3 0 90px,#c3d0d7 90px 180px);
+}
+.patient-room-scene::after{
+  content:"";position:absolute;left:-8%;right:-8%;bottom:-84px;height:210px;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 84px,rgba(45,58,78,.23) 84px 87px),
+    repeating-linear-gradient(0deg,transparent 0 54px,rgba(45,58,78,.23) 54px 57px),
+    linear-gradient(180deg,#c8d1d8,#8593a0);
+  transform:perspective(420px) rotateX(55deg);transform-origin:bottom;
+}
+.room-bed{
+  position:absolute;z-index:1;left:-28px;bottom:118px;width:310px;height:105px;border:8px solid #66758a;border-radius:24px 30px 14px 14px;
+  background:linear-gradient(180deg,#eef6f7 0 58%,#8eb7c7 58% 100%);box-shadow:0 20px 30px rgba(29,42,57,.22);
+}
+.room-bed::before{content:"";position:absolute;left:22px;top:-26px;width:106px;height:48px;border-radius:20px;background:#fff;border:3px solid #b8cbd2}
+.room-bed::after{content:"";position:absolute;left:30px;right:30px;bottom:-28px;height:25px;border-left:8px solid #59677b;border-right:8px solid #59677b}
+.vital-monitor{
+  position:absolute;z-index:1;right:28px;top:86px;width:172px;height:126px;border:9px solid #4e5a6a;border-radius:16px;background:#071a19;box-shadow:0 16px 26px rgba(20,30,43,.25);
+}
+.vital-monitor::before{content:"";position:absolute;inset:18px 12px;background:linear-gradient(135deg,transparent 0 28%,#65e7a5 28% 31%,transparent 31% 44%,#65e7a5 44% 47%,transparent 47% 60%,#65e7a5 60% 63%,transparent 63%)}
+.vital-monitor::after{content:"72";position:absolute;right:12px;top:8px;color:#65e7a5;font:bold 20px/1 monospace}
+.patient-clipboard{
+  position:relative;z-index:4;width:min(960px,calc(100% - 120px));margin:0 auto;padding:34px 22px 22px;
+  border:4px solid #70491f;border-radius:24px 24px 20px 20px;
+  background:linear-gradient(135deg,#c99a58,#97662e 70%,#7d501f);box-shadow:0 34px 56px rgba(20,29,42,.34),inset 0 2px 0 #efd09b;
+  transform:rotate(-.35deg);
+}
+.clipboard-clip{
+  position:absolute;z-index:5;left:50%;top:-27px;width:190px;height:62px;transform:translateX(-50%);
+  border:4px solid #657184;border-radius:20px 20px 12px 12px;background:linear-gradient(180deg,#eef2f5,#8c98a9 54%,#697587);box-shadow:0 7px 10px rgba(20,28,43,.24),inset 0 2px 0 #fff;
+}
+.clipboard-clip::after{content:"PATIENT CHART";position:absolute;left:50%;bottom:7px;transform:translateX(-50%);color:#202b3d;font-size:.68rem;font-weight:950;letter-spacing:.11em;white-space:nowrap}
+.clipboard-paper{
+  position:relative;min-height:560px;padding:34px 30px 30px;border:1px solid #d9d3bc;border-radius:8px;
+  background:
+    linear-gradient(90deg,transparent 0 54px,rgba(203,64,71,.16) 54px 56px,transparent 56px),
+    repeating-linear-gradient(180deg,#fffdf7 0 31px,#dfe9f0 31px 32px);
+  color:#202737;box-shadow:0 7px 12px rgba(75,48,22,.25);transform:rotate(.25deg);
+}
+.clipboard-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding-bottom:14px;border-bottom:3px double #64748b}
+.clipboard-title-row h2{margin:0;color:#172033;font-size:1.55rem}
+.clipboard-title-row p{margin:4px 0 0;color:#586379;font-size:.86rem;font-weight:750}
+.chart-status-badge{flex:0 0 auto;padding:7px 11px;border:2px solid #2f6bd8;border-radius:8px;color:#234f9f;background:#eff5ff;font-size:.7rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;transform:rotate(1deg)}
+.chart-status-badge.closed{border-color:#bb2d3d;color:#a21f2f;background:#fff1f3;transform:rotate(-3deg)}
+.patient-id-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}
+.patient-id-item{padding:9px 10px;border:1px solid #cbd5df;border-radius:8px;background:rgba(255,255,255,.82)}
+.patient-id-item span{display:block;color:#64748b;font-size:.62rem;font-weight:950;letter-spacing:.09em;text-transform:uppercase}
+.patient-id-item strong{display:block;margin-top:2px;color:#1f2937;font-size:.86rem}
+.patient-clipboard .chart-layout{grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);align-items:start}
+.patient-clipboard .clipboard{border:0;border-radius:0;background:transparent;overflow:visible}
+.patient-clipboard .clipboard-head{padding:8px 10px;border:1px solid #9c874c;border-radius:8px;background:#efe3aa;color:#4f4100}
+.patient-clipboard .evidence-list{padding:10px 0 0}
+.patient-clipboard .evidence-list li{position:relative;padding:10px 11px 10px 34px;border:0;border-bottom:1px solid #9eb2c3;border-radius:0;background:rgba(255,255,255,.58);color:#273246;font-size:.9rem}
+.patient-clipboard .evidence-list li::before{content:"✓";position:absolute;left:10px;top:9px;color:#1a8a4a;font-weight:950}
+.patient-clipboard .diagnosis-bank{border:2px solid #667085;border-radius:12px;background:rgba(247,249,252,.93);box-shadow:3px 4px 0 rgba(66,78,97,.14)}
+.patient-clipboard .diagnosis-bank h3{color:#1f2937;font-size:1.05rem}
+.patient-clipboard .diagnosis-bank p{color:#586379}
+.patient-clipboard .token-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.patient-clipboard .diagnosis-token{width:100%;text-align:left;border-radius:9px;padding:10px 12px;background:#fff8cc;box-shadow:none}
+.patient-clipboard .diagnosis-token::before{content:"○";margin-right:8px;color:#806700}
+.patient-clipboard .diagnosis-token.selected{background:#e9f2ff;color:#18366c}
+.patient-clipboard .diagnosis-token.selected::before{content:"●";color:#2f6bd8}
+.patient-clipboard .status-card{background:#fff;border-width:2px}
+.patient-clipboard .action-row{margin-top:12px}
+.patient-clipboard .game-btn.primary{width:100%;border-radius:10px;padding:13px 16px;background:#245fca}
+.case-resolution{padding:18px;border:3px double #26905a;border-radius:14px;background:#eefbf3;color:#135f3c;text-align:center;transform:rotate(-.4deg)}
+.case-resolution .resolution-check{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 8px;border-radius:50%;background:#1a8a4a;color:#fff;font-size:1.45rem;font-weight:950}
+.case-resolution strong{display:block;font-size:1.18rem}
+.case-resolution p{margin:6px 0 0!important;color:#236d4b!important;line-height:1.4}
+html[data-mls-theme="dark"] body.ua-case-files .hallway-stage .room-card h3{color:#20293b}
+html[data-mls-theme="dark"] body.ua-case-files .hallway-stage .room-card p{color:#59657a}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .clipboard-title-row h2{color:#172033}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .clipboard-title-row p{color:#586379}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .clipboard{background:transparent;border:0}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .evidence-list li{background:rgba(255,255,255,.58);color:#273246;border-color:#9eb2c3}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .diagnosis-bank{background:rgba(247,249,252,.93);border-color:#667085}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .diagnosis-bank h3{color:#1f2937}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .diagnosis-bank p{color:#586379}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .status-card{background:#fff;color:#4c5570;border-color:#c8cce0}
+html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .status-card.bad{border-color:#f0b6bf;background:#fff1f3;color:#a42033}
+
+@media(max-width:980px){
+  .lobby-stage .unit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hallway-stage .room-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .patient-clipboard{width:calc(100% - 34px)}
+  .patient-clipboard .chart-layout{grid-template-columns:1fr}
+  .vital-monitor{opacity:.35}
+}
+@media(max-width:680px){
+  .stage-topbar{align-items:flex-start;flex-direction:column}
+  .stage-actions{width:100%;justify-content:flex-start}
+  .stage-actions .game-btn{width:auto}
+  .hospital-lobby{min-height:285px;padding-inline:16px}
+  .lobby-clock{display:none}
+  .reception-desk{width:82%}
+  .reception-bell{display:none}
+  .lobby-stage .unit-grid{grid-template-columns:1fr;padding:12px}
+  .lobby-stage .answer-key-panel{margin:0 12px}
+  .hallway-perspective{padding:38px 14px 130px}
+  .hallway-stage .room-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .hallway-stage .room-card{min-height:250px}
+  .hallway-stage .room-card .room-door{width:92px;height:132px}
+  .hallway-stage .room-card h3{margin-top:158px}
+  .patient-room-scene{padding:58px 10px 40px}
+  .room-bed,.vital-monitor{display:none}
+  .patient-clipboard{width:100%;padding:31px 8px 9px;border-width:3px}
+  .clipboard-paper{padding:28px 14px 18px}
+  .clipboard-title-row{display:grid}
+  .chart-status-badge{justify-self:start}
+  .patient-id-grid{grid-template-columns:1fr}
+}
 @media print{
   @page{size:letter landscape;margin:.25in}
   @page uaSingleCaseCard{size:4in 6in;margin:0}
@@ -1235,13 +1543,10 @@ html[data-mls-theme="dark"] body.ua-case-files .answer-key-item span{color:#f4f6
       <div>
         <div class="eyebrow">Urinalysis Case Game</div>
         <h1 class="game-font">UA Case Game</h1>
-        <p>Solve the UA pattern rooms by matching short clues to the correct diagnosis token.</p>
+        <p>Enter the hospital, choose a department, and investigate each patient room to close the case.</p>
         <div class="action-row">
-          <button class="game-btn enter" type="button" onclick="document.getElementById('gameRoot').scrollIntoView({behavior:'smooth',block:'start'})">Enter the UA Case Wing!</button>
-          <button class="game-btn ghost" type="button" onclick="printMode('cases')">Print Case Cards</button>
-          <button class="game-btn ghost" type="button" onclick="printMode('cases-single')">Print Single 4x6</button>
-          <button class="game-btn ghost" type="button" onclick="printMode('tokens')">Print Diagnosis Tokens</button>
-          <button class="game-btn ghost" type="button" onclick="printMode('full')">Print Full Game Pack</button>
+          <button class="game-btn enter" type="button" onclick="enterHospitalLobby()">Enter Hospital Lobby</button>
+          <button class="game-btn ghost" type="button" onclick="printMode('full')">Print Whole Game</button>
         </div>
       </div>
       <div class="hero-badge" aria-hidden="true"><div><span>🔎</span>Case<br>Game</div></div>
@@ -1806,6 +2111,7 @@ const renalCaseFiles = [
 
 const storageKey = "mls.uaRenalCaseFiles.v1";
 let progress = loadProgress();
+let gameStarted = false;
 let activeUnitId = null;
 let activeRoom = null;
 let selectedDiagnosis = "";
@@ -1911,7 +2217,11 @@ function diagnosisBankFor(item){
 
 function render(){
   const root = document.getElementById("gameRoot");
-  root.innerHTML = activeUnitId ? renderUnit() : renderStart();
+  if(!gameStarted){
+    root.innerHTML = "";
+    return;
+  }
+  root.innerHTML = activeRoom ? renderRoom(activeRoom) : (activeUnitId ? renderUnit() : renderStart());
   document.querySelectorAll(".diagnosis-token").forEach(button => {
     button.addEventListener("click", () => selectDiagnosis(button.dataset.diagnosis));
   });
@@ -1923,17 +2233,42 @@ function renderStart(){
   const completeMessage = totalClosed === totalCases
     ? `<div class="completion" style="margin-top:18px">UA Case Game Complete - ${totalCases}/${totalCases} cases closed.</div>`
     : "";
-  return `
-    <div class="unit-grid">
+  return `<section class="game-stage lobby-stage" aria-label="Hospital lobby">
+    <header class="stage-topbar">
+      <div>
+        <div class="stage-kicker">UA Hospital</div>
+        <h2>Investigation Lobby</h2>
+        <p>Choose a department entrance to begin or continue its cases.</p>
+      </div>
+      <div class="stage-actions">
+        <button class="game-btn ghost" type="button" onclick="resetWholeGame()">Reset Progress</button>
+      </div>
+    </header>
+    <div class="stage-path"><strong>Lobby</strong><span aria-hidden="true">›</span><span>Choose a department</span></div>
+    <div class="hospital-lobby" aria-hidden="true">
+      <div class="lobby-sign"><strong>Urinalysis Hospital</strong><span>Patient Case Investigation Wing</span></div>
+      <div class="lobby-clock"></div>
+      <div class="reception-desk"></div>
+      <div class="reception-bell"></div>
+    </div>
+    <div class="lobby-copy"><strong>Department Directory</strong><span>Select a set of elevator doors to enter that hospital unit.</span></div>
+    <div class="unit-grid immersive-grid">
       ${units().map(unit => {
         const cases = casesForUnit(unit.unitId);
         const closed = closedCases(unit.unitId).length;
         const isEmpty = cases.length === 0;
         const pct = isEmpty ? 0 : Math.round((closed / cases.length) * 100);
-        const countCopy = isEmpty ? (unit.comingSoon || "Cases coming soon") : `${cases.length} rooms / ${cases.length} cases`;
+        const countCopy = isEmpty ? (unit.comingSoon || "Cases coming soon") : `${cases.length} patient rooms`;
         const progressCopy = isEmpty ? "Ready for future cases" : `Cases Closed ${closed}/${cases.length}`;
-        return `<button class="unit-card ${isEmpty ? "is-empty" : ""}" type="button" ${isEmpty ? "disabled" : `onclick="enterUnit(${unit.unitId})"`}>
-          <div class="unit-lobby-icon" aria-hidden="true"></div>
+        return `<button class="unit-card immersive-unit-card ${isEmpty ? "is-empty" : ""}" type="button" ${isEmpty ? "disabled" : `onclick="enterUnit(${unit.unitId},this)"`} aria-label="Enter ${esc(unit.department)}">
+          <div class="department-entry" aria-hidden="true">
+            <div class="department-sign">${esc(unit.unitName)}</div>
+            <div class="door-track"></div>
+            <div class="door-glow"></div>
+            <div class="unit-door left"></div>
+            <div class="unit-door right"></div>
+            <div class="door-alert">Doors opening</div>
+          </div>
           <div class="unit-summary">
             <div class="eyebrow">${esc(unit.unitName)}</div>
             <h2>${esc(unit.department)}</h2>
@@ -1941,82 +2276,53 @@ function renderStart(){
           </div>
           <div class="progress-track"><div class="progress-fill" style="--progress:${pct}%"></div></div>
           <div class="progress-copy">${esc(progressCopy)}</div>
-          ${isEmpty ? '<div class="coming-soon-pill">Coming soon</div>' : ""}
+          ${isEmpty ? '<div class="coming-soon-pill">Coming soon</div>' : '<span class="enter-unit-label">Enter Unit</span>'}
         </button>`;
       }).join("")}
     </div>
     ${completeMessage}
     ${renderAnswerKey()}
-  `;
+  </section>`;
 }
 
 function renderUnit(){
   const unitCases = casesForUnit(activeUnitId);
   const unit = units().find(item => item.unitId === activeUnitId);
-  if(!unitCases.length){
-    return `
-      <section class="unit-panel">
-        <div class="unit-head">
-          <div>
-            <div class="eyebrow">${esc(unit.unitName)}</div>
-            <h2>${esc(unit.department)}</h2>
-            <p>${esc(unit.comingSoon || "Cases coming soon")}</p>
-          </div>
-          <div class="action-row" style="margin-top:0">
-            <button class="game-btn ghost" type="button" onclick="backToUnits()">Hospital Lobby</button>
-          </div>
-        </div>
-      </section>
-    `;
-  }
+  if(!unitCases.length){return renderStart();}
   const closed = closedCases(activeUnitId).length;
   const completion = closed === unitCases.length
     ? `<div class="completion">${esc(unit.department)} Complete - ${closed}/${unitCases.length} cases closed.</div>`
     : "";
-  return `
-    <section class="unit-panel">
-      <div class="unit-head">
-        <div>
-          <div class="eyebrow">${esc(unit.unitName)}</div>
-          <h2>${esc(unit.department)}</h2>
-          <p>Open a hospital room, review the pattern clues, then choose a diagnosis token.</p>
-          <div class="progress-track"><div class="progress-fill" style="--progress:${Math.round((closed / unitCases.length) * 100)}%"></div></div>
-          <div class="progress-copy">Cases Closed ${closed}/${unitCases.length}</div>
-        </div>
-        <div class="action-row" style="margin-top:0">
-          <button class="game-btn ghost" type="button" onclick="backToUnits()">Hospital Lobby</button>
-          <button class="game-btn warn" type="button" onclick="resetUnit(${activeUnitId})">Reset Unit</button>
-          <button class="game-btn warn" type="button" onclick="resetWholeGame()">Reset Whole Game</button>
-        </div>
+  return `<section class="game-stage hallway-stage" aria-label="${esc(unit.department)} hallway">
+    <header class="stage-topbar">
+      <div>
+        <div class="stage-kicker">${esc(unit.unitName)}</div>
+        <h2>${esc(unit.department)} Hallway</h2>
+        <p>Open a patient room to investigate its UA pattern.</p>
       </div>
-      ${completion}
-      <div class="department-hall">
-        <div class="department-hall-door" aria-hidden="true"></div>
-        <div>
-          <strong>${esc(unit.department)} Hallway</strong>
-          <span>Choose a room to pull the short evidence pattern for that case.</span>
-        </div>
+      <div class="stage-actions">
+        <button class="game-btn ghost" type="button" onclick="backToUnits()">← Hospital Lobby</button>
+        <button class="game-btn warn" type="button" onclick="resetUnit(${activeUnitId})">Reset This Unit</button>
       </div>
+    </header>
+    <div class="stage-path"><span>Lobby</span><span aria-hidden="true">›</span><strong>${esc(unit.department)}</strong><span aria-hidden="true">›</span><span>Choose a room</span></div>
+    <div class="hallway-perspective">
+      <div class="hallway-unit-sign"><strong>${esc(unit.unitName)}</strong><span>${esc(unit.department)}</span></div>
       <div class="room-panel">
-        <div class="chart-title-row">
-          <div>
-            <h2>Case Rooms</h2>
-            <p>Closed rooms stay marked in the case list.</p>
-          </div>
-        </div>
-        <div class="room-grid">
-          ${unitCases.map(renderRoomCard).join("")}
-        </div>
+        <div class="room-grid immersive-room-grid">${unitCases.map(renderRoomCard).join("")}</div>
       </div>
-      ${activeRoom ? renderChart(activeRoom) : ""}
-    </section>
-  `;
+      <div class="hallway-progress">
+        <div class="progress-track"><div class="progress-fill" style="--progress:${Math.round((closed / unitCases.length) * 100)}%"></div></div>
+        <div class="progress-copy">Cases Closed ${closed}/${unitCases.length}</div>
+      </div>
+    </div>
+    ${completion}
+  </section>`;
 }
 
 function renderRoomCard(item){
   const closed = progress.closed[caseKey(item)];
-  const selected = activeRoom && activeRoom.unitId === item.unitId && activeRoom.room === item.room;
-  return `<button class="room-card ${closed ? "closed" : ""} ${selected ? "selected" : ""}" type="button" onclick="openRoom(${item.unitId},${item.room})">
+  return `<button class="room-card ${closed ? "closed" : ""}" type="button" onclick="openRoom(${item.unitId},${item.room},this)" aria-label="${closed ? "Open closed case for review" : "Enter"} room ${caseCode(item)}">
     <div class="room-door" aria-hidden="true">
       <div class="room-door-window"></div>
       <div class="room-door-handle"></div>
@@ -2025,7 +2331,31 @@ function renderRoomCard(item){
     <h3>Case Room ${caseCode(item)}</h3>
     <p>${esc(item.caseTitle)}</p>
     ${closed ? '<span class="closed-stamp">Case Closed</span>' : ""}
+    ${closed ? '<span class="room-review-label">Open to review</span>' : '<span class="enter-unit-label">Enter room</span>'}
   </button>`;
+}
+
+function renderRoom(item){
+  const unit = unitFor(item);
+  return `<section class="game-stage patient-room-stage" aria-label="Patient room ${caseCode(item)}">
+    <header class="stage-topbar">
+      <div>
+        <div class="stage-kicker">Patient Room ${caseCode(item)}</div>
+        <h2>${esc(item.caseTitle)}</h2>
+        <p>Review the clipboard, choose a diagnosis, and close the case.</p>
+      </div>
+      <div class="stage-actions">
+        <button class="game-btn ghost" type="button" onclick="closeChart()">← Department Hallway</button>
+        <button class="game-btn ghost" type="button" onclick="backToUnits()">Hospital Lobby</button>
+      </div>
+    </header>
+    <div class="stage-path"><span>Lobby</span><span aria-hidden="true">›</span><span>${esc(unit.department)}</span><span aria-hidden="true">›</span><strong>Room ${caseCode(item)}</strong></div>
+    <div class="patient-room-scene">
+      <div class="room-bed" aria-hidden="true"></div>
+      <div class="vital-monitor" aria-hidden="true"></div>
+      ${renderChart(item)}
+    </div>
+  </section>`;
 }
 
 function renderChart(item){
@@ -2034,35 +2364,56 @@ function renderChart(item){
   const available = diagnosisBankFor(item)
     .filter(diagnosis => !unitUsed.has(diagnosis));
   const message = closed
-    ? "Case Closed. This room is sealed."
+    ? (chartMessage || `Case closed. Correct diagnosis: ${item.diagnosis}. You can review this patient chart any time.`)
     : (chartMessage || "Choose a diagnosis token, then confirm the case.");
   const messageState = closed ? "good" : chartMessageState;
-  return `<div class="chart-panel" id="patientChart">
-    <div class="chart-title-row">
-      <div>
-        <h2>Patient Chart - ${caseCode(item)}</h2>
-        <p>${esc(unitNameFor(item))} / ${esc(item.department)} / ${esc(item.caseTitle)}</p>
-      </div>
-      <button class="game-btn ghost" type="button" onclick="closeChart()">Close Chart</button>
-    </div>
-    <div class="chart-layout">
-      <div class="clipboard">
-        <div class="clipboard-head"><span>Patient Pattern</span><span>UA Evidence</span></div>
-        <ul class="evidence-list">
-          ${caseClues(item).map(result => `<li>${esc(result)}</li>`).join("")}
-        </ul>
-      </div>
-      <aside class="diagnosis-bank">
-        <h3>Diagnosis Bank</h3>
-        <p>${closed ? "This room no longer needs a token." : "Pick one diagnosis token for this room."}</p>
-        <div class="token-grid">
-          ${closed ? "" : available.map(diagnosis => `<button type="button" class="diagnosis-token ${selectedDiagnosis === diagnosis ? "selected" : ""}" data-diagnosis="${esc(diagnosis)}">${esc(diagnosis)}</button>`).join("")}
+  return `<article class="patient-clipboard" id="patientChart">
+    <div class="clipboard-clip" aria-hidden="true"></div>
+    <div class="clipboard-paper">
+      <header class="clipboard-title-row">
+        <div>
+          <h2>Patient Clipboard - ${caseCode(item)}</h2>
+          <p>${esc(unitNameFor(item))} / ${esc(item.department)}</p>
         </div>
-        <div class="status-card ${messageState}">${esc(message)}</div>
-        ${closed ? "" : `<div class="action-row"><button class="game-btn primary" type="button" onclick="confirmDiagnosis()">Confirm Diagnosis</button></div>`}
-      </aside>
+        <span class="chart-status-badge ${closed ? "closed" : ""}">${closed ? "Case closed" : "Active case"}</span>
+      </header>
+      <div class="patient-id-grid">
+        <div class="patient-id-item"><span>Patient</span><strong>Case ${caseCode(item)}</strong></div>
+        <div class="patient-id-item"><span>Location</span><strong>Room ${caseCode(item)}</strong></div>
+        <div class="patient-id-item"><span>Service</span><strong>${esc(item.caseTitle)}</strong></div>
+      </div>
+      <div class="chart-layout">
+        <section class="clipboard" aria-label="Patient evidence">
+          <div class="clipboard-head"><span>Patient Pattern</span><span>UA Evidence</span></div>
+          <ul class="evidence-list">${caseClues(item).map(result => `<li>${esc(result)}</li>`).join("")}</ul>
+        </section>
+        <aside class="diagnosis-bank">
+          ${closed ? `<div class="case-resolution">
+            <span class="resolution-check">✓</span>
+            <strong>${esc(message)}</strong>
+            <p>This chart remains available for review. Return to the hallway when you are ready.</p>
+          </div>` : `<h3>Choose the diagnosis</h3>
+            <p>Select one diagnosis from the chart, then confirm the case.</p>
+            <div class="token-grid">
+              ${available.map(diagnosis => `<button type="button" class="diagnosis-token ${selectedDiagnosis === diagnosis ? "selected" : ""}" data-diagnosis="${esc(diagnosis)}">${esc(diagnosis)}</button>`).join("")}
+            </div>
+            <div class="status-card ${messageState}">${esc(message)}</div>
+            <div class="action-row"><button class="game-btn primary" type="button" onclick="confirmDiagnosis()">Confirm Diagnosis</button></div>`}
+        </aside>
+      </div>
     </div>
-  </div>`;
+  </article>`;
+}
+
+function enterHospitalLobby(){
+  gameStarted = true;
+  activeUnitId = null;
+  activeRoom = null;
+  selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
+  render();
+  setTimeout(() => document.getElementById("gameRoot")?.scrollIntoView({behavior:"smooth",block:"start"}), 40);
 }
 
 function enterUnit(unitId, doorCard){
@@ -2081,13 +2432,22 @@ function enterUnit(unitId, doorCard){
 }
 
 function backToUnits(){
+  gameStarted = true;
   activeUnitId = null;
   activeRoom = null;
   selectedDiagnosis = "";
+  chartMessage = "";
+  chartMessageState = "";
   render();
+  setTimeout(() => document.querySelector(".lobby-stage")?.scrollIntoView({behavior:"smooth",block:"start"}), 40);
 }
 
-function openRoom(unitId, room){
+function openRoom(unitId, room, doorCard){
+  if(doorCard && !doorCard.classList.contains("door-opening")){
+    doorCard.classList.add("door-opening");
+    setTimeout(() => openRoom(unitId, room), 320);
+    return;
+  }
   activeUnitId = unitId;
   activeRoom = renalCaseFiles.find(item => item.unitId === unitId && item.room === room);
   selectedDiagnosis = "";
@@ -2103,6 +2463,7 @@ function closeChart(){
   chartMessage = "";
   chartMessageState = "";
   render();
+  setTimeout(() => document.querySelector(".hallway-stage")?.scrollIntoView({behavior:"smooth",block:"start"}), 40);
 }
 
 function selectDiagnosis(diagnosis){
@@ -2123,13 +2484,13 @@ function confirmDiagnosis(){
   if(selectedDiagnosis === activeRoom.diagnosis){
     progress.closed[caseKey(activeRoom)] = selectedDiagnosis;
     saveProgress();
-    chartMessage = "Case Closed.";
+    chartMessage = `Yes - congrats! It is ${activeRoom.diagnosis}. Case closed.`;
     chartMessageState = "good";
     selectedDiagnosis = "";
     render();
     return;
   }
-  chartMessage = "Recheck the Chart.";
+  chartMessage = "Not quite. Review the patient clipboard and try again.";
   chartMessageState = "bad";
   render();
 }

@@ -1030,7 +1030,18 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .ascp-guideline-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg2)}
 .ascp-guideline-title{font-size:17px;font-weight:800;color:var(--text)}
 .ascp-guideline-date{font-size:11px;color:var(--text2);margin-top:3px}
-.ascp-guideline-frame{display:block;width:100%;height:100%;min-height:0;flex:1;border:0;background:#fff}
+.ascp-guideline-page-count{flex:0 0 auto;padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:var(--bg3);color:var(--text2);font-family:var(--mono);font-size:10px;font-weight:800}
+.ascp-guideline-viewer{min-height:0;flex:1;overflow:auto;scroll-behavior:smooth;padding:22px;background:#20242d;overscroll-behavior:contain}
+.ascp-guideline-pages{width:min(920px,100%);margin:0 auto;display:grid;gap:22px}
+.ascp-guideline-page{position:relative;margin:0;background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 16px 34px #00000055}
+.ascp-guideline-page img{display:block;width:100%;height:auto;background:#fff}
+.ascp-guideline-page figcaption{position:absolute;right:10px;bottom:9px;padding:5px 8px;border-radius:999px;background:#111827cc;color:#fff;font-family:var(--mono);font-size:9px;font-weight:800;line-height:1}
+@media(max-width:620px){
+  .ascp-guideline-head{padding:11px 12px}
+  .ascp-guideline-page-count{display:none}
+  .ascp-guideline-viewer{padding:10px}
+  .ascp-guideline-pages{gap:10px}
+}
 .ascp-outline-grid{display:grid;grid-template-columns:1fr;gap:18px}
 .ascp-section-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:22px}
 .ascp-section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:17px}
@@ -3284,7 +3295,8 @@ const STUDY_OUTLINES={
   }
 };
 
-const ASCP_GUIDELINE_PDF='assets/ascp/ascp_ascpi_mls_content_guideline_2025-09-25.pdf';
+const ASCP_GUIDELINE_PAGE_COUNT=17;
+const ASCP_GUIDELINE_PAGE_PATH='assets/ascp/pages/ascp-guideline-';
 const ASCP_GUIDELINE_DATE='September 25, 2025';
 const ASCP_GUIDELINE_CITATION='ASCP Board of Certification. Medical Laboratory Scientist, MLS(ASCP) and MLS(ASCPi) Examination Content Guideline. Revised September 25, 2025.';
 const ascpLines=(...items)=>items.map(item=>({level:Array.isArray(item)?item[0]:1,text:Array.isArray(item)?item[1]:item}));
@@ -5629,6 +5641,15 @@ function openASCPGuideline(){
   if(!modal||!dialog||!body)return;
   dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');
   dialog.classList.add('ascp-guideline-modal');
+  const pages=Array.from({length:ASCP_GUIDELINE_PAGE_COUNT},(_,index)=>{
+    const page=index+1;
+    const number=String(page).padStart(2,'0');
+    const loading=page<=2?'eager':'lazy';
+    return `<figure class="ascp-guideline-page" id="ascp-guideline-page-${page}">
+      <img src="${ASCP_GUIDELINE_PAGE_PATH}${number}.jpg" alt="ASCP MLS Examination Content Guideline, page ${page} of ${ASCP_GUIDELINE_PAGE_COUNT}" loading="${loading}" decoding="async">
+      <figcaption>Page ${page} of ${ASCP_GUIDELINE_PAGE_COUNT}</figcaption>
+    </figure>`;
+  }).join('');
   body.innerHTML=`
     <div class="ascp-guideline-shell">
       <header class="ascp-guideline-head">
@@ -5636,10 +5657,12 @@ function openASCPGuideline(){
           <div class="ascp-guideline-title">ASCP MLS Examination Content Guideline</div>
           <div class="ascp-guideline-date">Revised ${ASCP_GUIDELINE_DATE}</div>
         </div>
-        <a class="btn btn-ghost btn-sm" href="${ASCP_GUIDELINE_PDF}" target="_blank" rel="noopener">Open PDF</a>
+        <span class="ascp-guideline-page-count">${ASCP_GUIDELINE_PAGE_COUNT} pages · scroll to read</span>
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeASCPGuideline()" aria-label="Close guideline">✕</button>
       </header>
-      <iframe class="ascp-guideline-frame" src="${ASCP_GUIDELINE_PDF}#view=FitH" title="ASCP MLS Examination Content Guideline"></iframe>
+      <div class="ascp-guideline-viewer" role="document" aria-label="ASCP MLS Examination Content Guideline">
+        <div class="ascp-guideline-pages">${pages}</div>
+      </div>
     </div>`;
   modal.onclick=e=>{if(e.target===modal)closeASCPGuideline();};
   modal.classList.remove('hidden');
