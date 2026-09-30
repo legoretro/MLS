@@ -51,7 +51,6 @@
     </style>
   </defs>
 
-  <rect x="10" y="10" width="340" height="340" rx="18" fill="var(--paper)"/>
   <path d="M33 62c70-15 157-18 292 7M39 293c88 13 174 12 279-6" class="sketch"/>
   <path d="M45 85c27-6 49-6 72-1M255 80c30-7 52-5 69 3" class="sketch"/>
   <ellipse cx="180" cy="307" rx="106" ry="15" fill="#25304a" opacity=".13"/>
