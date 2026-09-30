@@ -1090,6 +1090,11 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .quiz-mastered-replace{white-space:nowrap!important;background:#ffd84d!important;border-color:#c89b00!important;color:#3b2d00!important;font-size:13px!important;font-weight:850!important;box-shadow:0 4px 12px rgba(177,133,0,.22)!important}
 .quiz-mastered-replace:hover:not(:disabled){background:#ffca1f!important;border-color:#a97d00!important}
 .quiz-mastered-replace:disabled{background:#e9dfae!important;border-color:#c9bd84!important;color:#80754a!important;box-shadow:none!important}
+.quiz-count-grid{display:grid;grid-template-columns:minmax(120px,1fr) minmax(150px,auto);gap:10px;align-items:stretch}
+.quiz-all-choice{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:800;cursor:pointer;text-transform:none;letter-spacing:0}
+.quiz-all-choice:has(input:checked){background:color-mix(in srgb,var(--accent) 13%,var(--bg2));border-color:var(--accent);color:var(--accent)}
+.quiz-all-choice input{width:17px;height:17px;margin:0;accent-color:var(--accent)}
+@media(max-width:520px){.quiz-count-grid{grid-template-columns:1fr}}
 @media(max-width:900px){.study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){
   .study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -3621,7 +3626,7 @@ let isAdmin = false;
 let sessionUserId = null;
 let appState = {
   view:'home', subject:null, subjectTab:'quiz',
-  quizQ:[], quizPool:[], quizIdx:0, quizAns:[], quizStarted:false, quizDone:false,
+  quizQ:[], quizPool:[], quizIdx:0, quizAns:[], quizStarted:false, quizDone:false, quizAllSelected:false,
   allQ:[], allPool:[], allIdx:0, allAns:[], allPending:null, allStarted:false, allDone:false, allReviewUnlocked:false,
   allTimer:null, allSeconds:0,
   attempts:[],
@@ -5370,9 +5375,9 @@ async function loadAttemptsHome(){
 
 // ─── SUBJECT VIEW ─────────────────────────────────────────────────────────────
 function goSubject(key){
-  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='quiz';appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;renderView();return;}
+  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='quiz';appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;renderView();return;}
   appState.view='subject';appState.subject=key;appState.subjectTab='quiz';
-  appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;
+  appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;
   appState.microCasesPage=null;appState.caseSelections={};
   appState.hemeImgPage=null;appState.hemeImgMode='browse';
   renderView();
@@ -5418,7 +5423,7 @@ function switchTab(tab){
     btn.classList.toggle('active', btn.dataset.tab===tab);
   });
   appState.subjectTab=tab;
-  appState.quizStarted=false;appState.quizDone=false;appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];
+  appState.quizStarted=false;appState.quizDone=false;appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizAllSelected=false;
   appState.microCasesPage=null;appState.caseSelections={};
   appState.hemeImgPage=null;appState.hemeImgMode='browse';
   appState.hemeQuizItems=[];appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
@@ -5813,7 +5818,13 @@ async function renderQuizTab(el){
           <div class="divider"></div>
           <div class="form-group">
             <label>Number of questions</label>
-            <input type="number" id="q-count" value="${Math.min(10,Math.max(count,1))}" min="1" max="${count||50}">
+            <div class="quiz-count-grid">
+              <input type="number" id="q-count" value="${Math.min(10,Math.max(count,1))}" min="1" max="${count||50}">
+              <label class="quiz-all-choice">
+                <input type="checkbox" id="q-all" onchange="toggleSubjectQuizAll(this.checked,${count||0})">
+                <span>Quiz all ${count||0}</span>
+              </label>
+            </div>
           </div>
           <button class="btn btn-primary" onclick="startSubjectQuiz()" ${count?'':'disabled'}>Start Quiz</button>
         </div>
@@ -5826,6 +5837,9 @@ async function renderQuizTab(el){
   if(!appState.quizQ.length){el.innerHTML='<div class="empty">No questions found for this subject.</div>';return;}
   const q=appState.quizQ[appState.quizIdx];
   const answered=appState.quizAns[appState.quizIdx];
+  const replacementUnavailable=appState.quizAllSelected||appState.quizQ.length>=(appState.quizPool||[]).length;
+  const replaceDisabled=!!answered||replacementUnavailable;
+  const replaceTitle=replacementUnavailable?'All available questions are already included in this quiz.':(answered?'Answered questions stay in your results.':'Swap this for another question from this subject.');
   const pct=Math.round((appState.quizIdx+1)/appState.quizQ.length*100);
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
@@ -5835,7 +5849,7 @@ async function renderQuizTab(el){
     <div class="bbq-overlay">
       <div class="bbq-header">
         <button class="btn btn-ghost btn-sm" onclick="switchTab('quiz')">✕ Exit</button>
-        <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${answered?'disabled title="Answered questions stay in your results."':'title="Swap this for another question from this subject."'}>Already Mastered, Replace Question</button>
+        <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${replaceDisabled?'disabled':''} title="${replaceTitle}">Already Mastered, Replace Question</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         <span class="quiz-mini-note">seen ${quizSeenCount(q)}x</span>
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
@@ -6229,7 +6243,8 @@ async function deleteQuizQuestion(id){
 }
 
 async function startSubjectQuiz(){
-  const cnt=parseInt(document.getElementById('q-count').value)||10;
+  const useAll=!!document.getElementById('q-all')?.checked;
+  const requestedCount=parseInt(document.getElementById('q-count')?.value)||10;
   let data;
   if(appState.subject==='para_myco'){
     const [r1,r2]=await Promise.all([
@@ -6242,11 +6257,25 @@ async function startSubjectQuiz(){
     data=res.data||[];
   }
   if(!data||!data.length){alert('No questions found.');return;}
+  const cnt=useAll?data.length:Math.max(1,Math.min(requestedCount,data.length));
   window._kqOpts={};
   appState.quizPool=data;
   appState.quizQ=pickQuizQuestions(data,cnt);
-  appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;
+  appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;appState.quizAllSelected=useAll;
   renderTab();
+}
+
+function toggleSubjectQuizAll(useAll,total){
+  const countInput=document.getElementById('q-count');
+  if(!countInput)return;
+  countInput.disabled=!!useAll;
+  if(useAll){
+    countInput.dataset.previousValue=countInput.value;
+    countInput.value=Math.max(1,Number(total)||1);
+  }else{
+    const previous=Number(countInput.dataset.previousValue)||Math.min(10,Math.max(1,Number(total)||1));
+    countInput.value=Math.min(previous,Math.max(1,Number(total)||1));
+  }
 }
 
 const QUIZ_SEEN_KEY='mlsboc_quiz_seen_counts';
@@ -6279,6 +6308,7 @@ function answerQ(opt){
 }
 function replaceCurrentQuizQuestion(){
   if(!appState.quizStarted||appState.quizDone||!appState.quizQ.length)return;
+  if(appState.quizAllSelected||appState.quizQ.length>=(appState.quizPool||[]).length)return;
   if(appState.quizAns[appState.quizIdx]){alert('This question is already answered. Replace before answering so your score stays clean.');return;}
   const idx=appState.quizIdx;
   const currentKey=quizQuestionKey(appState.quizQ[idx]);
@@ -6998,11 +7028,13 @@ function uaSearchModeHTML(query,count=null,loading=false){
 }
 async function renderUAImages(el){
   if(appState.uaImgMode==='quiz'){renderUAImageQuiz(el);return;}
-  // Show skeleton immediately
+  // Load and cache the complete UA image library once so every category tab is instant.
   el.innerHTML=imageLoadingHTML();
   let all=[];
   try{
-    all=uaSortItems(await getUAMetaItems());
+    const metadata=await getUAMetaItems();
+    all=uaSortItems(await getUAItemsWithImages(metadata));
+    window._uaCache=all;
   }catch(e){
     el.innerHTML=imageLoadRetryHTML('Urinalysis','invalidateUACaches();renderTab()');
     return;
@@ -7021,10 +7053,10 @@ async function renderUAImages(el){
       const q=searchQuery.toLowerCase();
       filteredMeta=uaSortItems(all.filter(item=>uaSearchText(item).includes(q)));
       window._uaFilteredMeta=filteredMeta;
-      activeItems=await getUAItemsWithImages(filteredMeta);
+      activeItems=filteredMeta;
     }else{
       window._uaFilteredMeta=[];
-      activeItems=await getUAItemsWithImages(sectionGroups[activeSection]||[]);
+      activeItems=sectionGroups[activeSection]||[];
     }
   }catch(e){
     el.innerHTML=imageLoadRetryHTML('Urinalysis','window._uaImageCacheById={};renderTab()');
@@ -14166,7 +14198,7 @@ async function fetchRowsWithRetry(fetcher, attempts=3, retryEmpty=false){
   throw lastError||new Error('Load failed');
 }
 function imageLoadingHTML(){
-  return '<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>Loading images — this may take a moment on first visit...</span><span style="font-size:12px;color:var(--text3)">If images do not load the first try, refresh or try the tab again.</span></div>';
+  return '<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>Loading the complete image library...</span></div>';
 }
 function imageLoadRetryHTML(label,retryAction){
   return `<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>${label} images did not load this time. Try this tab again; if it still looks blank, refresh once.</span><button class="btn btn-primary btn-sm" onclick="${retryAction}">Try loading again</button></div>`;
