@@ -104,7 +104,7 @@ select option{background:var(--bg3)}
 .subject-icon{font-size:22px}
 .subject-name{font-size:14px;font-weight:600;color:var(--text)}
 .subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.home-dashboard{max-width:1180px;margin:0 auto;padding-bottom:28px}
+.home-dashboard{position:relative;left:50%;width:min(1440px,calc(100vw - 48px));max-width:none;margin:0;transform:translateX(-50%);padding-bottom:28px}
 .home-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--bg2) 94%,var(--accent)),var(--bg2));border:1px solid var(--border);border-radius:22px;padding:24px 26px;box-shadow:0 18px 42px rgba(18,35,74,.10);display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
 .home-kicker{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));color:var(--accent);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
 .home-title{font-size:clamp(28px,3.45vw,40px);line-height:1.04;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:8px}
@@ -115,7 +115,7 @@ select option{background:var(--bg3)}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
 .home-section-title{font-size:20px;font-weight:750;color:var(--text);letter-spacing:-.01em}
 .home-section-title-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.home-subject-legend{font-size:10px;font-weight:650;color:var(--text3);letter-spacing:.01em}
+.home-subject-legend{font-size:12.5px;font-weight:700;color:var(--text2);letter-spacing:0;line-height:1.4}
 .home-section-sub{font-size:13px;color:var(--text2)}
 .home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .home-subject-grid>div{display:flex;min-width:0}
@@ -127,7 +127,7 @@ select option{background:var(--bg3)}
 .home-subject-icon img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
 .home-subject-code{display:none}
 .home-subject-arrow{color:var(--text3);font-size:22px;line-height:1}
-.home-subject-image-flag{position:absolute;right:42px;top:19px;font-size:11px;line-height:1;opacity:.78}
+.home-subject-image-flag{position:absolute;right:41px;top:12px;width:31px;height:31px;display:inline-flex;align-items:center;justify-content:center;border:1px solid color-mix(in srgb,var(--subject-color,var(--accent)) 28%,var(--border));border-radius:999px;background:color-mix(in srgb,var(--subject-color,var(--accent)) 10%,var(--bg3));font-size:18px;line-height:1;opacity:.98}
 .home-subject-name{font-size:17px;font-weight:750;color:var(--text);line-height:1.2;margin-bottom:7px;letter-spacing:-.01em}
 .home-subject-weight{display:block;font-size:14px;font-weight:800;color:var(--text2);margin-top:3px;letter-spacing:0;white-space:nowrap}
 .home-subject-desc{font-size:13.5px;color:var(--text2);line-height:1.4;margin-bottom:11px}
@@ -305,21 +305,21 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-view-shell{width:min(1320px,calc(100vw - 48px));margin-inline:50%;transform:translateX(-50%)}
-.formula-sheet{display:grid;align-content:start;gap:18px;min-width:0;overflow-x:auto;padding:2px 0 12px}
-.formula-category{--category-color:#2f7dd1;position:relative;display:block;width:100%;height:auto;min-width:760px;min-height:0;margin:0;padding-left:14px;border:0;border-left:3px solid var(--category-color);border-radius:0;background:transparent;overflow:visible;break-inside:avoid;page-break-inside:avoid}
+.formula-view-shell{position:relative;left:50%;width:min(1440px,calc(100vw - 48px));margin:0;transform:translateX(-50%)}
+.formula-sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;align-content:start;gap:18px 20px;min-width:0;padding:2px 0 12px}
+.formula-category{--category-color:#2f7dd1;position:relative;display:block;width:100%;height:auto;min-width:0;min-height:0;margin:0;padding-left:14px;border:0;border-left:3px solid var(--category-color);border-radius:0;background:transparent;overflow:hidden;break-inside:avoid;page-break-inside:avoid}
 .formula-category-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.2;text-transform:uppercase;letter-spacing:.04em}
 .formula-category-head::before{content:'';width:4px;height:18px;border-radius:2px;background:var(--category-color)}
 .formula-category>.formula-category-head{padding:0 0 6px;background:transparent;border:0;color:var(--category-color);font-size:14px;letter-spacing:.09em}
 .formula-category>.formula-category-head::before{width:8px;height:8px;margin-left:-19px;border:3px solid var(--bg);border-radius:50%;box-shadow:0 0 0 2px var(--category-color);background:var(--category-color)}
-.calc-table-head{display:grid;grid-template-columns:34px minmax(190px,29%) minmax(0,1fr);padding:0 8px 5px;border:0;color:var(--text3);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.12em}
+.calc-table-head{display:grid;grid-template-columns:32px minmax(130px,24%) minmax(410px,1fr);min-width:590px;padding:0 8px 5px;border:0;color:var(--text3);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.12em}
 .calc-table-head span:last-child{text-align:left}
-.calc-category-grid{display:block;min-height:0;padding:0;border-top:1px solid color-mix(in srgb,var(--category-color) 55%,var(--border));border-bottom:1px solid color-mix(in srgb,var(--category-color) 25%,var(--border));background:linear-gradient(90deg,color-mix(in srgb,var(--category-color) 5%,transparent),transparent 48%)}
-.calc-card{display:grid;grid-template-columns:34px minmax(190px,29%) minmax(0,1fr);align-items:center;width:100%;min-width:0;min-height:42px;padding:5px 8px;border:0;border-bottom:1px solid var(--border);background:transparent;break-inside:avoid;page-break-inside:avoid}
+.calc-category-grid{display:block;min-height:0;padding:0;border-top:1px solid color-mix(in srgb,var(--category-color) 55%,var(--border));border-bottom:1px solid color-mix(in srgb,var(--category-color) 25%,var(--border));background:linear-gradient(90deg,color-mix(in srgb,var(--category-color) 5%,transparent),transparent 48%);overflow-x:auto;scrollbar-width:thin}
+.calc-card{display:grid;grid-template-columns:32px minmax(130px,24%) minmax(410px,1fr);align-items:center;width:100%;min-width:590px;min-height:46px;padding:5px 8px;border:0;border-bottom:1px solid var(--border);background:transparent;break-inside:avoid;page-break-inside:avoid}
 .calc-card:last-child{border-bottom:0}.calc-card:hover{background:color-mix(in srgb,var(--category-color) 5%,var(--bg2))}
 .calc-row-index{font-family:var(--mono);font-size:10px;font-weight:850;color:var(--category-color);letter-spacing:.04em}
-.calc-card-head{display:flex;align-items:center;gap:5px;margin:0;padding-right:18px;min-width:0}
-.calc-card-title{font-size:13px;font-weight:780;color:var(--text);line-height:1.2;white-space:nowrap}
+.calc-card-head{display:flex;align-items:center;gap:5px;margin:0;padding-right:10px;min-width:0}
+.calc-card-title{font-size:12px;font-weight:780;color:var(--text);line-height:1.14;white-space:normal;overflow-wrap:anywhere}
 .calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:7px;flex-wrap:nowrap;min-width:0;max-width:100%;overflow-x:auto;padding:3px 0;border:0;border-radius:0;background:transparent;text-align:left;scrollbar-width:thin}
 .calc-equation-label,.calc-equals{display:inline;color:var(--text2);font-family:var(--mono);font-size:12px;font-weight:750;white-space:nowrap}
 .calc-equals{color:var(--category-color);font-size:15px}
@@ -348,8 +348,9 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
+@media(max-width:1000px){.formula-sheet{grid-template-columns:1fr}}
 @media(max-width:900px){.rr-category-grid{column-count:1}}
-@media(max-width:560px){.formula-view-shell{width:calc(100vw - 32px)}.formula-category{min-width:700px}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
+@media(max-width:560px){.home-dashboard,.formula-view-shell{width:calc(100vw - 32px)}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
 /* Quiz */
 .admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
@@ -3651,8 +3652,8 @@ let isAdmin = false;
 let sessionUserId = null;
 let appState = {
   view:'home', subject:null, subjectTab:'quiz',
-  quizQ:[], quizPool:[], quizIdx:0, quizAns:[], quizStarted:false, quizDone:false, quizAllSelected:false,
-  allQ:[], allPool:[], allIdx:0, allAns:[], allPending:null, allStarted:false, allDone:false, allReviewUnlocked:false,
+  quizQ:[], quizPool:[], quizMasteryQ:[], quizRetryRound:0, quizIdx:0, quizAns:[], quizStarted:false, quizDone:false, quizAllSelected:false,
+  allQ:[], allPool:[], allMasteryQ:[], allRetryRound:0, allIdx:0, allAns:[], allPending:null, allStarted:false, allDone:false, allReviewUnlocked:false,
   allTimer:null, allSeconds:0,
   attempts:[],
   // microbiology cases
@@ -5002,7 +5003,7 @@ async function renderHome(v){
     + '<div class="home-practice-grid">' + practiceCards + '</div>'
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-section-head"><div class="home-section-title-row"><div class="home-section-title">Subject Cards</div><div class="home-subject-legend">* 🔬 means image review is available</div></div></div>'
+    + '<div class="home-section-head"><div class="home-section-title-row"><div class="home-section-title">Subject Cards</div><div class="home-subject-legend">🔬 Indicates microscopy images are available for that subject</div></div></div>'
     + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
@@ -5392,14 +5393,14 @@ async function loadAttemptsHome(){
 
 // ─── SUBJECT VIEW ─────────────────────────────────────────────────────────────
 function goSubject(key){
-  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='quiz';appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;renderView();return;}
+  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='quiz';appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;renderView();return;}
   appState.view='subject';appState.subject=key;appState.subjectTab='quiz';
-  appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;
+  appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;
   appState.microCasesPage=null;appState.caseSelections={};
   appState.hemeImgPage=null;appState.hemeImgMode='browse';
   renderView();
 }
-function goAll(){appState.view='all';appState.allStarted=false;appState.allDone=false;appState.allReviewUnlocked=false;appState.allQ=[];appState.allPool=[];appState.allAns=[];appState.allPending=null;appState.allIdx=0;appState.allSeconds=0;clearInterval(appState.allTimer);renderView();}
+function goAll(){appState.view='all';appState.allStarted=false;appState.allDone=false;appState.allReviewUnlocked=false;appState.allQ=[];appState.allPool=[];appState.allMasteryQ=[];appState.allRetryRound=0;appState.allAns=[];appState.allPending=null;appState.allIdx=0;appState.allSeconds=0;clearInterval(appState.allTimer);renderView();}
 function goFormulas(){appState.view='formulas';renderView();}
 function goHome(){appState.view='home';clearInterval(appState.allTimer);if(location.hash)history.replaceState(null,'',location.pathname+location.search);renderView();}
 function goInteractive(){appState.view='interactive';history.replaceState(null,'',location.pathname+location.search+'#interactive');renderView();}
@@ -5440,7 +5441,7 @@ function switchTab(tab){
     btn.classList.toggle('active', btn.dataset.tab===tab);
   });
   appState.subjectTab=tab;
-  appState.quizStarted=false;appState.quizDone=false;appState.quizQ=[];appState.quizIdx=0;appState.quizAns=[];appState.quizAllSelected=false;
+  appState.quizStarted=false;appState.quizDone=false;appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizAllSelected=false;
   appState.microCasesPage=null;appState.caseSelections={};
   appState.hemeImgPage=null;appState.hemeImgMode='browse';
   appState.hemeQuizItems=[];appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
@@ -6295,6 +6296,8 @@ async function startSubjectQuiz(){
   window._kqOpts={};
   appState.quizPool=data;
   appState.quizQ=pickQuizQuestions(data,cnt);
+  appState.quizMasteryQ=appState.quizQ.slice();
+  appState.quizRetryRound=0;
   appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=true;appState.quizDone=false;appState.quizAllSelected=useAll;
   renderTab();
 }
@@ -6392,20 +6395,31 @@ function renderPracticeExamSubjectReport(subjStats,totalQs){
       <div style="font-size:11px;color:var(--text3)">Subject counts reflect the questions available in this attempt (${totalQs} total).</div>
     </div>`;
 }
-function renderQuizResults(el,isAll){
+function quizResultSnapshot(isAll){
   const qs=isAll?appState.allQ:appState.quizQ;
   const ans=isAll?appState.allAns:appState.quizAns;
-  let correct=0,missed=[];
-  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;else missed.push({q,given:ans[i]});});
-  const pct=Math.round(correct/qs.length*100);
+  const missed=[];
+  let currentCorrect=0;
+  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)currentCorrect++;else missed.push({q,given:ans[i]});});
+  const storedMasteryQ=isAll?appState.allMasteryQ:appState.quizMasteryQ;
+  const masteryQ=storedMasteryQ&&storedMasteryQ.length?storedMasteryQ:qs;
+  const masteryTotal=masteryQ.length||qs.length||1;
+  const mastered=Math.max(0,masteryTotal-missed.length);
+  const pct=Math.round(mastered/masteryTotal*100);
+  const remainingKeys=new Set(missed.map(({q})=>quizQuestionKey(q)));
+  return {qs,ans,missed,currentCorrect,masteryQ,masteryTotal,mastered,pct,remainingKeys};
+}
+
+function renderQuizResults(el,isAll){
+  const {qs,ans,missed,masteryQ,masteryTotal,mastered,pct,remainingKeys}=quizResultSnapshot(isAll);
   const timeStr=isAll?fmtTime(appState.allSeconds):'';
   // Per-subject breakdown
   const subjStats={};
-  qs.forEach((q,i)=>{
+  masteryQ.forEach(q=>{
     const s=q.subject||'unknown';
     if(!subjStats[s])subjStats[s]={correct:0,total:0};
     subjStats[s].total++;
-    if(ans[i]===q.correct_answer)subjStats[s].correct++;
+    if(!remainingKeys.has(quizQuestionKey(q)))subjStats[s].correct++;
   });
   // Merge parasitology & mycology into microbiology for suggestion display
   const MICRO_GROUP=['microbiology','parasitology','mycology'];
@@ -6431,12 +6445,13 @@ function renderQuizResults(el,isAll){
   el.innerHTML=`
     <div class="result-grid" style="grid-template-columns:repeat(${isAll?4:3},1fr)">
       <div class="stat-card"><div class="stat-num" style="color:${pct>=60?'var(--success)':'var(--danger)'}">${pct}%</div><div class="stat-label">Score</div></div>
-      <div class="stat-card"><div class="stat-num text-success">${correct}</div><div class="stat-label">Correct</div></div>
-      <div class="stat-card"><div class="stat-num text-danger">${qs.length-correct}</div><div class="stat-label">Missed</div></div>
+      <div class="stat-card"><div class="stat-num text-success">${mastered}</div><div class="stat-label">Mastered</div></div>
+      <div class="stat-card"><div class="stat-num text-danger">${missed.length}</div><div class="stat-label">Remaining</div></div>
       ${isAll?`<div class="stat-card"><div class="stat-num" style="color:var(--accent);font-size:16px">${timeStr}</div><div class="stat-label">Time</div></div>`:''}
     </div>
-    <div class="card-sm mb-12" style="background:color-mix(in srgb,var(--warn) 10%,transparent);border-color:var(--warn);font-size:12px;color:var(--text2)">Results are not saved. Export a PDF now if you want to keep this attempt. Available book explanations appear with reviewed questions.</div>
-    ${isAll?renderPracticeExamSubjectReport(subjStats,qs.length):''}
+    <div class="card-sm mb-12" style="background:color-mix(in srgb,${missed.length?'var(--warn)':'var(--success)'} 10%,transparent);border-color:${missed.length?'var(--warn)':'var(--success)'};font-size:12px;color:var(--text2)">${missed.length?'Results update after every retry. Export Current Results saves only the questions you still missed.':'Every question in this set is now mastered.'}</div>
+    ${!missed.length?`<div class="card mb-16" style="border-color:color-mix(in srgb,var(--success) 55%,var(--border));background:color-mix(in srgb,var(--success) 9%,var(--bg2));text-align:center;padding:26px"><div style="font-size:34px;margin-bottom:7px">🎉</div><div style="font-size:21px;font-weight:850;color:var(--success)">Congratulations! You have mastered them all.</div><div style="margin-top:5px;font-size:13px;color:var(--text2)">${masteryTotal} of ${masteryTotal} questions mastered.</div></div>`:''}
+    ${isAll?renderPracticeExamSubjectReport(subjStats,masteryTotal):''}
     ${isAll&&weakSubjects.length?`
       <div class="card-sm mb-16" style="border-left:3px solid var(--danger)">
         <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📌 Suggested Focus Areas</div>
@@ -6457,8 +6472,9 @@ function renderQuizResults(el,isAll){
       </div>`:''}
     <div class="flex gap-8 mb-16 flex-wrap">
       ${isAll?`<button class="btn btn-primary" onclick="startAllExam()">Retake Simulator</button>`:`<button class="btn btn-primary" onclick="switchTab('quiz')">New Quiz</button>`}
-      <button class="btn btn-warn" onclick="exportResultsPDF(${isAll?'true':'false'})">📄 Export Results PDF</button>
-      ${isAll?`<button class="btn btn-ghost btn-sm" onclick="exportFromResults()">📊 Export CSV</button>`:''}
+      <button class="btn btn-warn" onclick="exportResultsPDF(${isAll?'true':'false'})">📄 Export Current Results</button>
+      ${missed.length?`<button class="btn btn-success" onclick="retryMissedQuestions(${isAll?'true':'false'})">↻ Retry Missed</button>`:''}
+      ${isAll&&missed.length?`<button class="btn btn-ghost btn-sm" onclick="exportFromResults()">📊 Export Missed CSV</button>`:''}
     </div>
     ${missed.length?`<div style="font-size:14px;font-weight:600;margin-bottom:12px">Missed Questions (${missed.length})</div>`:''}
     ${missed.map(({q,given})=>`
@@ -6473,13 +6489,38 @@ function renderQuizResults(el,isAll){
   `;
 }
 
+function retryMissedQuestions(isAll=false){
+  const {missed}=quizResultSnapshot(isAll);
+  if(!missed.length)return;
+  window._kqOpts={};
+  const questions=missed.map(({q})=>q);
+  if(isAll){
+    appState.allQ=questions;
+    appState.allIdx=0;
+    appState.allAns=Array(questions.length).fill(null);
+    appState.allPending=null;
+    appState.allStarted=true;
+    appState.allDone=false;
+    appState.allReviewUnlocked=false;
+    appState.allRetryRound=Number(appState.allRetryRound||0)+1;
+    clearInterval(appState.allTimer);
+    appState.allTimer=setInterval(()=>{appState.allSeconds++;updateAllTimer();},1000);
+    renderView();
+    return;
+  }
+  appState.quizQ=questions;
+  appState.quizIdx=0;
+  appState.quizAns=Array(questions.length).fill(null);
+  appState.quizStarted=true;
+  appState.quizDone=false;
+  appState.quizAllSelected=true;
+  appState.quizRetryRound=Number(appState.quizRetryRound||0)+1;
+  renderTab();
+}
+
 function exportResultsPDF(isAll=false){
-  const qs=isAll?appState.allQ:appState.quizQ;
-  const ans=isAll?appState.allAns:appState.quizAns;
+  const {qs,ans,missed,masteryQ,masteryTotal,mastered,pct,remainingKeys}=quizResultSnapshot(isAll);
   if(!qs||!qs.length){alert('No quiz results to export yet.');return;}
-  let correct=0;
-  qs.forEach((q,i)=>{if(ans[i]===q.correct_answer)correct++;});
-  const pct=Math.round(correct/qs.length*100);
   const timeStr=isAll?fmtTime(appState.allSeconds):'';
   try{
     const {jsPDF}=window.jspdf;
@@ -6494,23 +6535,23 @@ function exportResultsPDF(isAll=false){
     };
     doc.setFillColor(30,30,30);doc.rect(margin,y,cW,14,'F');
     doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text(isAll?'Practice Exam Simulator Results':'MLS BOC Prep - Subject Quiz Results',margin+4,y+9);y+=18;
+    doc.text(isAll?'Practice Exam - Current Results':'Subject Quiz - Current Results',margin+4,y+9);y+=18;
     doc.setFillColor(245,245,245);doc.rect(margin,y,cW,20,'F');doc.setDrawColor(200,200,200);doc.rect(margin,y,cW,20,'S');
     doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);
-    doc.text(`Score: ${correct}/${qs.length} (${pct}%)`,margin+4,y+7);
+    doc.text(`Mastered: ${mastered}/${masteryTotal} (${pct}%)`,margin+4,y+7);
     doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
-    doc.text(`Missed: ${qs.length-correct}   |   Date: ${new Date().toLocaleDateString()}`,margin+4,y+13);
+    doc.text(`Still missed: ${missed.length}   |   Date: ${new Date().toLocaleDateString()}`,margin+4,y+13);
     if(isAll)doc.text(`Time: ${timeStr}`,margin+cW-4,y+13,{align:'right'});
     y+=25;
     doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,100);
     doc.text('Refer to the assigned book/source for the book discussion.',margin,y);y+=8;
     if(isAll){
       const subjStats={};
-      qs.forEach((q,i)=>{
+      masteryQ.forEach(q=>{
         const s=q.subject||'unknown';
         if(!subjStats[s])subjStats[s]={correct:0,total:0};
         subjStats[s].total++;
-        if(ans[i]===q.correct_answer)subjStats[s].correct++;
+        if(!remainingKeys.has(quizQuestionKey(q)))subjStats[s].correct++;
       });
       const order=['blood_bank','clinical_chemistry','hematology','microbiology','parasitology','mycology','urinalysis','immunology','lab_operations'];
       const rows=Object.entries(subjStats)
@@ -6530,13 +6571,20 @@ function exportResultsPDF(isAll=false){
       });
       y+=3;
     }
-    qs.forEach((q,i)=>{
+    if(!missed.length){
+      checkPage(24);
+      writeText('Congratulations! You have mastered all questions in this set.',{size:13,bold:true,color:[20,130,70]});
+      writeText('There are no missed questions remaining in these current results.',{size:10,color:[70,70,90]});
+      y+=5;
+    }else{
+      writeText(`Current missed questions (${missed.length})`,{size:11,bold:true,color:[30,30,30]});
+      y+=2;
+    }
+    missed.forEach(({q,given},i)=>{
       checkPage(30);
-      const given=ans[i];
-      const ok=given===q.correct_answer;
       const sourceLabel=quizSourceLabel(q);
-      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...(ok?[20,120,60]:[180,40,40]));
-      doc.text(`${i+1}. ${ok?'Correct':'Missed'}${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,margin,y);y+=5;
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(180,40,40);
+      doc.text(`${i+1}. Missed${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,margin,y);y+=5;
       writeText(cleanQuestionText(q),{size:9.5,bold:true,color:[20,20,20]});
       doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(70,70,70);
       checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
@@ -6550,11 +6598,11 @@ function exportResultsPDF(isAll=false){
     const tot=doc.internal.getNumberOfPages();
     for(let p=1;p<=tot;p++){
       doc.setPage(p);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
-      doc.text((isAll?'Practice Exam Simulator Results':'MLS BOC Prep - Quiz Results')+' - Page '+p+' of '+tot,margin,pageH-8);
+      doc.text((isAll?'Practice Exam Current Results':'Subject Quiz Current Results')+' - Page '+p+' of '+tot,margin,pageH-8);
       doc.text(new Date().toLocaleDateString(),pageW-margin,pageH-8,{align:'right'});
     }
     const subject=(isAll?'practice_exam_simulator':(appState.subject||'quiz')).replace(/[^a-z0-9_-]+/gi,'_');
-    doc.save((isAll?'':'boc_')+subject+'_results_'+new Date().toISOString().slice(0,10)+'.pdf');
+    doc.save((isAll?'':'boc_')+subject+'_current_results_'+new Date().toISOString().slice(0,10)+'.pdf');
   }catch(err){alert('PDF export failed: '+err.message);}
 }
 
@@ -11869,7 +11917,7 @@ async function openFormulasExport(){
       <div style="font-size:16px;font-weight:600">Print-ready PDF</div>
       <button class="btn btn-ghost btn-sm ml-auto" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
     </div>
-    <div style="font-size:12px;color:var(--text2);margin:-6px 0 14px">Each selected sheet fits on one portrait page.</div>
+    <div style="font-size:12px;color:var(--text2);margin:-6px 0 14px">Clean portrait pages with grouped sections and readable spacing.</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
       <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
         <input type="checkbox" id="exp-calc" ${calcData.length?'checked':''} ${!calcData.length?'disabled':''} style="width:16px;height:16px">
@@ -11946,7 +11994,7 @@ function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
     const gap=1.35;
     const pdfText=value=>String(value||'').replace(/−/g,'-').replace(/×/g,'x');
     const measure=()=>{
-      doc.setFont('courier','bold');doc.setFontSize(fontSize);
+      doc.setFont('helvetica','bold');doc.setFontSize(fontSize);
       return line.map(part=>part.top!==undefined
         ?Math.max(doc.getTextWidth(pdfText(part.top)),doc.getTextWidth(pdfText(part.bottom)))+2.2
         :doc.getTextWidth(pdfText(part.text))).reduce((sum,width)=>sum+width,0)+gap*Math.max(0,line.length-1);
@@ -11956,7 +12004,7 @@ function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
     let cursor=x;
     const midY=y+lineIndex*7.2;
     line.forEach((part,index)=>{
-      doc.setFont('courier','bold');doc.setFontSize(fontSize);doc.setTextColor(30,39,55);
+      doc.setFont('helvetica','bold');doc.setFontSize(fontSize);doc.setTextColor(30,39,55);
       if(part.top!==undefined){
         const top=pdfText(part.top),bottom=pdfText(part.bottom);
         const width=Math.max(doc.getTextWidth(top),doc.getTextWidth(bottom))+2.2;
@@ -11980,92 +12028,89 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
   const items=calcData||[];
   const cW=pageW-margin*2;
   doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
-  pdfHeader(doc,'Calculations - Memorization Sheet',items.length+' formulas - portrait',pageW,margin);
+  pdfHeader(doc,'Calculations','Formula review  ·  '+items.length+' equations  ·  one-line layout',pageW,margin);
 
-  const cols=2;
-  const gap=4;
-  const colW=(cW-gap)/cols;
-  const startY=18.5;
-  const bottom=9;
-  const rowsPerCol=Math.max(1,Math.ceil(items.length/cols));
-  const rowPitch=Math.min(24.5,(pageH-startY-bottom)/rowsPerCol);
-  items.forEach((f,i)=>{
-    const col=Math.floor(i/rowsPerCol);
-    const row=i%rowsPerCol;
+  const groups=[];
+  const groupMap={};
+  items.forEach(f=>{const name=f.category||'General';if(!groupMap[name]){groupMap[name]=[];groups.push(name);}groupMap[name].push(f);});
+  const columns=[[],[]],targetRows=Math.ceil(items.length/2);
+  let activeCol=0,rowCount=0;
+  groups.forEach(name=>{
+    const group={name,items:groupMap[name]};
+    if(activeCol===0&&rowCount&&rowCount+group.items.length>targetRows){activeCol=1;rowCount=0;}
+    columns[activeCol].push(group);
+    rowCount+=group.items.length;
+  });
+
+  const gap=4.5,colW=(cW-gap)/2,startY=19.5,bottom=10,catH=8.5,catGap=3;
+  const maxRows=Math.max(...columns.map(col=>col.reduce((sum,group)=>sum+group.items.length,0)),1);
+  const maxGroups=Math.max(...columns.map(col=>col.length),1);
+  const rowH=Math.min(24,(pageH-startY-bottom-maxGroups*(catH+catGap))/maxRows);
+
+  columns.forEach((column,col)=>{
     const x=margin+col*(colW+gap);
-    const y=startY+row*rowPitch;
-    const h=rowPitch-1;
-    const color=pdfCategoryRgb(f.category);
-    doc.setFillColor(255,255,255);
-    doc.setDrawColor(205,209,218);
-    doc.roundedRect(x,y,colW,h,.9,.9,'FD');
-    doc.setFillColor(...color);
-    doc.rect(x,y,1.25,h,'F');
+    let y=startY;
+    column.forEach(group=>{
+      const color=pdfCategoryRgb(group.name);
+      doc.setFillColor(...pdfTint(color,.88));doc.roundedRect(x,y,colW,catH,1.4,1.4,'F');
+      doc.setFillColor(...color);doc.roundedRect(x,y,2,catH,1.2,1.2,'F');
+      doc.setFont('helvetica','bold');doc.setTextColor(...color);
+      fitPdfText(doc,String(group.name).toUpperCase(),colW-22,9.5,7.3);doc.text(String(group.name).toUpperCase(),x+4,y+5.7);
+      doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(78,87,103);
+      doc.text(group.items.length+' formulas',x+colW-3,y+5.55,{align:'right'});
+      y+=catH;
 
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(25,31,46);
-    fitPdfText(doc,String(f.name||''),colW-32,10.2,7.2);
-    doc.text(String(f.name||''),x+3.2,y+5.2);
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(...color);
-    fitPdfText(doc,String(f.category||''),26,6.8,5.3);
-    doc.text(String(f.category||''),x+colW-2.5,y+4.9,{align:'right'});
+      group.items.forEach((f,index)=>{
+        const tint=pdfTint(color,.98);
+        doc.setFillColor(...(index%2===0?[255,255,255]:tint));doc.rect(x,y,colW,rowH,'F');
+        doc.setDrawColor(221,226,234);doc.setLineWidth(.25);doc.line(x,y+rowH,x+colW,y+rowH);
+        doc.setFont('helvetica','bold');doc.setTextColor(27,35,51);
+        fitPdfText(doc,String(f.name||''),colW-6,10,7.5);doc.text(String(f.name||''),x+3,y+5.4);
 
-    const displaySpec=calcDisplaySpec(f);
-    if(displaySpec){
-      drawCalcDisplaySpec(doc,displaySpec,x+3.2,y+12.2,colW-6.4,color);
-    }else if(f.numerator||f.denominator){
-      const label=String(f.result_label||f.name||'');
-      const numerator=String(f.numerator||'...');
-      const denominator=String(f.denominator||'...');
-      const multiplier=f.multiplier?'x '+String(f.multiplier):'';
-      doc.setFont('helvetica','bold');
-      fitPdfText(doc,label,25,8.2,6.2);
-      const labelW=Math.min(23,Math.max(11,doc.getTextWidth(label)+1));
-      const formulaY=y+12.7;
-      doc.setTextColor(62,68,80);
-      doc.text(label,x+3.2,formulaY+.8);
-      doc.setFontSize(9);
-      doc.text('=',x+labelW+4.6,formulaY+.8);
+        const displaySpec=calcDisplaySpec(f);
+        if(displaySpec){
+          drawCalcDisplaySpec(doc,displaySpec,x+3,y+12.7,colW-6,color);
+        }else if(f.numerator||f.denominator){
+          const label=String(f.result_label||f.name||'');
+          const numerator=String(f.numerator||'...');
+          const denominator=String(f.denominator||'...');
+          const multiplier=f.multiplier?'x '+String(f.multiplier):'';
+          doc.setFont('helvetica','bold');fitPdfText(doc,label,25,8.5,6.3);
+          const labelW=Math.min(23,Math.max(11,doc.getTextWidth(label)+1));
+          const formulaY=y+13.1;
+          doc.setTextColor(62,68,80);doc.text(label,x+3,formulaY+.8);
+          doc.setFontSize(9);doc.text('=',x+labelW+4.4,formulaY+.8);
+          doc.setFont('helvetica','bold');doc.setFontSize(8.8);
+          const formulaStart=x+labelW+9.3;
+          const formulaEnd=x+colW-3-(multiplier?11:0);
+          const maxFracW=Math.max(24,formulaEnd-formulaStart);
+          const needed=Math.max(doc.getTextWidth(numerator),doc.getTextWidth(denominator))+5;
+          const fracW=Math.min(maxFracW,Math.max(26,needed));
+          const fracMid=(formulaStart+formulaEnd)/2;
+          doc.setTextColor(30,39,55);
+          fitPdfText(doc,numerator,fracW-2,8.8,6.2);doc.text(numerator,fracMid,formulaY-1.8,{align:'center'});
+          fitPdfText(doc,denominator,fracW-2,8.8,6.2);doc.text(denominator,fracMid,formulaY+4.3,{align:'center'});
+          doc.setDrawColor(...color);doc.setLineWidth(.45);doc.line(fracMid-fracW/2,formulaY,fracMid+fracW/2,formulaY);
+          if(multiplier){doc.setFontSize(7.6);doc.text(multiplier,x+colW-2.5,formulaY+.8,{align:'right'});}
+        }else{
+          const formula=calcFormulaText(f);
+          doc.setFont('helvetica','bold');doc.setTextColor(30,39,55);
+          fitPdfText(doc,formula,colW-6,9.2,6.2);doc.text(formula,x+3,y+14.1);
+        }
 
-      doc.setFont('courier','bold');
-      doc.setFontSize(8.7);
-      const formulaStart=x+labelW+9.5;
-      const formulaEnd=x+colW-3-(multiplier?11:0);
-      const maxFracW=Math.max(24,formulaEnd-formulaStart);
-      const needed=Math.max(doc.getTextWidth(numerator),doc.getTextWidth(denominator))+5;
-      const fracW=Math.min(maxFracW,Math.max(26,needed));
-      const fracMid=(formulaStart+formulaEnd)/2;
-      const fracLeft=fracMid-fracW/2;
-      const fracRight=fracMid+fracW/2;
-      doc.setTextColor(30,39,55);
-      fitPdfText(doc,numerator,fracW-2,8.7,6.2);
-      doc.text(numerator,fracMid,formulaY-1.8,{align:'center'});
-      fitPdfText(doc,denominator,fracW-2,8.7,6.2);
-      doc.text(denominator,fracMid,formulaY+4.3,{align:'center'});
-      doc.setDrawColor(...color);
-      doc.setLineWidth(.45);
-      doc.line(fracLeft,formulaY,fracRight,formulaY);
-      if(multiplier){doc.setFontSize(7.5);doc.setTextColor(30,39,55);doc.text(multiplier,x+colW-2.5,formulaY+.8,{align:'right'});}
-    }else{
-      const formula=calcFormulaText(f);
-      doc.setFont('courier','bold');
-      doc.setTextColor(30,39,55);
-      fitPdfText(doc,formula,colW-7,9.1,6.5);
-      const formulaLines=doc.splitTextToSize(formula,colW-7).slice(0,2);
-      doc.text(formulaLines,x+3.2,y+11.5);
-    }
-
-    const noteParts=[];
-    if(f.numerator||f.denominator)noteParts.push(...calcExplanatorySteps(f));
-    if(f.notes)noteParts.push(String(f.notes));
-    if(noteParts.length){
-      const note=noteParts.join(' - ');
-      doc.setFont('helvetica','normal');
-      doc.setFontSize(6.6);
-      doc.setTextColor(92,97,108);
-      doc.text(doc.splitTextToSize(note,colW-6).slice(0,2),x+3.2,y+h-3.5);
-    }
+        const noteParts=[];
+        if(f.numerator||f.denominator)noteParts.push(...calcExplanatorySteps(f));
+        if(f.notes)noteParts.push(String(f.notes));
+        if(noteParts.length){
+          const note=noteParts.join(' - ');
+          doc.setFont('helvetica','normal');doc.setFontSize(6.1);doc.setTextColor(92,97,108);
+          const noteLines=doc.splitTextToSize(note,colW-6).slice(0,2);
+          doc.text(noteLines,x+3,y+rowH-(noteLines.length>1?5.1:2.7),{lineHeightFactor:1.02});
+        }
+        y+=rowH;
+      });
+      y+=catGap;
+    });
   });
 }
 
@@ -12100,51 +12145,67 @@ function drawRROnePage(doc,rrData,pageW,pageH,margin){
   const cats=[];
   const catMap={};
   (rrData||[]).forEach(f=>{const name=f.category||'General';if(!catMap[name]){catMap[name]=[];cats.push(name);}catMap[name].push(f);});
-  doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
-  pdfHeader(doc,'Reference Ranges - Conventional Units',(rrData||[]).length+' memorization ranges - portrait',pageW,margin);
-
-  const cols=3;
-  const gap=2.4;
-  const cW=pageW-margin*2;
-  const colW=(cW-gap*(cols-1))/cols;
-  const top=18.5;
-  const bottom=9;
-  const columnHeadH=5.5;
-  const contentH=pageH-top-bottom-columnHeadH;
-  const stacks=Array.from({length:cols},()=>({names:[],weight:0}));
-  cats.forEach(name=>{
-    const target=stacks.reduce((best,stack,i)=>stack.weight<stacks[best].weight?i:best,0);
-    stacks[target].names.push(name);
-    stacks[target].weight+=catMap[name].length+1.25;
+  const cols=2,gap=4.5,cW=pageW-margin*2,colW=(cW-gap)/cols;
+  const top=19.5,bottom=11,rowH=9,catH=9,labelH=5.8,catGap=3.5;
+  const maxColH=pageH-top-bottom;
+  const blocks=cats.map((name,index)=>({name,index,items:catMap[name],height:catH+labelH+catMap[name].length*rowH+catGap}));
+  const totalHeight=blocks.reduce((sum,block)=>sum+block.height,0);
+  const neededCols=Math.max(cols,Math.ceil(totalHeight/maxColH));
+  const columnCount=Math.ceil(neededCols/cols)*cols;
+  const balanced=Array.from({length:columnCount},()=>({height:0,blocks:[]}));
+  blocks.slice().sort((a,b)=>b.height-a.height).forEach(block=>{
+    const target=balanced.reduce((best,col)=>col.height<best.height?col:best,balanced[0]);
+    target.blocks.push(block);
+    target.height+=block.height;
   });
+  balanced.forEach(column=>column.blocks.sort((a,b)=>a.index-b.index));
+  const pages=[];
+  for(let i=0;i<balanced.length;i+=cols)pages.push([balanced[i].blocks,balanced[i+1].blocks]);
 
-  stacks.forEach((stack,col)=>{
-    const x=margin+col*(colW+gap);
-    doc.setFillColor(244,245,247);doc.setDrawColor(190,195,205);
-    doc.rect(x,top,colW*.49,columnHeadH,'FD');doc.rect(x+colW*.49,top,colW*.51,columnHeadH,'FD');
-    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(56,63,77);
-    doc.text('ANALYTE',x+1.8,top+4);doc.text('CONVENTIONAL',x+colW-1.8,top+4,{align:'right'});
+  pages.forEach((columns,p)=>{
+    if(p>0)doc.addPage('a4','portrait');
+    doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
+    pdfHeader(doc,'Reference Ranges','Conventional units  ·  '+(rrData||[]).length+' analytes  ·  '+(p+1)+' of '+pages.length,pageW,margin);
+    columns.forEach((blocks,col)=>{
+      const x=margin+col*(colW+gap);
+      let y=top;
+      blocks.forEach(block=>{
+        const color=pdfCategoryRgb(block.name);
+        const blockH=block.height-catGap;
+        doc.setFillColor(255,255,255);doc.setDrawColor(210,216,226);doc.setLineWidth(.35);
+        doc.roundedRect(x,y,colW,blockH,1.5,1.5,'FD');
 
-    const itemCount=stack.names.reduce((n,name)=>n+catMap[name].length,0);
-    const catCount=stack.names.length;
-    const catH=5.2,catGap=.5;
-    const rowH=Math.min(8.7,(contentH-catCount*(catH+catGap))/Math.max(1,itemCount));
-    let y=top+columnHeadH;
-    stack.names.forEach(name=>{
-      const color=pdfCategoryRgb(name);
-      doc.setFillColor(...pdfTint(color,.96));doc.setDrawColor(...pdfTint(color,.66));doc.rect(x,y,colW,catH,'FD');
-      doc.setFillColor(...color);doc.rect(x,y,.9,catH,'F');
-      doc.setFont('helvetica','bold');doc.setTextColor(...color);fitPdfText(doc,name.toUpperCase(),colW-4.5,7.3,5.8);doc.text(name.toUpperCase(),x+2.2,y+3.8);
-      y+=catH;
-      catMap[name].forEach((f,i)=>{
-        doc.setFillColor(i%2===0?255:249,i%2===0?255:249,i%2===0?255:250);doc.setDrawColor(218,221,227);
-        doc.rect(x,y,colW*.49,rowH,'FD');doc.rect(x+colW*.49,y,colW*.51,rowH,'FD');
-        const nameText=String(f.name||''),valueText=rrConventionalText(f);
-        doc.setFont('helvetica','bold');doc.setTextColor(29,34,46);fitPdfText(doc,nameText,colW*.49-3.3,8.4,6.2);doc.text(nameText,x+1.6,y+rowH*.68);
-        doc.setFont('courier','bold');doc.setTextColor(42,47,58);fitPdfText(doc,valueText,colW*.51-3.3,8.0,6.0);doc.text(valueText,x+colW*.49+1.6,y+rowH*.68);
-        y+=rowH;
+        doc.setFillColor(...pdfTint(color,.88));
+        doc.roundedRect(x,y,colW,catH,1.5,1.5,'F');
+        doc.setFillColor(...color);doc.roundedRect(x,y,2,catH,1.2,1.2,'F');
+        doc.setFont('helvetica','bold');doc.setTextColor(...color);
+        fitPdfText(doc,block.name.toUpperCase(),colW-19,9.8,7.5);
+        doc.text(block.name.toUpperCase(),x+4,y+6);
+        doc.setFont('helvetica','normal');doc.setFontSize(7.2);doc.setTextColor(78,87,103);
+        doc.text(String(block.items.length)+' items',x+colW-3,y+5.85,{align:'right'});
+        y+=catH;
+
+        doc.setFillColor(246,248,251);doc.rect(x,y,colW,labelH,'F');
+        doc.setFont('helvetica','bold');doc.setFontSize(6.8);doc.setTextColor(96,105,122);
+        doc.text('ANALYTE',x+3,y+3.95);
+        doc.text('CONVENTIONAL RANGE',x+colW*.56,y+3.95);
+        y+=labelH;
+
+        block.items.forEach((f,i)=>{
+          const tint=pdfTint(color,.975);
+          doc.setFillColor(...(i%2===0?[255,255,255]:tint));doc.rect(x,y,colW,rowH,'F');
+          doc.setDrawColor(226,230,237);doc.setLineWidth(.22);doc.line(x,y+rowH,x+colW,y+rowH);
+          const split=x+colW*.54;
+          doc.setDrawColor(233,236,241);doc.line(split,y+1,split,y+rowH-1);
+          const nameText=String(f.name||''),valueText=rrConventionalText(f);
+          doc.setFont('helvetica','bold');doc.setTextColor(30,38,54);
+          fitPdfText(doc,nameText,colW*.54-5,9.3,7.2);doc.text(nameText,x+3,y+5.9);
+          doc.setFont('helvetica','normal');doc.setTextColor(44,52,68);
+          fitPdfText(doc,valueText,colW*.46-5,9.2,7.2);doc.text(valueText,split+3,y+5.9);
+          y+=rowH;
+        });
+        y+=catGap;
       });
-      y+=catGap;
     });
   });
 }
@@ -12284,6 +12345,8 @@ async function startAllExam(){
   window._kqOpts={};
   appState.allPool=allAvailable;
   appState.allQ=shuffle(selected);
+  appState.allMasteryQ=appState.allQ.slice();
+  appState.allRetryRound=0;
   appState.allIdx=0;
   appState.allAns=Array(appState.allQ.length).fill(null);
   appState.allPending=null;
@@ -12484,6 +12547,8 @@ async function reviewAttempt(idx){
   const allIds=[...(a.correct_ids||[]),...(a.incorrect_ids||[])];
   const {data:qs}=await sb.from('mlsboc_questions').select('*').in('id',allIds);
   appState.allQ=qs||[];
+  appState.allMasteryQ=appState.allQ.slice();
+  appState.allRetryRound=0;
   appState.allAns=qs.map(q=>(a.correct_ids||[]).includes(q.id)?q.correct_answer:'?');
   appState.allSeconds=a.time_seconds||0;
   appState.allDone=true;appState.view='all';
