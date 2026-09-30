@@ -105,18 +105,19 @@ select option{background:var(--bg3)}
 .subject-name{font-size:14px;font-weight:600;color:var(--text)}
 .subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
 .home-dashboard{max-width:1180px;margin:0 auto;padding-bottom:28px}
-.home-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--bg2) 94%,var(--accent)),var(--bg2));border:1px solid var(--border);border-radius:22px;padding:30px;box-shadow:0 18px 42px rgba(18,35,74,.10);display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
+.home-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--bg2) 94%,var(--accent)),var(--bg2));border:1px solid var(--border);border-radius:22px;padding:24px 26px;box-shadow:0 18px 42px rgba(18,35,74,.10);display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
 .home-kicker{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));color:var(--accent);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
-.home-title{font-size:clamp(30px,4vw,48px);line-height:1.02;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:10px}
-.home-subtitle{font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:620px;line-height:1.45}
-.home-hero-mark{position:relative;width:148px;aspect-ratio:1/1;border-radius:16px;background:color-mix(in srgb,var(--accent) 8%,var(--bg2));border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 12px 24px rgba(41,78,150,.10);overflow:hidden}
+.home-title{font-size:clamp(28px,3.45vw,40px);line-height:1.04;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:8px}
+.home-subtitle{font-size:clamp(14px,1.7vw,17px);color:var(--text2);max-width:620px;line-height:1.42}
+.home-hero-mark{position:relative;width:118px;aspect-ratio:1/1;border-radius:16px;background:color-mix(in srgb,var(--accent) 8%,var(--bg2));border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 12px 24px rgba(41,78,150,.10);overflow:hidden}
 .home-hero-mark img,.home-hero-mark svg{width:100%;height:100%;display:block;object-fit:cover}
-.home-section{margin-top:26px}
+.home-section{margin-top:22px}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
-.home-section-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.home-section-title{font-size:20px;font-weight:750;color:var(--text);letter-spacing:-.01em}
 .home-section-sub{font-size:13px;color:var(--text2)}
 .home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--subject-color,var(--accent));border-radius:18px;padding:14px;min-height:146px;aspect-ratio:auto;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden;display:flex;flex-direction:column}
+.home-subject-grid>div{display:flex;min-width:0}
+.home-subject-card{position:relative;background:var(--bg2);border:1px solid var(--border);border-top:4px solid var(--subject-color,var(--accent));border-radius:18px;padding:16px;min-height:168px;height:100%;aspect-ratio:auto;text-align:left;width:100%;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(18,35,74,.07);overflow:hidden;display:flex;flex-direction:column}
 .home-subject-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--subject-color,var(--accent)) 38%,var(--border));box-shadow:0 16px 34px rgba(18,35,74,.12);background:color-mix(in srgb,var(--bg2) 96%,var(--subject-color,var(--accent)))}
 .home-subject-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .home-subject-mark{display:flex;align-items:center;gap:9px;min-width:0}
@@ -124,10 +125,10 @@ select option{background:var(--bg3)}
 .home-subject-icon img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
 .home-subject-code{display:none}
 .home-subject-arrow{color:var(--text3);font-size:22px;line-height:1}
-.home-subject-name{font-size:15px;font-weight:750;color:var(--text);line-height:1.18;margin-bottom:7px;letter-spacing:-.01em}
-.home-subject-weight{display:block;font-size:13px;font-weight:800;color:var(--text2);margin-top:3px;letter-spacing:0;white-space:nowrap}
-.home-subject-desc{font-size:12px;color:var(--text2);line-height:1.35;margin-bottom:10px}
-.home-subject-count{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:auto}
+.home-subject-name{font-size:17px;font-weight:750;color:var(--text);line-height:1.2;margin-bottom:7px;letter-spacing:-.01em}
+.home-subject-weight{display:block;font-size:14px;font-weight:800;color:var(--text2);margin-top:3px;letter-spacing:0;white-space:nowrap}
+.home-subject-desc{font-size:13.5px;color:var(--text2);line-height:1.4;margin-bottom:11px}
+.home-subject-count{font-size:12.5px;color:var(--text3);font-family:var(--mono);margin-top:auto}
 .home-utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
 .home-utility-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;transition:all .18s ease;box-shadow:0 8px 20px rgba(18,35,74,.06)}
 .home-utility-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 30%,var(--border));box-shadow:0 13px 28px rgba(18,35,74,.10)}
@@ -140,20 +141,20 @@ select option{background:var(--bg3)}
 .home-practice-card::after{content:'';position:absolute;inset:auto 18px 18px auto;width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22)}
 .home-practice-card:hover{transform:translateY(-2px);box-shadow:0 23px 46px rgba(18,35,74,.22);filter:saturate(1.05)}
 .home-practice-card.featured{grid-column:auto}
-.home-practice-card.exam-feature{min-height:270px;padding:30px 34px;background:linear-gradient(135deg,#5630d8 0%,#7354e6 48%,#3f279d 100%);box-shadow:0 24px 54px rgba(82,48,190,.28)}
+.home-practice-card.exam-feature{min-height:224px;padding:25px 29px;background:linear-gradient(135deg,#5630d8 0%,#7354e6 48%,#3f279d 100%);box-shadow:0 24px 54px rgba(82,48,190,.28)}
 .home-practice-card.exam-feature::before{inset:-34% -9% auto auto;width:300px;height:300px;background:rgba(255,255,255,.20)}
 .home-practice-card.exam-feature::after{width:92px;height:92px;border-radius:26px;right:28px;bottom:28px;background:rgba(255,255,255,.18)}
 .home-practice-card.exam-feature .home-practice-icon{width:62px;height:62px;border-radius:20px;font-size:31px;margin-bottom:26px}
-.home-practice-card.exam-feature .home-practice-title{font-size:40px;max-width:720px;margin-bottom:14px}
-.home-practice-card.exam-feature .home-practice-sub{font-size:18px;line-height:1.42;max-width:800px}
-.home-practice-card.exam-feature .home-practice-meta{font-size:16px;margin-top:28px;color:rgba(255,255,255,.88)}
-.home-practice-card.reference-compact{min-height:270px;padding:26px;background:linear-gradient(135deg,#2f7dd1 0%,#2369b4 100%);box-shadow:0 15px 30px rgba(35,105,180,.18)}
+.home-practice-card.exam-feature .home-practice-title{font-size:32px;max-width:720px;margin-bottom:11px}
+.home-practice-card.exam-feature .home-practice-sub{font-size:15.5px;line-height:1.42;max-width:800px}
+.home-practice-card.exam-feature .home-practice-meta{font-size:14px;margin-top:22px;color:rgba(255,255,255,.88)}
+.home-practice-card.reference-compact{min-height:224px;padding:23px;background:linear-gradient(135deg,#2f7dd1 0%,#2369b4 100%);box-shadow:0 15px 30px rgba(35,105,180,.18)}
 .home-practice-card.reference-compact::before{width:170px;height:170px}
 .home-practice-card.reference-compact::after{width:58px;height:58px;border-radius:16px}
 .home-practice-card.reference-compact .home-practice-icon{width:44px;height:44px;font-size:22px;margin-bottom:14px}
-.home-practice-card.reference-compact .home-practice-title{font-size:27px;max-width:360px}
-.home-practice-card.reference-compact .home-practice-sub{font-size:15px;line-height:1.45;max-width:360px}
-.home-practice-card.reference-compact .home-practice-meta{font-size:14px}
+.home-practice-card.reference-compact .home-practice-title{font-size:23px;max-width:360px}
+.home-practice-card.reference-compact .home-practice-sub{font-size:14px;line-height:1.45;max-width:360px}
+.home-practice-card.reference-compact .home-practice-meta{font-size:13px}
 .home-practice-icon{position:relative;z-index:1;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.26);font-size:23px;font-weight:900;margin-bottom:18px}
 .home-practice-title{position:relative;z-index:1;font-size:22px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:8px;max-width:420px}
 .home-practice-sub{position:relative;z-index:1;font-size:13px;line-height:1.4;color:rgba(255,255,255,.83);max-width:520px}
@@ -1091,10 +1092,30 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .quiz-mastered-replace:hover:not(:disabled){background:#ffca1f!important;border-color:#a97d00!important}
 .quiz-mastered-replace:disabled{background:#e9dfae!important;border-color:#c9bd84!important;color:#80754a!important;box-shadow:none!important}
 .quiz-count-grid{display:grid;grid-template-columns:minmax(120px,1fr) minmax(150px,auto);gap:10px;align-items:stretch}
-.quiz-all-choice{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:800;cursor:pointer;text-transform:none;letter-spacing:0}
-.quiz-all-choice:has(input:checked){background:color-mix(in srgb,var(--accent) 13%,var(--bg2));border-color:var(--accent);color:var(--accent)}
-.quiz-all-choice input{width:17px;height:17px;margin:0;accent-color:var(--accent)}
+.quiz-count-field label{margin-bottom:7px}
+.quiz-count-field input{min-height:52px;font-size:18px;font-weight:750;padding:11px 14px}
+.quiz-all-choice{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 16px;border:1px solid #d2a91c;border-radius:var(--r);background:linear-gradient(135deg,#fff0a6,#ffd84d);color:#453400;font-size:14px;font-weight:850;cursor:pointer;text-transform:none;letter-spacing:0;box-shadow:0 7px 16px rgba(177,133,0,.18)}
+.quiz-all-choice:hover{background:linear-gradient(135deg,#ffe887,#ffca24);border-color:#b98b00}
+.quiz-all-choice:has(input:checked){background:linear-gradient(135deg,#ffd84d,#f5b800);border-color:#9f7500;color:#302300;box-shadow:0 8px 18px rgba(177,133,0,.28)}
+.quiz-all-choice input{width:19px;height:19px;margin:0;accent-color:#8b6500}
+.quiz-all-choice-copy{display:grid;gap:1px;text-align:left;line-height:1.18}
+.quiz-all-choice-copy small{font-size:10px;font-weight:700;color:#6f5500;text-transform:none;letter-spacing:0}
+.quiz-start-shell{max-width:840px;margin:12px auto 0}
+.quiz-start-card{--quiz-accent:var(--accent);overflow:hidden;border:1px solid color-mix(in srgb,var(--quiz-accent) 34%,var(--border));border-radius:20px;background:var(--bg2);box-shadow:0 20px 46px rgba(8,15,35,.14)}
+.quiz-start-head{position:relative;overflow:hidden;padding:24px 26px 21px;background:linear-gradient(135deg,color-mix(in srgb,var(--quiz-accent) 15%,var(--bg2)),var(--bg2))}
+.quiz-start-head::after{content:'';position:absolute;right:-54px;top:-82px;width:190px;height:190px;border-radius:50%;background:color-mix(in srgb,var(--quiz-accent) 12%,transparent);pointer-events:none}
+.quiz-start-kicker{position:relative;z-index:1;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase;color:var(--quiz-accent);margin-bottom:5px}
+.quiz-start-title{position:relative;z-index:1;font-size:26px;font-weight:800;letter-spacing:-.025em;line-height:1.12;color:var(--text)}
+.quiz-start-summary{position:relative;z-index:1;margin-top:7px;color:var(--text2);font-size:15px;line-height:1.45}
+.quiz-start-summary strong{color:var(--text);font-weight:800}
+.quiz-start-source{padding:11px 26px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--quiz-accent) 5%,var(--bg3));color:var(--text2);font-size:12px;line-height:1.45}
+.quiz-start-body{padding:20px 26px 22px}
+.quiz-start-body .quiz-count-grid{grid-template-columns:minmax(170px,1fr) minmax(210px,.78fr);align-items:end}
+.quiz-start-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:17px}
+.quiz-start-button{min-height:46px;padding:11px 24px;font-size:15px;font-weight:800;border-radius:12px;box-shadow:0 10px 22px color-mix(in srgb,var(--quiz-accent) 27%,transparent)}
+.quiz-start-footnote{color:var(--text3);font-size:11.5px;line-height:1.4}
 @media(max-width:520px){.quiz-count-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.quiz-start-shell{margin-top:4px}.quiz-start-head,.quiz-start-body{padding:19px}.quiz-start-source{padding:10px 19px}.quiz-start-title{font-size:22px}.quiz-start-body .quiz-count-grid{grid-template-columns:1fr}}
 @media(max-width:900px){.study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){
   .study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -4972,7 +4993,7 @@ async function renderHome(v){
     + '<div class="home-practice-grid">' + practiceCards + '</div>'
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-section-head"><div><div class="home-section-title">Book Questions</div></div><button class="home-ascp-guide" type="button" onclick="openASCPGuideline()">See ASCP Guideline · Revised September 25, 2025</button></div>'
+    + '<div class="home-section-head"><div><div class="home-section-title">Subject Cards</div></div></div>'
     + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
@@ -5495,14 +5516,6 @@ async function renderStudyOutlineTab(el){
         </div>
         <button class="btn btn-ghost btn-sm study-guideline-button" type="button" onclick="openASCPGuideline()">See ASCP Guideline<br><span style="font-size:10px;font-weight:650">Revised September 25, 2025</span></button>
       </section>
-      <button class="study-ascp-card" type="button" onclick="openASCPStudyOutline('${subjectKey}')">
-        <span class="study-ascp-mark">ASCP</span>
-        <span>
-          <span class="study-ascp-title">ASCP Examination Content Outline</span>
-          <span class="study-ascp-sub">${esc(outline.title)} · ${esc(outline.ascp.percent)} of the examination · Revised September 25, 2025</span>
-        </span>
-        <span class="study-ascp-open" aria-hidden="true">›</span>
-      </button>
       ${isAdmin?`<div class="study-outline-actions"><button class="btn btn-primary btn-sm" type="button" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','')">+ Add Study Topic</button></div>`:''}
       ${cards?`<div class="study-outline-grid">${cards}</div>`:'<div class="study-custom-empty"></div>'}
       <details class="study-bibliography">
@@ -5809,6 +5822,38 @@ async function renderQuizTab(el){
   if(!appState.quizStarted){
     const questions=await loadCurrentQuizQuestions();
     const count=questions.length;
+    const quizCountControls=`
+      <div class="quiz-count-grid">
+        <div class="quiz-count-field">
+          <label for="q-count">Questions in this session</label>
+          <input type="number" id="q-count" value="${Math.min(10,Math.max(count,1))}" min="1" max="${count||50}">
+        </div>
+        <label class="quiz-all-choice">
+          <input type="checkbox" id="q-all" onchange="toggleSubjectQuizAll(this.checked,${count||0})">
+          <span class="quiz-all-choice-copy"><strong>Quiz all ${count||0}</strong><small>Use the complete subject bank</small></span>
+        </label>
+      </div>`;
+    if(!isAdmin){
+      el.innerHTML=`
+        <div class="quiz-start-shell">
+          <section class="quiz-start-card" style="--quiz-accent:${homeSubjectColor(appState.subject)}">
+            <div class="quiz-start-head">
+              <div class="quiz-start-kicker">Subject practice</div>
+              <h2 class="quiz-start-title">Build your ${esc(subjectLabel(appState.subject))} quiz</h2>
+              <p class="quiz-start-summary"><strong>${count||0} questions ready.</strong> Choose a focused set or practice the complete subject bank.</p>
+            </div>
+            <div class="quiz-start-source">Based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr and the sources listed on the Resources page.</div>
+            <div class="quiz-start-body">
+              ${quizCountControls}
+              <div class="quiz-start-actions">
+                <button class="btn btn-primary quiz-start-button" onclick="startSubjectQuiz()" ${count?'':'disabled'}>Start Quiz&nbsp; →</button>
+                <span class="quiz-start-footnote">Practice mode · results are not saved</span>
+              </div>
+            </div>
+          </section>
+        </div>`;
+      return;
+    }
     el.innerHTML=`
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start">
         <div class="card">
@@ -5817,14 +5862,7 @@ async function renderQuizTab(el){
           <div class="quiz-source-note">Refer to Medical Laboratory Science Review, Fifth Edition (Robert R. Harr) or the source listed on the Resources page for the book discussion.</div>
           <div class="divider"></div>
           <div class="form-group">
-            <label>Number of questions</label>
-            <div class="quiz-count-grid">
-              <input type="number" id="q-count" value="${Math.min(10,Math.max(count,1))}" min="1" max="${count||50}">
-              <label class="quiz-all-choice">
-                <input type="checkbox" id="q-all" onchange="toggleSubjectQuizAll(this.checked,${count||0})">
-                <span>Quiz all ${count||0}</span>
-              </label>
-            </div>
+            ${quizCountControls}
           </div>
           <button class="btn btn-primary" onclick="startSubjectQuiz()" ${count?'':'disabled'}>Start Quiz</button>
         </div>
