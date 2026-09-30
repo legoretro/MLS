@@ -301,29 +301,32 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-sheet{display:block;column-count:2;column-gap:8px;min-width:0}
-.formula-category{--category-color:#2f7dd1;display:inline-block;width:100%;margin:0 0 8px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+.formula-sheet{display:grid;gap:26px;min-width:0;overflow-x:auto;padding:4px 2px 18px}
+.formula-category{--category-color:#2f7dd1;position:relative;display:block;width:100%;min-width:760px;margin:0;padding-left:18px;border:0;border-left:3px solid var(--category-color);border-radius:0;background:transparent;overflow:visible;break-inside:avoid;page-break-inside:avoid}
 .formula-category-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.2;text-transform:uppercase;letter-spacing:.04em}
 .formula-category-head::before{content:'';width:4px;height:18px;border-radius:2px;background:var(--category-color)}
-.calc-table-head{display:grid;grid-template-columns:minmax(120px,42%) minmax(0,58%);background:var(--bg3);border-bottom:1px solid var(--border2);padding:5px 8px;color:var(--text2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
-.calc-table-head span:last-child{text-align:right}
-.calc-category-grid{display:block;padding:0}
-.calc-card{display:grid;grid-template-columns:minmax(120px,42%) minmax(0,58%);align-items:center;background:var(--bg2);border:0;border-bottom:1px solid var(--border);padding:5px 8px;min-width:0;min-height:0;break-inside:avoid;page-break-inside:avoid;width:100%}
-.calc-card:last-child{border-bottom:0}
-.calc-card:nth-child(even){background:color-mix(in srgb,var(--text) 1.8%,var(--bg2))}
-.calc-card-head{display:flex;align-items:center;gap:5px;margin:0;padding-right:8px;min-width:0}
-.calc-card-title{font-size:13px;font-weight:750;color:var(--text);line-height:1.2;overflow-wrap:anywhere}
-.calc-formula-board{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap;background:transparent;border:0;border-radius:0;padding:0;min-width:0;max-width:100%;text-align:right}
-.calc-equation-label{display:none}
-.calc-equals{display:none}
-.calc-equation-text{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--text);line-height:1.2;overflow-wrap:anywhere;min-width:0;text-align:right}
-.calc-expression{display:flex;align-items:center;justify-content:flex-end;gap:4px;flex-wrap:wrap;min-width:0;max-width:100%;font-family:var(--mono);font-size:13px;font-weight:800;color:var(--text);line-height:1.15}
-.calc-expression-line{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap;min-width:0;max-width:100%}
-.calc-inline-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:stretch;min-width:44px;max-width:100%;vertical-align:middle;color:inherit}
-.calc-inline-fraction-top,.calc-inline-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:850;color:inherit;padding:1px 5px;text-align:center;line-height:1.1;white-space:normal;overflow-wrap:anywhere}
+.formula-category>.formula-category-head{padding:0 0 9px;background:transparent;border:0;color:var(--category-color);font-size:15px;letter-spacing:.09em}
+.formula-category>.formula-category-head::before{width:8px;height:8px;margin-left:-23px;border:3px solid var(--bg);border-radius:50%;box-shadow:0 0 0 2px var(--category-color);background:var(--category-color)}
+.calc-table-head{display:grid;grid-template-columns:38px minmax(190px,31%) minmax(0,1fr);padding:0 10px 7px;border:0;color:var(--text3);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.12em}
+.calc-table-head span:last-child{text-align:left}
+.calc-category-grid{display:block;padding:0;border-top:1px solid color-mix(in srgb,var(--category-color) 55%,var(--border));border-bottom:1px solid color-mix(in srgb,var(--category-color) 25%,var(--border));background:linear-gradient(90deg,color-mix(in srgb,var(--category-color) 5%,transparent),transparent 48%)}
+.calc-card{display:grid;grid-template-columns:38px minmax(190px,31%) minmax(0,1fr);align-items:center;width:100%;min-width:0;min-height:48px;padding:7px 10px;border:0;border-bottom:1px solid var(--border);background:transparent;break-inside:avoid;page-break-inside:avoid}
+.calc-card:last-child{border-bottom:0}.calc-card:hover{background:color-mix(in srgb,var(--category-color) 5%,var(--bg2))}
+.calc-row-index{font-family:var(--mono);font-size:10px;font-weight:850;color:var(--category-color);letter-spacing:.04em}
+.calc-card-head{display:flex;align-items:center;gap:5px;margin:0;padding-right:18px;min-width:0}
+.calc-card-title{font-size:13px;font-weight:780;color:var(--text);line-height:1.2;white-space:nowrap}
+.calc-formula-board{display:flex;align-items:center;justify-content:flex-start;gap:7px;flex-wrap:nowrap;min-width:0;max-width:100%;overflow-x:auto;padding:3px 0;border:0;border-radius:0;background:transparent;text-align:left;scrollbar-width:thin}
+.calc-equation-label,.calc-equals{display:inline;color:var(--text2);font-family:var(--mono);font-size:12px;font-weight:750;white-space:nowrap}
+.calc-equals{color:var(--category-color);font-size:15px}
+.calc-equation-text{min-width:max-content;font-family:var(--mono);font-size:13px;font-weight:800;color:var(--text);line-height:1.2;white-space:nowrap;text-align:left}
+.calc-step-separator{color:var(--category-color);padding:0 7px;font-weight:900}
+.calc-expression{display:flex;align-items:center;justify-content:flex-start;gap:5px;flex-wrap:nowrap;min-width:max-content;max-width:none;font-family:var(--mono);font-size:13px;font-weight:800;color:var(--text);line-height:1.15;white-space:nowrap}
+.calc-expression-line{display:flex;align-items:center;justify-content:flex-start;gap:5px;flex-wrap:nowrap;min-width:max-content;max-width:none;white-space:nowrap}
+.calc-inline-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:stretch;min-width:44px;max-width:none;vertical-align:middle;color:inherit;white-space:nowrap}
+.calc-inline-fraction-top,.calc-inline-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:850;color:inherit;padding:1px 5px;text-align:center;line-height:1.1;white-space:nowrap}
 .calc-inline-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
-.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:105px;max-width:100%;color:var(--text)}
-.calc-fraction-top,.calc-fraction-bottom{font-family:var(--mono);font-size:12px;font-weight:850;color:inherit;padding:1px 6px;text-align:center;line-height:1.1;white-space:normal;overflow-wrap:anywhere;width:100%}
+.calc-fraction{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;min-width:max-content;max-width:none;color:var(--text);white-space:nowrap}
+.calc-fraction-top,.calc-fraction-bottom{width:100%;padding:1px 6px;color:inherit;font-family:var(--mono);font-size:12px;font-weight:850;line-height:1.1;text-align:center;white-space:nowrap}
 .calc-fraction-top{border-bottom:2px solid var(--category-color,#2f7dd1)}
 .calc-support-note{display:none}
 .rr-category-grid{display:block;column-count:2;column-gap:8px;min-width:0}
@@ -340,8 +343,8 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
-@media(max-width:900px){.formula-sheet,.rr-category-grid{column-count:1}}
-@media(max-width:520px){.calc-card,.calc-table-head{grid-template-columns:minmax(105px,40%) minmax(0,60%)}.calc-card{padding:5px 7px}.calc-formula-board{align-items:center}.calc-fraction{min-width:88px}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
+@media(max-width:900px){.rr-category-grid{column-count:1}}
+@media(max-width:520px){.formula-category{min-width:700px}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
 /* Quiz */
 .admin-quiz-explanation{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--danger) 42%,var(--border));border-left:4px solid var(--danger);border-radius:var(--r);background:color-mix(in srgb,var(--danger) 8%,var(--bg2))}
@@ -11607,9 +11610,9 @@ function renderCalcTab(cats,all){
   return `<div class="formula-sheet">${Object.entries(cats).map(([cat,items])=>`
     <section class="formula-category" style="--category-color:${formulaCategoryColor(cat)}">
       <div class="formula-category-head">${esc(cat)}</div>
-      <div class="calc-table-head"><span>Calculation</span><span>Formula</span></div>
+      <div class="calc-table-head"><span></span><span>Calculation</span><span>Equation</span></div>
       <div class="calc-category-grid">
-        ${items.map(f=>renderCalcCard(f)).join('')}
+        ${items.map((f,index)=>renderCalcCard(f,index)).join('')}
       </div>
     </section>`).join('')}</div>`;
 }
@@ -11646,7 +11649,7 @@ function calcDisplaySpecHtml(spec){
   return `<div class="calc-formula-board"><div class="calc-expression">${spec.map(line=>`<div class="calc-expression-line">${line.map(part=>part.top!==undefined?calcInlineFractionHtml(part):`<span>${esc(part.text)}</span>`).join('')}</div>`).join('')}</div></div>`;
 }
 
-function renderCalcCard(f){
+function renderCalcCard(f,index=0){
   const steps=(f.steps||[]).filter(Boolean).map(String);
   const hasFraction=!!(f.numerator||f.denominator);
   const displaySpec=calcDisplaySpec(f);
@@ -11654,6 +11657,7 @@ function renderCalcCard(f){
   const support=[...(hasFraction?calcExplanatorySteps(f):[]),String(f.notes||'').trim()].filter(Boolean);
   return `
     <article class="calc-card">
+      <span class="calc-row-index">${String(index+1).padStart(2,'0')}</span>
       <div class="calc-card-head">
         <span class="calc-card-title">${esc(f.name)}</span>
         ${isAdmin&&!f._placeholder?`<div class="ml-auto flex gap-6">
@@ -11664,6 +11668,7 @@ function renderCalcCard(f){
       ${displaySpec?calcDisplaySpecHtml(displaySpec):''}
       ${!displaySpec&&hasFraction?`
         <div class="calc-formula-board">
+          <span class="calc-equation-label">${esc(label)}</span><span class="calc-equals">=</span>
           <div class="calc-fraction" aria-label="${esc((f.numerator||'')+' divided by '+(f.denominator||''))}">
             <div class="calc-fraction-top">${esc(f.numerator||'...')}</div>
             <div class="calc-fraction-bottom">${esc(f.denominator||'...')}</div>
@@ -11672,7 +11677,7 @@ function renderCalcCard(f){
         </div>`:''}
       ${!displaySpec&&!hasFraction&&steps.length?`
         <div class="calc-formula-board">
-          <div class="calc-equation-text">${steps.map(esc).join('<br>')}</div>
+          <div class="calc-equation-text">${steps.map(esc).join('<span class="calc-step-separator">•</span>')}</div>
         </div>`:''}
       ${support.length?`<div class="calc-support-note">${support.map(esc).join(' • ')}</div>`:''}
     </article>`;
