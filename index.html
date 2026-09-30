@@ -19,13 +19,14 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230d0f12'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle' fill='%234f8ef7'%3E🩸%3C/text%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300..900;1,300..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..900;1,8..60,400..900&display=swap" rel="stylesheet">
 
 <!-- Splash/loading screen shown instantly before JS loads -->
 <style>
 #pwa-splash{position:fixed;inset:0;background:#0d0f12;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px}
-#pwa-splash .sp-logo{font-family:monospace;font-size:22px;color:#4f8ef7;letter-spacing:-1px}
-#pwa-splash .sp-sub{font-size:13px;color:#5c6380;font-family:sans-serif}
+#pwa-splash .sp-logo{font-family:'Source Sans 3',sans-serif;font-size:22px;color:#4f8ef7;letter-spacing:-1px}
+#pwa-splash .sp-sub{font-size:13px;color:#5c6380;font-family:'Source Sans 3',sans-serif}
 #pwa-splash .sp-dot{display:inline-block;animation:blink 1.2s infinite}
 #pwa-splash .sp-dot:nth-child(2){animation-delay:.2s}
 #pwa-splash .sp-dot:nth-child(3){animation-delay:.4s}
@@ -40,7 +41,7 @@
   --accent:#4f8ef7;--accent2:#7fb3ff;
   --success:#3ddc84;--danger:#f06474;--warn:#f5a623;
   --text:#e8eaf6;--text2:#9aa0c0;--text3:#5c6380;
-  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --serif:'Source Serif 4',Georgia,serif;--sans:'Source Sans 3',Arial,sans-serif;--mono:var(--sans);
   --r:8px;--r2:12px;
 }
 body.light-mode {
@@ -55,6 +56,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 button{font-family:var(--sans);cursor:pointer;border:none;outline:none}
 input,select,textarea{font-family:var(--sans);outline:none}
 img{display:block}
+h1,h2,h3,.home-title,.home-section-title,.home-practice-title,.home-hubs-title,.home-recall-title,.section-title,.modal-title,.study-window-title,.study-ascp-title,.ascp-guideline-title,.ascp-section-title,.ascp-topic-title,.interactive-topic-title,.quiz-start-title,.formula-category-head{font-family:var(--serif)}
 
 /* Layout */
 header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
@@ -104,7 +106,7 @@ select option{background:var(--bg3)}
 .subject-icon{font-size:22px}
 .subject-name{font-size:14px;font-weight:600;color:var(--text)}
 .subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.home-dashboard{position:relative;left:50%;width:min(1440px,calc(100vw - 48px));max-width:none;margin:0;transform:translateX(-50%);padding-bottom:28px}
+.home-dashboard{position:relative;left:50%;width:min(1260px,calc(100vw - 80px));max-width:none;margin:0;transform:translateX(-50%);padding-bottom:28px}
 .home-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--bg2) 94%,var(--accent)),var(--bg2));border:1px solid var(--border);border-radius:22px;padding:24px 26px;box-shadow:0 18px 42px rgba(18,35,74,.10);display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
 .home-kicker{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));color:var(--accent);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
 .home-title{font-size:clamp(28px,3.45vw,40px);line-height:1.04;letter-spacing:-.03em;color:var(--text);font-weight:700;margin-bottom:8px}
@@ -115,7 +117,7 @@ select option{background:var(--bg3)}
 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
 .home-section-title{font-size:20px;font-weight:750;color:var(--text);letter-spacing:-.01em}
 .home-section-title-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.home-subject-legend{font-size:12.5px;font-weight:700;color:var(--text2);letter-spacing:0;line-height:1.4}
+.home-subject-legend{font-size:16.5px;font-weight:700;color:var(--text2);letter-spacing:0;line-height:1.35}
 .home-section-sub{font-size:13px;color:var(--text2)}
 .home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .home-subject-grid>div{display:flex;min-width:0}
@@ -128,8 +130,8 @@ select option{background:var(--bg3)}
 .home-subject-code{display:none}
 .home-subject-arrow{color:var(--text3);font-size:22px;line-height:1}
 .home-subject-image-flag{position:absolute;right:41px;top:12px;width:31px;height:31px;display:inline-flex;align-items:center;justify-content:center;border:1px solid color-mix(in srgb,var(--subject-color,var(--accent)) 28%,var(--border));border-radius:999px;background:color-mix(in srgb,var(--subject-color,var(--accent)) 10%,var(--bg3));font-size:18px;line-height:1;opacity:.98}
-.home-subject-name{font-size:17px;font-weight:750;color:var(--text);line-height:1.2;margin-bottom:7px;letter-spacing:-.01em}
-.home-subject-weight{display:block;font-size:14px;font-weight:800;color:var(--text2);margin-top:3px;letter-spacing:0;white-space:nowrap}
+.home-subject-name{font-size:19px;font-weight:750;color:var(--text);line-height:1.18;margin-bottom:7px;letter-spacing:-.01em}
+.home-subject-weight{display:block;font-size:16px;font-weight:800;color:var(--text2);margin-top:3px;letter-spacing:0;white-space:nowrap}
 .home-subject-desc{font-size:13.5px;color:var(--text2);line-height:1.4;margin-bottom:11px}
 .home-subject-count{font-size:12.5px;color:var(--text3);font-family:var(--mono);margin-top:auto}
 .home-utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
@@ -162,7 +164,7 @@ select option{background:var(--bg3)}
 .home-practice-title{position:relative;z-index:1;font-size:22px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-bottom:8px;max-width:420px}
 .home-practice-sub{position:relative;z-index:1;font-size:13px;line-height:1.4;color:rgba(255,255,255,.83);max-width:520px}
 .home-practice-meta{position:relative;z-index:1;margin-top:20px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.76)}
-.exam-sim-shell{position:fixed;inset:0;z-index:700;background:#fff;color:#111827;font-family:Arial,Helvetica,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+.exam-sim-shell{position:fixed;inset:0;z-index:700;background:#fff;color:#111827;font-family:var(--sans);display:flex;flex-direction:column;overflow:hidden}
 .exam-sim-topbar{height:58px;background:#113f70;color:#fff;display:flex;align-items:center;gap:18px;padding:0 22px;flex-shrink:0}
 .exam-sim-logo{width:34px;height:34px;border-radius:50%;background:#fff;color:#113f70;display:grid;place-items:center;font-size:13px;font-weight:800;letter-spacing:-.04em}
 .exam-sim-brand{font-size:25px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:baseline;gap:18px}
@@ -205,7 +207,7 @@ select option{background:var(--bg3)}
 .exam-sim-media .question-media{margin:0;display:block;width:100%}
 .exam-sim-media .question-media-zoom{background:transparent;border:0;padding:0;width:100%;box-shadow:none}
 .exam-sim-media img{max-width:100%;max-height:360px;object-fit:contain;border:0;border-radius:0;box-shadow:none;background:#fff}
-.exam-sim-start{max-width:860px;margin:44px auto;padding:30px;border:1px solid #cbd5e1;background:#fff;border-radius:4px;color:#111827;font-family:Arial,Helvetica,sans-serif}
+.exam-sim-start{max-width:860px;margin:44px auto;padding:30px;border:1px solid #cbd5e1;background:#fff;border-radius:4px;color:#111827;font-family:var(--sans)}
 .exam-sim-start h2{font-size:28px;margin:0 0 10px;color:#111827}
 .exam-sim-start p{font-size:15px;line-height:1.55;color:#374151;margin:8px 0}
 .exam-sim-coverage-note{background:#fff3b8;border:1px solid #e7c85c;border-left:4px solid #d4a900;border-radius:6px;padding:10px 12px;color:#5f4b00!important;font-weight:700}
@@ -265,7 +267,8 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 @keyframes hub-preview-slide-mobile{0%{transform:translateX(0)}100%{transform:translateX(-1452px)}}
 @media(max-width:1100px){.home-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.home-hero,.home-hubs-card{grid-template-columns:1fr}.home-hero-mark{justify-self:center;width:min(126px,42vw)}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-practice-grid{grid-template-columns:1fr}.home-practice-card.featured{grid-column:auto}.home-hubs-preview{min-height:145px}}
-@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-hero{padding:22px;border-radius:18px}.home-hero-mark{width:min(72px,20vw);border-radius:10px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:130px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-practice-card.exam-feature{min-height:226px;padding:22px}.home-practice-card.exam-feature .home-practice-title{font-size:31px}.home-practice-card.exam-feature .home-practice-sub{font-size:14px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview{min-height:150px;padding:12px}.home-hubs-preview-track{position:absolute;left:12px;top:12px;display:flex;grid-template-columns:none;gap:10px;animation:hub-preview-slide-mobile 18s linear infinite}.home-hubs-card:hover .home-hubs-preview-track{animation-duration:11s}.home-hub-tile{width:232px;height:126px;min-height:126px}.home-hub-tile-title{font-size:12px}.home-hub-tile-sub{display:none}.home-hub-feature-list{gap:4px;margin-top:6px}.home-hub-feature-list span{font-size:8px;padding:3px 5px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
+@media(max-width:700px){.home-section-title-row{align-items:flex-start;gap:5px}.home-subject-legend{flex-basis:100%}}
+@media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-dashboard{width:calc(100vw - 32px)}.home-hero{padding:22px;border-radius:18px}.home-hero-mark{width:min(72px,20vw);border-radius:10px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:130px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-practice-card.exam-feature{min-height:226px;padding:22px}.home-practice-card.exam-feature .home-practice-title{font-size:31px}.home-practice-card.exam-feature .home-practice-sub{font-size:14px}.home-hubs-card{padding:18px;border-radius:18px}.home-hubs-preview{min-height:150px;padding:12px}.home-hubs-preview-track{position:absolute;left:12px;top:12px;display:flex;grid-template-columns:none;gap:10px;animation:hub-preview-slide-mobile 18s linear infinite}.home-hubs-card:hover .home-hubs-preview-track{animation-duration:11s}.home-hub-tile{width:232px;height:126px;min-height:126px}.home-hub-tile-title{font-size:12px}.home-hub-tile-sub{display:none}.home-hub-feature-list{gap:4px;margin-top:6px}.home-hub-feature-list span{font-size:8px;padding:3px 5px}.home-kicker{font-size:10px}.home-title{font-size:32px}}
 @media(prefers-reduced-motion:reduce){.home-hubs-preview-track{animation:none!important}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
@@ -305,18 +308,19 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-view-shell{position:relative;left:50%;width:min(1440px,calc(100vw - 48px));margin:0;transform:translateX(-50%)}
-.formula-sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;align-content:start;gap:18px 20px;min-width:0;padding:2px 0 12px}
-.formula-category{--category-color:#2f7dd1;position:relative;display:block;width:100%;height:auto;min-width:0;min-height:0;margin:0;padding-left:14px;border:0;border-left:3px solid var(--category-color);border-radius:0;background:transparent;overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+.formula-view-shell{position:relative;left:50%;width:min(1260px,calc(100vw - 80px));margin:0;transform:translateX(-50%)}
+.formula-sheet{display:block;column-count:2;column-gap:14px;min-width:0;padding:2px 0 12px}
+.formula-category{--category-color:#2f7dd1;position:relative;display:inline-block;width:100%;height:auto;min-width:0;min-height:0;margin:0 0 14px;padding:0;border:1px solid var(--border2);border-radius:12px;background:var(--bg2);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
 .formula-category-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.2;text-transform:uppercase;letter-spacing:.04em}
 .formula-category-head::before{content:'';width:4px;height:18px;border-radius:2px;background:var(--category-color)}
-.formula-category>.formula-category-head{padding:0 0 6px;background:transparent;border:0;color:var(--category-color);font-size:14px;letter-spacing:.09em}
-.formula-category>.formula-category-head::before{width:8px;height:8px;margin-left:-19px;border:3px solid var(--bg);border-radius:50%;box-shadow:0 0 0 2px var(--category-color);background:var(--category-color)}
-.calc-table-head{display:grid;grid-template-columns:32px minmax(130px,24%) minmax(410px,1fr);min-width:590px;padding:0 8px 5px;border:0;color:var(--text3);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.12em}
+.formula-category>.formula-category-head{padding:9px 12px;background:color-mix(in srgb,var(--category-color) 5%,var(--bg2));border:0;border-bottom:2px solid var(--category-color);color:var(--text);font-size:14px;letter-spacing:.045em}
+.formula-category>.formula-category-head::before{width:4px;height:18px;margin-left:0;border:0;border-radius:2px;box-shadow:none;background:var(--category-color)}
+.calc-table-head{display:grid;grid-template-columns:32px minmax(130px,24%) minmax(410px,1fr);min-width:590px;padding:6px 8px;border:0;border-bottom:1px solid var(--border2);background:var(--bg3);color:var(--text3);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.12em}
 .calc-table-head span:last-child{text-align:left}
-.calc-category-grid{display:block;min-height:0;padding:0;border-top:1px solid color-mix(in srgb,var(--category-color) 55%,var(--border));border-bottom:1px solid color-mix(in srgb,var(--category-color) 25%,var(--border));background:linear-gradient(90deg,color-mix(in srgb,var(--category-color) 5%,transparent),transparent 48%);overflow-x:auto;scrollbar-width:thin}
-.calc-card{display:grid;grid-template-columns:32px minmax(130px,24%) minmax(410px,1fr);align-items:center;width:100%;min-width:590px;min-height:46px;padding:5px 8px;border:0;border-bottom:1px solid var(--border);background:transparent;break-inside:avoid;page-break-inside:avoid}
+.calc-category-grid{display:block;min-height:0;padding:0;border:0;background:transparent;overflow-x:auto;scrollbar-width:thin}
+.calc-card{display:grid;grid-template-columns:32px minmax(130px,24%) minmax(410px,1fr);align-items:center;width:100%;min-width:590px;min-height:46px;padding:7px 8px;border:0;border-bottom:1px solid var(--border);background:transparent;break-inside:avoid;page-break-inside:avoid}
 .calc-card:last-child{border-bottom:0}.calc-card:hover{background:color-mix(in srgb,var(--category-color) 5%,var(--bg2))}
+.calc-card:nth-child(even){background:color-mix(in srgb,var(--category-color) 1.8%,var(--bg2))}
 .calc-row-index{font-family:var(--mono);font-size:10px;font-weight:850;color:var(--category-color);letter-spacing:.04em}
 .calc-card-head{display:flex;align-items:center;gap:5px;margin:0;padding-right:10px;min-width:0}
 .calc-card-title{font-size:12px;font-weight:780;color:var(--text);line-height:1.14;white-space:normal;overflow-wrap:anywhere}
@@ -348,7 +352,7 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-value{text-align:right;font-family:var(--mono);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
-@media(max-width:1000px){.formula-sheet{grid-template-columns:1fr}}
+@media(max-width:1100px){.formula-sheet{column-count:1}}
 @media(max-width:900px){.rr-category-grid{column-count:1}}
 @media(max-width:560px){.home-dashboard,.formula-view-shell{width:calc(100vw - 32px)}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
@@ -10338,7 +10342,7 @@ function renderBBVisual(r,w){
         <circle cx="42" cy="58" r="3" fill="#333" opacity=".5"/>
         <circle cx="58" cy="58" r="3" fill="#333" opacity=".5"/>
         <path d="${smile}" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" opacity=".5"/>
-        <text x="50" y="134" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+        <text x="50" y="134" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Source Sans 3, sans-serif">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
       </svg>
     </div>
   </div>`;
@@ -10421,7 +10425,7 @@ function renderChemVisual(r,w){
         <path d="${smile}" fill="none" stroke="#1a5276" stroke-width="1.8" stroke-linecap="round" opacity=".45"/>
         <!-- base stand lines -->
         <line x1="8" y1="104" x2="72" y2="104" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
-        <text x="40" y="122" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+        <text x="40" y="122" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Source Sans 3, sans-serif">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
       </svg>
     </div>
   </div>`;
@@ -10472,7 +10476,7 @@ function renderUAVisual(r,w){
         <circle cx="35" cy="56" r="2.5" fill="#5d4a00" opacity=".45"/>
         <circle cx="45" cy="56" r="2.5" fill="#5d4a00" opacity=".45"/>
         <path d="${smile}" fill="none" stroke="#5d4a00" stroke-width="1.8" stroke-linecap="round" opacity=".45"/>
-        <text x="40" y="102" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+        <text x="40" y="102" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Source Sans 3, sans-serif">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
       </svg>
     </div>
   </div>`;
@@ -10521,7 +10525,7 @@ function renderMicroVisual(r,w){
         <circle cx="45" cy="86" r="2.5" fill="#333" opacity=".38"/>
         <circle cx="59" cy="86" r="2.5" fill="#333" opacity=".38"/>
         <path d="${smile}" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round" opacity=".38"/>
-        <text x="52" y="108" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
+        <text x="52" y="108" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Source Sans 3, sans-serif">${r}% ✓${w>0?' · '+w+'% ✗':''}</text>
       </svg>
     </div>
   </div>`;
@@ -10549,7 +10553,7 @@ function renderGenericVisual(r,w){
         </g>
         <rect x="14" y="18" width="32" height="68" rx="10" fill="none" stroke="#aac" stroke-width="2"/>
         <rect x="17" y="22" width="6" height="20" rx="3" fill="rgba(255,255,255,0.3)"/>
-        <text x="30" y="104" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="monospace">${r}%✓${w>0?' '+w+'%✗':''}</text>
+        <text x="30" y="104" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Source Sans 3, sans-serif">${r}%✓${w>0?' '+w+'%✗':''}</text>
       </svg>
     </div>
   </div>`;
@@ -12024,11 +12028,43 @@ function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
   return true;
 }
 
+function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
+  const formulaY=y+h/2;
+  const displaySpec=calcDisplaySpec(f);
+  if(displaySpec){drawCalcDisplaySpec(doc,displaySpec,x+2,formulaY,w-4,color);return;}
+  if(f.numerator||f.denominator){
+    const label=String(f.result_label||f.name||'');
+    const numerator=String(f.numerator||'...');
+    const denominator=String(f.denominator||'...');
+    const multiplier=f.multiplier?'x '+String(f.multiplier):'';
+    doc.setFont('helvetica','bold');fitPdfText(doc,label,Math.min(22,w*.28),8.4,5.8);
+    const labelW=Math.min(21,Math.max(9,doc.getTextWidth(label)+1));
+    doc.setTextColor(62,68,80);doc.text(label,x+2,formulaY+.8);
+    doc.setFontSize(8.6);doc.text('=',x+labelW+3.2,formulaY+.8);
+    doc.setFont('helvetica','bold');doc.setFontSize(8.4);
+    const formulaStart=x+labelW+7.2;
+    const formulaEnd=x+w-2-(multiplier?9:0);
+    const maxFracW=Math.max(18,formulaEnd-formulaStart);
+    const needed=Math.max(doc.getTextWidth(numerator),doc.getTextWidth(denominator))+3;
+    const fracW=Math.min(maxFracW,Math.max(20,needed));
+    const fracMid=(formulaStart+formulaEnd)/2;
+    doc.setTextColor(30,39,55);
+    fitPdfText(doc,numerator,fracW-1.5,8.4,5.7);doc.text(numerator,fracMid,formulaY-1.7,{align:'center'});
+    fitPdfText(doc,denominator,fracW-1.5,8.4,5.7);doc.text(denominator,fracMid,formulaY+3.9,{align:'center'});
+    doc.setDrawColor(...color);doc.setLineWidth(.42);doc.line(fracMid-fracW/2,formulaY,fracMid+fracW/2,formulaY);
+    if(multiplier){doc.setFontSize(7);doc.text(multiplier,x+w-1.5,formulaY+.8,{align:'right'});}
+    return;
+  }
+  const formula=calcFormulaText(f);
+  doc.setFont('helvetica','bold');doc.setTextColor(30,39,55);
+  fitPdfText(doc,formula,w-4,8.8,5.8);doc.text(formula,x+2,formulaY+1);
+}
+
 function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
   const items=calcData||[];
   const cW=pageW-margin*2;
   doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
-  pdfHeader(doc,'Calculations','Formula review  ·  '+items.length+' equations  ·  one-line layout',pageW,margin);
+  pdfHeader(doc,'Calculations','Formula review  ·  '+items.length+' equations',pageW,margin);
 
   const groups=[];
   const groupMap={};
@@ -12038,77 +12074,46 @@ function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
   groups.forEach(name=>{
     const group={name,items:groupMap[name]};
     if(activeCol===0&&rowCount&&rowCount+group.items.length>targetRows){activeCol=1;rowCount=0;}
-    columns[activeCol].push(group);
-    rowCount+=group.items.length;
+    columns[activeCol].push(group);rowCount+=group.items.length;
   });
 
-  const gap=4.5,colW=(cW-gap)/2,startY=19.5,bottom=10,catH=8.5,catGap=3;
+  const gap=4.5,colW=(cW-gap)/2,startY=19.5,bottom=10,catH=8.5,labelH=5.8,catGap=3.5;
   const maxRows=Math.max(...columns.map(col=>col.reduce((sum,group)=>sum+group.items.length,0)),1);
   const maxGroups=Math.max(...columns.map(col=>col.length),1);
-  const rowH=Math.min(24,(pageH-startY-bottom-maxGroups*(catH+catGap))/maxRows);
+  const rowH=Math.min(22,(pageH-startY-bottom-maxGroups*(catH+labelH+catGap))/maxRows);
 
   columns.forEach((column,col)=>{
     const x=margin+col*(colW+gap);
     let y=startY;
     column.forEach(group=>{
       const color=pdfCategoryRgb(group.name);
-      doc.setFillColor(...pdfTint(color,.88));doc.roundedRect(x,y,colW,catH,1.4,1.4,'F');
+      const blockH=catH+labelH+group.items.length*rowH;
+      doc.setFillColor(255,255,255);doc.setDrawColor(210,216,226);doc.setLineWidth(.35);doc.roundedRect(x,y,colW,blockH,1.5,1.5,'FD');
+      doc.setFillColor(...pdfTint(color,.88));doc.roundedRect(x,y,colW,catH,1.5,1.5,'F');
       doc.setFillColor(...color);doc.roundedRect(x,y,2,catH,1.2,1.2,'F');
       doc.setFont('helvetica','bold');doc.setTextColor(...color);
-      fitPdfText(doc,String(group.name).toUpperCase(),colW-22,9.5,7.3);doc.text(String(group.name).toUpperCase(),x+4,y+5.7);
-      doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(78,87,103);
-      doc.text(group.items.length+' formulas',x+colW-3,y+5.55,{align:'right'});
+      fitPdfText(doc,String(group.name).toUpperCase(),colW-21,9.7,7.3);doc.text(String(group.name).toUpperCase(),x+4,y+5.8);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.1);doc.setTextColor(78,87,103);doc.text(group.items.length+' formulas',x+colW-3,y+5.65,{align:'right'});
       y+=catH;
 
+      const split=x+colW*.34;
+      doc.setFillColor(246,248,251);doc.rect(x,y,colW,labelH,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(6.8);doc.setTextColor(96,105,122);
+      doc.text('CALCULATION',x+3,y+3.95);doc.text('EQUATION',split+3,y+3.95);
+      y+=labelH;
+
       group.items.forEach((f,index)=>{
-        const tint=pdfTint(color,.98);
+        const tint=pdfTint(color,.975);
         doc.setFillColor(...(index%2===0?[255,255,255]:tint));doc.rect(x,y,colW,rowH,'F');
-        doc.setDrawColor(221,226,234);doc.setLineWidth(.25);doc.line(x,y+rowH,x+colW,y+rowH);
-        doc.setFont('helvetica','bold');doc.setTextColor(27,35,51);
-        fitPdfText(doc,String(f.name||''),colW-6,10,7.5);doc.text(String(f.name||''),x+3,y+5.4);
-
-        const displaySpec=calcDisplaySpec(f);
-        if(displaySpec){
-          drawCalcDisplaySpec(doc,displaySpec,x+3,y+12.7,colW-6,color);
-        }else if(f.numerator||f.denominator){
-          const label=String(f.result_label||f.name||'');
-          const numerator=String(f.numerator||'...');
-          const denominator=String(f.denominator||'...');
-          const multiplier=f.multiplier?'x '+String(f.multiplier):'';
-          doc.setFont('helvetica','bold');fitPdfText(doc,label,25,8.5,6.3);
-          const labelW=Math.min(23,Math.max(11,doc.getTextWidth(label)+1));
-          const formulaY=y+13.1;
-          doc.setTextColor(62,68,80);doc.text(label,x+3,formulaY+.8);
-          doc.setFontSize(9);doc.text('=',x+labelW+4.4,formulaY+.8);
-          doc.setFont('helvetica','bold');doc.setFontSize(8.8);
-          const formulaStart=x+labelW+9.3;
-          const formulaEnd=x+colW-3-(multiplier?11:0);
-          const maxFracW=Math.max(24,formulaEnd-formulaStart);
-          const needed=Math.max(doc.getTextWidth(numerator),doc.getTextWidth(denominator))+5;
-          const fracW=Math.min(maxFracW,Math.max(26,needed));
-          const fracMid=(formulaStart+formulaEnd)/2;
-          doc.setTextColor(30,39,55);
-          fitPdfText(doc,numerator,fracW-2,8.8,6.2);doc.text(numerator,fracMid,formulaY-1.8,{align:'center'});
-          fitPdfText(doc,denominator,fracW-2,8.8,6.2);doc.text(denominator,fracMid,formulaY+4.3,{align:'center'});
-          doc.setDrawColor(...color);doc.setLineWidth(.45);doc.line(fracMid-fracW/2,formulaY,fracMid+fracW/2,formulaY);
-          if(multiplier){doc.setFontSize(7.6);doc.text(multiplier,x+colW-2.5,formulaY+.8,{align:'right'});}
-        }else{
-          const formula=calcFormulaText(f);
-          doc.setFont('helvetica','bold');doc.setTextColor(30,39,55);
-          fitPdfText(doc,formula,colW-6,9.2,6.2);doc.text(formula,x+3,y+14.1);
-        }
-
-        const noteParts=[];
-        if(f.numerator||f.denominator)noteParts.push(...calcExplanatorySteps(f));
-        if(f.notes)noteParts.push(String(f.notes));
-        if(noteParts.length){
-          const note=noteParts.join(' - ');
-          doc.setFont('helvetica','normal');doc.setFontSize(6.1);doc.setTextColor(92,97,108);
-          const noteLines=doc.splitTextToSize(note,colW-6).slice(0,2);
-          doc.text(noteLines,x+3,y+rowH-(noteLines.length>1?5.1:2.7),{lineHeightFactor:1.02});
-        }
+        doc.setDrawColor(226,230,237);doc.setLineWidth(.22);doc.line(x,y+rowH,x+colW,y+rowH);
+        doc.setDrawColor(233,236,241);doc.line(split,y+1,split,y+rowH-1);
+        const name=String(f.name||'');
+        doc.setFont('helvetica','bold');doc.setTextColor(30,38,54);
+        fitPdfText(doc,name,colW*.34-5,9.2,5.8);doc.text(name,x+3,y+rowH/2+1.2);
+        drawCalcPdfFormulaCell(doc,f,split+1,y,colW*.66-1,rowH,color);
         y+=rowH;
       });
+      doc.setDrawColor(210,216,226);doc.roundedRect(x,y-blockH,colW,blockH,1.5,1.5,'S');
       y+=catGap;
     });
   });
