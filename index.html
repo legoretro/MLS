@@ -4948,8 +4948,31 @@ function bocWeightLabel(key){
   return weight?weight+' ASCP':'';
 }
 
-function homeSubjectHasImages(key){
-  return !['clinical_chemistry','immunology'].includes(key);
+let homeImageAvailability={};
+function homeSubjectHasImages(key){return !!homeImageAvailability[key];}
+
+async function refreshHomeImageAvailability(){
+  if(!sb)return;
+  const next={};
+  const usableRows=rows=>(rows||[]).some(row=>{
+    if(typeof row.image_url==='string'&&row.image_url.trim())return true;
+    return imageEntryList(row.images).some(entry=>!!imageEntrySrc(entry));
+  });
+  const safe=async fetcher=>{try{return await fetchRowsWithRetry(fetcher,3,false);}catch(e){return [];}};
+  const [generic,heme,micro,ua]=await Promise.all([
+    safe(()=>sb.from('mlsboc_images').select('subject,image_url').in('subject',['blood_bank','lab_operations','parasitology','mycology']).limit(200)),
+    safe(()=>sb.from('mlsboc_heme_conditions').select('id').not('images','is',null).neq('images','[]').limit(1)),
+    safe(()=>sb.from('mlsboc_micro_organisms').select('id').not('images','is',null).neq('images','[]').limit(1)),
+    safe(()=>sb.from('mlsboc_ua_images').select('id').not('images','is',null).neq('images','[]').limit(1))
+  ]);
+  next.blood_bank=usableRows(generic.filter(row=>row.subject==='blood_bank'));
+  next.lab_operations=usableRows(generic.filter(row=>row.subject==='lab_operations'));
+  next.para_myco=usableRows(generic.filter(row=>row.subject==='parasitology'||row.subject==='mycology'));
+  next.hematology=heme.length>0;
+  next.microbiology=micro.length>0;
+  next.urinalysis=ua.length>0;
+  homeImageAvailability=next;
+  Object.keys(next).forEach(key=>document.getElementById('home-image-flag-'+key)?.classList.toggle('hidden',!next[key]));
 }
 
 function homeMascotScene(){
@@ -4983,7 +5006,7 @@ function homeSubjectCardHtml(cfg){
     + '<button class="home-subject-card" style="--subject-color:'+homeSubjectColor(cfg.key)+'" onclick="'+cfg.onclick+'">'
     + '<div class="home-subject-layout">'+homeSubjectMark(cfg.key,cfg.code||cfg.name)
     + '<div class="home-subject-copy"><div class="home-subject-name">'+title+'</div></div>'
-    + (cfg.hasImages?'<span class="home-subject-image-flag" title="Microscopy images available" aria-label="Microscopy images available">🔬</span>':'')
+    + '<span id="home-image-flag-'+cfg.key+'" class="home-subject-image-flag'+(cfg.hasImages?'':' hidden')+'" title="Microscopy images available" aria-label="Microscopy images available">🔬</span>'
     + '<div class="home-subject-arrow">›</div></div>'
     + '</button>'
     + (cfg.uploadKey?homeAdminIconUpload(cfg.uploadKey):'')
@@ -5006,7 +5029,7 @@ async function renderHome(v){
       return homeSubjectCardHtml({
         key:'para_myco',name:s.name,desc:HOME_SUBJECT_DETAILS[s.key]||'Subject review and practice',
         countId:'cnt-para_myco',countText:'0 questions',onclick:"goSubject('para_myco')",uploadKey:'para_myco',
-        weightLabel:bocWeightLabel('para_myco'),hasImages:true
+        weightLabel:bocWeightLabel('para_myco'),hasImages:homeSubjectHasImages('para_myco')
       });
     }
     return homeSubjectCardHtml({
@@ -5017,8 +5040,8 @@ async function renderHome(v){
   }).join('');
 
   const practiceCards=[
-    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'🧠',title:'Practice Exam Simulator',desc:'A fixed BOC-style weighted practice mix from the review question bank.',metaId:'cnt-all',meta:'Calculating BOC-style practice mix...',onclick:'goAll()'}),
-    homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'∑',title:'Calculations / Reference Ranges',desc:'One-line formulas and conventional-unit ranges for quick review.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
+    homePracticeCardHtml({featured:true,className:'exam-feature',color:'#5630d8',icon:'',title:'Practice Exam Simulator',desc:'A fixed BOC-style weighted practice mix from the review question bank.',metaId:'cnt-all',meta:'Calculating BOC-style practice mix...',onclick:'goAll()'}),
+    homePracticeCardHtml({className:'reference-compact',color:'#2f7dd1',icon:'',title:'Calculations / Reference Ranges',desc:'One-line formulas and conventional-unit ranges for quick review.',metaId:'cnt-formulas',meta:(CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges',onclick:'goFormulas()'})
   ].join('');
 
   const classMaterialSection=isAdmin
@@ -5067,6 +5090,7 @@ async function renderHome(v){
     + '</div>';
 
   refreshHomePracticeExamCount();
+  refreshHomeImageAvailability();
   sb.from('mlsboc_formulas').select('id',{count:'exact',head:true}).then(({count})=>{
     const el=document.getElementById('cnt-formulas');
     if(el)el.textContent=((count||0)+CALC_PLACEHOLDERS.length+RR_PLACEHOLDERS.length)+' formulas / ranges';
