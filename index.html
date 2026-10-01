@@ -375,6 +375,32 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-value{text-align:right;font-family:var(--sans);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
+.study-template-sheet{width:100%;max-width:1160px;margin:0 auto 18px;border:2px solid #111;background:#fff;color:#111;box-shadow:0 10px 26px rgba(25,32,52,.08);overflow:hidden}
+.study-template-title{padding:9px 14px;border-bottom:2px solid #111;background:#dedcc7;color:#111;font-family:var(--serif);font-size:23px;font-weight:800;line-height:1.15;text-align:center}
+.study-template-section-title{padding:7px 12px;border-bottom:2px solid #111;background:#dedcc7;color:#111;font-family:var(--serif);font-size:19px;font-weight:800;line-height:1.1;text-align:center}
+.calc-template-group:not(:first-child) .study-template-section-title{border-top:2px solid #111}
+.calc-template-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.calc-template-cell{position:relative;display:flex;min-width:0;min-height:102px;padding:12px 14px 9px;flex-direction:column;align-items:center;border-bottom:2px solid #111;background:#fff;color:#111}
+.calc-template-cell:nth-child(2){border-left:2px solid #111}
+.calc-template-cell-empty{background:#fff}
+.calc-template-row:last-child .calc-template-cell{border-bottom:0}
+.calc-template-name{max-width:88%;font-family:var(--serif);font-size:18px;font-weight:800;line-height:1.15;text-align:center}
+.calc-template-equation{display:flex;width:100%;min-width:0;flex:1;align-items:center;justify-content:center;padding:8px 0 4px}
+.calc-template-equation .calc-formula-board{justify-content:center;width:100%;max-width:100%;min-width:0;overflow-x:auto;color:#111;font-family:var(--serif);scrollbar-width:thin}
+.calc-template-equation .calc-equation-label,.calc-template-equation .calc-equation-text,.calc-template-equation .calc-expression,.calc-template-equation .calc-inline-fraction-top,.calc-template-equation .calc-inline-fraction-bottom,.calc-template-equation .calc-fraction-top,.calc-template-equation .calc-fraction-bottom{color:#111;font-family:var(--serif);font-weight:650}
+.calc-template-equation .calc-equals{color:#111}
+.calc-template-equation .calc-inline-fraction-top,.calc-template-equation .calc-fraction-top{border-bottom-color:#111}
+.calc-template-admin{position:absolute;right:7px;top:7px;display:flex;gap:4px}
+.rr-template-block{display:grid;grid-template-columns:minmax(180px,28%) minmax(0,1fr);border-bottom:2px solid #111;background:#fff}
+.rr-template-block:last-child{border-bottom:0}
+.rr-template-category{display:flex;align-items:center;padding:12px 14px;border-right:2px solid #111;color:#111;font-family:var(--serif);font-size:17px;line-height:1.25;overflow-wrap:anywhere}
+.rr-template-items{min-width:0}
+.rr-template-row{display:grid;grid-template-columns:minmax(0,44%) minmax(0,56%);min-height:39px;border-bottom:1.5px solid #111;color:#111;font-family:var(--serif)}
+.rr-template-row:last-child{border-bottom:0}
+.rr-template-analyte,.rr-template-value{display:flex;min-width:0;align-items:center;padding:7px 10px;font-size:15px;line-height:1.15;overflow-wrap:anywhere}
+.rr-template-analyte{font-weight:750}
+.rr-template-value{border-left:1.5px solid #111;font-weight:500}
+.rr-template-value .rr-unit{margin-left:5px;color:#111;font-family:var(--serif);font-size:13px;font-weight:500}
 @media(max-width:1100px){.formula-sheet{column-count:1}}
 @media(max-width:900px){.rr-category-grid,.calc-rr-grid{column-count:1}}
 @media(max-width:700px){
@@ -388,6 +414,20 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
   .calc-table-equation .calc-formula-board{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain}
   .calc-table-equation .calc-expression,.calc-table-equation .calc-expression-line,.calc-table-equation .calc-equation-text{max-width:none}
   .rr-table{width:100%;max-width:100%}
+  .study-template-title{padding:8px 10px;font-size:19px}
+  .study-template-section-title{padding:6px 8px;font-size:16px}
+  .calc-template-row{grid-template-columns:1fr}
+  .calc-template-cell{min-height:96px;padding:11px 10px 8px}
+  .calc-template-cell:nth-child(2){border-left:0}
+  .calc-template-cell-empty{display:none}
+  .calc-template-row:last-child .calc-template-cell:first-child:not(:last-child){border-bottom:2px solid #111}
+  .calc-template-name{font-size:16px}
+  .calc-template-equation{padding:7px 0 3px}
+  .rr-template-block{grid-template-columns:minmax(92px,31%) minmax(0,69%)}
+  .rr-template-category{padding:9px 8px;font-size:13px}
+  .rr-template-row{grid-template-columns:minmax(0,48%) minmax(0,52%);min-height:38px}
+  .rr-template-analyte,.rr-template-value{padding:6px;font-size:12px}
+  .rr-template-value .rr-unit{display:inline;margin-left:3px;font-size:10px}
 }
 @media(max-width:560px){.home-dashboard{width:calc(100vw - 32px)}.rr-table td{padding:5px 6px}.rr-table .rr-unit{display:block;margin:2px 0 0}}
 
@@ -11940,21 +11980,34 @@ function formulaCategoryColor(category){
   return '#2f7dd1';
 }
 
+function calcFormulaGroups(items){
+  const groups=[
+    {name:'Hematology',items:[]},
+    {name:'Chemistry',items:[]},
+    {name:'Other',items:[]}
+  ];
+  (items||[]).forEach(item=>{
+    const category=String(item?.category||'').toLowerCase();
+    const group=category.includes('hematology')?groups[0]:category.includes('chemistry')?groups[1]:groups[2];
+    group.items.push(item);
+  });
+  return groups.filter(group=>group.items.length);
+}
+
 function renderCalcTab(cats,all){
   if(!all.length)return '<div class="empty">No calculations yet. Use Admin mode to add some.</div>';
-  return `<div class="calc-rr-grid">${Object.entries(cats).map(([cat,items])=>`
-    <section class="calc-rr-card" style="--category-color:${formulaCategoryColor(cat)}">
-      <div class="formula-category-head">${esc(cat)}</div>
-      <div class="calc-table-wrap">
-        <table class="calc-table">
-          <thead><tr><th>Calculation</th><th>Equation</th></tr></thead>
-          <tbody>${items.map(f=>`<tr>
-            <td class="calc-table-name">${esc(f.name)}${isAdmin&&!f._placeholder?`<span class="rr-row-actions"><button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','calc')">Edit</button><button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button></span>`:''}</td>
-            <td class="calc-table-equation">${renderCalcEquationCell(f)}</td>
-          </tr>`).join('')}</tbody>
-        </table>
-      </div>
-    </section>`).join('')}</div>`;
+  const cell=f=>f?`<article class="calc-template-cell">
+    ${isAdmin&&!f._placeholder?`<span class="calc-template-admin"><button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','calc')">Edit</button><button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button></span>`:''}
+    <div class="calc-template-name">${esc(f.name)}</div>
+    <div class="calc-template-equation">${renderCalcEquationCell(f)}</div>
+  </article>`:'<article class="calc-template-cell calc-template-cell-empty" aria-hidden="true"></article>';
+  return `<section class="study-template-sheet calc-template-sheet">
+    <div class="study-template-title">ASCP Formula Sheet</div>
+    <div class="calc-template-groups">${calcFormulaGroups(all).map(group=>{
+      const rows=Math.ceil(group.items.length/2);
+      return `<section class="calc-template-group"><div class="study-template-section-title">${esc(group.name)}</div><div class="calc-template-rows">${Array.from({length:rows},(_,index)=>`<div class="calc-template-row">${cell(group.items[index])}${cell(group.items[index+rows])}</div>`).join('')}</div></section>`;
+    }).join('')}</div>
+  </section>`;
 }
 
 function calcFractionSpec(top,bottom){return {top:String(top||''),bottom:String(bottom||'')};}
@@ -12039,22 +12092,18 @@ function renderCalcCard(f,index=0){
 
 function renderRRTab(cats,all){
   if(!all.length)return '<div class="empty">No reference ranges yet. Use Admin mode to add some.</div>';
-  return `<div class="rr-category-grid">${Object.entries(cats).map(([cat,items])=>`
-    <section class="rr-category-card" style="--category-color:${formulaCategoryColor(cat)}">
-      <div class="formula-category-head">${esc(cat)}</div>
-      <div class="rr-table-wrap">
-        <table class="rr-table">
-          <thead><tr><th>Analyte</th><th>Conventional units</th></tr></thead>
-          <tbody>
-            ${items.map(f=>`
-              <tr>
-                <td class="rr-analyte">${esc(f.name)}${isAdmin&&!f._placeholder?`<span class="rr-row-actions"><button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','rr')">Edit</button><button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button></span>`:''}</td>
-                <td class="rr-value">${esc(f.conventional_value||'--')}${f.conventional_unit?'<span class="rr-unit">'+esc(f.conventional_unit)+'</span>':''}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    </section>`).join('')}</div>`;
+  return `<section class="study-template-sheet rr-template-sheet">
+    <div class="study-template-title">ASCP Reference Range Sheet</div>
+    <div class="rr-template-body">${Object.entries(cats).map(([cat,items])=>`
+      <section class="rr-template-block">
+        <div class="rr-template-category">${esc(cat)}</div>
+        <div class="rr-template-items">${items.map(f=>`
+          <div class="rr-template-row">
+            <div class="rr-template-analyte">${esc(f.name)}${isAdmin&&!f._placeholder?`<span class="rr-row-actions"><button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','rr')">Edit</button><button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button></span>`:''}</div>
+            <div class="rr-template-value">${esc(f.conventional_value||'--')}${f.conventional_unit?'<span class="rr-unit">'+esc(f.conventional_unit)+'</span>':''}</div>
+          </div>`).join('')}</div>
+      </section>`).join('')}</div>
+  </section>`;
 }
 
 async function openFormulaEditor(id,type){
@@ -12272,50 +12321,36 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
   fitPdfText(doc,formula,w-4,8.8,5.8);doc.text(formula,x+2,formulaY+1);
 }
 
-function drawCalcOnePage(doc,calcData,pageW,pageH,margin){
-  const items=calcData||[];
-  const cW=pageW-margin*2;
-  const perPage=28,rowsPerCol=14,colW=cW/2,startY=18,bottom=10;
-  const rowH=(pageH-startY-bottom)/rowsPerCol;
-  const pageCount=Math.max(1,Math.ceil(items.length/perPage));
-  for(let pageIndex=0;pageIndex<pageCount;pageIndex++){
-    if(pageIndex>0)doc.addPage('a4','portrait');
-    doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
-    doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.7);doc.rect(margin,10,cW,8,'FD');
-    doc.setFont('times','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text('ASCP Formula Sheet',pageW/2,15.4,{align:'center'});
-    const pageItems=items.slice(pageIndex*perPage,(pageIndex+1)*perPage);
-    pageItems.forEach((f,index)=>{
-      const col=Math.floor(index/rowsPerCol),row=index%rowsPerCol;
-      const x=margin+col*colW,y=startY+row*rowH,h=rowH;
-      doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(x,y,colW,h,'FD');
-      doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,String(f.name||''),colW-7,8.2,6.2);doc.text(String(f.name||''),x+colW/2,y+4.6,{align:'center'});
-      drawCalcPdfFormulaCell(doc,f,x+3,y+4.9,colW-6,h-6.6,[0,0,0]);
-      const note=String(f.notes||'').trim();
-      if(note){doc.setFont('times','normal');doc.setTextColor(220,0,0);fitPdfText(doc,note,colW-6,5.8,4.3);doc.text(note,x+3,y+h-2);}
-    });
-  }
+function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
+  const groups=calcFormulaGroups(calcData||[]);
+  const cW=pageW-margin*2,colW=cW/2,startY=18,bottom=10,groupH=6.6;
+  const formulaRows=groups.reduce((sum,group)=>sum+Math.ceil(group.items.length/2),0)||1;
+  const rowH=(pageH-startY-bottom-groups.length*groupH)/formulaRows;
+  doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
+  doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.7);doc.rect(margin,10,cW,8,'FD');
+  doc.setFont('times','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(blank?'ASCP Formula Sheet - Blank Practice':'ASCP Formula Sheet',pageW/2,15.4,{align:'center'});
+  let y=startY;
+  groups.forEach(group=>{
+    doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(margin,y,cW,groupH,'FD');
+    doc.setFont('times','bold');doc.setFontSize(9.2);doc.setTextColor(0,0,0);doc.text(group.name,pageW/2,y+4.55,{align:'center'});
+    y+=groupH;
+    const rows=Math.ceil(group.items.length/2);
+    for(let row=0;row<rows;row++){
+      const pair=[group.items[row],group.items[row+rows]];
+      pair.forEach((f,col)=>{
+        const x=margin+col*colW;
+        doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(x,y,colW,rowH,'FD');
+        if(!f)return;
+        doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,String(f.name||''),colW-7,8.2,6);doc.text(String(f.name||''),x+colW/2,y+4.5,{align:'center'});
+        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+4.7,colW-6,rowH-5.9,[0,0,0]);
+      });
+      y+=rowH;
+    }
+  });
 }
 
-function drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin){
-  const items=calcData||[];
-  const cW=pageW-margin*2;
-  const perPage=28,rowsPerCol=14,colW=cW/2,startY=18,bottom=10;
-  const rowH=(pageH-startY-bottom)/rowsPerCol;
-  const pageCount=Math.max(1,Math.ceil(items.length/perPage));
-  for(let pageIndex=0;pageIndex<pageCount;pageIndex++){
-    if(pageIndex>0)doc.addPage('a4','portrait');
-    doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
-    doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.7);doc.rect(margin,10,cW,8,'FD');
-    doc.setFont('times','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text('ASCP Formula Sheet - Blank Practice',pageW/2,15.4,{align:'center'});
-    items.slice(pageIndex*perPage,(pageIndex+1)*perPage).forEach((f,index)=>{
-      const col=Math.floor(index/rowsPerCol),row=index%rowsPerCol;
-      const x=margin+col*colW,y=startY+row*rowH,h=rowH;
-      doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(x,y,colW,h,'FD');
-      doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,String(f.name||''),colW-7,8.4,6.2);doc.text(String(f.name||''),x+colW/2,y+5,{align:'center'});
-      doc.setLineWidth(.3);doc.line(x+7,y+h*.62,x+colW-7,y+h*.62);doc.line(x+7,y+h*.84,x+colW-7,y+h*.84);
-    });
-  }
-}
+function drawCalcOnePage(doc,calcData,pageW,pageH,margin){drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,false);}
+function drawBlankCalcPracticePage(doc,calcData,pageW,pageH,margin){drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,true);}
 
 function rrConventionalText(f){
   return (f.conventional_value||'--')+(f.conventional_unit?' '+f.conventional_unit:'');
@@ -12355,8 +12390,7 @@ function drawRROnePage(doc,rrData,pageW,pageH,margin,blank=false){
         doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(margin+leftW,y,cW-leftW,rowH,'FD');
         const nameText=String(f.name||''),valueText=blank?'':rrConventionalText(f);
         doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,nameText,47,9.4,6.6);doc.text(nameText,margin+leftW+2,y+4.8);
-        if(blank){doc.setLineWidth(.28);doc.line(margin+leftW+52,y+4.9,margin+cW-3,y+4.9);}
-        else{doc.setFont('times','normal');fitPdfText(doc,valueText,cW-leftW-55,9.4,6.6);doc.text(valueText,margin+leftW+52,y+4.8);}
+        if(!blank){doc.setFont('times','normal');fitPdfText(doc,valueText,cW-leftW-55,9.4,6.6);doc.text(valueText,margin+leftW+52,y+4.8);}
         y+=rowH;
       });
     });
