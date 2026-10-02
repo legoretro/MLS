@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Urine Color & Clarity – MLS 449</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap');
@@ -40,6 +40,7 @@
     padding: 16px;
     font-size: 14px;
     line-height: 1.4;
+    overflow-x: hidden;
   }
 
   .wrap { max-width: 1260px; margin: 0 auto 32px; }
@@ -104,6 +105,8 @@
     cursor: pointer;
     font-size: .78rem;
     transition: .12s ease;
+    min-height: 44px;
+    touch-action: manipulation;
   }
   button:hover { filter: brightness(1.08); }
   .checkBtn { background: #1e1c1a; color: #fff; }
@@ -215,6 +218,11 @@
   .chip.dragging { opacity: .35; transform: scale(.97); }
   .chip.used { opacity: .18; pointer-events: none; text-decoration: line-through; }
   .chip:hover:not(.used) { border-color: var(--accent); background: #fff8f3; }
+  .chip.selected {
+    border-color: var(--accent);
+    background: #fff0e5;
+    box-shadow: 0 0 0 3px rgba(200,96,26,.2);
+  }
 
   /* ── TABLE SECTION ── */
   .col-section {
@@ -288,6 +296,7 @@
   .dropzone.filled { border-style: solid; background: #fff; cursor: pointer; color: var(--text); }
   .dropzone.correct { background: var(--good-bg); border-color: var(--good); color: var(--good); border-style: solid; }
   .dropzone.wrong   { background: var(--bad-bg);  border-color: var(--bad);  color: var(--bad);  border-style: solid; }
+  .dropzone.tap-ready { border-color: var(--accent); background: #fff4ea; border-style: solid; }
   .placeholder { color: #b0a48a; font-weight: 600; font-size: .6rem; text-align: center; width: 100%; }
 
   /* ── CUP CELL ── */
@@ -324,10 +333,86 @@
 
   @media (max-width: 900px) {
     .color-activity-layout { grid-template-columns: 1fr; }
-    .clarity-activity-layout { grid-template-columns: 1fr; }
+    .clarity-activity-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "nonbank" "pathbank" "claritytable";
+    }
+    .clarity-bank.nonpath-bank { grid-area: nonbank; }
+    .clarity-bank.path-bank { grid-area: pathbank; }
+    .clarity-activity-layout > .col-section { grid-area: claritytable; }
     .sticky-bank, .clarity-bank { position: static; max-height: none; }
     .section-tag { display: none; }
     table { table-layout: auto; }
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 8px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+    .wrap { width: 100%; margin-bottom: 24px; }
+    .page-header { padding: 12px; gap: 10px; align-items: flex-start; }
+    .page-header > svg { flex: 0 0 auto; max-width: 80px; height: auto; }
+    .page-header-text { min-width: 0; }
+    .page-header-text h1 { font-size: 1rem; }
+    .page-header-text p { overflow-wrap: anywhere; }
+    .controls { padding: 8px; }
+    .controls > button { flex: 1 1 125px; }
+    .score { width: 100%; text-align: center; }
+    .chip { min-height: 44px; padding: 9px; display: flex; align-items: center; }
+    .col-section { overflow: visible; }
+
+    #colorTableBody,
+    #colorTableBody tr,
+    #clarityTableBody,
+    #clarityTableBody tr { display: grid; width: 100%; }
+    #colorTableBody { gap: 8px; background: var(--border); }
+    #colorTableBody tr {
+      grid-template-columns: 58px minmax(82px,.75fr) minmax(0,1.5fr);
+      gap: 0;
+      background: var(--surface);
+    }
+    #colorTableBody td { min-width: 0; }
+    #colorTableBody .color-cause-cell { padding: 5px; }
+    #colorTableBody .row-label { overflow-wrap: anywhere; }
+    .color-activity-layout .col-section thead { display: none; }
+
+    .clarity-activity-layout .col-section thead { display: none; }
+    #clarityTableBody { gap: 8px; background: var(--border); }
+    #clarityTableBody tr {
+      grid-template-columns: 64px minmax(0,1fr);
+      background: var(--surface);
+    }
+    #clarityTableBody td { min-width: 0; }
+    #clarityTableBody .clarity-description-cell,
+    #clarityTableBody .clarity-non-cell,
+    #clarityTableBody .clarity-path-cell { grid-column: 1 / -1; padding: 7px; }
+    #clarityTableBody .clarity-description-cell::before,
+    #clarityTableBody .clarity-non-cell::before,
+    #clarityTableBody .clarity-path-cell::before {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    #clarityTableBody .clarity-description-cell::before { content: "Description"; }
+    #clarityTableBody .clarity-non-cell::before { content: "Non-pathological cause"; }
+    #clarityTableBody .clarity-path-cell::before { content: "Pathological cause"; }
+    .dropzone { min-height: 48px; overflow-wrap: anywhere; }
+
+    .answers-panel { padding: 8px; }
+    .answers-panel table,
+    .answers-panel tbody { display: block; width: 100%; }
+    .answers-panel thead { display: none; }
+    .answers-panel tr { display: grid; width: 100%; margin-bottom: 8px; border: 1px solid var(--border); }
+    .answers-panel td { border: 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+    #colorAnswersPanel tr { grid-template-columns: minmax(90px,.7fr) minmax(0,1.5fr); }
+    #clarityAnswersPanel tr { grid-template-columns: minmax(0,1fr); }
+    #clarityAnswersPanel td::before { display: block; color: var(--muted); font-size: .58rem; font-weight: 700; text-transform: uppercase; }
+    #clarityAnswersPanel td:nth-child(1)::before { content: "Clarity"; }
+    #clarityAnswersPanel td:nth-child(2)::before { content: "Description"; }
+    #clarityAnswersPanel td:nth-child(3)::before { content: "Non-pathological"; }
+    #clarityAnswersPanel td:nth-child(4)::before { content: "Pathological"; }
   }
 </style>
 <script src="interactive_theme.js"></script>
@@ -382,7 +467,7 @@
 
     <div class="page-header-text">
       <h1>Urine Color</h1>
-      <p>Drag the correct cause into each color row. Click a filled box to clear it.</p>
+      <p>Drag a cause, or tap a cause and then its destination. Tap a filled box to clear it.</p>
     </div>
     <span class="section-tag">Color</span>
   </div>
@@ -405,7 +490,7 @@
   <div class="color-activity-layout">
     <div class="sticky-bank">
       <h2>Causes</h2>
-      <p class="hint">Drag into a row · click to return</p>
+      <p class="hint">Drag, or tap a cause then its destination · tap a filled box to return it</p>
       <div id="colorBank"></div>
     </div>
 
@@ -481,7 +566,7 @@
 
     <div class="page-header-text">
       <h1>Urine Clarity</h1>
-      <p>Descriptions are shown. Drag the correct non-path and pathological cause into each row.</p>
+      <p>Descriptions are shown. Drag a cause, or tap a cause and then its destination.</p>
     </div>
     <span class="section-tag">Clarity</span>
   </div>
@@ -502,9 +587,9 @@
   </div>
 
   <div class="clarity-activity-layout">
-    <div class="clarity-bank">
+    <div class="clarity-bank nonpath-bank">
       <h2>Non-path Causes</h2>
-      <p class="hint">Use each once</p>
+      <p class="hint">Drag, or tap a cause then its destination. Use each once.</p>
       <div id="clarityNonPathBank"></div>
     </div>
 
@@ -524,9 +609,9 @@
       </table>
     </div>
 
-    <div class="clarity-bank">
+    <div class="clarity-bank path-bank">
       <h2>Pathological Causes</h2>
-      <p class="hint">Use each once</p>
+      <p class="hint">Drag, or tap a cause then its destination. Use each once.</p>
       <div id="clarityPathBank"></div>
     </div>
   </div>
@@ -820,6 +905,13 @@ const colorState = {};
 let colorDragItem = null;
 let colorDragFrom = null;
 
+function clearColorTapSelection(){
+  colorDragItem=null;
+  colorDragFrom=null;
+  document.querySelectorAll("#colorBank .chip.selected").forEach(chip=>chip.classList.remove("selected"));
+  document.querySelectorAll("#colorTableBody .dropzone.tap-ready").forEach(zone=>zone.classList.remove("tap-ready"));
+}
+
 function colorSlotKey(id){ return `color__${id}`; }
 function colorGetState(key){ return colorState[key] || null; }
 function colorSetState(key, value){ if(value==null) delete colorState[key]; else colorState[key]=value; }
@@ -838,11 +930,21 @@ function buildColorBank(){
     chip.textContent = value;
     chip.addEventListener("dragstart", e => {
       if(colorCount(value) >= colorMax(value)){ e.preventDefault(); return; }
+      clearColorTapSelection();
       colorDragItem = { value };
       colorDragFrom = null;
       chip.classList.add("dragging");
     });
     chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    chip.addEventListener("click", () => {
+      if(colorCount(value) >= colorMax(value)) return;
+      const alreadySelected=chip.classList.contains("selected");
+      clearColorTapSelection();
+      if(alreadySelected) return;
+      colorDragItem={value};
+      chip.classList.add("selected");
+      document.querySelectorAll("#colorTableBody .dropzone").forEach(zone=>zone.classList.add("tap-ready"));
+    });
     wrap.appendChild(chip);
   });
 }
@@ -872,10 +974,23 @@ function makeColorDropzone(rowId){
     }
     colorSetState(key, { value: colorDragItem.value });
     renderColorSlot(key);
-    colorDragItem = null; colorDragFrom = null;
+    clearColorTapSelection();
     clearColorMarks(); renderColorBankUsage();
   });
-  dz.addEventListener("click", () => { if(!colorGetState(key)) return; colorSetState(key, null); renderColorSlot(key); clearColorMarks(); renderColorBankUsage(); });
+  dz.addEventListener("click", () => {
+    if(colorDragItem){
+      const movingSame=colorDragFrom && colorGetState(colorDragFrom)?.value===colorDragItem.value;
+      if(colorCount(colorDragItem.value)<colorMax(colorDragItem.value) || movingSame){
+        if(colorDragFrom && colorDragFrom!==key){ colorSetState(colorDragFrom,null); renderColorSlot(colorDragFrom); }
+        colorSetState(key,{value:colorDragItem.value});
+        renderColorSlot(key);
+        clearColorTapSelection(); clearColorMarks(); renderColorBankUsage();
+      }
+      return;
+    }
+    if(!colorGetState(key)) return;
+    colorSetState(key, null); renderColorSlot(key); clearColorMarks(); renderColorBankUsage();
+  });
   dz.addEventListener("dragstart", e => { const cur=colorGetState(key); if(!cur){ e.preventDefault(); return; } colorDragItem={...cur}; colorDragFrom=key; });
   return dz;
 }
@@ -900,10 +1015,10 @@ function buildColorTable(){
     const lCup = document.createElement("td"); lCup.className="cup-cell";
     lCup.innerHTML = buildCupHTML(left); tr.appendChild(lCup);
 
-    const lLabel = document.createElement("td");
+    const lLabel = document.createElement("td"); lLabel.className="color-label-cell";
     lLabel.innerHTML = `<div class="row-label">${left.color}</div>`; tr.appendChild(lLabel);
 
-    const lDrop = document.createElement("td");
+    const lDrop = document.createElement("td"); lDrop.className="color-cause-cell";
     lDrop.appendChild(makeColorDropzone(left.id)); tr.appendChild(lDrop);
 
     const right = rightRows[i];
@@ -911,10 +1026,10 @@ function buildColorTable(){
       const rCup = document.createElement("td"); rCup.className="cup-cell";
       rCup.innerHTML = buildCupHTML(right); tr.appendChild(rCup);
 
-      const rLabel = document.createElement("td");
+      const rLabel = document.createElement("td"); rLabel.className="color-label-cell";
       rLabel.innerHTML = `<div class="row-label">${right.color}</div>`; tr.appendChild(rLabel);
 
-      const rDrop = document.createElement("td");
+      const rDrop = document.createElement("td"); rDrop.className="color-cause-cell";
       rDrop.appendChild(makeColorDropzone(right.id)); tr.appendChild(rDrop);
     } else {
       tr.appendChild(document.createElement("td"));
@@ -938,12 +1053,14 @@ function checkColorAnswers(){
   const msg=document.getElementById("colorScoreMsg"); msg.textContent=`${correct}/${total} correct`; msg.className=`score ${correct===total?"good":"bad"}`;
 }
 function resetColor(){
+  clearColorTapSelection();
   Object.keys(colorState).forEach(k=>delete colorState[k]);
   buildColorBank();
   colorRows.forEach(row=>renderColorSlot(colorSlotKey(row.id)));
   clearColorMarks(); renderColorBankUsage();
 }
 function showColorAnswers(){
+  clearColorTapSelection();
   colorRows.forEach(row=>{
     const key=colorSlotKey(row.id);
     colorSetState(key,{value:row.cause});
@@ -959,6 +1076,13 @@ const clarityPathState = {};
 let clarityDragItem = null;
 let clarityDragFrom = null;
 
+function clearClarityTapSelection(){
+  clarityDragItem=null;
+  clarityDragFrom=null;
+  document.querySelectorAll("#clarityNonPathBank .chip.selected, #clarityPathBank .chip.selected").forEach(chip=>chip.classList.remove("selected"));
+  document.querySelectorAll("#clarityTableBody .dropzone.tap-ready").forEach(zone=>zone.classList.remove("tap-ready"));
+}
+
 function cSlotKey(type, id){ return `clarity__${type}__${id}`; }
 function cObj(type){ return type==="non" ? clarityNonState : clarityPathState; }
 function cGet(type, key){ return cObj(type)[key] || null; }
@@ -973,9 +1097,19 @@ function buildClarityBank(type, wrapperId){
     chip.className="chip"; chip.dataset.type=type; chip.dataset.value=value; chip.draggable=true; chip.textContent=value;
     chip.addEventListener("dragstart", e => {
       if(cCount(type, value)>=1){ e.preventDefault(); return; }
+      clearClarityTapSelection();
       clarityDragItem={type,value}; clarityDragFrom=null; chip.classList.add("dragging");
     });
     chip.addEventListener("dragend", ()=>chip.classList.remove("dragging"));
+    chip.addEventListener("click", ()=>{
+      if(cCount(type,value)>=1) return;
+      const alreadySelected=chip.classList.contains("selected");
+      clearClarityTapSelection();
+      if(alreadySelected) return;
+      clarityDragItem={type,value};
+      chip.classList.add("selected");
+      document.querySelectorAll(`#clarityTableBody .dropzone[id^="cslot-${type}-"]`).forEach(zone=>zone.classList.add("tap-ready"));
+    });
     wrap.appendChild(chip);
   });
 }
@@ -1003,10 +1137,26 @@ function makeClarityDZ(type, rowId){
     }
     cSet(type, key, {value:clarityDragItem.value});
     renderClaritySlot(type, rowId);
-    clarityDragItem=null; clarityDragFrom=null;
+    clearClarityTapSelection();
     clearClarityMarks(); renderClarityBankUsage();
   });
-  dz.addEventListener("click", ()=>{ if(!cGet(type,key)) return; cSet(type,key,null); renderClaritySlot(type,rowId); clearClarityMarks(); renderClarityBankUsage(); });
+  dz.addEventListener("click", ()=>{
+    if(clarityDragItem && clarityDragItem.type===type){
+      const movingSame=clarityDragFrom && cGet(type,clarityDragFrom)?.value===clarityDragItem.value;
+      if(cCount(type,clarityDragItem.value)<1 || movingSame){
+        if(clarityDragFrom && clarityDragFrom!==key){
+          const oldRowId=clarityDragFrom.split("__")[2];
+          cSet(type,clarityDragFrom,null); renderClaritySlot(type,oldRowId);
+        }
+        cSet(type,key,{value:clarityDragItem.value});
+        renderClaritySlot(type,rowId);
+        clearClarityTapSelection(); clearClarityMarks(); renderClarityBankUsage();
+      }
+      return;
+    }
+    if(!cGet(type,key)) return;
+    cSet(type,key,null); renderClaritySlot(type,rowId); clearClarityMarks(); renderClarityBankUsage();
+  });
   dz.addEventListener("dragstart", e=>{ const cur=cGet(type,key); if(!cur){ e.preventDefault(); return; } clarityDragItem={type,...cur}; clarityDragFrom=key; });
   return dz;
 }
@@ -1031,14 +1181,14 @@ function buildClarityTable(){
     const cupTd=document.createElement("td"); cupTd.className="cup-cell";
     cupTd.innerHTML=`<div class="cup-wrap">${cupSVG(row.cup)}</div>`; tr.appendChild(cupTd);
 
-    const labelTd=document.createElement("td");
+    const labelTd=document.createElement("td"); labelTd.className="clarity-label-cell";
     labelTd.innerHTML=`<div class="row-label">${row.label}</div>`; tr.appendChild(labelTd);
 
-    const descTd=document.createElement("td");
+    const descTd=document.createElement("td"); descTd.className="clarity-description-cell";
     descTd.innerHTML=`<div class="static-cell">${row.description}</div>`; tr.appendChild(descTd);
 
-    const nonTd=document.createElement("td"); nonTd.appendChild(makeClarityDZ("non", row.id)); tr.appendChild(nonTd);
-    const pathTd=document.createElement("td"); pathTd.appendChild(makeClarityDZ("path", row.id)); tr.appendChild(pathTd);
+    const nonTd=document.createElement("td"); nonTd.className="clarity-non-cell"; nonTd.appendChild(makeClarityDZ("non", row.id)); tr.appendChild(nonTd);
+    const pathTd=document.createElement("td"); pathTd.className="clarity-path-cell"; pathTd.appendChild(makeClarityDZ("path", row.id)); tr.appendChild(pathTd);
 
     body.appendChild(tr);
   });
@@ -1062,6 +1212,7 @@ function checkClarityAnswers(){
   const msg=document.getElementById("clarityScoreMsg"); msg.textContent=`${correct}/${total} correct`; msg.className=`score ${correct===total?"good":"bad"}`;
 }
 function resetClarity(){
+  clearClarityTapSelection();
   Object.keys(clarityNonState).forEach(k=>delete clarityNonState[k]);
   Object.keys(clarityPathState).forEach(k=>delete clarityPathState[k]);
   buildClarityBank("non","clarityNonPathBank");
@@ -1070,6 +1221,7 @@ function resetClarity(){
   clearClarityMarks();
 }
 function showClarityAnswers(){
+  clearClarityTapSelection();
   clarityRows.forEach(row=>{
     cSet("non",cSlotKey("non",row.id),{value:row.nonpath});
     cSet("path",cSlotKey("path",row.id),{value:row.path});
