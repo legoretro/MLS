@@ -7294,7 +7294,7 @@ function renderQuizResults(el,isAll){
       </div>`:''}
     <div class="flex gap-8 mb-16 flex-wrap">
       ${isAll?`<button class="btn btn-primary" onclick="startAllExam()">Retake Simulator</button>`:`<button class="btn btn-primary" onclick="${appState.view==='monster_mix'?'resetMonsterMixQuiz()':"switchTab('quiz')"}">New Quiz</button>`}
-      <button class="btn btn-warn" onclick="exportResultsPDF(${isAll?'true':'false'})">📄 Export Current Results</button>
+      <button class="btn btn-warn" onclick="openResultsExportOptions(${isAll?'true':'false'})">📄 Export Current Results</button>
       ${missed.length?`<button class="btn btn-success" onclick="retryMissedQuestions(${isAll?'true':'false'})">↻ Retry Missed</button>`:''}
       ${isAll&&missed.length?`<button class="btn btn-ghost btn-sm" onclick="exportFromResults()">📊 Export Missed CSV</button>`:''}
     </div>
@@ -7340,7 +7340,28 @@ function retryMissedQuestions(isAll=false){
   renderTab();
 }
 
-function exportResultsPDF(isAll=false){
+function openResultsExportOptions(isAll=false){
+  const modal=document.getElementById('condition-modal');
+  const body=document.getElementById('condition-modal-body');
+  if(!modal||!body)return;
+  body.innerHTML=`
+    <div class="flex-center gap-8 mb-16">
+      <div style="font-size:18px;font-weight:800;color:var(--text)">Export Current Results</div>
+      <button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:14px">Choose whether the PDF should include the book explanations beneath each missed question.</div>
+    <label style="display:flex;align-items:flex-start;gap:11px;padding:13px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer">
+      <input type="checkbox" id="results-export-explanations" checked style="width:18px;height:18px;flex:0 0 auto;margin-top:1px">
+      <span><strong style="display:block;color:var(--text);font-size:13px">Include explanations</strong><span style="display:block;color:var(--text3);font-size:12px;margin-top:3px">Uncheck for a shorter answer-review PDF.</span></span>
+    </label>
+    <div class="flex gap-8 mt-20">
+      <button class="btn btn-ghost" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-primary" type="button" onclick="exportResultsPDF(${isAll?'true':'false'},document.getElementById('results-export-explanations').checked)">📄 Generate PDF</button>
+    </div>`;
+  modal.classList.remove('hidden');
+}
+
+function exportResultsPDF(isAll=false,includeExplanations=true){
   const {qs,ans,missed,masteryQ,masteryTotal,mastered,pct,remainingKeys}=quizResultSnapshot(isAll);
   if(!qs||!qs.length){alert('No quiz results to export yet.');return;}
   const timeStr=isAll?fmtTime(appState.allSeconds):'';
@@ -7351,9 +7372,12 @@ function exportResultsPDF(isAll=false){
     let y=margin;
     const checkPage=(n=8)=>{if(y+n>pageH-margin){doc.addPage();y=margin;}};
     const writeText=(text,opts={})=>{
-      const {size=10,bold=false,color=[30,30,30],indent=0}=opts;
+      const {size=10,bold=false,color=[30,30,30],indent=0,spaceAfter=0}=opts;
       doc.setFontSize(size);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...color);
-      doc.splitTextToSize(String(text||''),cW-indent).forEach(l=>{checkPage(6);doc.text(l,margin+indent,y);y+=size*0.4+1.5;});
+      if(typeof doc.setCharSpace==='function')doc.setCharSpace(0);
+      const lineH=Math.max(4.1,size*0.4+1.35);
+      doc.splitTextToSize(String(text||'').replace(/\t/g,' '),cW-indent).forEach(line=>{checkPage(lineH+1);doc.text(line,margin+indent,y);y+=lineH;});
+      y+=spaceAfter;
     };
     doc.setFillColor(30,30,30);doc.rect(margin,y,cW,14,'F');
     doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
@@ -7405,16 +7429,12 @@ function exportResultsPDF(isAll=false){
     missed.forEach(({q,given},i)=>{
       checkPage(30);
       const sourceLabel=quizSourceLabel(q);
-      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(180,40,40);
-      doc.text(`${i+1}. Missed${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,margin,y);y+=5;
+      writeText(`${i+1}. Missed${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,{size:9,bold:true,color:[180,40,40],spaceAfter:1});
       writeText(questionPlainText(q),{size:9.5,bold:true,color:[20,20,20]});
-      doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(70,70,70);
-      checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
-      doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
-      checkPage(7);doc.text(`Correct: ${String(q['option_'+q.correct_answer]||'')}`,margin+4,y);y+=8;
-      if(quizBookExplanation(q)){
-        writeText(`Explanation: ${quizBookExplanation(q)}`,{size:8.5,color:[70,70,90],indent:4});
-        y+=3;
+      writeText(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,{size:9,color:[70,70,70],indent:4,spaceAfter:1});
+      writeText(`Correct: ${String(q['option_'+q.correct_answer]||'')}`,{size:9,bold:true,color:[20,120,60],indent:4,spaceAfter:3});
+      if(includeExplanations&&quizBookExplanation(q)){
+        writeText(`Explanation: ${quizBookExplanation(q)}`,{size:8.5,color:[70,70,90],indent:4,spaceAfter:3});
       }
     });
     const tot=doc.internal.getNumberOfPages();
@@ -7425,6 +7445,7 @@ function exportResultsPDF(isAll=false){
     }
     const subject=(isAll?'practice_exam_simulator':(appState.subject||'quiz')).replace(/[^a-z0-9_-]+/gi,'_');
     doc.save((isAll?'':'boc_')+subject+'_current_results_'+new Date().toISOString().slice(0,10)+'.pdf');
+    document.getElementById('condition-modal')?.classList.add('hidden');
   }catch(err){alert('PDF export failed: '+err.message);}
 }
 
