@@ -381,20 +381,21 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .study-template-section-title{padding:7px 12px;border-bottom:2px solid #111;background:#dedcc7;color:#111;font-family:var(--serif);font-size:19px;font-weight:800;line-height:1.1;text-align:center}
 .calc-template-group:not(:first-child) .study-template-section-title{border-top:2px solid #111}
 .calc-template-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
-.calc-template-cell{position:relative;display:flex;min-width:0;min-height:68px;padding:7px 10px 6px;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-bottom:2px solid #111;background:#fff;color:#111}
+.calc-template-cell{position:relative;display:flex;min-width:0;min-height:76px;padding:10px 12px 9px;flex-direction:column;align-items:center;justify-content:center;gap:7px;border-bottom:2px solid #111;background:#fff;color:#111}
 .calc-template-cell:nth-child(2){border-left:2px solid #111}
 .calc-template-cell-wide{grid-column:1/-1}
 .calc-template-cell-empty{background:#fff}
 .calc-template-row:last-child .calc-template-cell{border-bottom:0}
-.calc-template-name{width:100%;max-width:100%;font-family:var(--serif);font-size:16px;font-weight:800;line-height:1.08;text-align:center;text-wrap:balance;overflow-wrap:anywhere}
-.calc-template-equation{display:flex;width:100%;min-width:0;align-items:center;justify-content:center;padding:1px 0 0}
+.calc-template-name{width:100%;max-width:100%;font-family:var(--serif);font-size:16px;font-weight:800;line-height:1.12;text-align:center;text-wrap:balance;overflow-wrap:anywhere}
+.calc-template-equation{display:flex;width:100%;min-width:0;align-items:center;justify-content:center;padding:2px 0}
 .calc-template-equation .calc-formula-board{justify-content:center;width:100%;max-width:100%;min-width:0;overflow-x:auto;color:#111;font-family:var(--serif);scrollbar-width:thin}
 .calc-template-equation .calc-equation-label,.calc-template-equation .calc-equation-text,.calc-template-equation .calc-expression,.calc-template-equation .calc-inline-fraction-top,.calc-template-equation .calc-inline-fraction-bottom,.calc-template-equation .calc-fraction-top,.calc-template-equation .calc-fraction-bottom{color:#111;font-family:var(--serif);font-weight:650}
-.calc-template-equation .calc-equation-text{width:100%;min-width:0;white-space:normal;text-align:center;overflow-wrap:anywhere}
+.calc-template-equation .calc-equation-text{width:auto;min-width:0;white-space:normal;text-align:center;overflow-wrap:anywhere}
+.calc-template-equation .calc-formula-board>.calc-equation-text:only-child{width:100%}
 .calc-template-equation .calc-equals{color:#111}
 .calc-template-equation .calc-inline-fraction-top,.calc-template-equation .calc-fraction-top{border-bottom-color:#111}
 .calc-template-admin{position:absolute;right:5px;top:4px;display:flex;gap:3px;z-index:2}
-.calc-template-cell.is-admin{padding-top:31px;cursor:grab}
+.calc-template-cell.is-admin{padding-top:38px;cursor:grab}
 .calc-template-cell.is-admin:active{cursor:grabbing}
 .calc-template-cell.is-dragging{opacity:.48;background:#fff8d8}
 .calc-template-cell.is-drag-target{box-shadow:inset 0 0 0 4px #d6a800}
@@ -447,8 +448,8 @@ button.calc-example-cell{appearance:none;cursor:pointer}
   .study-template-title{padding:8px 10px;font-size:19px}
   .study-template-section-title{padding:6px 8px;font-size:16px}
   .calc-template-row{grid-template-columns:1fr}
-  .calc-template-cell{min-height:66px;padding:7px 8px 6px}
-  .calc-template-cell.is-admin{padding-top:32px}
+  .calc-template-cell{min-height:72px;padding:9px 8px 8px;gap:6px}
+  .calc-template-cell.is-admin{padding-top:38px}
   .calc-template-cell:nth-child(2){border-left:0}
   .calc-template-cell-empty{display:none}
   .calc-template-row:last-child .calc-template-cell:first-child:not(:last-child){border-bottom:2px solid #111}
@@ -1582,7 +1583,10 @@ body:not(.light-mode) .practice-exam-toolbar{background:rgba(20,23,32,.88);borde
   z-index:580;
   display:flex;
   align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
   gap:8px;
+  max-width:calc(100vw - 20px);
   background:rgba(255,255,255,.90);
   border:1px solid rgba(255,255,255,.55);
   border-radius:16px;
@@ -1606,6 +1610,15 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
 .quiz-audio-btn.is-on{background:var(--accent);border-color:var(--accent);color:#fff}
 .quiz-mood-switch{display:flex;align-items:center;padding:8px 11px;border:1px solid #d0a400;border-radius:12px;background:#ffd84d;color:#3b2d00;font-size:12px;font-weight:850;white-space:nowrap;cursor:pointer}
 .quiz-mood-switch:hover{background:#ffca24}
+.quiz-theme-switch{display:flex;align-items:center;padding:8px 11px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:12px;font-weight:850;white-space:nowrap;cursor:pointer}
+.quiz-theme-switch:hover{background:var(--bg3)}
+.quiz-accuracy-badge{display:inline-flex;align-items:center;justify-content:center;min-width:76px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap;border:1px solid transparent}
+.quiz-accuracy-low{background:#ffe2e5;color:#a51f2d;border-color:#e9a1aa}
+.quiz-accuracy-mid{background:#fff1b8;color:#705500;border-color:#d8b842}
+.quiz-accuracy-high{background:#d9f5e6;color:#17633f;border-color:#76c59a}
+body:not(.light-mode) .quiz-accuracy-low{background:#5e2028;color:#ffd6dc;border-color:#943947}
+body:not(.light-mode) .quiz-accuracy-mid{background:#5b490a;color:#fff0a8;border-color:#927724}
+body:not(.light-mode) .quiz-accuracy-high{background:#174d35;color:#d8ffea;border-color:#2f7e59}
 .quiz-mood-menu{position:absolute;right:0;top:calc(100% + 8px);width:min(280px,calc(100vw - 20px));padding:7px;border:1px solid var(--border);border-radius:14px;background:var(--bg2);box-shadow:0 18px 42px rgba(20,28,54,.24)}
 .quiz-mood-option{display:flex;width:100%;align-items:center;gap:9px;padding:9px 10px;border:0;border-radius:9px;background:transparent;color:var(--text);font-size:12px;font-weight:750;text-align:left;cursor:pointer}
 .quiz-mood-option:hover,.quiz-mood-option.is-active{background:color-mix(in srgb,#ffd84d 28%,var(--bg3))}
@@ -1625,6 +1638,7 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
   .bbq-opt{min-height:66px;font-size:15px;padding:15px 16px}
   .practice-exam-toolbar{align-items:stretch;flex-direction:column}
   .quiz-mini-note{display:none}
+  .quiz-accuracy-badge{order:2;min-width:68px;padding:4px 7px}
   .quiz-audio-dock{right:10px;top:auto;bottom:12px}
   .quiz-mood-menu{top:auto;bottom:calc(100% + 8px)}
   .bbq-overlay::before{
@@ -3672,14 +3686,14 @@ const CALC_PLACEHOLDERS=[
   {id:'builtin-calc-crcl',type:'calc',_placeholder:true,name:'Creatinine Clearance',category:'Chemistry',result_label:'CrCl',numerator:'Urine creatinine x urine volume (mL per min)',denominator:'Serum creatinine',steps:['Convert timed urine volume to mL per minute first.'],notes:'May be normalized to body surface area depending on assignment.',example:'Use timed urine volume, urine creatinine, and serum creatinine.'},
   {id:'builtin-calc-ldl',type:'calc',_placeholder:true,name:'LDL Cholesterol (Friedewald)',category:'Chemistry',steps:['LDL = total cholesterol - HDL - (triglycerides/5)'],notes:'',example:'TC 200, HDL 50, TG 150 -> LDL 120 mg/dL'},
   {id:'builtin-calc-transferrin-sat',type:'calc',_placeholder:true,name:'Percent Transferrin Saturation',category:'Chemistry',result_label:'% Saturation',numerator:'Serum iron',denominator:'TIBC',multiplier:'100',steps:['Serum iron / TIBC x 100'],notes:'Often used with ferritin, TIBC, and clinical picture.',example:'Iron 80, TIBC 320 -> 25%'},
-  {id:'builtin-calc-uibc',type:'calc',_placeholder:true,name:'UIBC & TIBC',category:'Chemistry',steps:['UIBC = TIBC - serum iron; TIBC = serum iron + UIBC'],notes:'',example:''},
+  {id:'builtin-calc-uibc',type:'calc',_placeholder:true,name:'UIBC & TIBC',category:'Chemistry',steps:['UIBC = TIBC - serum iron','TIBC = serum iron + UIBC'],notes:'',example:''},
   {id:'builtin-calc-indirect-bilirubin',type:'calc',_placeholder:true,name:'Unconjugated (Indirect) Bilirubin',category:'Chemistry',steps:['Indirect bilirubin = total bilirubin - direct bilirubin'],notes:'',example:''},
   {id:'builtin-calc-non-hdl',type:'calc',_placeholder:true,name:'Non-HDL Cholesterol',category:'Chemistry',steps:['Non-HDL = total cholesterol - HDL'],notes:'',example:''},
   {id:'builtin-calc-ag-ratio',type:'calc',_placeholder:true,name:'Albumin-Globulin Ratio (A:G)',category:'Chemistry',result_label:'A:G ratio',numerator:'Albumin',denominator:'Globulin',steps:[],notes:'',example:''},
   {id:'builtin-calc-timed-urine',type:'calc',_placeholder:true,name:'Timed Urine Flow Rate',category:'Chemistry',result_label:'Urine flow',numerator:'Total urine volume',denominator:'Collection time (minutes)',steps:[],notes:'',example:''},
   {id:'builtin-calc-henderson-hasselbalch',type:'calc',_placeholder:true,name:'Henderson-Hasselbalch Equation',category:'Chemistry',steps:['pH = 6.1 + log of bicarbonate over 0.03 x pCO2'],notes:'Blood-gas form of the Henderson-Hasselbalch equation.',example:''},
-  {id:'builtin-calc-ph-hydrogen',type:'calc',_placeholder:true,name:'pH & Hydrogen Ion Concentration',category:'Chemistry',steps:['pH = -log10[H+]; [H+] = 10^-pH'],notes:'',example:''},
-  {id:'builtin-calc-egfr',type:'calc',_placeholder:true,name:'Estimated GFR (2021 CKD-EPI)',category:'Chemistry',steps:['eGFR uses SCr over k in the 2021 CKD-EPI equation','k = 0.7 female or 0.9 male; a = -0.241 female or -0.302 male'],notes:'SCr in mg per dL; eGFR in mL per min per 1.73 m^2.',example:''},
+  {id:'builtin-calc-ph-hydrogen',type:'calc',_placeholder:true,name:'pH & Hydrogen Ion Concentration',category:'Chemistry',steps:['pH = -log10[H+]','[H+] = 10^-pH'],notes:'',example:''},
+  {id:'builtin-calc-egfr',type:'calc',_placeholder:true,name:'Estimated Glomerular Filtration Rate (eGFR)',category:'Chemistry',steps:['eGFR uses SCr over k in the 2021 CKD-EPI equation','k = 0.7 female or 0.9 male; a = -0.241 female or -0.302 male'],notes:'2021 CKD-EPI equation. SCr in mg per dL; eGFR in mL per min per 1.73 m^2.',example:''},
   {id:'builtin-calc-wbc-manual',type:'calc',_placeholder:true,name:'WBC Manual Count * Hemocytometer',category:'Hematology',result_label:'WBC count',numerator:'Average cells x dilution',denominator:'Area x depth (volume)',steps:[],notes:'',example:''},
   {id:'builtin-calc-rbc-manual',type:'calc',_placeholder:true,name:'RBC Manual Count * Hemocytometer',category:'Hematology',result_label:'RBC count',numerator:'Average cells x dilution',denominator:'Area x depth (volume)',steps:[],notes:'',example:''},
   {id:'builtin-calc-plt-manual',type:'calc',_placeholder:true,name:'Platelet Manual Count * Hemocytometer',category:'Hematology',result_label:'PLT count',numerator:'Average cells x dilution',denominator:'Area x depth (volume)',steps:[],notes:'',example:''},
@@ -3906,7 +3920,7 @@ let appState = {
   _quizResultMap:{} // idx -> 'right'|'wrong'
 };
 
-let quizAudio={ctx:null,master:null,source:null,audio:null,customUrls:{},customReady:{},metas:{},metasLoaded:false,metaPromise:null,slot:1,on:false};
+let quizAudio={ctx:null,master:null,source:null,audio:null,customUrls:{},customReady:{},metas:{},metasLoaded:false,cloudLoaded:false,cloudSyncing:false,metaPromise:null,slot:1,on:false};
 
 function activeQuizOverlay(){
   const overlay=document.querySelector('.bbq-overlay');
@@ -3960,12 +3974,14 @@ function syncQuizShell(){
         <span id="quiz-audio-icon">♪</span><span id="quiz-audio-label">Off</span>
       </button>
       <button class="quiz-mood-switch" type="button" onclick="toggleQuizMoodMenu()">Switch Mood</button>
+      <button class="quiz-theme-switch" id="quiz-theme-btn" type="button" onclick="toggleTheme()">🌙 Dark</button>
       <div class="quiz-mood-menu hidden" id="quiz-mood-menu"></div>`;
     overlay.appendChild(dock);
   }else if(dock.parentElement!==overlay){
     overlay.appendChild(dock);
   }
   updateQuizMusicButton();
+  updateThemeButton();
   loadQuizMoodMetas().then(()=>updateQuizMusicButton()).catch(error=>console.warn('Mood metadata load failed',error));
 }
 
@@ -3997,22 +4013,31 @@ async function openQuizMoodNames(){
   modal.classList.remove('hidden');
 }
 async function saveQuizMoodNames(){
-  const metas=quizMoodMetas();
-  for(const slot of [1,2,3]){
-    const meta=metas[String(slot)];
-    if(!meta)continue;
-    const title=document.getElementById(`quiz-mood-name-${slot}`)?.value.trim()||meta.name||`Mood ${slot}`;
-    metas[String(slot)]={...meta,title};
-    const storageKey=meta.storageKey||quizMusicStorageKey(slot);
-    const record=await quizMusicStore('readonly',store=>store.get(storageKey));
-    if(record)await quizMusicStore('readwrite',store=>store.put({...record,title},storageKey));
+  try{
+    const metas=quizMoodMetas();
+    for(const slot of [1,2,3]){
+      const meta=metas[String(slot)];
+      if(!meta)continue;
+      const title=document.getElementById(`quiz-mood-name-${slot}`)?.value.trim()||meta.name||`Mood ${slot}`;
+      metas[String(slot)]={...meta,title};
+      const storageKey=meta.storageKey||quizMusicStorageKey(slot);
+      const record=await quizMusicStore('readonly',store=>store.get(storageKey));
+      if(record)await quizMusicStore('readwrite',store=>store.put({...record,title},storageKey));
+      if(meta.cloudId&&sb){
+        const {error}=await sb.from('mlsboc_cases').update({title}).eq('id',meta.cloudId);
+        if(error)throw error;
+      }
+    }
+    quizAudio.metas={...metas};
+    safeLocalRemove(QUIZ_MUSIC_META_KEY);
+    document.getElementById('condition-modal').classList.add('hidden');
+    setMediaStatus('mood names saved');
+    renderQuizMoodMenu();
+    updateQuizMusicButton();
+  }catch(error){
+    console.warn('Mood name save failed',error);
+    alert('Mood names could not be saved: '+(error.message||error));
   }
-  quizAudio.metas={...metas};
-  safeLocalRemove(QUIZ_MUSIC_META_KEY);
-  document.getElementById('condition-modal').classList.add('hidden');
-  setMediaStatus('mood names saved');
-  renderQuizMoodMenu();
-  updateQuizMusicButton();
 }
 function renderQuizMoodMenu(){
   const menu=document.getElementById('quiz-mood-menu');
@@ -4097,6 +4122,7 @@ const QUIZ_MUSIC_META_KEY='mlsboc_quiz_music_meta';
 const QUIZ_MUSIC_VOLUME_KEY='mlsboc_quiz_music_volume';
 const QUIZ_MUSIC_ACTIVE_KEY='mlsboc_quiz_music_active';
 const QUIZ_MUSIC_MAX_SIZE=12*1024*1024;
+const QUIZ_MUSIC_CLOUD_SUBJECT='quiz_mood_audio';
 
 function safeLocalGet(key){
   try{return localStorage.getItem(key)||'';}catch(error){return '';}
@@ -4138,6 +4164,7 @@ function refreshQuizMediaAdminUi(){
   loadQuizMoodMetas().then(metas=>{
     const loaded=Object.keys(metas).length;
     if(loaded)setMediaStatus(`${loaded} mood${loaded===1?'':'s'} loaded`);
+    syncLocalQuizMoodsToCloud();
   }).catch(error=>console.warn('Mood metadata load failed',error));
 }
 
@@ -4167,6 +4194,64 @@ async function quizMusicStore(mode,fn){
   });
 }
 
+function quizBlobDataUrl(blob){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||''));
+    reader.onerror=()=>reject(reader.error||new Error('Could not read the song.'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function saveQuizMoodToCloud(slot,record,preferredTitle=''){
+  if(!sb)throw new Error('The shared library is not connected yet.');
+  const dataUrl=await quizBlobDataUrl(record.blob);
+  const groupLabel=String(quizMusicSlot(slot));
+  const {data:existing,error:findError}=await sb.from('mlsboc_cases').select('id').eq('subject',QUIZ_MUSIC_CLOUD_SUBJECT).eq('group_label',groupLabel).limit(1);
+  if(findError)throw findError;
+  const payload={
+    subject:QUIZ_MUSIC_CLOUD_SUBJECT,
+    title:preferredTitle||record.title||record.name||`Mood ${slot}`,
+    scenario:dataUrl,
+    answer:record.name||`Mood ${slot}`,
+    images:[],
+    group_label:groupLabel,
+    case_data:record.type||record.blob?.type||'audio/mpeg',
+    steps:'[]',
+    is_draft:false
+  };
+  const currentId=existing?.[0]?.id;
+  const result=currentId
+    ?await sb.from('mlsboc_cases').update(payload).eq('id',currentId).select('id').single()
+    :await sb.from('mlsboc_cases').insert(payload).select('id').single();
+  if(result.error)throw result.error;
+  return result.data?.id||currentId||'';
+}
+
+async function syncLocalQuizMoodsToCloud(){
+  if(!isAdmin||!sb||quizAudio.cloudSyncing)return;
+  quizAudio.cloudSyncing=true;
+  try{
+    for(const slot of [1,2,3]){
+      const meta=quizMoodMetas()[String(slot)];
+      if(!meta||meta.cloudId)continue;
+      const storageKey=meta.storageKey||quizMusicStorageKey(slot);
+      const record=await quizMusicStore('readonly',store=>store.get(storageKey));
+      if(!record?.blob)continue;
+      setMediaStatus(`syncing Mood ${slot} to mobile...`);
+      const cloudId=await saveQuizMoodToCloud(slot,record,meta.title);
+      quizAudio.metas[String(slot)]={...meta,cloudId,cloud:true};
+    }
+    quizAudio.cloudLoaded=true;
+    if(Object.keys(quizMoodMetas()).length)setMediaStatus('moods synced for mobile');
+  }catch(error){
+    console.warn('Mobile mood sync failed',error);
+    setMediaStatus('mobile mood sync needs attention');
+  }finally{
+    quizAudio.cloudSyncing=false;
+  }
+}
+
 function legacyQuizMoodMetas(){
   try{
     const parsed=JSON.parse(safeLocalGet(QUIZ_MUSIC_META_KEY)||'{}');
@@ -4177,7 +4262,7 @@ function legacyQuizMoodMetas(){
 }
 
 async function loadQuizMoodMetas(force=false){
-  if(quizAudio.metasLoaded&&!force)return quizMoodMetas();
+  if(quizAudio.metasLoaded&&(!sb||quizAudio.cloudLoaded)&&!force)return quizMoodMetas();
   if(quizAudio.metaPromise&&!force)return quizAudio.metaPromise;
   quizAudio.metaPromise=(async()=>{
     const legacy=legacyQuizMoodMetas();
@@ -4199,6 +4284,18 @@ async function loadQuizMoodMetas(force=false){
       }
       metas[String(slot)]={name,title,size:record.size||record.blob?.size||0,type:record.type||record.blob?.type||'',storageKey};
     }
+    if(sb){
+      const {data:cloudRows,error}=await sb.from('mlsboc_cases').select('id,title,answer,case_data,group_label').eq('subject',QUIZ_MUSIC_CLOUD_SUBJECT);
+      if(error)console.warn('Shared mood metadata load failed',error);
+      else{
+        (cloudRows||[]).forEach(row=>{
+          const slot=quizMusicSlot(row.group_label);
+          const local=metas[String(slot)]||{};
+          metas[String(slot)]={...local,name:row.answer||local.name||`Mood ${slot}`,title:row.title||local.title||row.answer||`Mood ${slot}`,type:row.case_data||local.type||'audio/mpeg',cloudId:row.id,cloud:true};
+        });
+        quizAudio.cloudLoaded=true;
+      }
+    }
     quizAudio.metas=metas;
     quizAudio.metasLoaded=true;
     safeLocalRemove(QUIZ_MUSIC_META_KEY);
@@ -4212,6 +4309,17 @@ async function loadQuizMusicUrl(slot=getQuizMusicActiveSlot()){
   slot=quizMusicSlot(slot);
   if(quizAudio.customUrls[slot])return quizAudio.customUrls[slot];
   try{
+    await loadQuizMoodMetas();
+    const meta=quizMoodMetas()[String(slot)];
+    if(meta?.cloudId&&sb){
+      const {data,error}=await sb.from('mlsboc_cases').select('scenario').eq('id',meta.cloudId).single();
+      if(!error&&String(data?.scenario||'').startsWith('data:')){
+        quizAudio.customUrls[slot]=data.scenario;
+        quizAudio.customReady[slot]=true;
+        return quizAudio.customUrls[slot];
+      }
+      if(error)console.warn('Shared mood audio load failed',error);
+    }
     let storageKey=quizMusicStorageKey(slot);
     let rec=await quizMusicStore('readonly',store=>store.get(storageKey));
     if(!rec&&slot===1){
@@ -4313,10 +4421,19 @@ async function handleQuizMusicFile(e,slot=1){
     quizAudio.metas[String(slot)]={name,title,size:file.size,type:file.type||'',storageKey};
     quizAudio.metasLoaded=true;
     safeLocalRemove(QUIZ_MUSIC_META_KEY);
+    try{
+      setMediaStatus(`syncing Mood ${slot} to mobile...`);
+      const cloudId=await saveQuizMoodToCloud(slot,{blob:file,name,title,type:file.type||'audio/mpeg',size:file.size},title);
+      quizAudio.metas[String(slot)]={...quizAudio.metas[String(slot)],cloudId,cloud:true};
+      quizAudio.cloudLoaded=true;
+    }catch(cloudError){
+      console.warn('Shared mood upload failed',cloudError);
+      alert('The song was saved in this browser, but mobile sync failed: '+(cloudError.message||cloudError));
+    }
     if(quizAudio.customUrls[slot]){URL.revokeObjectURL(quizAudio.customUrls[slot]);delete quizAudio.customUrls[slot];}
     delete quizAudio.customReady[slot];
     if(quizAudio.on&&quizAudio.slot===slot){stopQuizMusic(false);await startQuizMusic(slot);}
-    setMediaStatus(`Mood ${slot} saved`);
+    setMediaStatus(quizAudio.metas[String(slot)]?.cloudId?`Mood ${slot} saved for all devices`:`Mood ${slot} saved on this browser`);
     renderQuizMoodMenu();
     if(e.target)e.target.value='';
   }catch(err){
@@ -4338,10 +4455,14 @@ async function resetQuizMusic(){
     for(const key of [QUIZ_MUSIC_LEGACY_KEY,quizMusicStorageKey(1),quizMusicStorageKey(2),quizMusicStorageKey(3)]){
       await quizMusicStore('readwrite',store=>store.delete(key));
     }
+    if(sb&&isAdmin){
+      const {error}=await sb.from('mlsboc_cases').delete().eq('subject',QUIZ_MUSIC_CLOUD_SUBJECT);
+      if(error)throw error;
+    }
     safeLocalRemove(QUIZ_MUSIC_META_KEY);
     safeLocalRemove(QUIZ_MUSIC_ACTIVE_KEY);
     Object.values(quizAudio.customUrls).forEach(url=>{try{URL.revokeObjectURL(url);}catch(error){}});
-    quizAudio.customUrls={};quizAudio.customReady={};quizAudio.metas={};quizAudio.metasLoaded=true;quizAudio.slot=1;
+    quizAudio.customUrls={};quizAudio.customReady={};quizAudio.metas={};quizAudio.metasLoaded=true;quizAudio.cloudLoaded=true;quizAudio.slot=1;
     setMediaStatus('all moods reset');
     renderQuizMoodMenu();
   }catch(err){
@@ -6564,7 +6685,7 @@ async function renderQuizTab(el){
         <button class="btn btn-ghost btn-sm" onclick="${appState.view==='monster_mix'?'resetMonsterMixQuiz()':"switchTab('quiz')"}">✕ Exit</button>
         <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${replaceDisabled?'disabled':''} title="${replaceTitle}"><span class="replace-wide">Already Mastered, Replace Question</span><span class="replace-short">Replace</span></button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <span class="quiz-mini-note">seen ${quizSeenCount(q)}x</span>
+        ${quizSessionAccuracyBadge()}
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
       </div>
       <div class="bbq-body">
@@ -6985,6 +7106,20 @@ function toggleSubjectQuizAll(useAll,total){
 
 const QUIZ_SEEN_KEY='mlsboc_quiz_seen_counts';
 function quizQuestionKey(q){return q?.id||`${q?.subject||appState.subject||'subject'}:${cleanQuestionText(q||'').slice(0,120)}`;}
+function quizSessionAccuracy(){
+  let answered=0,correct=0;
+  (appState.quizAns||[]).forEach((answer,index)=>{
+    if(!answer)return;
+    answered++;
+    if(answer===appState.quizQ?.[index]?.correct_answer)correct++;
+  });
+  return {answered,correct,pct:answered?Math.round(correct/answered*100):0};
+}
+function quizSessionAccuracyBadge(){
+  const score=quizSessionAccuracy();
+  const level=score.pct>=75?'high':score.pct>=50?'mid':'low';
+  return `<span class="quiz-accuracy-badge quiz-accuracy-${level}" title="${score.correct} correct out of ${score.answered} answered">${score.pct}% right</span>`;
+}
 function quizSeenCounts(){
   try{return JSON.parse(localStorage.getItem(QUIZ_SEEN_KEY)||'{}')||{};}catch{return {};}
 }
@@ -12353,6 +12488,7 @@ function splitFormulaRows(allRows){
 }
 
 async function renderFormulasView(v){
+  await loadCalcSavedOrder();
   // Fetch all rows then split by type — works even if 'type' column not yet added to Supabase
   let calcData=[],rrData=[];
   try{
@@ -12401,6 +12537,8 @@ function formulaCategoryColor(category){
 }
 
 const CALC_ORDER_STORAGE_KEY='mlsboc_calc_formula_order_v1';
+const CALC_ORDER_DB_KEY='calc_formula_order';
+const CALC_ORDER_CLOUD_SUBJECT='formula_order_config';
 const CALC_DEFAULT_ORDER=[
   'builtin-calc-wbc-manual','builtin-calc-rbc-manual','builtin-calc-plt-manual','builtin-calc-absolute-cell',
   'builtin-calc-mcv','builtin-calc-mch','builtin-calc-mchc','builtin-calc-corrected-wbc',
@@ -12418,10 +12556,54 @@ function calcFormulaOrderKey(item){
   return formulaBuiltinOrigin(item)||`custom:${String(item?.id||'')}::${String(item?.name||'').toLowerCase()}`;
 }
 function calcSavedOrder(){
+  if(window._calcSavedOrderLoaded)return window._calcSavedOrder||[];
   try{
-    const value=JSON.parse(localStorage.getItem(CALC_ORDER_STORAGE_KEY)||'[]');
+    const value=JSON.parse(safeLocalGet(CALC_ORDER_STORAGE_KEY)||'[]');
     return Array.isArray(value)?value.map(String):[];
   }catch(error){return [];}
+}
+async function loadCalcSavedOrder(){
+  if(window._calcSavedOrderLoaded)return calcSavedOrder();
+  const legacy=calcSavedOrder();
+  try{
+    const record=await quizMusicStore('readonly',store=>store.get(CALC_ORDER_DB_KEY));
+    let keys=Array.isArray(record?.keys)?record.keys.map(String):legacy;
+    if(sb){
+      const {data,error}=await sb.from('mlsboc_cases').select('id,scenario').eq('subject',CALC_ORDER_CLOUD_SUBJECT).eq('group_label','calc').limit(1);
+      if(error)console.warn('Shared formula order load failed',error);
+      else if(data?.[0]){
+        window._calcOrderCloudId=data[0].id;
+        try{
+          const cloudKeys=JSON.parse(data[0].scenario||'[]');
+          if(Array.isArray(cloudKeys))keys=cloudKeys.map(String);
+        }catch(error){console.warn('Shared formula order was invalid',error);}
+      }
+    }
+    window._calcSavedOrder=keys;
+    window._calcSavedOrderLoaded=true;
+    if(!record&&keys.length)await quizMusicStore('readwrite',store=>store.put({keys,updatedAt:new Date().toISOString()},CALC_ORDER_DB_KEY));
+    if(isAdmin&&!window._calcOrderCloudId&&keys.length)saveCalcOrderToCloud(keys);
+    safeLocalRemove(CALC_ORDER_STORAGE_KEY);
+    return keys;
+  }catch(error){
+    window._calcSavedOrder=legacy;
+    window._calcSavedOrderLoaded=true;
+    return legacy;
+  }
+}
+async function saveCalcOrderToCloud(keys){
+  if(!isAdmin||!sb)return;
+  const payload={subject:CALC_ORDER_CLOUD_SUBJECT,title:'Calculation formula order',scenario:JSON.stringify(keys||[]),answer:'',images:[],group_label:'calc',case_data:'',steps:'[]',is_draft:false};
+  if(!window._calcOrderCloudId){
+    const {data,error}=await sb.from('mlsboc_cases').select('id').eq('subject',CALC_ORDER_CLOUD_SUBJECT).eq('group_label','calc').limit(1);
+    if(error)throw error;
+    window._calcOrderCloudId=data?.[0]?.id||'';
+  }
+  const result=window._calcOrderCloudId
+    ?await sb.from('mlsboc_cases').update(payload).eq('id',window._calcOrderCloudId).select('id').single()
+    :await sb.from('mlsboc_cases').insert(payload).select('id').single();
+  if(result.error)throw result.error;
+  window._calcOrderCloudId=result.data?.id||window._calcOrderCloudId;
 }
 function sortCalcGroupItems(items){
   const saved=calcSavedOrder();
@@ -12456,7 +12638,11 @@ function calcFormulaGroups(items){
 
 function calcSaveGroupOrder(groups){
   const keys=(groups||[]).flatMap(group=>group.items.map(calcFormulaOrderKey));
-  localStorage.setItem(CALC_ORDER_STORAGE_KEY,JSON.stringify(keys));
+  window._calcSavedOrder=keys;
+  window._calcSavedOrderLoaded=true;
+  safeLocalRemove(CALC_ORDER_STORAGE_KEY);
+  quizMusicStore('readwrite',store=>store.put({keys,updatedAt:new Date().toISOString()},CALC_ORDER_DB_KEY)).catch(error=>console.warn('Formula order save failed',error));
+  saveCalcOrderToCloud(keys).catch(error=>{console.warn('Shared formula order save failed',error);alert('The formula moved here, but its shared order could not be saved: '+(error.message||error));});
 }
 function calcMoveFormula(key,groupName,direction){
   const groups=calcFormulaGroups(window._calcOrderItems||[]);
@@ -12503,8 +12689,16 @@ function calcDropFormula(event,targetKey,targetGroup){
   calcDragEnd();
   renderView();
 }
-function calcResetOrder(){
-  localStorage.removeItem(CALC_ORDER_STORAGE_KEY);
+async function calcResetOrder(){
+  window._calcSavedOrder=[];
+  window._calcSavedOrderLoaded=true;
+  safeLocalRemove(CALC_ORDER_STORAGE_KEY);
+  try{await quizMusicStore('readwrite',store=>store.delete(CALC_ORDER_DB_KEY));}catch(error){console.warn('Formula order reset failed',error);}
+  if(sb&&isAdmin){
+    const {error}=await sb.from('mlsboc_cases').delete().eq('subject',CALC_ORDER_CLOUD_SUBJECT).eq('group_label','calc');
+    if(error){alert('The local order reset, but the shared order could not be reset: '+error.message);return;}
+  }
+  window._calcOrderCloudId='';
   renderView();
 }
 
@@ -12517,7 +12711,7 @@ function renderCalcTab(cats,all){
     const adminDrag=isAdmin?` draggable="true" ondragstart="calcDragStart(event,'${jsAttr(key)}','${jsAttr(groupName)}')" ondragover="calcDragOver(event)" ondrop="calcDropFormula(event,'${jsAttr(key)}','${jsAttr(groupName)}')" ondragend="calcDragEnd()"`:'';
     return `<article class="calc-template-cell${wide?' calc-template-cell-wide':''}${isAdmin?' is-admin':''}"${adminDrag}>
     ${isAdmin?`<span class="calc-template-admin"><span class="calc-order-grip" title="Drag to reorder" aria-label="Drag to reorder">↕</span><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move up" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',-1)">↑</button><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move down" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',1)">↓</button><button class="btn btn-ghost btn-xs" type="button" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>${!f._placeholder?`<button class="btn btn-danger btn-xs" type="button" onclick="deleteFormula('${f.id}')">Delete</button>`:''}</span>`:''}
-    <div class="calc-template-name">${esc(f.name)}</div>
+    <div class="calc-template-name">${esc(calcDisplayName(f))}</div>
     <div class="calc-template-equation">${renderCalcEquationCell(f)}</div>
   </article>`;};
   return `<section class="study-template-sheet calc-template-sheet">
@@ -12571,7 +12765,7 @@ function renderCalcExamplesTab(all,exampleMap){
     const tag=interactive?'button':'article';
     const action=hasExample?`openCalculationExample('${jsAttr(key)}')`:`openCalculationExampleEditor('${jsAttr(key)}')`;
     return `<${tag} class="calc-template-cell calc-example-cell${wide?' calc-template-cell-wide':''} ${hasExample?'has-example':isAdmin?'is-admin-empty':'is-empty'}" ${interactive?`type="button" onclick="${action}"`:''}>
-      <div class="calc-template-name">${esc(formula.name)}</div>
+      <div class="calc-template-name">${esc(calcDisplayName(formula))}</div>
       ${isAdmin?`<div class="calc-example-status">${hasExample?'Open / edit example':'+ Add example'}</div>`:''}
     </${tag}>`;
   };
@@ -12667,7 +12861,7 @@ function openCalculationExampleEditor(key){
   modal.classList.add('calculation-example-window');
   document.getElementById('condition-modal-body').innerHTML=`
     <div class="flex-center gap-8 mb-16">
-      <div><div class="text-xs text-muted" style="font-weight:800;letter-spacing:.08em;text-transform:uppercase">Admin - Calculation Example</div><div class="modal-title" style="margin:3px 0 0">${esc(formula.name)}</div></div>
+      <div><div class="text-xs text-muted" style="font-weight:800;letter-spacing:.08em;text-transform:uppercase">Admin - Calculation Example</div><div class="modal-title" style="margin:3px 0 0">${esc(calcDisplayName(formula))}</div></div>
       <button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="closeCalculationExampleWindow()">✕</button>
     </div>
     <div class="form-group"><label>Typed example or explanation</label><textarea id="calc-example-text" style="min-height:150px" placeholder="Type a worked example, explanation, or practice prompt...">${esc(row.scenario||'')}</textarea></div>
@@ -12713,6 +12907,16 @@ async function deleteCalculationExample(key){
 
 function calcFractionSpec(top,bottom){return {top:String(top||''),bottom:String(bottom||'')};}
 function calcTextSpec(text){return {text:String(text||'')};}
+function calcDisplayName(formula){
+  const origin=formulaBuiltinOrigin(formula);
+  const name=String(formula?.name||'');
+  if(origin==='builtin-calc-egfr'||/estimated\s+(?:gfr|glomerular filtration rate)/i.test(name))return 'Estimated Glomerular Filtration Rate (eGFR)';
+  return name;
+}
+function calcStepLines(formula,fallback=[]){
+  const source=(Array.isArray(formula?.steps)?formula.steps:[]).map(String).filter(Boolean);
+  return (source.length?source:fallback).flatMap(line=>String(line).split(/\s*;\s*|\s+\band\b\s+/i)).map(line=>line.trim()).filter(Boolean);
+}
 function calcHasCustomDisplayOverride(formula){
   const base=formulaBuiltinBase(formula);
   if(!base||formula?._placeholder)return false;
@@ -12723,10 +12927,12 @@ function calcHasCustomDisplayOverride(formula){
   return JSON.stringify(currentSteps)!==JSON.stringify(baseSteps);
 }
 function calcDisplaySpec(f){
-  if(calcHasCustomDisplayOverride(f))return null;
   const name=String(f?.name||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   const origin=formulaBuiltinOrigin(f);
   const matches=(id,text)=>origin===id||name.includes(text);
+  if(matches('builtin-calc-uibc','uibc tibc'))return calcStepLines(f,['UIBC = TIBC - serum iron','TIBC = serum iron + UIBC']).map(line=>[calcTextSpec(line)]);
+  if(matches('builtin-calc-ph-hydrogen','ph hydrogen ion concentration'))return calcStepLines(f,['pH = -log10[H+]','[H+] = 10^-pH']).map(line=>[calcTextSpec(line)]);
+  if(calcHasCustomDisplayOverride(f))return null;
   if(matches('builtin-calc-serum-osm','calculated serum osmolality'))return [[
     calcTextSpec('2(Na+) +'),calcFractionSpec('glucose','18'),calcTextSpec('+'),calcFractionSpec('BUN','2.8')
   ]];
@@ -12816,7 +13022,7 @@ function renderCalcCard(f,index=0){
     <article class="calc-card">
       <span class="calc-row-index">${String(index+1).padStart(2,'0')}</span>
       <div class="calc-card-head">
-        <span class="calc-card-title">${esc(f.name)}</span>
+        <span class="calc-card-title">${esc(calcDisplayName(f))}</span>
         ${isAdmin?`<div class="ml-auto flex gap-6">
           <button class="btn btn-ghost btn-xs" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>
           ${!f._placeholder?`<button class="btn btn-danger btn-xs" onclick="deleteFormula('${f.id}')">Delete</button>`:''}
@@ -13013,12 +13219,12 @@ function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
   if(!spec?.length)return false;
   spec.forEach((line,lineIndex)=>{
     const isMultiLine=spec.length>1;
-    let fontSize=isMultiLine?5.45:7.2;
-    const gap=isMultiLine?.8:1.1;
-    const lineGap=isMultiLine?3.2:3;
-    const topOffset=isMultiLine?-.55:-.75;
-    const bottomOffset=isMultiLine?1.2:1.55;
-    const textOffset=isMultiLine?.3:.65;
+    let fontSize=isMultiLine?5.15:6.7;
+    const gap=isMultiLine?.75:1;
+    const lineGap=isMultiLine?2.75:2.8;
+    const topOffset=isMultiLine?-.45:-.6;
+    const bottomOffset=isMultiLine?.95:1.15;
+    const textOffset=isMultiLine?.25:.45;
     const pdfText=value=>String(value||'').replace(/−/g,'-').replace(/×/g,'x').replace(/√/g,'sqrt');
     const measure=()=>{
       doc.setFont('times','bold');doc.setFontSize(fontSize);
@@ -13061,7 +13267,7 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
     const denominator=String(f.denominator||'...');
     const multiplier=f.multiplier?'x '+String(f.multiplier):'';
     const gap=2.1;
-    let fontSize=8.35;
+    let fontSize=7.45;
     const measure=()=>{
       doc.setFont('times','bold');doc.setFontSize(fontSize);
       const labelW=doc.getTextWidth(label);
@@ -13075,15 +13281,15 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
     if(sizes.total>w-4){fontSize=Math.max(5.7,fontSize*((w-4)/sizes.total));sizes=measure();}
     let cursor=x+Math.max(2,(w-sizes.total)/2);
     doc.setFont('times','bold');doc.setFontSize(fontSize);doc.setTextColor(0,0,0);
-    doc.text(label,cursor,formulaY+.8);cursor+=sizes.labelW+gap;
-    doc.text('=',cursor,formulaY+.8);cursor+=sizes.equalsW+gap;
+    doc.text(label,cursor,formulaY+.45);cursor+=sizes.labelW+gap;
+    doc.text('=',cursor,formulaY+.45);cursor+=sizes.equalsW+gap;
     const fracMid=cursor+sizes.fracW/2;
     doc.setTextColor(0,0,0);
-    doc.text(numerator,fracMid,formulaY-1.3,{align:'center'});
-    doc.text(denominator,fracMid,formulaY+2.5,{align:'center'});
+    doc.text(numerator,fracMid,formulaY-.95,{align:'center'});
+    doc.text(denominator,fracMid,formulaY+1.75,{align:'center'});
     doc.setDrawColor(...color);doc.setLineWidth(.42);doc.line(cursor,formulaY,cursor+sizes.fracW,formulaY);
     cursor+=sizes.fracW;
-    if(multiplier){cursor+=gap;doc.text(multiplier,cursor,formulaY+.8);}
+    if(multiplier){cursor+=gap;doc.text(multiplier,cursor,formulaY+.45);}
     return;
   }
   const formula=calcFormulaText(f);
@@ -13107,7 +13313,7 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
     for(let index=0;index<group.items.length;index+=2){
       const pair=[group.items[index],group.items[index+1]].filter(Boolean);
       const displayLines=Math.max(1,...pair.map(item=>calcDisplaySpec(item)?.length||1));
-      rows.push({pair,weight:1+Math.max(0,displayLines-1)*.3});
+      rows.push({pair,weight:1+Math.max(0,displayLines-1)*.36});
     }
     return rows;
   });
@@ -13131,8 +13337,9 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
         const cellW=second?colW:cW;
         doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(x,y,cellW,rowH,'FD');
         if(!f)return;
-        doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,String(f.name||''),cellW-7,7.7,5.5);doc.text(String(f.name||''),x+cellW/2,y+3.75,{align:'center'});
-        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+5,cellW-6,rowH-5.2,[0,0,0]);
+        const displayName=calcDisplayName(f);
+        doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,displayName,cellW-7,7.25,5.2);doc.text(displayName,x+cellW/2,y+3.9,{align:'center'});
+        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+4.7,cellW-6,rowH-5.15,[0,0,0]);
       });
       y+=rowH;
     }
@@ -15372,23 +15579,27 @@ function parseSteps(s){
   try{return typeof s==='string'?JSON.parse(s||'[]'):(s||[]);}catch{return [];}
 }
 function applySavedTheme(){
-  if(!localStorage.getItem('mlsboc_theme')){
-    localStorage.setItem('mlsboc_theme','light');
-  }
-  const saved=localStorage.getItem('mlsboc_theme')||'light';
+  const saved=safeLocalGet('mlsboc_theme')||'light';
+  if(!safeLocalGet('mlsboc_theme'))safeLocalSet('mlsboc_theme','light');
   document.body.classList.toggle('light-mode', saved!=='dark');
   updateThemeButton();
 }
 function updateThemeButton(){
   const btn=document.getElementById('theme-btn');
-  if(!btn)return;
   const isLight=document.body.classList.contains('light-mode');
-  btn.textContent=isLight?'🔬🐱 Switch to dark':'💤🐱 Switch to light';
-  btn.title=isLight?'Switch to dark mode':'Switch to light mode';
+  if(btn){
+    btn.textContent=isLight?'🔬🐱 Switch to dark':'💤🐱 Switch to light';
+    btn.title=isLight?'Switch to dark mode':'Switch to light mode';
+  }
+  const quizBtn=document.getElementById('quiz-theme-btn');
+  if(quizBtn){
+    quizBtn.textContent=isLight?'🌙 Dark':'☀️ Light';
+    quizBtn.title=isLight?'Use dark quiz mode':'Use light quiz mode';
+  }
 }
 function toggleTheme(){
   const isLight=document.body.classList.toggle('light-mode');
-  localStorage.setItem('mlsboc_theme', isLight?'light':'dark');
+  safeLocalSet('mlsboc_theme', isLight?'light':'dark');
   updateThemeButton();
 }
 function handleILImgFile(e){
