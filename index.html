@@ -1229,7 +1229,10 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .monster-mix-subject:hover{border-color:#c79700;background:color-mix(in srgb,#ffd84d 9%,var(--bg2));transform:translateY(-1px)}
 .monster-mix-subject:has(input:checked){border-color:#c79700;background:linear-gradient(135deg,color-mix(in srgb,#fff0a6 44%,var(--bg2)),color-mix(in srgb,#ffd84d 22%,var(--bg2)));box-shadow:0 5px 14px rgba(177,133,0,.12)}
 .monster-mix-subject input{width:18px;height:18px;flex:0 0 auto;accent-color:#b88600}
-.monster-mix-subject-icon{width:28px;text-align:center;font-size:20px;line-height:1}
+.monster-mix-subject-icon{width:42px;flex:0 0 42px;line-height:1}
+.monster-mix-subject-icon .home-subject-mark{display:block}
+.monster-mix-subject-icon .home-subject-icon{width:42px;height:42px;border-radius:13px}
+.monster-mix-subject-icon .home-subject-icon img{border-radius:11px}
 .monster-mix-subject-copy{display:grid;min-width:0;gap:2px}
 .monster-mix-subject-name{font-size:13px;font-weight:800;line-height:1.2}
 .monster-mix-subject-count{font-size:10.5px;font-weight:650;color:var(--text3)}
@@ -6226,7 +6229,7 @@ async function renderMonsterMixView(v){
               <div class="monster-mix-selection-actions"><button class="btn btn-ghost btn-xs" type="button" onclick="monsterSelectAll(true)">Select all</button><button class="btn btn-ghost btn-xs" type="button" onclick="monsterSelectAll(false)">Clear</button></div>
             </div>
             <div class="monster-mix-subjects">
-              ${SUBJECTS.filter(subject=>!subject._hidden).map(subject=>`<label class="monster-mix-subject"><input type="checkbox" data-monster-subject value="${subject.key}" ${selectedSet.has(subject.key)?'checked':''} onchange="updateMonsterMixControls()"><span class="monster-mix-subject-icon">${subject.icon}</span><span class="monster-mix-subject-copy"><span class="monster-mix-subject-name">${esc(subject.name)}</span><span class="monster-mix-subject-count">${Number(appState.monsterCounts?.[subject.key]||0)} questions</span></span></label>`).join('')}
+              ${SUBJECTS.filter(subject=>!subject._hidden).map(subject=>`<label class="monster-mix-subject" style="--subject-color:${homeSubjectColor(subject.key)}"><input type="checkbox" data-monster-subject value="${subject.key}" ${selectedSet.has(subject.key)?'checked':''} onchange="updateMonsterMixControls()"><span class="monster-mix-subject-icon">${homeSubjectMark(subject.key,subject.name)}</span><span class="monster-mix-subject-copy"><span class="monster-mix-subject-name">${esc(subject.name)}</span><span class="monster-mix-subject-count">${Number(appState.monsterCounts?.[subject.key]||0)} questions</span></span></label>`).join('')}
             </div>
             <div class="divider"></div>
             <div class="quiz-count-grid">
