@@ -394,6 +394,9 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .calc-template-equation .calc-formula-board>.calc-equation-text:only-child{width:100%}
 .calc-template-equation .calc-equals{color:#111}
 .calc-template-equation .calc-inline-fraction-top,.calc-template-equation .calc-fraction-top{border-bottom-color:#111}
+.calc-template-note{width:100%;color:#c1121f;font-family:var(--serif);font-size:11px;font-weight:700;line-height:1.2;text-align:center}
+.calc-template-group-note{padding:6px 12px;border-top:0;border-bottom:2px solid #111;background:#fff;color:#c1121f;font-family:var(--serif);font-size:11px;font-weight:700;line-height:1.35;text-align:center}
+.calc-template-group:last-child .calc-template-group-note{border-bottom:0}
 .calc-template-admin{position:absolute;right:5px;top:4px;display:flex;gap:3px;z-index:2}
 .calc-template-cell.is-admin{padding-top:38px;cursor:grab}
 .calc-template-cell.is-admin:active{cursor:grabbing}
@@ -1397,6 +1400,19 @@ body:not(.light-mode) .bbq-context{background:rgba(20,23,32,.90);border-color:rg
   word-break:break-word;
 }
 body:not(.light-mode) .bbq-question{color:var(--text);background:rgba(20,23,32,.88);border-color:rgba(255,255,255,.12)}
+.quiz-question-prose{white-space:pre-wrap}
+.quiz-question-prose+.quiz-question-table-block,.quiz-question-table-block+.quiz-question-prose{margin-top:16px}
+.quiz-question-table-block{margin:16px 0 0;border:1px solid color-mix(in srgb,var(--accent) 38%,var(--border));border-radius:12px;background:var(--bg2);overflow:hidden;font-size:14px;font-weight:600;line-height:1.3}
+.quiz-question-table-title{padding:9px 12px;background:color-mix(in srgb,var(--accent) 12%,var(--bg3));color:var(--text);font-size:13px;font-weight:850;letter-spacing:.02em}
+.quiz-question-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.quiz-question-table{width:100%;min-width:520px;border-collapse:collapse;table-layout:auto}
+.quiz-question-table th,.quiz-question-table td{padding:8px 10px;border-top:1px solid var(--border);border-right:1px solid var(--border);text-align:left;vertical-align:top;white-space:normal}
+.quiz-question-table th:last-child,.quiz-question-table td:last-child{border-right:0}
+.quiz-question-table th{background:var(--bg3);color:var(--text2);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
+.quiz-question-table td{color:var(--text);font-size:13px;font-weight:650}
+.quiz-question-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--accent) 3%,var(--bg2))}
+.bbq-question .quiz-question-table-block{font-size:14px}
+.bbq-question .quiz-question-prose{font-size:inherit;font-weight:inherit;line-height:inherit}
 .question-media{
   display:grid;
   gap:16px;
@@ -1634,6 +1650,9 @@ body:not(.light-mode) .quiz-accuracy-high{background:#174d35;color:#d8ffea;borde
   .replace-wide{display:none}.replace-short{display:inline}
   .bbq-body{padding:22px 12px 38px}
   .bbq-question{font-size:18px;padding:18px 16px;margin-bottom:16px}
+  .quiz-question-table-block{margin-top:12px}
+  .quiz-question-table{min-width:460px}
+  .quiz-question-table th,.quiz-question-table td{padding:7px 8px}
   .bbq-options{padding:12px;gap:10px}
   .bbq-opt{min-height:66px;font-size:15px;padding:15px 16px}
   .practice-exam-toolbar{align-items:stretch;flex-direction:column}
@@ -3694,15 +3713,15 @@ const CALC_PLACEHOLDERS=[
   {id:'builtin-calc-henderson-hasselbalch',type:'calc',_placeholder:true,name:'Henderson-Hasselbalch Equation',category:'Chemistry',steps:['pH = 6.1 + log of bicarbonate over 0.03 x pCO2'],notes:'Blood-gas form of the Henderson-Hasselbalch equation.',example:''},
   {id:'builtin-calc-ph-hydrogen',type:'calc',_placeholder:true,name:'pH & Hydrogen Ion Concentration',category:'Chemistry',steps:['pH = -log10[H+]','[H+] = 10^-pH'],notes:'',example:''},
   {id:'builtin-calc-egfr',type:'calc',_placeholder:true,name:'Estimated Glomerular Filtration Rate (eGFR)',category:'Chemistry',steps:['eGFR uses SCr over k in the 2021 CKD-EPI equation','k = 0.7 female or 0.9 male; a = -0.241 female or -0.302 male'],notes:'2021 CKD-EPI equation. SCr in mg per dL; eGFR in mL per min per 1.73 m^2.',example:''},
-  {id:'builtin-calc-wbc-manual',type:'calc',_placeholder:true,name:'WBC Manual Count * Hemocytometer',category:'Hematology',result_label:'WBC count',numerator:'Average cells x dilution',denominator:'Area x depth (volume)',steps:[],notes:'',example:''},
-  {id:'builtin-calc-rbc-manual',type:'calc',_placeholder:true,name:'RBC Manual Count * Hemocytometer',category:'Hematology',result_label:'RBC count',numerator:'Average cells x dilution',denominator:'Area x depth (volume)',steps:[],notes:'',example:''},
-  {id:'builtin-calc-plt-manual',type:'calc',_placeholder:true,name:'Platelet Manual Count * Hemocytometer',category:'Hematology',result_label:'PLT count',numerator:'Average cells x dilution',denominator:'Area x depth (volume)',steps:[],notes:'',example:''},
+  {id:'builtin-calc-wbc-manual',type:'calc',_placeholder:true,name:'WBC Manual Count * Hemocytometer',category:'Hematology',result_label:'WBC per mm^3',numerator:'# cells counted x dilution',denominator:'# squares x area per square (mm^2) x depth (0.1 mm)',steps:[],notes:'',example:''},
+  {id:'builtin-calc-rbc-manual',type:'calc',_placeholder:true,name:'RBC Manual Count * Hemocytometer',category:'Hematology',result_label:'RBC per mm^3',numerator:'# cells counted x dilution',denominator:'# squares x area per square (mm^2) x depth (0.1 mm)',steps:[],notes:'',example:''},
+  {id:'builtin-calc-plt-manual',type:'calc',_placeholder:true,name:'Platelet Manual Count * Hemocytometer',category:'Hematology',result_label:'PLT per mm^3',numerator:'# cells counted x dilution',denominator:'# squares x area per square (mm^2) x depth (0.1 mm)',steps:[],notes:'',example:''},
   {id:'builtin-calc-volume-conversion',type:'calc',_placeholder:true,name:'Microliter Volume Conversion',category:'Hematology',steps:['uL = mm^3 = 10^-3 mL = 10^-6 L'],notes:'Equivalent volume units used in manual cell counting.',example:''},
   {id:'builtin-calc-mcv',type:'calc',_placeholder:true,name:'Mean Cell Volume (MCV)',category:'Hematology',result_label:'MCV',numerator:'Hct x 10',denominator:'RBC in millions',steps:[],notes:'Report in fL.',example:''},
   {id:'builtin-calc-mch',type:'calc',_placeholder:true,name:'Mean Cell Hemoglobin (MCH)',category:'Hematology',result_label:'MCH',numerator:'Hgb x 10',denominator:'RBC in millions',steps:[],notes:'Report in pg.',example:''},
   {id:'builtin-calc-mchc',type:'calc',_placeholder:true,name:'Mean Cell Hemoglobin Concentration (MCHC)',category:'Hematology',result_label:'MCHC',numerator:'Hgb',denominator:'Hct',multiplier:'100',steps:[],notes:'Use Hct as a percentage; report as percent or g/dL per course convention.',example:''},
   {id:'builtin-calc-raw-retic',type:'calc',_placeholder:true,name:'Raw Reticulocyte Percent',category:'Hematology',result_label:'Raw retic %',numerator:'Reticulocytes counted',denominator:'10',steps:[],notes:'Applies when 1,000 RBCs are counted.',example:''},
-  {id:'builtin-calc-maturation-days',type:'calc',_placeholder:true,name:'Reticulocyte Maturation Days',category:'Hematology',result_label:'Days to mature',numerator:'65 - patient Hct',denominator:'20',steps:[],notes:'Use with the corrected reticulocyte percentage to determine RPI.',example:''},
+  {id:'builtin-calc-maturation-days',type:'calc',_placeholder:true,name:'Reticulocyte Maturation Days',category:'Hematology',result_label:'Days to mature',numerator:'65 - patient Hct',denominator:'20',steps:[],notes:'* Derived formula.',example:''},
   {id:'builtin-calc-beers-law',type:'calc',_placeholder:true,name:"Beer's Law",category:'Hematology',steps:['Concentration unknown / concentration known = absorbance unknown / absorbance known'],notes:'Rearrange the proportion to solve for the unknown concentration.',example:''},
   {id:'builtin-calc-absolute-cell',type:'calc',_placeholder:true,name:'Absolute Cell Count',category:'Hematology',steps:['WBC count x differential percent / 100'],notes:'Use the cell percent as a whole number, then divide by 100.',example:'WBC 10.0 x 10^3/uL, neutrophils 60% -> ANC 6.0 x 10^3/uL'},
   {id:'builtin-calc-corrected-wbc',type:'calc',_placeholder:true,name:'Corrected WBC Count',category:'Hematology',result_label:'Corrected WBC',numerator:'Observed WBC x 100',denominator:'100 + NRBC per 100 WBC',steps:['Correct when many NRBCs are counted as WBCs by the instrument.'],notes:'Used when NRBCs are reported per 100 WBC.',example:'WBC 20.0, NRBC 25 -> 20 x 100 / 125 = 16.0 x 10^3/uL'},
@@ -6412,7 +6431,7 @@ function renderSubjectFlashcards(){
   appState.subjectFlashIdx=idx;
   const q=items[idx];
   const flipped=!!appState.subjectFlashFlipped;
-  const questionText=cleanQuestionText(q);
+  const questionText=questionPlainText(q);
   const answerText=subjectFlashAnswer(q);
   return `<section id="subject-flashcards" class="subject-flash-section" style="--flash-accent:${homeSubjectColor(appState.subject)}">
     <header class="subject-flash-head">
@@ -6690,7 +6709,7 @@ async function renderQuizTab(el){
       </div>
       <div class="bbq-body">
         ${quizSourceLabel(q)?`<div class="quiz-source-label">${esc(quizSourceLabel(q))}</div>`:''}
-        <div class="bbq-question">${escNL(cleanQuestionText(q))}</div>
+        <div class="bbq-question">${renderStructuredQuizQuestion(q)}</div>
         ${renderQuestionMedia(q)}
         <div class="bbq-options">
           ${opts.map((opt,oi)=>`
@@ -7388,7 +7407,7 @@ function exportResultsPDF(isAll=false){
       const sourceLabel=quizSourceLabel(q);
       doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(180,40,40);
       doc.text(`${i+1}. Missed${q.subject?' - '+String(q.subject).replace(/_/g,' '):''}${sourceLabel?' - '+sourceLabel:''}`,margin,y);y+=5;
-      writeText(cleanQuestionText(q),{size:9.5,bold:true,color:[20,20,20]});
+      writeText(questionPlainText(q),{size:9.5,bold:true,color:[20,20,20]});
       doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(70,70,70);
       checkPage(7);doc.text(`Your answer: ${given?String(q['option_'+given]||given):'(unanswered)'}`,margin+4,y);y+=5;
       doc.setFont('helvetica','bold');doc.setTextColor(20,120,60);
@@ -12705,6 +12724,7 @@ async function calcResetOrder(){
 function renderCalcTab(cats,all){
   if(!all.length)return '<div class="empty">No calculations yet. Use Admin mode to add some.</div>';
   window._calcOrderItems=all;
+  const hemocytometerNote='* Hemocytometer: chamber depth is 0.1 mm. Use the area of the square counted: large square = 1 mm^2; RBC group square = 0.04 mm^2; smallest RBC square = 0.0025 mm^2. Only the cells counted, dilution, and number of squares change.';
   const cell=(f,wide=false,groupName='')=>{
     if(!f)return '';
     const key=calcFormulaOrderKey(f);
@@ -12713,13 +12733,15 @@ function renderCalcTab(cats,all){
     ${isAdmin?`<span class="calc-template-admin"><span class="calc-order-grip" title="Drag to reorder" aria-label="Drag to reorder">↕</span><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move up" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',-1)">↑</button><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move down" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',1)">↓</button><button class="btn btn-ghost btn-xs" type="button" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>${!f._placeholder?`<button class="btn btn-danger btn-xs" type="button" onclick="deleteFormula('${f.id}')">Delete</button>`:''}</span>`:''}
     <div class="calc-template-name">${esc(calcDisplayName(f))}</div>
     <div class="calc-template-equation">${renderCalcEquationCell(f)}</div>
+    ${String(f.notes||'').trim().startsWith('*')?`<div class="calc-template-note">${esc(String(f.notes).trim())}</div>`:''}
   </article>`;};
   return `<section class="study-template-sheet calc-template-sheet">
     <div class="study-template-title">ASCP Formula Sheet</div>
     ${isAdmin?`<div class="calc-order-toolbar"><span>Drag formulas or use ↑ ↓ to arrange them. Your order is used here, in Calculation Examples, and in the PDF.</span><button class="btn btn-ghost btn-xs" type="button" onclick="calcResetOrder()">Reset order</button></div>`:''}
     <div class="calc-template-groups">${calcFormulaGroups(all).map(group=>{
       const rows=Math.ceil(group.items.length/2);
-      return `<section class="calc-template-group"><div class="study-template-section-title">${esc(group.name)}</div><div class="calc-template-rows">${Array.from({length:rows},(_,index)=>{const first=group.items[index*2],second=group.items[index*2+1];return `<div class="calc-template-row">${cell(first,!second,group.name)}${cell(second,false,group.name)}</div>`;}).join('')}</div></section>`;
+      const hasHemocytometer=group.items.some(item=>/hemocytometer/i.test(String(item.name||'')));
+      return `<section class="calc-template-group"><div class="study-template-section-title">${esc(group.name)}</div><div class="calc-template-rows">${Array.from({length:rows},(_,index)=>{const first=group.items[index*2],second=group.items[index*2+1];return `<div class="calc-template-row">${cell(first,!second,group.name)}${cell(second,false,group.name)}</div>`;}).join('')}</div>${hasHemocytometer?`<div class="calc-template-group-note">${esc(hemocytometerNote)}</div>`:''}</section>`;
     }).join('')}</div>
   </section>`;
 }
@@ -13308,6 +13330,9 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
 function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
   const groups=calcFormulaGroups(calcData||[]);
   const cW=pageW-margin*2,colW=cW/2,startY=18,bottom=10,groupH=6.6;
+  const hemocytometerNote='* Hemocytometer: chamber depth is 0.1 mm. Square area: large = 1 mm^2; RBC group = 0.04 mm^2; smallest RBC square = 0.0025 mm^2. Only cells counted, dilution, and number of squares change.';
+  const groupNoteH=9.5;
+  const groupHasHemocytometer=groups.map(group=>group.items.some(item=>/hemocytometer/i.test(String(item.name||''))));
   const groupedRows=groups.map(group=>{
     const rows=[];
     for(let index=0;index<group.items.length;index+=2){
@@ -13318,7 +13343,8 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
     return rows;
   });
   const rowUnits=groupedRows.flat().reduce((sum,row)=>sum+row.weight,0)||1;
-  const baseRowH=(pageH-startY-bottom-groups.length*groupH)/rowUnits;
+  const totalGroupNoteH=groupHasHemocytometer.filter(Boolean).length*groupNoteH;
+  const baseRowH=(pageH-startY-bottom-groups.length*groupH-totalGroupNoteH)/rowUnits;
   doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
   doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.7);doc.rect(margin,10,cW,8,'FD');
   doc.setFont('times','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(blank?'ASCP Formula Sheet - Blank Practice':'ASCP Formula Sheet',pageW/2,15.4,{align:'center'});
@@ -13339,9 +13365,24 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
         if(!f)return;
         const displayName=calcDisplayName(f);
         doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,displayName,cellW-7,7.25,5.2);doc.text(displayName,x+cellW/2,y+3.9,{align:'center'});
-        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+4.7,cellW-6,rowH-5.15,[0,0,0]);
+        const cellNote=String(f.notes||'').trim();
+        const showCellNote=!blank&&cellNote.startsWith('*');
+        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+4.7,cellW-6,rowH-5.15-(showCellNote?3.2:0),[0,0,0]);
+        if(showCellNote){
+          doc.setFont('times','bold');doc.setFontSize(5.2);doc.setTextColor(193,18,31);
+          doc.text(cellNote,x+cellW/2,y+rowH-1.4,{align:'center'});
+        }
       });
       y+=rowH;
+    }
+    if(groupHasHemocytometer[groupIndex]){
+      doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(margin,y,cW,groupNoteH,'FD');
+      doc.setFont('times','bold');doc.setFontSize(5.5);doc.setTextColor(193,18,31);
+      const noteLines=doc.splitTextToSize(hemocytometerNote,cW-8).slice(0,2);
+      const lineH=2.4;
+      const firstY=y+(groupNoteH-(noteLines.length-1)*lineH)/2+.7;
+      noteLines.forEach((line,index)=>doc.text(line,pageW/2,firstY+index*lineH,{align:'center'}));
+      y+=groupNoteH;
     }
   });
 }
@@ -13574,7 +13615,7 @@ function allExamTopicPath(q){
   return parts.filter((p,i,a)=>a.indexOf(p)===i).join(' → ');
 }
 function allQuestionSnippet(q){
-  const text=cleanQuestionText(q).replace(/\s+/g,' ').trim();
+  const text=questionPlainText(q).replace(/\s+/g,' ').trim();
   return text.length>54?text.slice(0,54).trim()+'[...]':text;
 }
 function allJump(idx){
@@ -13635,7 +13676,7 @@ function renderAllExam(v){
           <div class="exam-sim-topic">${esc(allExamTopicPath(q))}</div>
           <div class="exam-sim-question-row ${media?'':'no-media'}">
             <section>
-              <div class="exam-sim-stem">${escNL(cleanQuestionText(q))}</div>
+              <div class="exam-sim-stem">${renderStructuredQuizQuestion(q)}</div>
               <div class="exam-sim-directions">Please select the single best answer</div>
               <div class="exam-sim-options">
                 ${opts.map(opt=>`
@@ -15368,6 +15409,40 @@ function cleanQuestionText(qOrText){
     .trim();
   return cleaned;
 }
+function parseStructuredQuizQuestion(qOrText){
+  const text=cleanQuestionText(qOrText);
+  const parts=[];
+  const marker=/\[\[quiz-table:([^\]]+)\]\]\s*([\s\S]*?)\s*\[\[\/quiz-table\]\]/g;
+  let match,lastIndex=0;
+  while((match=marker.exec(text))){
+    const prose=text.slice(lastIndex,match.index).trim();
+    if(prose)parts.push({type:'prose',text:prose});
+    const lines=String(match[2]||'').split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+    const cells=lines.map(line=>line.split('|').map(value=>value.trim()));
+    const headers=cells.shift()||[];
+    if(headers.length&&cells.length)parts.push({type:'table',title:String(match[1]||'Results').trim(),headers,rows:cells});
+    else parts.push({type:'prose',text:`${String(match[1]||'Results').trim()}\n${lines.join('\n')}`.trim()});
+    lastIndex=marker.lastIndex;
+  }
+  const tail=text.slice(lastIndex).trim();
+  if(tail)parts.push({type:'prose',text:tail});
+  if(!parts.length&&text)parts.push({type:'prose',text});
+  return parts;
+}
+function questionPlainText(qOrText){
+  return parseStructuredQuizQuestion(qOrText).map(part=>{
+    if(part.type==='prose')return part.text;
+    return [part.title,[part.headers,...part.rows].map(row=>row.join(' — ')).join('\n')].filter(Boolean).join('\n');
+  }).join('\n\n').trim();
+}
+function renderStructuredQuizQuestion(qOrText){
+  return parseStructuredQuizQuestion(qOrText).map(part=>{
+    if(part.type==='prose')return `<div class="quiz-question-prose">${escNL(part.text)}</div>`;
+    const width=Math.max(part.headers.length,...part.rows.map(row=>row.length));
+    const headers=Array.from({length:width},(_,index)=>part.headers[index]||'');
+    return `<section class="quiz-question-table-block"><div class="quiz-question-table-title">${esc(part.title)}</div><div class="quiz-question-table-scroll"><table class="quiz-question-table"><thead><tr>${headers.map(value=>`<th>${esc(value)}</th>`).join('')}</tr></thead><tbody>${part.rows.map(row=>`<tr>${Array.from({length:width},(_,index)=>`<td>${esc(row[index]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`;
+  }).join('');
+}
 function renderQuestionMedia(qOrText){
   const urls=questionMediaUrls(qOrText);
   if(!urls.length)return '';
@@ -15391,7 +15466,7 @@ function closeQuestionMediaZoom(){
   document.body.style.overflow='';
 }
 function renderQuestionWithMedia(qOrText){
-  return `${escNL(cleanQuestionText(qOrText))}${renderQuestionMedia(qOrText)}`;
+  return `${renderStructuredQuizQuestion(qOrText)}${renderQuestionMedia(qOrText)}`;
 }
 function csvEsc(s){s=String(s||'');if(s.includes(',')||s.includes('"')||s.includes('\n'))s='"'+s.replace(/"/g,'""')+'"';return s;}
 function dlCSV(rows,filename){
