@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Reagent Strip – Match the Reagent!</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
@@ -31,6 +31,7 @@
     background: var(--bg);
     color: var(--text);
     padding: 12px;
+    overflow-x: hidden;
   }
 
   .wrap { max-width: 1300px; margin: 0 auto; }
@@ -81,6 +82,8 @@
     font-weight: 800;
     cursor: pointer;
     font-size: .82rem;
+    min-height: 44px;
+    touch-action: manipulation;
   }
 
   .checkBtn { background: #1f3a6e; color: #fff; }
@@ -226,6 +229,11 @@
   .chip:last-child { margin-bottom: 0; }
   .chip.dragging   { opacity: .4; }
   .chip.used       { opacity: .22; pointer-events: none; }
+  .chip.selected {
+    border-color: #f0a500;
+    background: #fff6d8;
+    box-shadow: 0 0 0 3px rgba(240,165,0,.22);
+  }
 
   /* ── STRIP SECTION ── */
   .strip-section {
@@ -400,6 +408,11 @@
     color: var(--bad);
   }
 
+  .dropzone.tap-ready {
+    border-color: #f0a500;
+    background: #fff9e5;
+  }
+
   .placeholder {
     color: #8899bb;
     font-weight: 800;
@@ -425,6 +438,49 @@
     margin-bottom: 4px;
     border: 1px solid #c8bfb2;
   }
+
+  @media (max-width: 900px) {
+    body { padding: 8px; }
+    .wrap { width: 100%; }
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "reagent" "reaction" "strip";
+      gap: 10px;
+    }
+    .reagent-bank { grid-area: reagent; }
+    .reaction-bank { grid-area: reaction; }
+    .strip-section { grid-area: strip; min-width: 0; }
+    .bank-panel { position: static; }
+    .bank-panel .hint { margin-bottom: 8px; }
+    .chip { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .controls > button { flex: 1 1 130px; }
+    .score { width: 100%; justify-content: center; }
+    .strip-body { padding: 10px 6px; }
+    .strip-stick { display: none; }
+    .rows-area { min-width: 0; padding-left: 0; }
+    .strip-row,
+    .col-headers-row {
+      grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1fr);
+      gap: 4px;
+    }
+    .col-headers-row { padding-left: 0; }
+    .row-label { font-size: .68rem; padding-right: 3px; }
+    .dropzone { min-width: 0; min-height: 48px; padding: 5px 4px; overflow-wrap: anywhere; }
+    .answer-key { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .key-table { min-width: 680px; }
+  }
+
+  @media (max-width: 520px) {
+    header { padding: 12px; align-items: flex-start; flex-wrap: wrap; }
+    header h1 { font-size: 1.05rem; }
+    header p { font-size: .7rem; }
+    .badge { margin-left: 0; }
+    .controls { padding: 8px; }
+    .section-title { font-size: .78rem; }
+    .strip-row,
+    .col-headers-row { grid-template-columns: 66px minmax(0, 1fr) minmax(0, 1fr); }
+    .dropzone { font-size: .64rem; }
+  }
 </style>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css">
@@ -443,7 +499,7 @@
   <header>
     <div>
       <h1>🧪 Urinalysis Reagent Strip – Match It!</h1>
-      <p>Drag from the <strong style="color:#a8c8ff">Reagent bank (left)</strong> and <strong style="color:#ffd599">Reaction bank (right)</strong> into the correct pad rows. Click a filled slot to return it.</p>
+      <p>Drag a choice into a row, or tap a choice and then tap its destination. Tap a filled slot to return it.</p>
     </div>
     <span class="badge">MATCH IT!</span>
   </header>
@@ -460,7 +516,7 @@
     <!-- LEFT BANK: Reagent / Chemistry -->
     <div class="bank-panel reagent-bank">
       <h2>🔬 Reagent / Chemistry</h2>
-      <p class="hint">Drag to the <strong>Reagent</strong> column. Each chip used once.</p>
+      <p class="hint">Drag, or tap a choice then its <strong>Reagent</strong> destination. Each choice is used once.</p>
       <div id="reagentBank"></div>
     </div>
 
@@ -501,7 +557,7 @@
     <!-- RIGHT BANK: Reaction Type -->
     <div class="bank-panel reaction-bank">
       <h2>⚗️ Reaction Type</h2>
-      <p class="hint">Drag to the <strong>Reaction</strong> column. Each chip used once.</p>
+      <p class="hint">Drag, or tap a choice then its <strong>Reaction</strong> destination. Each choice is used once.</p>
       <div id="reactionBank"></div>
     </div>
 
@@ -655,6 +711,23 @@ const state = {};
 let dragItem = null;
 let dragFrom = null;
 
+function clearTapSelection() {
+  dragItem = null;
+  dragFrom = null;
+  document.querySelectorAll(".chip.selected").forEach(chip => chip.classList.remove("selected"));
+  document.querySelectorAll(".dropzone.tap-ready").forEach(zone => zone.classList.remove("tap-ready"));
+}
+
+function selectBankChoice(chip, col, value) {
+  if (countUses(col, value) >= 1) return;
+  const alreadySelected = chip.classList.contains("selected");
+  clearTapSelection();
+  if (alreadySelected) return;
+  dragItem = { col, value };
+  chip.classList.add("selected");
+  document.querySelectorAll(`.dropzone[id$="__${col}"]`).forEach(zone => zone.classList.add("tap-ready"));
+}
+
 function slotKey(padId, col) { return `${padId}__${col}`; }
 function getState(k)    { return state[k] || null; }
 function setState(k, v) { if (v == null) delete state[k]; else state[k] = v; }
@@ -682,10 +755,12 @@ function buildBank() {
       chip.textContent = value;
       chip.addEventListener("dragstart", e => {
         if (countUses(col, value) >= 1) { e.preventDefault(); return; }
+        clearTapSelection();
         dragItem = { col, value }; dragFrom = null;
         chip.classList.add("dragging");
       });
       chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+      chip.addEventListener("click", () => selectBankChoice(chip, col, value));
       wrap.appendChild(chip);
     });
   });
@@ -763,11 +838,27 @@ function makeDropzone(padId, col) {
     }
     setState(key, { col: c, value });
     renderSlot(key);
-    dragItem = null; dragFrom = null;
+    clearTapSelection();
     clearMarks(); refreshBankUsage();
   });
 
   dz.addEventListener("click", () => {
+    if (dragItem && dragItem.col === col) {
+      const { value } = dragItem;
+      const movingSame = dragFrom && getState(dragFrom)?.value === value;
+      if (countUses(col, value) < 1 || movingSame) {
+        if (dragFrom && dragFrom !== key) {
+          setState(dragFrom, null);
+          renderSlot(dragFrom);
+        }
+        setState(key, { col, value });
+        renderSlot(key);
+        clearTapSelection();
+        clearMarks();
+        refreshBankUsage();
+      }
+      return;
+    }
     if (!getState(key)) return;
     setState(key, null); renderSlot(key); clearMarks(); refreshBankUsage();
   });
@@ -830,6 +921,7 @@ function checkAnswers() {
 }
 
 function reset() {
+  clearTapSelection();
   Object.keys(state).forEach(k => delete state[k]);
   PADS.forEach(pad => COL_DEFS.forEach(({ col }) => renderSlot(slotKey(pad.id, col))));
   clearMarks(); refreshBankUsage();
@@ -990,6 +1082,11 @@ reset();
   .a2-chip[data-col="cs"] { border: 1.5px solid #7acca0; color: #0a4030; }
   .a2-chip.a2-dragging { opacity: .35; transform: scale(.93); }
   .a2-chip.a2-used     { opacity: .28; cursor: not-allowed; }
+  .a2-chip.a2-selected {
+    border-color: #d4a800;
+    background: #fff6c7;
+    box-shadow: 0 0 0 3px rgba(212,168,0,.2);
+  }
 
   /* ── TABLE PANEL ── */
   .a2-table-panel {
@@ -1068,6 +1165,7 @@ reset();
   .a2-drop.a2-drag-over { background: #fff8c0; border-color: #d4a800; border-style: solid; }
   .a2-drop.a2-correct   { background: #e6f9ee !important; border-color: #27ae60; border-style: solid; }
   .a2-drop.a2-wrong     { background: #fde8e8 !important; border-color: #c0392b; border-style: solid; }
+  .a2-drop.a2-tap-ready { background: #fff9dc; border-color: #d4a800; border-style: solid; }
 
   /* chip inside drop — slightly smaller */
   .a2-drop .a2-chip {
@@ -1118,6 +1216,62 @@ reset();
     display: inline-block; padding: 2px 6px; border-radius: 4px;
     font-weight: 900; font-size: .68rem;
   }
+
+  @media (max-width: 900px) {
+    .a2-wrap { padding: 0 8px 40px; margin-top: 18px; }
+    .a2-header { align-items: flex-start; flex-wrap: wrap; padding: 12px; }
+    .a2-header h1 { font-size: .9rem; }
+    .a2-controls > button { flex: 1 1 120px; min-height: 44px; }
+    .a2-score { width: 100%; margin-left: 0; text-align: center; }
+    .a2-body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "fp" "fn" "cs" "table";
+      padding: 8px;
+    }
+    .a2-table-panel { grid-area: table; min-width: 0; overflow: visible; }
+    .a2-bank { position: static; }
+    .a2-bank.fp-bank { grid-area: fp; }
+    .a2-bank.fn-bank { grid-area: fn; }
+    .a2-bank.cs-bank { grid-area: cs; }
+    .a2-chip { min-height: 44px; padding: 8px; display: flex; align-items: center; }
+    .a2-tbl thead { display: none; }
+    .a2-tbl,
+    .a2-tbl tbody { display: block; width: 100%; }
+    .a2-tbl tbody tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      border-bottom: 8px solid #e6edf5;
+    }
+    .a2-tbl td.td-pad,
+    .a2-tbl td.td-drop {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      border-right: 0;
+    }
+    .a2-tbl td.td-pad { padding: 9px; white-space: normal; }
+    .a2-tbl td.td-drop { padding: 7px; }
+    .a2-tbl td.td-drop::before {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .6rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .35px;
+    }
+    .a2-tbl td.fp-col::before { content: "False Positive"; color: #c0392b; }
+    .a2-tbl td.fn-col::before { content: "False Negative"; color: #2471a3; }
+    .a2-tbl td.cs-col::before { content: "Clinical Significance"; color: #1a7a50; }
+    .a2-drop { min-height: 48px; }
+    .a2-answer-key { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .a2-key-table { min-width: 680px; }
+  }
+
+  @media (max-width: 520px) {
+    .a2-header p { font-size: .64rem; }
+    .a2-badge { margin-left: 0; }
+    .a2-answer-key-header { align-items: flex-start; gap: 8px; }
+  }
 </style>
 
 <div class="a2-wrap">
@@ -1125,7 +1279,7 @@ reset();
   <div class="a2-header">
     <div>
       <h1>⚠️ False Positives, False Negatives &amp; Clinical Significance</h1>
-      <p>Drag each chip from the banks (right) into the correct pad row. Click a placed chip to return it.</p>
+      <p>Drag a choice, or tap a choice and then its destination. Tap a placed choice to return it.</p>
     </div>
     <span class="a2-badge">ACTIVITY 2</span>
   </div>
@@ -1158,21 +1312,21 @@ reset();
     <!-- COL 2: FALSE POSITIVE BANK -->
     <div class="a2-bank fp-bank">
       <h2 style="color:#c0392b">🔴 False Positive</h2>
-      <p class="a2-hint">Drag to the red column</p>
+      <p class="a2-hint">Drag, or tap a choice then its red destination</p>
       <div id="a2FpBank"></div>
     </div>
 
     <!-- COL 3: FALSE NEGATIVE BANK -->
     <div class="a2-bank fn-bank">
       <h2 style="color:#2471a3">🔵 False Negative</h2>
-      <p class="a2-hint">Drag to the blue column</p>
+      <p class="a2-hint">Drag, or tap a choice then its blue destination</p>
       <div id="a2FnBank"></div>
     </div>
 
     <!-- COL 4: CLINICAL SIGNIFICANCE BANK -->
     <div class="a2-bank cs-bank">
       <h2 style="color:#1a7a50">🟢 Clinical Sig.</h2>
-      <p class="a2-hint">Drag to the green column</p>
+      <p class="a2-hint">Drag, or tap a choice then its green destination</p>
       <div id="a2CsBank"></div>
     </div>
 
@@ -1296,6 +1450,13 @@ A2_PADS.forEach(p => { state2[p.id] = { fp:null, fn:null, cs:null }; });
 let a2DragItem = null; // {col, padId, label}
 let a2DragFrom = null; // {col, padId} | null
 
+function clearA2TapSelection() {
+  a2DragItem = null;
+  a2DragFrom = null;
+  document.querySelectorAll(".a2-chip.a2-selected").forEach(chip => chip.classList.remove("a2-selected"));
+  document.querySelectorAll(".a2-drop.a2-tap-ready").forEach(drop => drop.classList.remove("a2-tap-ready"));
+}
+
 /* ── BUILD TABLE ROWS ── */
 function a2BuildRows() {
   const tbody = document.getElementById("a2Rows");
@@ -1340,7 +1501,18 @@ function a2BuildRows() {
         state2[pad.id][col] = a2DragItem.label;
         renderA2Drop(pad.id, col);
         a2RefreshBankUsage();
-        a2DragItem = null; a2DragFrom = null;
+        clearA2TapSelection();
+      });
+      drop.addEventListener("click", () => {
+        if (!a2DragItem || a2DragItem.col !== col) return;
+        if (a2DragFrom) {
+          state2[a2DragFrom.padId][a2DragFrom.col] = null;
+          renderA2Drop(a2DragFrom.padId, a2DragFrom.col);
+        }
+        state2[pad.id][col] = a2DragItem.label;
+        renderA2Drop(pad.id, col);
+        clearA2TapSelection();
+        a2RefreshBankUsage();
       });
 
       tdDrop.appendChild(drop);
@@ -1377,6 +1549,7 @@ function makeA2Chip(col, padId, label, inSlot) {
 
   chip.addEventListener("dragstart", e => {
     if (!inSlot && state2[padId][col] !== null) { e.preventDefault(); return; }
+    clearA2TapSelection();
     a2DragItem = { col, padId, label };
     a2DragFrom = inSlot ? { col, padId } : null;
     chip.classList.add("a2-dragging");
@@ -1384,10 +1557,21 @@ function makeA2Chip(col, padId, label, inSlot) {
   chip.addEventListener("dragend", () => chip.classList.remove("a2-dragging"));
 
   if (inSlot) {
-    chip.addEventListener("click", () => {
+    chip.addEventListener("click", e => {
+      e.stopPropagation();
       state2[padId][col] = null;
       renderA2Drop(padId, col);
       a2RefreshBankUsage();
+    });
+  } else {
+    chip.addEventListener("click", () => {
+      if (state2[padId][col] !== null) return;
+      const alreadySelected = chip.classList.contains("a2-selected");
+      clearA2TapSelection();
+      if (alreadySelected) return;
+      a2DragItem = { col, padId, label };
+      chip.classList.add("a2-selected");
+      document.querySelectorAll(`.a2-drop[data-col="${col}"]`).forEach(drop => drop.classList.add("a2-tap-ready"));
     });
   }
   return chip;
@@ -1438,6 +1622,7 @@ function a2Check() {
 }
 
 function a2Reset() {
+  clearA2TapSelection();
   A2_PADS.forEach(p => { state2[p.id] = { fp:null, fn:null, cs:null }; });
   document.querySelectorAll(".a2-drop").forEach(d => {
     d.innerHTML = ""; d.classList.remove("a2-correct","a2-wrong");
@@ -1474,6 +1659,7 @@ const a2KeyPanel    = document.getElementById("a2AnswerKey");
 const a2KeyCloseBtn = document.getElementById("a2KeyCloseBtn");
 
 function a2ShowAnswers(){
+  clearA2TapSelection();
   A2_PADS.forEach(pad=>{
     ["fp","fn","cs"].forEach(col=>{
       state2[pad.id][col]=A2_CHIP_LABELS[pad.id][col];
