@@ -283,7 +283,7 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 @media(max-width:900px){.home-dashboard{width:min(720px,calc(100vw - 64px))}.home-hero{padding-left:96px;padding-right:96px}.home-hero-mark{right:0;width:86px}.home-hubs-card{grid-template-columns:1fr}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-practice-grid{grid-template-columns:1fr}.home-practice-card.featured{grid-column:auto}.home-hubs-preview{min-height:180px}}
 @media(max-width:700px){.home-section-title-row{align-items:flex-start;gap:5px}.home-subject-legend{flex-basis:100%}}
 @media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-dashboard{width:calc(100vw - 40px)}.home-hero{padding:8px 0 88px;text-align:center}.home-hero-mark{right:auto;left:50%;top:auto;bottom:4px;width:78px;transform:translateX(-50%)}.home-resource-link{font-size:9px;padding:4px 8px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:104px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-practice-card.exam-feature,.home-practice-card.reference-compact{min-height:184px;padding:20px}.home-practice-card.exam-feature .home-practice-title{font-size:28px}.home-practice-card.reference-compact .home-practice-title{font-size:24px}.home-practice-card.exam-feature .home-practice-sub{font-size:14px}.home-hubs-card{padding:16px;border-radius:18px}.home-hubs-copy{margin-bottom:12px}.home-hubs-preview{min-height:164px;padding:10px}.home-hubs-preview-track{position:absolute;left:10px;top:10px;display:flex;grid-template-columns:none;gap:10px;animation:hub-preview-slide-mobile 18s linear infinite}.home-hubs-card:hover .home-hubs-preview-track{animation-duration:11s}.home-hub-tile{width:250px;height:144px;min-height:144px}.home-hub-tile-title{font-size:12px}.home-hub-tile-sub{display:none}.home-hub-feature-list{gap:4px;margin-top:6px}.home-hub-feature-list span{font-size:8px;padding:3px 5px}.home-kicker{font-size:9px}.home-title{font-size:34px}.home-subtitle{font-size:14px}.home-subject-layout{grid-template-columns:auto minmax(0,1fr) auto auto}.home-subject-icon{width:46px;height:46px}}
-@media(max-width:560px){.global-question-search-launch{width:34px;height:34px;flex-basis:34px;border-radius:10px}.global-question-search-modal{padding:6px}.global-question-search-modal .modal{width:calc(100vw - 12px);max-height:calc(100vh - 12px)}.global-question-search-head{padding:14px 13px 12px}.global-question-search-controls{grid-template-columns:1fr}.global-question-search-status{padding:8px 13px}.global-question-search-results{padding:10px}.global-question-result{padding:11px}.global-question-result-question{font-size:13px}}
+@media(max-width:560px){.global-question-search-launch{width:34px;height:34px;flex-basis:34px;border-radius:10px}.global-question-search-modal{padding:6px}.global-question-search-modal .modal{width:calc(100vw - 12px);height:calc(100vh - 12px);height:calc(100dvh - 12px);max-height:none}.global-question-search-head{padding:14px 13px 12px}.global-question-search-controls{grid-template-columns:1fr}.global-question-search-status{padding:8px 13px}.global-question-search-results{padding:10px}.global-question-result{padding:11px}.global-question-result-question{font-size:13px}.global-question-result .question-media img{max-height:180px}.global-question-result .question-media-zoom{width:100%}}
 @media(prefers-reduced-motion:reduce){.home-hubs-preview-track{animation:none!important}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
@@ -1110,7 +1110,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:20px}
 .global-question-search-modal{padding:12px}
-.global-question-search-modal .modal{width:min(940px,calc(100vw - 24px));max-width:940px;max-height:min(880px,calc(100vh - 24px));padding:0;overflow:hidden;display:flex;flex-direction:column}
+.global-question-search-modal .modal{width:min(940px,calc(100vw - 24px));max-width:940px;height:min(880px,calc(100vh - 24px));height:min(880px,calc(100dvh - 24px));max-height:none;padding:0;overflow:hidden;display:flex;flex-direction:column}
 .global-question-search-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,color-mix(in srgb,#7b61ff 11%,var(--bg2)),var(--bg2))}
 .global-question-search-title-row{display:flex;align-items:center;gap:11px}
 .global-question-search-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#7b61ff,#5734cc);color:#fff;display:grid;place-items:center;box-shadow:0 7px 15px rgba(91,55,207,.23)}
@@ -1124,7 +1124,7 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .global-question-search-input:focus{border-color:#7457e6!important;box-shadow:0 0 0 3px rgba(116,87,230,.13);outline:0}
 .global-question-search-filter{height:44px!important;background:var(--bg2)!important;border:1px solid var(--border)!important;font-size:13px!important}
 .global-question-search-status{padding:9px 20px;border-bottom:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:11px;font-weight:750;letter-spacing:.02em}
-.global-question-search-results{flex:1 1 auto;min-height:0;overflow:auto;padding:14px 16px 20px;overscroll-behavior:contain}
+.global-question-search-results{position:relative;flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto;padding:14px 16px 20px;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .global-question-search-empty{padding:50px 20px;text-align:center;color:var(--text3);font-size:13px;line-height:1.6}
 .global-question-result{--result-color:#7b61ff;margin-bottom:12px;border:1px solid var(--border);border-left:5px solid var(--result-color);border-radius:14px;background:var(--bg2);padding:13px 14px;box-shadow:0 7px 18px rgba(18,35,74,.06)}
 .global-question-result:last-child{margin-bottom:0}
@@ -1133,6 +1133,9 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .global-question-result-source{color:var(--text3);font-family:var(--mono);font-size:10px;font-weight:700}
 .global-question-result-question{color:var(--text);font-size:14px;font-weight:750;line-height:1.5;overflow-wrap:anywhere}
 .global-question-result-question .quiz-question-table-block{font-weight:600}
+.global-question-result .question-media{width:100%;max-width:100%;margin:10px 0 12px;justify-items:center}
+.global-question-result .question-media-zoom{width:min(100%,460px)}
+.global-question-result .question-media img{width:100%;max-height:230px;padding:5px;box-shadow:0 7px 17px rgba(22,34,74,.11)}
 .global-question-result-answer{margin-top:11px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--success) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--success) 35%,var(--border));color:var(--text);font-size:13px;line-height:1.45;overflow-wrap:anywhere}
 .global-question-result-answer strong{color:var(--success)}
 .global-question-result details{margin-top:9px;border-top:1px solid var(--border);padding-top:8px}
@@ -5688,6 +5691,7 @@ async function loadGlobalQuestionSearchBank(){
 function closeGlobalQuestionSearch(){
   clearTimeout(globalQuestionSearchTimer);
   document.getElementById('global-question-search-modal')?.classList.add('hidden');
+  document.body.style.overflow='';
 }
 
 async function openGlobalQuestionSearch(){
@@ -5709,6 +5713,7 @@ async function openGlobalQuestionSearch(){
     </div>
     <div class="global-question-search-status" id="global-question-search-status">Loading all subject question banks…</div>
     <div class="global-question-search-results" id="global-question-search-results"><div class="global-question-search-empty">Preparing the global question index…</div></div>`;
+  document.body.style.overflow='hidden';
   modal.classList.remove('hidden');
   requestAnimationFrame(()=>document.getElementById('global-question-search-input')?.focus());
   try{
@@ -15674,7 +15679,8 @@ function openQuestionMediaZoom(url){
 function closeQuestionMediaZoom(){
   const modal=document.getElementById('question-media-zoom-modal');
   if(modal)modal.remove();
-  document.body.style.overflow='';
+  const searchModal=document.getElementById('global-question-search-modal');
+  document.body.style.overflow=searchModal&&!searchModal.classList.contains('hidden')?'hidden':'';
 }
 function renderQuestionWithMedia(qOrText){
   return `${renderStructuredQuizQuestion(qOrText)}${renderQuestionMedia(qOrText)}`;
