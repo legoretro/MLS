@@ -128,6 +128,9 @@ select option{background:var(--bg3)}
 .home-section-title-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .home-subject-legend{font-size:16.5px;font-weight:700;color:var(--text2);letter-spacing:0;line-height:1.35}
 .monster-mix-launch{flex-shrink:0;white-space:nowrap;font-size:11px;padding:6px 11px}
+.global-question-search-launch{width:38px;height:38px;flex:0 0 38px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #5c35d6;border-radius:11px;background:linear-gradient(135deg,#7b61ff,#5734cc);color:#fff;cursor:pointer;box-shadow:0 8px 17px rgba(91,55,207,.25);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+.global-question-search-launch:hover{transform:translateY(-1px);box-shadow:0 11px 23px rgba(91,55,207,.33);filter:saturate(1.08)}
+.global-question-search-launch svg{width:19px;height:19px;display:block}
 .home-section-sub{font-size:13px;color:var(--text2)}
 .home-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .home-subject-grid>div{display:flex;min-width:0}
@@ -280,6 +283,7 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 @media(max-width:900px){.home-dashboard{width:min(720px,calc(100vw - 64px))}.home-hero{padding-left:96px;padding-right:96px}.home-hero-mark{right:0;width:86px}.home-hubs-card{grid-template-columns:1fr}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr 1fr}.home-practice-grid{grid-template-columns:1fr}.home-practice-card.featured{grid-column:auto}.home-hubs-preview{min-height:180px}}
 @media(max-width:700px){.home-section-title-row{align-items:flex-start;gap:5px}.home-subject-legend{flex-basis:100%}}
 @media(max-width:560px){header{padding:0 12px}.theme-toggle-btn{min-width:auto;padding-left:10px;padding-right:10px}main{padding:16px}.home-dashboard{width:calc(100vw - 40px)}.home-hero{padding:8px 0 88px;text-align:center}.home-hero-mark{right:auto;left:50%;top:auto;bottom:4px;width:78px;transform:translateX(-50%)}.home-resource-link{font-size:9px;padding:4px 8px}.home-subject-grid,.home-utility-grid{grid-template-columns:1fr}.home-subject-card{aspect-ratio:auto;min-height:104px}.home-section-head{display:block}.home-section-sub{margin-top:3px}.home-practice-card.exam-feature,.home-practice-card.reference-compact{min-height:184px;padding:20px}.home-practice-card.exam-feature .home-practice-title{font-size:28px}.home-practice-card.reference-compact .home-practice-title{font-size:24px}.home-practice-card.exam-feature .home-practice-sub{font-size:14px}.home-hubs-card{padding:16px;border-radius:18px}.home-hubs-copy{margin-bottom:12px}.home-hubs-preview{min-height:164px;padding:10px}.home-hubs-preview-track{position:absolute;left:10px;top:10px;display:flex;grid-template-columns:none;gap:10px;animation:hub-preview-slide-mobile 18s linear infinite}.home-hubs-card:hover .home-hubs-preview-track{animation-duration:11s}.home-hub-tile{width:250px;height:144px;min-height:144px}.home-hub-tile-title{font-size:12px}.home-hub-tile-sub{display:none}.home-hub-feature-list{gap:4px;margin-top:6px}.home-hub-feature-list span{font-size:8px;padding:3px 5px}.home-kicker{font-size:9px}.home-title{font-size:34px}.home-subtitle{font-size:14px}.home-subject-layout{grid-template-columns:auto minmax(0,1fr) auto auto}.home-subject-icon{width:46px;height:46px}}
+@media(max-width:560px){.global-question-search-launch{width:34px;height:34px;flex-basis:34px;border-radius:10px}.global-question-search-modal{padding:6px}.global-question-search-modal .modal{width:calc(100vw - 12px);max-height:calc(100vh - 12px)}.global-question-search-head{padding:14px 13px 12px}.global-question-search-controls{grid-template-columns:1fr}.global-question-search-status{padding:8px 13px}.global-question-search-results{padding:10px}.global-question-result{padding:11px}.global-question-result-question{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.home-hubs-preview-track{animation:none!important}}
 .class-material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .class-material-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;min-height:92px;text-align:left;width:100%;position:relative;overflow:hidden}
@@ -1105,6 +1109,38 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .modal-overlay{position:fixed;inset:0;background:#000a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:20px}
+.global-question-search-modal{padding:12px}
+.global-question-search-modal .modal{width:min(940px,calc(100vw - 24px));max-width:940px;max-height:min(880px,calc(100vh - 24px));padding:0;overflow:hidden;display:flex;flex-direction:column}
+.global-question-search-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,color-mix(in srgb,#7b61ff 11%,var(--bg2)),var(--bg2))}
+.global-question-search-title-row{display:flex;align-items:center;gap:11px}
+.global-question-search-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#7b61ff,#5734cc);color:#fff;display:grid;place-items:center;box-shadow:0 7px 15px rgba(91,55,207,.23)}
+.global-question-search-mark svg{width:19px;height:19px}
+.global-question-search-title{font-size:19px;font-weight:850;color:var(--text)}
+.global-question-search-subtitle{font-size:12px;color:var(--text2);margin-top:2px}
+.global-question-search-controls{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:10px;margin-top:14px}
+.global-question-search-input-wrap{position:relative}
+.global-question-search-input-wrap svg{position:absolute;left:12px;top:50%;width:17px;height:17px;color:#7457e6;transform:translateY(-50%);pointer-events:none}
+.global-question-search-input{height:44px!important;padding-left:39px!important;background:var(--bg2)!important;border:2px solid color-mix(in srgb,#7b61ff 38%,var(--border))!important;font-size:15px!important}
+.global-question-search-input:focus{border-color:#7457e6!important;box-shadow:0 0 0 3px rgba(116,87,230,.13);outline:0}
+.global-question-search-filter{height:44px!important;background:var(--bg2)!important;border:1px solid var(--border)!important;font-size:13px!important}
+.global-question-search-status{padding:9px 20px;border-bottom:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:11px;font-weight:750;letter-spacing:.02em}
+.global-question-search-results{flex:1 1 auto;min-height:0;overflow:auto;padding:14px 16px 20px;overscroll-behavior:contain}
+.global-question-search-empty{padding:50px 20px;text-align:center;color:var(--text3);font-size:13px;line-height:1.6}
+.global-question-result{--result-color:#7b61ff;margin-bottom:12px;border:1px solid var(--border);border-left:5px solid var(--result-color);border-radius:14px;background:var(--bg2);padding:13px 14px;box-shadow:0 7px 18px rgba(18,35,74,.06)}
+.global-question-result:last-child{margin-bottom:0}
+.global-question-result-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.global-question-result-subject{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;background:color-mix(in srgb,var(--result-color) 11%,var(--bg3));color:var(--result-color);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.05em}
+.global-question-result-source{color:var(--text3);font-family:var(--mono);font-size:10px;font-weight:700}
+.global-question-result-question{color:var(--text);font-size:14px;font-weight:750;line-height:1.5;overflow-wrap:anywhere}
+.global-question-result-question .quiz-question-table-block{font-weight:600}
+.global-question-result-answer{margin-top:11px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--success) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--success) 35%,var(--border));color:var(--text);font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.global-question-result-answer strong{color:var(--success)}
+.global-question-result details{margin-top:9px;border-top:1px solid var(--border);padding-top:8px}
+.global-question-result summary{cursor:pointer;color:#7457e6;font-size:11px;font-weight:800}
+.global-question-result-options{display:grid;gap:5px;margin-top:8px}
+.global-question-result-option{padding:6px 8px;border-radius:8px;background:var(--bg3);color:var(--text2);font-size:12px;line-height:1.4}
+.global-question-result-option.is-correct{border:1px solid color-mix(in srgb,var(--success) 40%,var(--border));color:var(--success);font-weight:750}
+.global-question-result-explanation{margin-top:8px;color:var(--text2);font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
 .modal.study-outline-modal{width:min(1560px,calc(100vw - 24px));max-width:none;max-height:94vh;padding:0;overflow:hidden}
 .study-outline-modal-body{max-height:94vh;overflow-y:auto}
 .study-window-head{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;gap:14px;padding:18px 22px;background:var(--bg2);border-bottom:1px solid var(--border)}
@@ -1769,6 +1805,13 @@ body.light-mode .option-letter{color:var(--text3) !important}
 <div id="condition-modal" class="modal-overlay hidden">
   <div class="modal" style="max-width:700px">
     <div id="condition-modal-body"></div>
+  </div>
+</div>
+
+<!-- GLOBAL QUESTION SEARCH -->
+<div id="global-question-search-modal" class="modal-overlay global-question-search-modal hidden" onclick="if(event.target===this)closeGlobalQuestionSearch()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="global-question-search-title">
+    <div id="global-question-search-body"></div>
   </div>
 </div>
 
@@ -5571,7 +5614,7 @@ async function renderHome(v){
     + '<div class="home-practice-grid">' + practiceCards + '</div>'
     + '</section>'
     + '<section class="home-section">'
-    + '<div class="home-section-head"><div class="home-section-title-row"><div class="home-section-title">Subject Cards</div><div class="home-subject-legend">🔬 Indicates microscopy images are available for that subject</div><button type="button" class="home-resource-link home-ascp-link monster-mix-launch" onclick="goMonsterMix()">Monster Mix Quiz</button></div></div>'
+    + '<div class="home-section-head"><div class="home-section-title-row"><div class="home-section-title">Subject Cards</div><div class="home-subject-legend">🔬 Indicates microscopy images are available for that subject</div><button type="button" class="home-resource-link home-ascp-link monster-mix-launch" onclick="goMonsterMix()">Monster Mix Quiz</button><button type="button" class="global-question-search-launch" onclick="openGlobalQuestionSearch()" title="Search every subject question" aria-label="Search every subject question"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.2 4.2"></path></svg></button></div></div>'
     + '<div class="home-subject-grid">' + cards + '</div>'
     + '</section>'
     + '<section class="home-section">'
@@ -5608,6 +5651,153 @@ async function renderHome(v){
   }
   loadAttemptsHome();
   loadInteractiveLinks();
+}
+
+const GLOBAL_QUESTION_SEARCH_KEYS=['blood_bank','clinical_chemistry','hematology','microbiology','parasitology','mycology','urinalysis','immunology','lab_operations'];
+let globalQuestionSearchBank=null;
+let globalQuestionSearchPromise=null;
+let globalQuestionSearchTimer=null;
+
+function globalQuestionSearchIcon(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.2 4.2"></path></svg>';
+}
+
+function globalQuestionSearchSubjectColor(subject){
+  return homeSubjectColor(subject==='parasitology'||subject==='mycology'?'para_myco':subject);
+}
+
+async function loadGlobalQuestionSearchBank(){
+  if(Array.isArray(globalQuestionSearchBank))return globalQuestionSearchBank;
+  if(globalQuestionSearchPromise)return globalQuestionSearchPromise;
+  globalQuestionSearchPromise=Promise.all(GLOBAL_QUESTION_SEARCH_KEYS.map(async subject=>{
+    const {data,error}=await sb.from('mlsboc_questions').select('*').eq('subject',subject);
+    if(error)throw error;
+    return (data||[]).map(question=>({...question,subject:question.subject||subject}));
+  })).then(groups=>{
+    const seen=new Set();
+    globalQuestionSearchBank=groups.flat().filter(question=>{
+      const key=quizQuestionKey(question)||String(question.id||'');
+      if(!key||seen.has(key))return false;
+      seen.add(key);return true;
+    });
+    return globalQuestionSearchBank;
+  }).finally(()=>{globalQuestionSearchPromise=null;});
+  return globalQuestionSearchPromise;
+}
+
+function closeGlobalQuestionSearch(){
+  clearTimeout(globalQuestionSearchTimer);
+  document.getElementById('global-question-search-modal')?.classList.add('hidden');
+}
+
+async function openGlobalQuestionSearch(){
+  const modal=document.getElementById('global-question-search-modal');
+  const body=document.getElementById('global-question-search-body');
+  if(!modal||!body)return;
+  const subjectOptions=GLOBAL_QUESTION_SEARCH_KEYS.map(key=>`<option value="${esc(key)}">${esc(subjectDisplayName(key))}</option>`).join('');
+  body.innerHTML=`
+    <div class="global-question-search-head">
+      <div class="global-question-search-title-row">
+        <div class="global-question-search-mark">${globalQuestionSearchIcon()}</div>
+        <div><div class="global-question-search-title" id="global-question-search-title">Search Every Question</div><div class="global-question-search-subtitle">Find a question, its correct answer, choices, and explanation across every subject.</div></div>
+        <button type="button" class="btn btn-ghost btn-sm ml-auto" onclick="closeGlobalQuestionSearch()" aria-label="Close question search">✕</button>
+      </div>
+      <div class="global-question-search-controls">
+        <div class="global-question-search-input-wrap">${globalQuestionSearchIcon()}<input id="global-question-search-input" class="global-question-search-input" type="search" autocomplete="off" placeholder="Search question, answer, keyword, or section…" oninput="scheduleGlobalQuestionSearch()" onkeydown="if(event.key==='Escape')closeGlobalQuestionSearch()"></div>
+        <select id="global-question-search-subject" class="global-question-search-filter" onchange="runGlobalQuestionSearch()" aria-label="Filter search by subject"><option value="">All subjects</option>${subjectOptions}</select>
+      </div>
+    </div>
+    <div class="global-question-search-status" id="global-question-search-status">Loading all subject question banks…</div>
+    <div class="global-question-search-results" id="global-question-search-results"><div class="global-question-search-empty">Preparing the global question index…</div></div>`;
+  modal.classList.remove('hidden');
+  requestAnimationFrame(()=>document.getElementById('global-question-search-input')?.focus());
+  try{
+    const bank=await loadGlobalQuestionSearchBank();
+    if(modal.classList.contains('hidden'))return;
+    const status=document.getElementById('global-question-search-status');
+    const results=document.getElementById('global-question-search-results');
+    if(status)status.textContent=`${bank.length.toLocaleString()} questions ready · Search across all ${GLOBAL_QUESTION_SEARCH_KEYS.length} subject banks`;
+    if(results)results.innerHTML='<div class="global-question-search-empty">Type at least two characters to search every subject.<br>The correct answer appears directly under each matching question.</div>';
+  }catch(error){
+    const status=document.getElementById('global-question-search-status');
+    const results=document.getElementById('global-question-search-results');
+    if(status)status.textContent='Question search could not load.';
+    if(results)results.innerHTML='<div class="global-question-search-empty">Could not load the question banks. Close this window and try again.</div>';
+  }
+}
+
+function scheduleGlobalQuestionSearch(){
+  clearTimeout(globalQuestionSearchTimer);
+  globalQuestionSearchTimer=setTimeout(runGlobalQuestionSearch,120);
+}
+
+function globalQuestionCorrectKey(question){
+  const raw=String(question?.correct_answer||question?.correct||'').trim().toLowerCase();
+  const key=raw.replace(/^option_/,'');
+  return /^[a-e]$/.test(key)?key:'';
+}
+
+function globalQuestionCorrectAnswer(question){
+  const key=globalQuestionCorrectKey(question);
+  if(key&&question?.['option_'+key])return String(question['option_'+key]);
+  const raw=String(question?.correct_answer||question?.correct||'').trim();
+  return raw||'Answer not added yet';
+}
+
+function globalQuestionSearchText(question){
+  return [questionPlainText(question),question?.option_a,question?.option_b,question?.option_c,question?.option_d,question?.option_e,globalQuestionCorrectAnswer(question),quizBookExplanation(question),subjectDisplayName(question?.subject),quizSourceLabel(question),question?.id]
+    .filter(Boolean).join(' ').toLowerCase().replace(/\s+/g,' ').trim();
+}
+
+function renderGlobalQuestionSearchResult(question){
+  const correctKey=globalQuestionCorrectKey(question);
+  const correctAnswer=globalQuestionCorrectAnswer(question);
+  const options=['a','b','c','d','e'].filter(key=>String(question?.['option_'+key]||'').trim());
+  const explanation=quizBookExplanation(question);
+  const source=quizSourceLabel(question);
+  const color=globalQuestionSearchSubjectColor(question.subject);
+  return `<article class="global-question-result" style="--result-color:${color}">
+    <div class="global-question-result-meta"><span class="global-question-result-subject">${esc(subjectDisplayName(question.subject))}</span>${source?`<span class="global-question-result-source">${esc(source)}</span>`:''}</div>
+    <div class="global-question-result-question">${renderStructuredQuizQuestion(question)}</div>
+    ${renderQuestionMedia(question)}
+    <div class="global-question-result-answer"><strong>Correct answer${correctKey?' '+correctKey.toUpperCase():''}:</strong> ${esc(correctAnswer)}</div>
+    ${options.length?`<details><summary>Show all answer choices</summary><div class="global-question-result-options">${options.map(key=>`<div class="global-question-result-option${key===correctKey?' is-correct':''}"><strong>${key.toUpperCase()}.</strong> ${esc(question['option_'+key])}</div>`).join('')}</div></details>`:''}
+    ${explanation?`<details><summary>Show explanation</summary><div class="global-question-result-explanation">${escNL(explanation)}</div></details>`:''}
+  </article>`;
+}
+
+function runGlobalQuestionSearch(){
+  const input=document.getElementById('global-question-search-input');
+  const filter=document.getElementById('global-question-search-subject');
+  const status=document.getElementById('global-question-search-status');
+  const results=document.getElementById('global-question-search-results');
+  if(!input||!status||!results)return;
+  const query=String(input.value||'').trim().toLowerCase().replace(/\s+/g,' ');
+  if(query.length<2){
+    status.textContent=`${(globalQuestionSearchBank||[]).length.toLocaleString()} questions ready · Type at least two characters`;
+    results.innerHTML='<div class="global-question-search-empty">Search by diagnosis, analyte, organism, calculation, answer wording, or book section.</div>';
+    return;
+  }
+  const terms=query.split(' ').filter(Boolean);
+  const subject=String(filter?.value||'');
+  const matches=(globalQuestionSearchBank||[]).filter(question=>{
+    if(subject&&question.subject!==subject)return false;
+    const searchable=globalQuestionSearchText(question);
+    return terms.every(term=>searchable.includes(term));
+  }).map(question=>{
+    const questionText=questionPlainText(question).toLowerCase();
+    const answerText=globalQuestionCorrectAnswer(question).toLowerCase();
+    const explanation=quizBookExplanation(question).toLowerCase();
+    let score=0;
+    if(questionText.includes(query))score+=100;
+    if(answerText.includes(query))score+=80;
+    if(explanation.includes(query))score+=35;
+    terms.forEach(term=>{if(questionText.includes(term))score+=12;if(answerText.includes(term))score+=9;});
+    return {question,score};
+  }).sort((a,b)=>b.score-a.score||subjectDisplayName(a.question.subject).localeCompare(subjectDisplayName(b.question.subject)));
+  const visible=matches.slice(0,80);
+  status.textContent=`${matches.length.toLocaleString()} match${matches.length===1?'':'es'}${subject?' in '+subjectDisplayName(subject):' across all subjects'}${matches.length>visible.length?' · Showing first '+visible.length:''}`;
+  results.innerHTML=visible.length?visible.map(item=>renderGlobalQuestionSearchResult(item.question)).join(''):'<div class="global-question-search-empty">No matching questions found. Try fewer words or switch back to All subjects.</div>';
 }
 
 async function renderInteractiveView(v){
