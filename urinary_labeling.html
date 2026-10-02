@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Urinary System – Label It!</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@700&display=swap');
@@ -26,9 +27,10 @@
     color: var(--text);
     min-height: 100vh;
     padding-bottom: 60px;
+    overflow-x: hidden;
   }
 
-  header {
+  .game-header {
     background: #2c2c2c;
     color: #fff;
     padding: 14px 28px;
@@ -36,8 +38,8 @@
     align-items: center;
     gap: 14px;
   }
-  header h1 { font-family: 'Caveat', cursive; font-size: 1.85rem; color: var(--yellow); }
-  header p  { font-size: 0.82rem; color: #bbb; margin-top: 2px; }
+  .game-header h1 { font-family: 'Caveat', cursive; font-size: 1.85rem; color: var(--yellow); }
+  .game-header p  { font-size: 0.82rem; color: #bbb; margin-top: 2px; }
   .badge {
     margin-left: auto;
     background: var(--accent);
@@ -66,6 +68,8 @@
     padding: 9px 20px;
     cursor: pointer;
     transition: background 0.15s, transform 0.1s;
+    min-height: 44px;
+    touch-action: manipulation;
   }
   .controls button:active { transform: scale(0.97); }
   #btn-check  { background: #2c2c2c; color: var(--yellow); }
@@ -136,6 +140,11 @@
   .chip:hover  { box-shadow: 0 3px 9px rgba(0,0,0,0.13); transform: translateY(-1px); border-color: #bbb; }
   .chip.dragging { opacity: 0.35; transform: scale(0.96); cursor: grabbing; }
   .chip.used   { opacity: 0.18; pointer-events: none; background: #f0ede6; }
+  .chip.selected {
+    border-color: var(--blue);
+    background: #eaf4ff;
+    box-shadow: 0 0 0 3px rgba(41,128,185,.2);
+  }
 
   /* ── DIAGRAM CENTRE ── */
   .diagram-wrap {
@@ -219,6 +228,13 @@
     color: #c0392b;
     border-style: solid;
   }
+  .image-slot.tap-ready,
+  .answer-slot.tap-ready {
+    background: #eaf4ff;
+    border-color: var(--blue);
+    border-style: solid;
+    color: var(--blue);
+  }
 
 
   /* ── ANSWER PANEL RIGHT ── */
@@ -274,6 +290,7 @@
     padding: 3px 6px;
     text-align: center;
     line-height: 1.3;
+    touch-action: manipulation;
   }
   .answer-slot.drag-over {
     background: #deeeff;
@@ -292,6 +309,57 @@
   .answer-slot.filled:hover { background: #fff0ee; border-color: var(--accent); }
   .answer-slot.correct { background: #edfaf3; border-color: var(--green); color: #1a6e3c; border-style: solid; }
   .answer-slot.wrong   { background: #fff0f0; border-color: #e74c3c; color: #c0392b; border-style: solid; }
+
+  @media (max-width: 900px) {
+    .main {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      grid-template-areas: "bank" "answers" "diagram";
+      gap: 12px;
+      margin-top: 12px;
+      padding: 0 10px;
+    }
+    .word-bank { grid-area: bank; }
+    .diagram-wrap { grid-area: diagram; }
+    .answer-panel { grid-area: answers; }
+    .word-bank,
+    .answer-panel {
+      position: static;
+      width: 100%;
+      max-height: none;
+      overflow: visible;
+    }
+    #chip-wrap { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+    .chip { min-height: 44px; margin: 0; padding: 8px; display: flex; align-items: center; justify-content: center; }
+    #answer-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px 10px; }
+    .answer-row { min-width: 0; margin: 0; }
+    .answer-slot { min-width: 0; min-height: 46px; overflow-wrap: anywhere; cursor: pointer; }
+  }
+
+  @media (max-width: 600px) {
+    body { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+    .game-header { padding: 12px; align-items: flex-start; flex-wrap: wrap; }
+    .game-header h1 { font-size: 1.5rem; }
+    .game-header p { font-size: .76rem; }
+    .badge { margin-left: 0; }
+    .controls { padding: 9px; }
+    .controls button { flex: 1 1 120px; padding-inline: 10px; }
+    #score-msg { width: 100%; text-align: center; }
+    #answer-list { grid-template-columns: minmax(0,1fr); }
+    .diagram-wrap .image-slot { display: none; }
+    .diagram-wrap .nc { width: 20px; height: 20px; font-size: .5rem; }
+    .hint-text::after { content: " Tap a word, then tap a numbered answer slot."; }
+  }
+
+  @media (max-width: 390px) {
+    #chip-wrap { grid-template-columns: minmax(0,1fr); }
+  }
+
+  @media (hover:none) {
+    .chip:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .chip:active,
+    .answer-slot:active { filter: brightness(.95); }
+  }
 </style>
 <script src="interactive_theme.js"></script>
 <link rel="stylesheet" href="interactive_learning.css">
@@ -306,10 +374,10 @@
 </header>
 
 
-<header>
+<header class="game-header">
   <div>
     <h1>🫁 Urinary System – Label It!</h1>
-    <p>Drag a word from the bank onto any numbered slot. Click a filled slot to return it.</p>
+    <p>Drag a word onto a numbered slot, or tap a word and then tap its destination. Tap a filled slot to return it.</p>
   </div>
   <div class="badge">21 Labels</div>
 </header>
@@ -326,7 +394,7 @@
   <!-- WORD BANK LEFT -->
   <div class="word-bank">
     <h2>Word Bank</h2>
-    <p class="hint-text">Drag any word to its number →</p>
+    <p class="hint-text">Drag any word to its number.</p>
     <div id="chip-wrap"></div>
   </div>
 
@@ -383,6 +451,36 @@ ITEMS.forEach(item => state[item.n] = null);
 let dragWord = null;    // word being dragged
 let dragFromN = null;   // slot it came from (if dragged from a slot)
 
+function clearTapSelection() {
+  dragWord = null;
+  dragFromN = null;
+  document.querySelectorAll('.chip.selected').forEach(chip => chip.classList.remove('selected'));
+  document.querySelectorAll('.image-slot.tap-ready, .answer-slot.tap-ready').forEach(slot => slot.classList.remove('tap-ready'));
+}
+
+function selectWordForTap(chip, word) {
+  const alreadySelected = chip.classList.contains('selected');
+  clearTapSelection();
+  if (alreadySelected || chip.classList.contains('used')) return;
+  dragWord = word;
+  chip.classList.add('selected');
+  document.querySelectorAll('.image-slot, .answer-slot').forEach(slot => slot.classList.add('tap-ready'));
+}
+
+function placeWordInSlot(n) {
+  if (!dragWord) return false;
+  if (dragFromN && dragFromN !== n) {
+    state[dragFromN] = null;
+    renderSlot(dragFromN);
+  }
+  state[n] = dragWord;
+  renderSlot(n);
+  clearTapSelection();
+  refreshChips();
+  clearScore();
+  return true;
+}
+
 // ── CIRCLES ON DIAGRAM ────────────────────────────────────────────────────────
 const wrap = document.getElementById('diagram-wrap');
 const imgEl = document.getElementById('img');
@@ -412,21 +510,11 @@ function buildCircles() {
     imageSlot.addEventListener('drop', e => {
       e.preventDefault();
       imageSlot.classList.remove('drag-over');
-      if (!dragWord) return;
-      const n = item.n;
-
-      if (dragFromN && dragFromN !== n) {
-        state[dragFromN] = null;
-        renderSlot(dragFromN);
-      }
-
-      state[n] = dragWord;
-      renderSlot(n);
-      dragWord = null; dragFromN = null;
-      refreshChips(); clearScore();
+      placeWordInSlot(item.n);
     });
 
     imageSlot.addEventListener('click', () => {
+      if (dragWord) { placeWordInSlot(item.n); return; }
       if (!state[item.n]) return;
       state[item.n] = null;
       renderSlot(item.n);
@@ -451,12 +539,14 @@ function buildChips() {
     chip.draggable = true;
 
     chip.addEventListener('dragstart', e => {
+      clearTapSelection();
       dragWord = word;
       dragFromN = null;
       chip.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
     });
     chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+    chip.addEventListener('click', () => selectWordForTap(chip, word));
 
     cw.appendChild(chip);
   });
@@ -500,23 +590,12 @@ function buildAnswerList() {
     slot.addEventListener('drop', e => {
       e.preventDefault();
       slot.classList.remove('drag-over');
-      if (!dragWord) return;
-      const n = item.n;
-
-      // Clear source slot if dragged from another slot
-      if (dragFromN && dragFromN !== n) {
-        state[dragFromN] = null;
-        renderSlot(dragFromN);
-      }
-
-      state[n] = dragWord;
-      renderSlot(n);
-      dragWord = null; dragFromN = null;
-      refreshChips(); clearScore();
+      placeWordInSlot(item.n);
     });
 
     // Click filled slot to return word to bank
     slot.addEventListener('click', () => {
+      if (dragWord) { placeWordInSlot(item.n); return; }
       if (!state[item.n]) return;
       state[item.n] = null;
       renderSlot(item.n);
@@ -526,6 +605,7 @@ function buildAnswerList() {
     // Allow dragging FROM a filled slot back or to another slot
     slot.addEventListener('dragstart', e => {
       if (!state[item.n]) { e.preventDefault(); return; }
+      clearTapSelection();
       dragWord = state[item.n];
       dragFromN = item.n;
       e.dataTransfer.effectAllowed = 'move';
@@ -591,11 +671,13 @@ document.getElementById('btn-check').addEventListener('click', () => {
 });
 
 document.getElementById('btn-reset').addEventListener('click', () => {
+  clearTapSelection();
   ITEMS.forEach(item => { state[item.n] = null; renderSlot(item.n); });
   refreshChips(); clearScore();
 });
 
 document.getElementById('btn-reveal').addEventListener('click', () => {
+  clearTapSelection();
   ITEMS.forEach(item => {
     state[item.n] = item.answer;
     renderSlot(item.n);
