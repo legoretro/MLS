@@ -105,7 +105,19 @@ select option{background:var(--bg3)}
 .subject-card:hover{border-color:#4f8ef766;background:var(--bg3);transform:translateY(-1px)}
 .subject-card.all-subjects{border-color:#4f8ef744;background:linear-gradient(135deg,var(--bg2),var(--bg3))}
 .subject-icon{font-size:22px}
-.subject-page-mark{width:42px;height:42px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);font-size:23px;box-shadow:0 5px 13px rgba(18,35,74,.08)}
+.subject-page-mark{width:88px;height:88px;border-radius:22px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);font-size:46px;box-shadow:0 5px 13px rgba(18,35,74,.08)}
+.subject-page-header{margin-bottom:24px}
+.subject-home-link{margin-bottom:18px}
+.subject-page-heading{display:flex;align-items:center;gap:24px;padding:26px 28px;border:1px solid var(--border);border-left:4px solid var(--subject-accent,var(--accent));border-radius:18px;background:var(--bg2)}
+.subject-page-copy{min-width:0;flex:1}
+.subject-page-kicker{font-size:11px;font-weight:750;letter-spacing:.13em;text-transform:uppercase;color:var(--text2);margin-bottom:5px}
+.subject-page-title{font-family:var(--serif);font-size:clamp(28px,3vw,38px);line-height:1.2;letter-spacing:-.025em;margin:0;overflow-wrap:anywhere}
+.subject-page-caption{font-size:14px;color:var(--text2);margin-top:8px}
+.subject-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:6px;border:1px solid var(--border);border-radius:14px;background:var(--bg2);margin-bottom:24px}
+.subject-tabs .tab{flex:1 1 auto;min-height:48px;padding:12px 20px;font-size:15px;border-radius:9px}
+.subject-tabs .tab.active{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg2));box-shadow:inset 0 -3px 0 var(--accent)}
+.subject-tabs .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:620px){.subject-page-heading{padding:20px 16px;gap:16px}.subject-page-mark{width:68px;height:68px;border-radius:18px;font-size:34px}.subject-page-title{font-size:27px}.subject-page-caption{font-size:13px}.subject-page-kicker{font-size:9px}.subject-tabs .tab{padding:10px 12px;font-size:14px}.subject-home-link{margin-bottom:14px}}
 .subject-page-mark img{width:100%;height:100%;display:block;object-fit:cover}
 .subject-name{font-size:14px;font-weight:600;color:var(--text)}
 .subject-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
@@ -3715,6 +3727,16 @@ Object.assign(STUDY_OUTLINES,{
   }
 });
 
+// Reuse the existing Microbiology guideline topics for this combined subject.
+STUDY_OUTLINES.para_myco={
+  title:'Parasitology / Mycology',accent:STUDY_OUTLINES.microbiology.accent,
+  description:'Parasitology and Mycology topics from the Microbiology content outline.',
+  ascp:{...STUDY_OUTLINES.microbiology.ascp,sections:STUDY_OUTLINES.microbiology.ascp.sections
+    .filter(section=>section.number==='III')
+    .map(section=>({...section,title:'Analytic Procedures for Parasitology and Mycology',topics:section.topics.filter(topic=>['C','D'].includes(topic.letter))}))},
+  chapters:[],bibliography:[...STUDY_OUTLINES.microbiology.bibliography]
+};
+
 const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Guess: MLS Edition',url:'Guess_MLS_Edition.html',description:'Pick a subject, read the clue, and guess the answer',topic:'All Subjects',icon:'MLS',color:'#6b4fd8'},
   {title:"Who's That Blood Group?",url:'Blood_Group_Game.html',description:'Timed blood group cases plus rapid antigen-gated mini rounds',topic:'Blood Bank',icon:'BG',color:'#b22222',preview_url:'assets/interactive-previews/blood_group_game.png?v=20260606-4'},
@@ -3944,7 +3966,7 @@ let sb = null;
 let isAdmin = false;
 let sessionUserId = null;
 let appState = {
-  view:'home', subject:null, subjectTab:'quiz',
+  view:'home', subject:null, subjectTab:'outline',
   quizQ:[], quizPool:[], quizMasteryQ:[], quizRetryRound:0, quizIdx:0, quizAns:[], quizStarted:false, quizDone:false, quizAllSelected:false,
   monsterSelected:[], monsterCounts:{}, monsterCountsLoaded:false,
   allQ:[], allPool:[], allMasteryQ:[], allRetryRound:0, allIdx:0, allAns:[], allPending:null, allStarted:false, allDone:false, allReviewUnlocked:false,
@@ -3986,12 +4008,12 @@ let appState = {
   _quizResultMap:{} // idx -> 'right'|'wrong'
 };
 
+let quizMusicRequest=0;
 let quizAudio={ctx:null,master:null,source:null,audio:null,customUrls:{},customReady:{},metas:{},metasLoaded:false,cloudLoaded:false,cloudSyncing:false,metaPromise:null,slot:1,on:false};
 
 function activeQuizOverlay(){
   const overlay=document.querySelector('.bbq-overlay');
   const subjectCaseQuizKeys=['uaQuizMode','immQuizMode','chemQuizMode','paraQuizMode','mycoQuizMode'];
-  const caseStudyActive=appState.view==='subject'&&appState.subjectTab==='cases';
   const caseQuizActive=appState.view==='subject'
     && appState.subjectTab==='cases'
     && (
@@ -4001,23 +4023,19 @@ function activeQuizOverlay(){
   const imageQuizActive=appState.view==='subject'
     && appState.subjectTab==='images'
     && (
-      appState.imgFlashMode
-      ||
-      (appState.uaImgMode==='quiz'&&!appState.uaQuizDone)
+      !appState.imgFlashMode && ((appState.uaImgMode==='quiz'&&!appState.uaQuizDone)
       || (appState.hemeImgMode==='quiz'&&!appState.hemeQuizDone)
-      || (appState.microImgMode==='quiz'&&!appState.microQuizDone)
+      || (appState.microImgMode==='quiz'&&!appState.microQuizDone))
     );
   const classRecallActive=appState.view==='class'
     && (
       (appState.classView==='quiz'&&!appState.classQuizDone&&!window._classShowQuizResume)
-      || appState.classView==='flashcard'
     );
   const active=(
     (appState.view==='subject'&&appState.subjectTab==='quiz'&&appState.quizStarted&&!appState.quizDone)
     || (appState.view==='monster_mix'&&appState.quizStarted&&!appState.quizDone)
     || classRecallActive
     || imageQuizActive
-    || caseStudyActive
     || caseQuizActive
   );
   return active?(overlay||document.body):null;
@@ -4028,7 +4046,7 @@ function syncQuizShell(){
   let dock=document.getElementById('quiz-audio-dock');
   if(!overlay){
     if(dock)dock.remove();
-    if(quizAudio.on)stopQuizMusic(false);
+    stopQuizMusic(false);
     return;
   }
   if(!dock){
@@ -4406,33 +4424,45 @@ async function loadQuizMusicUrl(slot=getQuizMusicActiveSlot()){
 }
 
 async function startQuizMusic(slot=getQuizMusicActiveSlot()){
+  if(!activeQuizOverlay())return;
+  slot=quizMusicSlot(slot);
+  if(quizAudio.on&&quizAudio.slot===slot)return;
+  stopQuizMusic(false);
+  const request=quizMusicRequest;
+  let audio;
   try{
-    slot=quizMusicSlot(slot);
-    if(quizAudio.on&&quizAudio.slot===slot)return;
-    if(quizAudio.on)stopQuizMusic(false);
     const url=await loadQuizMusicUrl(slot);
+    if(request!==quizMusicRequest||!activeQuizOverlay())return;
     if(!url){
       alert(`Mood ${slot} has no song yet. Log in as Admin and add one.`);
       return;
     }
-    if(quizAudio.audio){try{quizAudio.audio.pause();}catch(e){}}
-    const audio=new Audio(url);
+    audio=new Audio(url);
     audio.loop=true;
     audio.volume=getQuizMusicVolume();
     audio.preload='auto';
-    await audio.play();
+    // Track pending playback so exiting can pause it before play() resolves.
     quizAudio.audio=audio;
+    await audio.play();
+    if(request!==quizMusicRequest||!activeQuizOverlay()){
+      audio.pause();
+      return;
+    }
     quizAudio.slot=slot;
     quizAudio.on=true;
     safeLocalSet(QUIZ_MUSIC_ACTIVE_KEY,String(slot));
     updateQuizMusicButton();
   }catch(err){
+    if(audio)audio.pause();
+    if(request!==quizMusicRequest)return;
+    stopQuizMusic(false);
     console.warn('Quiz music failed',err);
     alert('Music could not start in this browser. You can keep quizzing without it.');
   }
 }
 
 function stopQuizMusic(persist=true){
+  quizMusicRequest++;
   if(quizAudio.source){try{quizAudio.source.stop();}catch(e){}quizAudio.source=null;}
   if(quizAudio.audio){
     try{quizAudio.audio.pause();quizAudio.audio.currentTime=0;}catch(e){}
@@ -4687,7 +4717,7 @@ window.__appInit = async function(){
         // Only restore safe views — skip quiz/exam in-progress states
         if(nav.view==='subject'&&nav.subject){
           appState.view='subject';appState.subject=nav.subject;
-          appState.subjectTab=nav.subjectTab||'quiz';
+          appState.subjectTab=nav.subjectTab||'outline';
         }else if(nav.view==='formulas'){
           appState.view='formulas';
         }
@@ -5332,6 +5362,7 @@ function exitAdmin(){
 
 // ─── ROUTING ──────────────────────────────────────────────────────────────────
 function renderView(){
+  if(!activeQuizOverlay())stopQuizMusic(false);
   if(appState.view==='class'&&!isAdmin){
     appState.view='home';appState.classView=null;appState.classSubject=null;appState.classSet=null;
   }
@@ -6155,9 +6186,10 @@ async function loadAttemptsHome(){
 
 // ─── SUBJECT VIEW ─────────────────────────────────────────────────────────────
 function goSubject(key){
+  stopQuizMusic(false);
   appState.subjectFlashItems=[];appState.subjectFlashIdx=0;appState.subjectFlashFlipped=false;appState.subjectFlashSubject=null;appState.subjectFlashSignature='';
-  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='quiz';appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;renderView();return;}
-  appState.view='subject';appState.subject=key;appState.subjectTab='quiz';
+  if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='outline';appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;renderView();return;}
+  appState.view='subject';appState.subject=key;appState.subjectTab='outline';
   appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;
   appState.microCasesPage=null;appState.caseSelections={};
   appState.hemeImgPage=null;appState.hemeImgMode='browse';
@@ -6185,44 +6217,85 @@ function subjectPageMark(key,subject){
   return '<span class="subject-page-mark" aria-hidden="true">'+(key==='para_myco'?'🍄🪱':(subject?.icon||homeSubjectCode(key,subject?.name)))+'</span>';
 }
 
-function renderSubjectView(v){
-  const s=SUBJECTS.find(x=>x.key===appState.subject);
+async function subjectPageAvailability(key){
+  const imageTables={hematology:'mlsboc_heme_conditions',microbiology:'mlsboc_micro_organisms',urinalysis:'mlsboc_ua_images'};
+  const caseTables={blood_bank:['mlsboc_bb_cases'],hematology:['mlsboc_heme_cases'],microbiology:['mlsboc_micro_cases'],urinalysis:['mlsboc_ua_cases'],para_myco:['mlsboc_para_cases','mlsboc_myco_cases']};
+  const hasRows=async query=>{
+    const {data,error}=await query.limit(1);
+    if(error)throw error;
+    return !!data?.length;
+  };
+  const imageQuery=imageTables[key]
+    ?sb.from(imageTables[key]).select('id').not('images','is',null).neq('images','[]')
+    :sb.from('mlsboc_images').select('id').in('subject',key==='para_myco'?PARA_MYCO_KEYS:[key]).not('image_url','is',null).neq('image_url','');
+  const imagesAllowed=!['clinical_chemistry','immunology','blood_bank','lab_operations'].includes(key);
+  const casesAllowed=!['clinical_chemistry','immunology'].includes(key);
+  const [images,cases]=await Promise.all([
+    imagesAllowed?hasRows(imageQuery):false,
+    !casesAllowed?false:caseTables[key]
+      ?Promise.all(caseTables[key].map(table=>hasRows(sb.from(table).select('id')))).then(results=>results.some(Boolean))
+      :hasRows(sb.from('mlsboc_cases').select('id').eq('subject',key))
+  ]);
+  return {images,cases};
+}
+
+async function renderSubjectView(v){
+  const key=appState.subject;
+  const s=SUBJECTS.find(x=>x.key===key);
   if(!s){goHome();return;}
-  const iconHtml=subjectPageMark(appState.subject,s);
-  const showImages=!['clinical_chemistry','immunology','blood_bank','lab_operations'].includes(appState.subject);
-  const showCases=!['clinical_chemistry','immunology'].includes(appState.subject);
-  if(appState.subjectTab==='images'&&!showImages)appState.subjectTab='quiz';
+  v.innerHTML='<div class="empty">Loading subject…</div>';
+  let availability;
+  try{availability=await subjectPageAvailability(key);}
+  catch(error){
+    if(appState.view!=='subject'||appState.subject!==key)return;
+    console.warn('Subject sections could not be loaded',error);
+    v.innerHTML='<div class="empty">Subject sections could not be loaded. <button class="btn btn-ghost" onclick="renderView()">Try again</button> <button class="btn btn-ghost" onclick="goHome()">← Home</button></div>';
+    return;
+  }
+  if(appState.view!=='subject'||appState.subject!==key)return;
+  const tabs=[
+    ...(STUDY_OUTLINES[key]?[['outline','Study Outline']]:[]),
+    ...(availability.images?[['images','Learn by Images']]:[]),
+    ['flashcards','Flashcards'],['quiz','Quiz'],
+    ...(availability.cases?[['cases','Cases']]:[])
+  ];
+  if(!tabs.some(([tab])=>tab===appState.subjectTab))appState.subjectTab=tabs[0][0];
   v.innerHTML=`
-    <div class="flex-center gap-12 mb-16 flex-wrap">
-      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
-      ${iconHtml}
-      <div class="section-title">${s.name}</div>
-      ${appState.subject==='para_myco'&&isAdmin?`<label style="margin-left:auto;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;font-size:11px;cursor:pointer">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
+    <div class="subject-page-header" style="--subject-accent:${homeSubjectColor(key)}">
+      <button class="btn btn-ghost btn-sm subject-home-link" onclick="goHome()">← Home</button>
+      <div class="subject-page-heading">
+        ${subjectPageMark(key,s)}
+        <div class="subject-page-copy">
+          <div class="subject-page-kicker">Medical Laboratory Science</div>
+          <h1 class="subject-page-title">${esc(s.name)}</h1>
+          <p class="subject-page-caption">Study, recall, and apply your knowledge.</p>
+        </div>
+        ${key==='para_myco'&&isAdmin?`<label style="margin-left:auto;cursor:pointer" aria-label="Update subject icon">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
+      </div>
     </div>
-    ${appState.subject==='para_myco'?'<div style="font-size:11px;color:var(--accent);margin-bottom:12px;font-style:italic">* Per ASCP BOC 2025, Parasitology &amp; Mycology are subcategories of Microbiology.</div>':''}
-    ${appState.subject==='microbiology'?'<div style="font-size:12px;color:var(--text2);margin-bottom:12px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)">ASCP note: Microbiology includes mycobacteriology, virology, parasitology, and mycology.</div>':''}
-    <div class="tabs">
-      <button class="tab ${appState.subjectTab==='quiz'?'active':''}" data-tab="quiz" onclick="switchTab('quiz')">Quiz</button>
-      ${STUDY_OUTLINES[appState.subject]?`<button class="tab ${appState.subjectTab==='outline'?'active':''}" data-tab="outline" onclick="switchTab('outline')">Study Outline</button>`:''}
-      ${showImages?`<button class="tab ${appState.subjectTab==='images'?'active':''}" data-tab="images" onclick="switchTab('images')">Learn by Images</button>`:''}
-      ${showCases?`<button class="tab ${appState.subjectTab==='cases'?'active':''}" data-tab="cases" onclick="switchTab('cases')">Cases</button>`:''}
-    </div>
+    ${key==='para_myco'?'<div style="font-size:12px;color:var(--text2);margin-bottom:16px">Per ASCP BOC 2025, Parasitology &amp; Mycology are subcategories of Microbiology.</div>':''}
+    ${key==='microbiology'?'<div style="font-size:12px;color:var(--text2);margin-bottom:16px">Microbiology includes mycobacteriology, virology, parasitology, and mycology.</div>':''}
+    <nav class="subject-tabs" aria-label="Subject sections">
+      ${tabs.map(([tab,label])=>`<button class="tab ${appState.subjectTab===tab?'active':''}" data-tab="${tab}" aria-current="${appState.subjectTab===tab?'page':'false'}" onclick="switchTab('${tab}')">${label}</button>`).join('')}
+    </nav>
     <div id="tab-content"></div>
   `;
   renderTab();
 }
 
 function switchTab(tab){
+  stopQuizMusic(false);
   // Update tab buttons immediately — no re-render wait
   document.querySelectorAll('.tab').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.tab===tab);
+    btn.setAttribute('aria-current',btn.dataset.tab===tab?'page':'false');
   });
   appState.subjectTab=tab;
   appState.quizStarted=false;appState.quizDone=false;appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizAllSelected=false;
   appState.microCasesPage=null;appState.caseSelections={};
   appState.hemeImgPage=null;appState.hemeImgMode='browse';
   appState.hemeQuizItems=[];appState.hemeQuizIdx=0;appState.hemeQuizAns=[];appState.hemeQuizDone=false;
-  appState.bbAnswers={};
+  appState.bbAnswers={};appState.bbQuizMode=false;appState.bbQuizDone=false;appState.uaQuizMode=false;appState.uaQuizModeDone=false;
   appState.hemeCaseAnswers={};
   appState.hemeCaseCollapsed={};
   appState.microImgPage=null;appState.microImgMode='browse';
@@ -6243,7 +6316,9 @@ function switchTab(tab){
 
 async function renderTab(){
   const el=document.getElementById('tab-content');if(!el)return;
+  syncQuizShell();
   if(appState.subjectTab==='quiz')await renderQuizTab(el);
+  else if(appState.subjectTab==='flashcards')await renderFlashcardsTab(el);
   else if(appState.subjectTab==='outline')await renderStudyOutlineTab(el);
   else if(appState.subjectTab==='images')await renderImagesTab(el);
   else if(appState.subjectTab==='cases')await renderCasesTab(el);
@@ -6291,6 +6366,7 @@ async function renderStudyOutlineTab(el){
         <button class="btn btn-ghost btn-sm study-guideline-button" type="button" onclick="openASCPGuideline()">See ASCP Guideline<br><span style="font-size:10px;font-weight:650">Revised September 25, 2025</span></button>
       </section>
       ${isAdmin?`<div class="study-outline-actions"><button class="btn btn-primary btn-sm" type="button" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','')">+ Add Study Topic</button></div>`:''}
+      ${subjectKey==='para_myco'?`<button class="btn btn-ghost" onclick="openASCPStudyOutline('para_myco')">View Parasitology &amp; Mycology outline →</button>`:''}
       ${cards?`<div class="study-outline-grid">${cards}</div>`:'<div class="study-custom-empty"></div>'}
       <details class="study-bibliography">
         <summary>Source bibliography (${outline.bibliography.length} books)</summary>
@@ -6590,6 +6666,20 @@ document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&document.querySelector('#condition-modal .ascp-guideline-modal'))closeASCPGuideline();
 });
 
+// ─── SUBJECT FLASHCARDS ───────────────────────────────────────────────────────
+async function renderFlashcardsTab(el){
+  const subject=appState.subject;
+  el.innerHTML='<div class="empty">Loading flashcards…</div>';
+  try{
+    const questions=await loadCurrentQuizQuestions();
+    if(!el.isConnected||appState.subject!==subject||appState.subjectTab!=='flashcards')return;
+    el.innerHTML=prepareSubjectFlashcards(questions)||'<div class="empty">No flashcards are available for this subject yet.</div>';
+  }catch(error){
+    if(!el.isConnected||appState.subject!==subject||appState.subjectTab!=='flashcards')return;
+    el.innerHTML='<div class="empty">Flashcards could not be loaded. <button class="btn btn-ghost" onclick="renderTab()">Try again</button></div>';
+  }
+}
+
 // ─── QUIZ TAB ─────────────────────────────────────────────────────────────────
 function prepareSubjectFlashcards(questions){
   const items=(questions||[]).filter(q=>q&&cleanQuestionText(q)&&q.correct_answer&&q['option_'+String(q.correct_answer).toLowerCase()]);
@@ -6828,9 +6918,10 @@ async function startMonsterMixQuiz(){
 async function renderQuizTab(el){
   if(appState.quizDone){renderQuizResults(el,false);return;}
   if(!appState.quizStarted){
+    const subject=appState.subject;
     const questions=await loadCurrentQuizQuestions();
+    if(!el.isConnected||appState.subject!==subject||appState.subjectTab!=='quiz'||appState.quizStarted)return;
     const count=questions.length;
-    const subjectFlashcards=prepareSubjectFlashcards(questions);
     const quizCountControls=`
       <div class="quiz-count-grid">
         <div class="quiz-count-field">
@@ -6861,7 +6952,7 @@ async function renderQuizTab(el){
             </div>
           </section>
         </div>
-        ${subjectFlashcards}`;
+        `;
       return;
     }
     el.innerHTML=`
@@ -6878,7 +6969,6 @@ async function renderQuizTab(el){
         </div>
         ${isAdmin?adminQuizControls():''}
       </div>
-      ${subjectFlashcards}
       ${isAdmin?renderQuizQuestionBank(questions):renderHiddenQuestionBankNote()}
     `;
     return;
@@ -7038,6 +7128,8 @@ async function loadCurrentQuizQuestions(){
   const results=await Promise.all(keys.map(key=>
     sb.from('mlsboc_questions').select('*').eq('subject',key)
   ));
+  const failed=results.find(result=>result.error);
+  if(failed)throw failed.error;
   return sortQuestionsForAdmin(results.flatMap((res,idx)=>(res.data||[]).map(q=>({...q,_subject:q.subject||keys[idx]}))));
 }
 
