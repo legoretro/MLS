@@ -18,6 +18,7 @@
 <!-- Apple touch icon (shown on home screen) -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230d0f12'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle' fill='%234f8ef7'%3E🩸%3C/text%3E%3C/svg%3E">
 
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&amp;family=Kalam:wght@400;700&amp;display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300..900;1,300..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..900;1,8..60,400..900&display=swap" rel="stylesheet">
@@ -1755,6 +1756,58 @@ body.light-mode .option-letter{color:var(--text3) !important}
   .flash-q-text{font-size:12px !important}
   .flash-opt-item{font-size:11px !important;padding:6px 8px !important}
 }
+/* Image recall: photographs keep their natural proportions without padded tiles. */
+.image-recall-gallery{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;width:100%;margin:0 auto 18px}
+.image-recall-gallery img{display:block;width:auto;height:auto;max-width:calc(50% - 5px);max-height:240px;border-radius:10px;cursor:zoom-in}
+.image-recall-gallery.is-single img{max-width:100%;max-height:50vh}
+.image-recall-prompt{font-size:clamp(18px,2vw,23px);font-weight:700;color:var(--text);text-align:center;line-height:1.4}
+.image-flash-overlay .bbq-body{padding-top:18px}
+.image-flash-overlay .quiz-audio-dock{position:relative;top:auto;right:auto;bottom:auto;align-self:flex-end;margin:12px 20px 0;flex-shrink:0;order:0;z-index:5}
+.image-flash-overlay .bbq-body{order:1}
+.outline-section-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:22px 0 14px}
+.outline-section-toolbar h3{font-size:21px;margin:0}
+.outline-section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.outline-section-wrap{position:relative;border:1px solid var(--border);border-radius:16px;background:var(--bg2);overflow:hidden}
+.outline-section-card{display:flex;align-items:center;gap:16px;text-align:left;width:100%;min-height:122px;padding:22px;background:transparent;color:var(--text)}
+.outline-section-card:hover{background:color-mix(in srgb,var(--study-accent) 6%,var(--bg2))}
+.outline-section-card:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.outline-section-number{display:flex;align-items:center;justify-content:center;flex-shrink:0;min-width:48px;min-height:48px;border-radius:12px;padding:6px;color:var(--study-accent);background:color-mix(in srgb,var(--study-accent) 12%,var(--bg2));font-size:21px;font-weight:800}
+.outline-section-copy{display:grid;gap:6px;flex:1;min-width:0}
+.outline-section-copy strong{font-size:18px;line-height:1.3}
+.outline-section-copy span,.outline-section-copy small{font-size:13px;color:var(--text2)}
+.outline-section-edit{margin:0 16px 12px}
+.outline-section-empty{padding:30px;border:1px dashed var(--border2);border-radius:14px;color:var(--text2);background:var(--bg2)}
+.modal.subject-sheet-modal{width:min(1160px,calc(100vw - 24px));max-width:none;height:94vh;max-height:94vh;padding:0;overflow:hidden}
+.subject-sheet-modal #condition-modal-body{height:100%;min-height:0}
+.subject-sheet-shell{display:flex;flex-direction:column;height:100%;min-height:0}
+.subject-sheet-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg2);font-size:14px;font-weight:700;flex-shrink:0}
+.subject-sheet-toolbar .btn{flex-shrink:0}
+.subject-sheet-scroll{flex:1;min-height:0;overflow:auto;padding:26px;background:var(--bg3);overscroll-behavior:contain}
+.subject-notebook{--paper:#fffdf7;--ink:#23314a;--rule:#798dae1c;max-width:1020px;margin:0 auto;padding:44px clamp(22px,4vw,54px);color:var(--ink);background:repeating-linear-gradient(0deg,transparent 0,transparent 31px,var(--rule) 32px),var(--paper);border-radius:8px;box-shadow:0 10px 32px #17264220;font-family:'Kalam','Comic Sans MS',cursive;font-size:19px;line-height:1.6}
+.notebook-heading{padding-bottom:24px;margin-bottom:26px;border-bottom:2px solid color-mix(in srgb,var(--ink-accent) 35%,transparent)}
+.notebook-eyebrow,.notebook-source{font-family:var(--sans);font-size:12px;line-height:1.6}
+.subject-notebook h1,.subject-notebook h2{font-family:'Caveat','Kalam',cursive;font-weight:700;color:var(--ink);line-height:1.18}
+.subject-notebook h1{font-size:clamp(38px,5vw,56px);margin:8px 0}
+.subject-notebook h2{font-size:34px;display:inline;background:linear-gradient(transparent 67%,color-mix(in srgb,var(--ink-accent) 20%,transparent) 67%,color-mix(in srgb,var(--ink-accent) 20%,transparent) 94%,transparent 94%);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.subject-notebook h3{font-family:'Kalam',cursive;font-size:21px;line-height:1.5;margin:0 0 7px;font-weight:700}
+.notebook-section{margin-top:32px;padding-top:4px;break-inside:avoid}
+.notebook-topics{columns:2;column-gap:36px;margin-top:22px}
+.notebook-topic{break-inside:avoid;padding-bottom:20px;overflow-wrap:anywhere}
+.notebook-lines{list-style:none;margin:0;padding:0}
+.notebook-lines li{margin:3px 0;font-size:18px;line-height:1.6}
+.notebook-lines .notebook-level-2{padding-left:16px}
+.notebook-lines .notebook-level-3{padding-left:30px}
+.notebook-lines .notebook-level-4{padding-left:42px}
+.notebook-calculations{padding-left:24px;margin-top:16px}
+.notebook-source-note,.notebook-range-note{font-size:16px;line-height:1.5;margin:16px 0}
+.notebook-source{margin-top:32px;padding-top:18px;border-top:1px solid var(--rule)}
+.notebook-table-scroll{overflow-x:auto;margin:12px 0 22px}
+.subject-notebook table{width:100%;border-collapse:collapse;min-width:480px;font-size:16px}
+.subject-notebook th,.subject-notebook td{text-align:left;padding:9px 10px;border-bottom:1px solid color-mix(in srgb,var(--ink) 15%,transparent);vertical-align:top}
+.subject-notebook thead{background:color-mix(in srgb,var(--ink-accent) 10%,transparent)}
+body:not(.light-mode) .subject-notebook{--paper:#202b3b;--ink:#eaf0fa;--rule:#b6c8e518}
+@media(max-width:680px){.outline-section-grid{grid-template-columns:1fr}.outline-section-card{padding:18px;min-height:104px}.subject-sheet-scroll{padding:10px}.subject-notebook{padding:26px 20px}.notebook-topics{columns:1}.subject-notebook h2{font-size:31px}.subject-sheet-toolbar{padding:12px}.image-recall-gallery img{max-height:190px}.image-flash-overlay .quiz-audio-dock{margin:10px 10px 0}.image-flash-overlay .bbq-body{padding-top:12px}}
+
 /* Flashcard flip animation */
 .flash-flip-scene{perspective:1200px;width:100%}
 .flash-flip-card{position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(.4,0,.2,1);width:100%}
@@ -1762,6 +1815,28 @@ body.light-mode .option-letter{color:var(--text3) !important}
 .flash-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r2) var(--r2) 0 0;width:100%}
 .flash-face-back{transform:rotateY(180deg);position:absolute;inset:0;background:var(--bg2);display:flex;align-items:center;justify-content:center}
 .flash-face-front{background:var(--bg2)}
+/* Authored study notes: section tree and reading pane. */
+.study-reader-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;align-items:start;margin:24px 0}
+.study-reader-nav{position:sticky;top:20px;max-height:80vh;overflow:auto;border-right:1px solid var(--border);padding:0 18px 20px 0}
+.study-nav-section{margin:12px 0 20px}.study-nav-heading.outline-section-card{display:flex;justify-content:space-between;width:100%;min-height:0;padding:12px 10px;border:0;border-radius:7px;background:transparent;font-size:14px;text-align:left;font-weight:850;box-shadow:none;line-height:1.4;color:var(--text)}
+.study-nav-heading small{color:var(--text3);margin-left:10px}.study-nav-heading.active{background:var(--bg3);border-left:3px solid var(--study-accent)}
+.study-nav-section h4{font-size:12px;letter-spacing:.05em;text-transform:uppercase;margin:18px 12px 6px;color:var(--text2)}
+.study-nav-topic{display:block;width:100%;padding:10px 14px;border:0;border-radius:7px;background:transparent;color:var(--text2);text-align:left;font:inherit;font-size:14px;cursor:pointer;margin:3px 0}
+.study-nav-topic.active{background:var(--bg3);color:var(--text);font-weight:750;box-shadow:inset 3px 0 var(--study-accent)}
+.study-reader-content{min-width:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;min-height:450px}
+.study-reader-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:22px}.study-reader-header h2{font-size:30px;line-height:1.2;margin:10px 0 0}.study-reader-header button{flex-shrink:0}
+.study-reader-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}.study-authored-notes{font-size:17px;line-height:1.8;overflow-wrap:anywhere}.study-authored-notes p{margin:0 0 12px}.study-authored-notes h3{font-size:25px;margin:26px 0 12px}.study-authored-notes h4{font-size:21px;margin:22px 0 12px}.study-note-space{height:12px}.study-note-bullet{padding-left:14px}
+.study-authored-visuals figure{margin:24px 0}.study-authored-visuals img{display:block;max-width:100%;max-height:720px;object-fit:contain;border-radius:8px}.study-authored-visuals figcaption,.study-topic-citation{font-size:13px;line-height:1.6;color:var(--text2);margin-top:10px}.study-topic-video{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;margin-top:20px}
+.study-visual-editor{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}.study-visual-editor img{width:100px;height:80px;object-fit:contain}.study-visual-editor label{flex:1}.study-visual-editor input{width:100%}
+/* Exam settings, numbered review and a standalone basic calculator. */
+.exam-settings{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}.exam-settings fieldset{border:1px solid var(--border);border-radius:12px;padding:18px}.exam-settings legend{font-weight:800;padding:0 6px}.exam-settings label{display:flex;align-items:center;gap:10px;margin:12px 0;line-height:1.5}.exam-settings input{width:18px;height:18px;flex-shrink:0}
+.exam-number-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px;padding:3px}.exam-number{min-height:40px;border:1px solid #b7c2cc;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;line-height:1.2;color:#243448;background:#fff}.exam-number.current{outline:3px solid #245783;outline-offset:2px}.exam-number.correct,.exam-number-legend .correct{background:#bde29d;border-color:#658e39;color:#173600}.exam-number.incorrect,.exam-number-legend .incorrect{background:#ffc5c0;border-color:#c54d45;color:#681c17}.exam-number.answered,.exam-number-legend .answered{background:#dce5f2;border-color:#6a829f}.exam-number-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;margin-top:10px;color:#495669}.exam-number-legend span{display:flex;gap:5px;align-items:center}.exam-number-legend i{width:13px;height:13px;border:1px solid #9ca9b6;border-radius:3px;background:white}.exam-sim-list-title{font-size:14px;margin:22px 0 0}.exam-sim-sidebar{overflow:auto}.exam-sim-mastered{line-height:1.6!important;font-size:12px!important}.exam-clock{display:flex;gap:12px;align-items:center;color:#354b61;font-size:12px}.exam-clock strong{font-variant-numeric:tabular-nums;font-size:17px}.time-low{color:#b03025}.exam-sim-subbar{justify-content:space-between;gap:16px}
+.exam-sim-option{padding:15px!important;border:1px solid #dbe1e7!important;border-radius:8px;background:#fafbfc;line-height:1.5;cursor:pointer}.exam-sim-option.is-correct{background:#ecf6e4;border-color:#82ac57!important}.exam-sim-option.is-incorrect{background:#fff0ee;border-color:#d28780!important}.exam-question-actions{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:24px}.exam-question-actions .exam-sim-submit{margin:0}.exam-answer-feedback{margin-top:24px;padding:20px;border-radius:10px;background:#f4f6f8;color:#263648;font-size:15px;line-height:1.65}.exam-answer-feedback.correct{border-left:4px solid #73a745}.exam-answer-feedback.incorrect{border-left:4px solid #c56459}.exam-answer-feedback p{margin:10px 0}.exam-answer-saved{font-size:14px;color:#435c74;margin-top:20px}.exam-results-review{margin:24px 0;background:var(--bg2);padding:24px;border:1px solid var(--border);border-radius:12px}.exam-results-review .exam-number-grid{grid-template-columns:repeat(auto-fill,minmax(48px,1fr))}.exam-timeout-note{padding:18px;border:1px solid var(--border);border-radius:10px;background:var(--bg3)}
+.exam-calculator-toggle{margin-left:auto;border:1px solid #ffffff80;background:#ffffff18;color:white;border-radius:6px;padding:9px 12px;cursor:pointer;font-weight:700}.exam-calculator{position:absolute;right:18px;top:66px;width:280px;z-index:710;border:1px solid #b9c4d0;background:white;color:#263648;box-shadow:0 12px 45px #172d4c40;border-radius:12px;padding:16px}.exam-calculator-head{display:flex;align-items:center;justify-content:space-between}.exam-calculator-head button{border:0;background:none;padding:8px;cursor:pointer;color:#263648}.exam-calculator output{display:block;background:#eef3f7;border:1px solid #cbd4dd;padding:15px 10px;margin:12px 0;text-align:right;min-height:54px;overflow-wrap:anywhere;font-size:21px;font-variant-numeric:tabular-nums}.exam-calculator-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.exam-calculator-keys button{padding:12px;border:1px solid #cbd4dd;border-radius:6px;background:#f8fafc;color:#263648;font-size:17px;cursor:pointer}.exam-calculator-keys button:hover{background:#dce8f3}
+.home-hubs-card.is-admin-locked{cursor:default;opacity:.78;transform:none!important}.home-hubs-card.is-admin-locked:hover{box-shadow:none}
+@media(max-width:850px){.study-reader-layout{grid-template-columns:220px minmax(0,1fr);gap:16px}.study-reader-content{padding:22px}.study-reader-header{flex-wrap:wrap}.study-reader-header h2{font-size:25px}.exam-clock{flex-direction:column;gap:2px}.exam-sim-subbar{padding:12px}.exam-settings{grid-template-columns:1fr}}
+@media(max-width:600px){.study-reader-layout{display:block}.study-reader-nav{position:static;max-height:260px;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:20px}.study-reader-content{padding:20px}.study-visual-editor{flex-wrap:wrap}.exam-sim-brand span{display:none}.exam-sim-topbar{padding:10px 14px}.exam-clock strong{font-size:13px}.exam-clock span{font-size:10px}.exam-sim-navgroup{gap:8px}.exam-sim-subbar .exam-sim-link{font-size:12px}.exam-sim-content{padding:24px 18px}.exam-sim-stem{font-size:18px}.exam-sim-option{font-size:16px}.exam-question-actions{flex-wrap:wrap}.exam-calculator{right:10px;max-width:calc(100vw - 20px)}}
+
 </style>
 </head>
 <body class="light-mode">
@@ -3737,6 +3812,9 @@ STUDY_OUTLINES.para_myco={
   chapters:[],bibliography:[...STUDY_OUTLINES.microbiology.bibliography]
 };
 
+// Extracted from the September 25, 2025 source PDF, pages 2–17.
+const ASCP_SUBJECT_SHEETS={"blood_bank":{"sections":[{"number":"I","title":"Blood Products","topics":[{"letter":"A","title":"Donors","lines":[{"level":1,"text":"1. Qualification"},{"level":1,"text":"2. Collection methods"},{"level":1,"text":"3. Adverse reactions"},{"level":1,"text":"4. Special donations (e.g., autologous)"}]},{"letter":"B","title":"Processing","lines":[{"level":1,"text":"1. Testing"},{"level":1,"text":"2. Labeling"}]},{"letter":"C","title":"Storage","lines":[{"level":1,"text":"1. Anticoagulants/additives"},{"level":1,"text":"2. Temperature requirements"},{"level":1,"text":"3. Transportation"},{"level":1,"text":"4. Properties of stored products"},{"level":1,"text":"5. Expiration"}]},{"letter":"D","title":"Blood Components","lines":[{"level":1,"text":"1. Red blood cells"},{"level":1,"text":"2. Cryoprecipitated AHF"},{"level":1,"text":"3. Platelets"},{"level":1,"text":"4. Plasma"},{"level":1,"text":"5. Granulocytes"},{"level":1,"text":"6. Leukocyte-reduced components"},{"level":1,"text":"7. Frozen/deglycerolized red blood cells"},{"level":1,"text":"8. Apheresis products"},{"level":1,"text":"9. Fractionation products"},{"level":1,"text":"10. Whole blood"},{"level":1,"text":"11. Washed red blood cells"},{"level":1,"text":"12. Irradiated components"}]},{"letter":"E","title":"Blood Component Quality Control","lines":[]}]},{"number":"II","title":"Blood Group Systems","topics":[{"letter":"A","title":"Genetics","lines":[{"level":1,"text":"1. Basic"},{"level":1,"text":"2. Molecular"},{"level":1,"text":"3. Inheritance of blood groups"}]},{"letter":"B","title":"Biochemistry/Antigens","lines":[{"level":1,"text":"1. ABO"},{"level":1,"text":"2. Lewis"},{"level":1,"text":"3. Rh"},{"level":1,"text":"4. MNS"},{"level":1,"text":"5. P1PK/Globoside(P)"},{"level":1,"text":"6. Ii"},{"level":1,"text":"7. Kell"},{"level":1,"text":"8. Kidd"},{"level":1,"text":"9. Duffy"},{"level":1,"text":"10. Lutheran"},{"level":1,"text":"11. Antigens of high prevalence"},{"level":1,"text":"12. Antigens of low prevalence"},{"level":1,"text":"13. HLA"},{"level":1,"text":"14. Platelet-specific"}]},{"letter":"C","title":"Role of Blood Groups in Transfusion","lines":[{"level":1,"text":"1. Immunogenicity"},{"level":1,"text":"2. Antigen prevalence"}]}]},{"number":"III","title":"Blood Group Immunology","topics":[{"letter":"A","title":"Immune Response","lines":[{"level":1,"text":"1. Primary and secondary response"},{"level":1,"text":"2. B and T cells, macrophages"},{"level":1,"text":"3. Genetics"}]},{"letter":"B","title":"Immunoglobulins","lines":[{"level":1,"text":"1. Classes and subclasses"},{"level":1,"text":"2. Structure"},{"level":1,"text":"3. Biologic and physical properties"}]},{"letter":"C","title":"Antigen-Antibody Interactions","lines":[{"level":1,"text":"1. Principles"},{"level":1,"text":"2. Testing"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Methods"}]},{"letter":"D","title":"Complement","lines":[{"level":1,"text":"1. Classical and alternative pathway mechanisms"},{"level":1,"text":"2. Biologic properties"}]}]},{"number":"IV","title":"Physiology and Pathophysiology","topics":[{"letter":"A","title":"Physiology of Blood","lines":[{"level":1,"text":"1. Circulation and blood volume"},{"level":1,"text":"2. Composition and function of blood"},{"level":2,"text":"a. Normal function"},{"level":2,"text":"b. Abnormal physiology"},{"level":1,"text":"3. Cell survival"},{"level":1,"text":"4. Cell metabolism"}]},{"letter":"B","title":"Hemostasis and Coagulation","lines":[{"level":1,"text":"1. Coagulation factors and disorders"},{"level":1,"text":"2. Platelet functions and disorders"}]},{"letter":"C","title":"Hemolytic Disease of the Fetus and Newborn","lines":[{"level":1,"text":"1. Pathophysiology"},{"level":1,"text":"2. Detection"},{"level":1,"text":"3. Treatment"},{"level":1,"text":"4. Prevention"}]},{"letter":"D","title":"Anemias","lines":[{"level":1,"text":"1. Congenital and acquired"},{"level":2,"text":"a. Pathophysiology"},{"level":2,"text":"b. Detection"},{"level":2,"text":"c. Treatment"},{"level":1,"text":"2. Immune hemolytic anemias: warm, cold, drug-induced"},{"level":2,"text":"a. Pathophysiology"},{"level":2,"text":"b. Detection"},{"level":2,"text":"c. Treatment"}]},{"letter":"E","title":"Transplantation","lines":[{"level":1,"text":"1. Solid organ"},{"level":1,"text":"2. Hematopoietic progenitor cell (HPC)"}]}]},{"number":"V","title":"Serologic and Molecular Testing","topics":[{"letter":"A","title":"Routine Tests","lines":[{"level":1,"text":"1. Blood grouping tests"},{"level":1,"text":"2. Compatibility tests"},{"level":2,"text":"a. Antibody detection"},{"level":2,"text":"b. Crossmatch"},{"level":1,"text":"3. Antibody identification/clinical significance"},{"level":1,"text":"4. Direct antiglobulin testing"}]},{"letter":"B","title":"Reagents","lines":[{"level":1,"text":"1. Antiglobulin sera"},{"level":1,"text":"2. Blood grouping sera"},{"level":1,"text":"3. Reagent red cells"}]},{"letter":"C","title":"Application of Special Tests and Reagents","lines":[{"level":1,"text":"1. Enzymes"},{"level":1,"text":"2. Enhancement media"},{"level":1,"text":"3. Lectins"},{"level":1,"text":"4. Adsorptions"},{"level":1,"text":"5. Elutions"},{"level":1,"text":"6. Titrations"},{"level":1,"text":"7. Cell separations"},{"level":1,"text":"8. ELISA"},{"level":1,"text":"9. Molecular techniques"},{"level":1,"text":"10. Neutralization/inhibition"},{"level":1,"text":"11. Use of thiol reagents"},{"level":1,"text":"12. Immunofluorescence"},{"level":1,"text":"13. Solid phase"},{"level":1,"text":"14. Column agglutination test"},{"level":1,"text":"15. Chloroquine diphosphate"},{"level":1,"text":"16. EDTA glycine-acid"}]},{"letter":"D","title":"Leukocyte/Platelet Testing","lines":[{"level":1,"text":"1. Cytotoxicity"},{"level":1,"text":"2. Platelet testing"}]},{"letter":"E","title":"Quality Assurance","lines":[{"level":1,"text":"1. Blood samples"},{"level":1,"text":"2. Reagents"},{"level":1,"text":"3. Test procedures"}]}]},{"number":"VI","title":"Transfusion Practice","topics":[{"letter":"A","title":"Indications for Transfusion","lines":[]},{"letter":"B","title":"Component Therapy","lines":[]},{"letter":"C","title":"Adverse Effects of Transfusion","lines":[{"level":1,"text":"1. Immunologic reactions"},{"level":1,"text":"2. Nonimmunologic reactions"},{"level":1,"text":"3. Transfusion-transmitted diseases"}]},{"letter":"D","title":"Apheresis and Extracorporeal Circulation","lines":[]},{"letter":"E","title":"Blood Administration and Patient Blood Management","lines":[]}]}],"pages":[2,3],"percent":"17 – 22%"},"urinalysis":{"sections":[{"number":"I","title":"Urinalysis","topics":[{"letter":"A","title":"Physical","lines":[{"level":1,"text":"1. Color and clarity"},{"level":1,"text":"2. Specific gravity/osmolality"}]},{"letter":"B","title":"Chemical","lines":[{"level":1,"text":"1. Reagent strip"},{"level":1,"text":"2. Confirmatory tests"}]},{"letter":"C","title":"Microscopic","lines":[{"level":1,"text":"1. Cells"},{"level":1,"text":"2. Casts"},{"level":1,"text":"3. Crystals"},{"level":1,"text":"4. Microorganisms"},{"level":1,"text":"5. Contaminants"},{"level":1,"text":"6. Artifacts"}]},{"letter":"D","title":"Renal Physiology","lines":[]},{"letter":"E","title":"Disease States","lines":[]}]},{"number":"II","title":"Body Fluids (e.g., CSF, Amniotic, Synovial, Serous, Semen, Feces)","topics":[{"letter":"A","title":"Physical","lines":[]},{"letter":"B","title":"Chemical","lines":[]},{"letter":"C","title":"Microscopic","lines":[]},{"letter":"D","title":"Physiology","lines":[]},{"letter":"E","title":"Disease States","lines":[]}]}],"pages":[4,14,16,17],"percent":"5 – 10%","references":[{"title":"Cerebrospinal fluid (CSF)","rows":[["WBC and RBC","0 – 5/µL","0 – 5 × 10⁶/L"],["Glucose","50 – 80 mg/dL","2.8 – 4.4 mmol/L"],["Protein","15 – 45 mg/dL","150 – 450 mg/L"]]},{"title":"Seminal fluid","rows":[["Liquefaction","30 – 60 minutes","30 – 60 minutes"],["WBC","< 1 × 10⁶/mL","< 1 × 10⁹/L"],["Volume","2 – 5 mL","2 – 5 mL"],["pH","7.2 – 8.0","7.2 – 8.0"],["Motility","> 50% within 1 hour","> 50% within 1 hour"],["Sperm concentration","> 20 × 10⁶/mL","> 20 × 10⁹/L"],["Morphology","> 30% normal forms","> 30% normal forms"]]},{"title":"Urine","rows":[["Specific gravity","1.003 – 1.035","1.003 – 1.035"],["pH","4.5 – 8.0","4.5 – 8.0"],["Protein","< 10 mg/dL, trace, or negative","< 0.1 g/L, trace, or negative"],["Bilirubin","negative","negative"],["Blood","negative","negative"],["Glucose","≤ 15 mg/dL or negative","≤ 0.8 mmol/L or negative"],["Nitrite","negative","negative"],["Leukocyte esterase","negative","negative"],["Urobilinogen","< 1.0 EU","< 17.0 µmol/L"],["Ketones","< 5 mg/dL or negative","< 0.5 mmol/L or negative"]]},{"title":"Urine microscopy","rows":[["RBC","0 – 3/HPF","0 – 3/HPF"],["WBC","0 – 8/HPF","0 – 8/HPF"],["Casts","0 – 2 hyaline/LPF","0 – 2 hyaline/LPF"],["Epithelial cells","0 – 5/HPF","0 – 5/HPF"]]}],"calculations":["Timed urine calculations","Creatinine clearance calculations","Manual hemocytometer counts"]},"clinical_chemistry":{"sections":[{"number":"I","title":"General Chemistry","topics":[{"letter":"A","title":"Carbohydrates","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolic pathways"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Physical and chemical properties"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":2,"text":"c. Tolerance testing"},{"level":2,"text":"d. Glycated proteins"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]},{"letter":"B","title":"Lipids","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolic pathways"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Physical and chemical properties"},{"level":3,"text":"1) Lipoproteins"},{"level":3,"text":"2) Phospholipids"},{"level":3,"text":"3) Triglycerides"},{"level":3,"text":"4) Cholesterol"},{"level":3,"text":"5) Apolipoproteins"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]},{"letter":"C","title":"Heme Derivatives","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolic pathways"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Physical and chemical properties"},{"level":3,"text":"1) Hemoglobin"},{"level":3,"text":"2) Bilirubin"},{"level":3,"text":"3) Urobilinogen"},{"level":3,"text":"4) Myoglobin"},{"level":3,"text":"5) Porphyrins"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]}]},{"number":"II","title":"Proteins and Enzymes","topics":[{"letter":"A","title":"Enzymes","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolic pathways"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Physical and chemical properties"},{"level":3,"text":"1) LD"},{"level":3,"text":"2) CK"},{"level":3,"text":"3) AST/ALT"},{"level":3,"text":"4) GGT"},{"level":3,"text":"5) Lipase"},{"level":3,"text":"6) Amylase"},{"level":3,"text":"7) Alkaline phosphatase"},{"level":3,"text":"8) Angiotensin converting enzyme"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]},{"letter":"B","title":"Proteins and Other Nitrogen-Containing Compounds","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolic pathways"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Physical and chemical properties"},{"level":3,"text":"1) Proteins"},{"level":3,"text":"2) Amino acids"},{"level":3,"text":"3) Urea"},{"level":3,"text":"4) Uric acid"},{"level":3,"text":"5) Creatinine"},{"level":3,"text":"6) Ammonia"},{"level":3,"text":"7) Tumor markers"},{"level":3,"text":"8) Cardiac markers"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":2,"text":"c. Clearances"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]}]},{"number":"III","title":"Acid-Base, Blood Gases, and Electrolytes","topics":[{"letter":"A","title":"Acid-Base Determinations (Including Blood Gases)","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Henderson-Hasselbach equation"},{"level":2,"text":"b. pH and H+ ion concentration"},{"level":2,"text":"c. CO2 and O2 transport"},{"level":2,"text":"d. Normal and abnormal states"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Analytical principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]},{"letter":"B","title":"Electrolytes","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Sodium, potassium, chloride, CO2, bicarbonate"},{"level":2,"text":"b. Calcium, magnesium, phosphorus, iron, TIBC"},{"level":2,"text":"c. Trace elements"},{"level":2,"text":"d. Normal and abnormal states"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"3. Calculations (osmolality, anion gap)"},{"level":1,"text":"4. Test result interpretation"},{"level":1,"text":"5. Disease state correlation"}]}]},{"number":"IV","title":"Special Chemistry","topics":[{"letter":"A","title":"Endocrinology","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolic pathways"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Mechanism of action"},{"level":2,"text":"d. Physical and chemical properties"},{"level":3,"text":"1) Steroid hormones (e.g., cortisol, estrogen, hCG)"},{"level":3,"text":"2) Peptide hormones (e.g., insulin, prolactin)"},{"level":3,"text":"3) Thyroid hormones"},{"level":3,"text":"4) Catecholamines"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":3,"text":"1) Fluorescence"},{"level":3,"text":"2) Immunoassay"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":2,"text":"c. Stimulation/suppression tests"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]},{"letter":"B","title":"Vitamins and Nutrition","lines":[{"level":1,"text":"1. Biochemical theory and physiology"},{"level":2,"text":"a. Metabolism and action"},{"level":2,"text":"b. Normal and abnormal states"},{"level":2,"text":"c. Properties"},{"level":1,"text":"2. Test procedures"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"3. Test result interpretation"},{"level":1,"text":"4. Disease state correlation"}]},{"letter":"C","title":"Therapeutic Drug Monitoring","lines":[{"level":1,"text":"1. Pharmacokinetics"},{"level":2,"text":"a. Therapeutic states"},{"level":2,"text":"b. Toxic states"},{"level":2,"text":"c. Metabolism and excretion"},{"level":1,"text":"2. Chemical and physical properties"},{"level":2,"text":"a. Aminoglycosides (e.g., gentamicin)"},{"level":2,"text":"b. Cardioactive (e.g., digoxin)"},{"level":2,"text":"c. Anticonvulsants (e.g., phenobarbital)"},{"level":2,"text":"d. Antidepressants (e.g., lithium)"},{"level":2,"text":"e. Immunosuppressants (e.g., tacrolimus)"},{"level":1,"text":"3. Test procedures"},{"level":2,"text":"a. Principles"},{"level":3,"text":"1) Immunoassay"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"4. Test result interpretation"},{"level":1,"text":"5. Disease state correlation"}]},{"letter":"D","title":"Toxicology","lines":[{"level":1,"text":"1. Toxicokinetics"},{"level":2,"text":"a. Toxic effects, signs and symptoms"},{"level":2,"text":"b. Metabolism and excretion"},{"level":1,"text":"2. Chemical and physical properties"},{"level":2,"text":"a. Alcohols"},{"level":2,"text":"b. Heavy metals (e.g., lead)"},{"level":2,"text":"c. Analgesics (e.g., acetaminophen)"},{"level":2,"text":"d. Drugs of abuse"},{"level":1,"text":"3. Test procedures"},{"level":2,"text":"a. Principles"},{"level":3,"text":"1) Immunoassay"},{"level":3,"text":"2) Enzymatic methods"},{"level":2,"text":"b. Special precautions, specimen collection and processing, troubleshooting, and interfering substances"},{"level":1,"text":"4. Test result interpretation"},{"level":1,"text":"5. Disease state correlation"}]}]}],"pages":[4,5,6,14,15],"percent":"17 – 22%","references":[{"title":"Chemistry","rows":[["Sodium","136 – 145 mmol/L","136 – 145 mmol/L"],["Potassium","3.5 – 5.1 mmol/L","3.5 – 5.1 mmol/L"],["Chloride","98 – 107 mmol/L","98 – 107 mmol/L"],["Total CO₂","22 – 33 mmol/L","22 – 33 mmol/L"],["Creatinine","0.8 – 1.2 mg/dL","71 – 106 µmol/L"],["Blood urea nitrogen (BUN)","6 – 20 mg/dL","2.1 – 7.1 mmol/L"],["Glucose (fasting)","74 – 100 mg/dL","4.1 – 5.6 mmol/L"],["Hemoglobin A₁C","< 5.7%","< 39 mmol/mol"],["Haptoglobin","30 – 200 mg/dL","0.3 – 2.0 g/L"]]},{"title":"Arterial blood gases","rows":[["pH","7.35 – 7.45","7.35 – 7.45"],["pCO₂","35 – 44 mm Hg","4.7 – 5.9 kPa"],["pO₂","> 80 mm Hg","> 10.6 kPa"],["O₂ saturation","> 95%","> 95%"],["HCO₃⁻ (bicarbonate)","23 – 29 mmol/L","23 – 29 mmol/L"]]}],"calculations":["% Transferrin saturation/UIBC/TIBC","Unconjugated/indirect bilirubin","LDL/Friedewald equation/non-HDL","A/G ratio","Timed urine calculations","Creatinine clearance calculations","Beer’s law"]},"hematology":{"sections":[{"number":"I","title":"Hematology Physiology (to include blood, body fluids, and bone marrow)","topics":[{"letter":"A","title":"Production","lines":[]},{"letter":"B","title":"Destruction","lines":[]},{"letter":"C","title":"Function","lines":[]}]},{"number":"II","title":"Hematology Disease States","topics":[{"letter":"A","title":"Erythrocytes","lines":[{"level":1,"text":"1. Anemia"},{"level":2,"text":"a. Microcytic"},{"level":3,"text":"1) Iron deficiency"},{"level":3,"text":"2) Thalassemia"},{"level":3,"text":"3) Sideroblastic"},{"level":3,"text":"4) Chronic inflammation"},{"level":2,"text":"b. Normocytic"},{"level":3,"text":"1) Hereditary hemolytic"},{"level":3,"text":"2) Acquired hemolytic"},{"level":3,"text":"3) Hypoproliferative"},{"level":3,"text":"4) Acute hemorrhage"},{"level":2,"text":"c. Macrocytic"},{"level":3,"text":"1) Megaloblastic"},{"level":3,"text":"2) Non-megaloblastic"},{"level":2,"text":"d. Hemoglobinopathies"},{"level":1,"text":"2. Erythrocytosis"},{"level":2,"text":"a. Relative"},{"level":2,"text":"b. Absolute"}]},{"letter":"B","title":"Leukocytes (WHO classification)","lines":[{"level":1,"text":"1. Benign leukocyte disorders"},{"level":2,"text":"a. Myeloid"},{"level":2,"text":"b. Lymphoid"},{"level":1,"text":"2. Myeloid neoplasia"},{"level":2,"text":"a. Acute leukemia"},{"level":2,"text":"b. Myelodysplastic syndromes"},{"level":2,"text":"c. Myeloproliferative neoplasms"},{"level":1,"text":"3. Lymphoid neoplasia"},{"level":2,"text":"a. Acute leukemia"},{"level":2,"text":"b. Chronic leukemia/lymphoma"},{"level":2,"text":"c. Plasma cell dyscrasias"},{"level":1,"text":"4. Hereditary anomalies"}]},{"letter":"C","title":"Platelets","lines":[{"level":1,"text":"1. Quantitative abnormalities"},{"level":2,"text":"a. Thrombocytopenia"},{"level":3,"text":"1) Increased destruction (e.g., ITP, TTP, HIT)"},{"level":3,"text":"2) Decreased production"},{"level":3,"text":"3) Pseudothrombocytopenia"},{"level":2,"text":"b. Thrombocytosis"},{"level":1,"text":"2. Qualitative defects"},{"level":2,"text":"a. von Willebrand disease"},{"level":2,"text":"b. Bernard-Soulier syndrome"},{"level":2,"text":"c. Glanzmann thrombasthenia"}]}]},{"number":"III","title":"Hematology Laboratory Testing","topics":[{"letter":"A","title":"Cell Counts (to include blood and body fluids)","lines":[{"level":1,"text":"1. Manual"},{"level":1,"text":"2. Automated"},{"level":1,"text":"3. Reticulocytes"},{"level":1,"text":"4. Spurious results"}]},{"letter":"B","title":"Differentials and Morphology Evaluation (to include blood and body fluids)","lines":[]},{"letter":"C","title":"Hemoglobin","lines":[{"level":1,"text":"1. Quantitative"},{"level":1,"text":"2. Qualitative"},{"level":2,"text":"a. Electrophoresis"},{"level":2,"text":"b. HPLC"},{"level":2,"text":"c. Sickle solubility"}]},{"letter":"D","title":"Hematocrit","lines":[]},{"letter":"E","title":"Indices","lines":[]},{"letter":"F","title":"Hemolytic Indicators (e.g., haptoglobin, LD)","lines":[]},{"letter":"G","title":"Special Stains","lines":[{"level":1,"text":"1. Esterase"},{"level":1,"text":"2. Myeloperoxidase"},{"level":1,"text":"3. Prussian blue"},{"level":1,"text":"4. Kleihauer-Betke"}]},{"letter":"H","title":"Other Studies","lines":[{"level":1,"text":"1. ESR"},{"level":1,"text":"2. G-6-PD"},{"level":1,"text":"3. Heinz body"}]},{"letter":"I","title":"Flow Cytometry Immunophenotyping","lines":[{"level":1,"text":"1. Leukemia"},{"level":1,"text":"2. Lymphoma"},{"level":1,"text":"3. Lymphocyte subsets"},{"level":1,"text":"4. PNH"}]},{"letter":"J","title":"Molecular and Cytogenetic Testing","lines":[{"level":1,"text":"1. Recurring cytogenetic abnormalities (WHO classification)"},{"level":1,"text":"2. BCR/ABL1"},{"level":1,"text":"3. JAK2"}]}]},{"number":"IV","title":"Hemostasis","topics":[{"letter":"A","title":"Physiology","lines":[{"level":1,"text":"1. Coagulation pathways"},{"level":1,"text":"2. Fibrinolytic pathway"},{"level":1,"text":"3. Vascular system"}]},{"letter":"B","title":"Disease States","lines":[{"level":1,"text":"1. Coagulation factor deficiencies"},{"level":2,"text":"a. Acquired"},{"level":2,"text":"b. Hereditary"},{"level":1,"text":"2. Inhibitors"},{"level":1,"text":"3. Fibrinolytic system"},{"level":1,"text":"4. Hypercoagulable states"},{"level":1,"text":"5. DIC"}]},{"letter":"C","title":"Laboratory Determinations","lines":[{"level":1,"text":"1. PT/INR"},{"level":1,"text":"2. APTT"},{"level":1,"text":"3. Fibrinogen"},{"level":1,"text":"4. D-dimer"},{"level":1,"text":"5. Thrombin time"},{"level":1,"text":"6. Mixing studies"},{"level":1,"text":"7. Platelet function (e.g., PFA)"},{"level":1,"text":"8. Inhibitor assays"},{"level":1,"text":"9. Factor assays"},{"level":1,"text":"10. von Willebrand assays"},{"level":1,"text":"11. Platelet aggregation"},{"level":1,"text":"12. Thromboelastography"},{"level":1,"text":"13. Hypercoagulability assessment"},{"level":2,"text":"a. Assays (e.g., lupus anticoagulant, protein S, protein C, HIT studies)"},{"level":2,"text":"b. Molecular (e.g., factor V Leiden, prothrombin 20210)"},{"level":1,"text":"14. Anti-Xa"},{"level":1,"text":"15. Direct thrombin inhibitors"},{"level":1,"text":"16. Heparin neutralization"}]}]}],"pages":[7,8,14,15,16],"percent":"17 – 22%","references":[{"title":"Hematology","rows":[["RBC","4.00 – 6.00 × 10⁶/µL","4.00 – 6.00 × 10¹²/L"],["HGB","12.0 – 18.0 g/dL","120 – 180 g/L"],["HCT","35 – 50%","0.35 – 0.50 L/L"],["MCV","76 – 100 fL","76 – 100 fL"],["MCH","26 – 34 pg","26 – 34 pg"],["MCHC","32 – 36 g/dL","320 – 360 g/L"],["RDW","11.5 – 14.5%","0.115 – 0.145"],["Reticulocytes (absolute)","20 – 115 × 10³/µL","20 – 115 × 10⁹/L"],["Reticulocytes (relative)","0.5 – 2.5%","0.005 – 0.025"],["nRBCs","0 nRBC/100 WBC","0 nRBC/100 WBC"],["Platelets","150 – 450 × 10³/µL","150 – 450 × 10⁹/L"],["WBC (Total)","3.6 – 10.6 × 10³/µL","3.6 – 10.6 × 10⁹/L"],["Neutrophils (absolute)","1.7 – 7.5 × 10³/µL","1.7 – 7.5 × 10⁹/L"],["Neutrophils (relative)","50 – 70%","0.50 – 0.70"],["Lymphocytes (absolute)","1.0 – 3.2 × 10³/µL","1.0 – 3.2 × 10⁹/L"],["Lymphocytes (relative)","18 – 42%","0.18 – 0.42"],["Monocytes (absolute)","0.1 – 1.3 × 10³/µL","0.1 – 1.3 × 10⁹/L"],["Monocytes (relative)","2 – 11%","0.02 – 0.11"],["Eosinophils (absolute)","0 – 0.3 × 10³/µL","0 – 0.3 × 10⁹/L"],["Eosinophils (relative)","1 – 3%","0.01 – 0.03"],["Basophils (absolute)","0 – 0.2 × 10³/µL","0 – 0.2 × 10⁹/L"],["Basophils (relative)","0 – 2%","0.00 – 0.02"]]}],"calculations":["Corrected WBC counts when > 10 nRBCs present","Manual hemocytometer counts","Red blood cell indices (e.g., MCV, MCH, MCHC)","Absolute cell counts given the relative values (e.g., WBCs, reticulocytes)"]},"immunology":{"sections":[{"number":"I","title":"Principles of Immunology","topics":[{"letter":"A","title":"Immune System Physiology","lines":[{"level":1,"text":"1. Primary and secondary response"},{"level":1,"text":"2. B and T cells, macrophages"},{"level":1,"text":"3. Genetics"}]},{"letter":"B","title":"Immunoglobulins","lines":[{"level":1,"text":"1. Classes and subclasses"},{"level":1,"text":"2. Structure"},{"level":1,"text":"3. Biologic and physical properties"}]},{"letter":"C","title":"Antigen-Antibody Interactions","lines":[{"level":1,"text":"1. Principles"},{"level":1,"text":"2. Testing"},{"level":2,"text":"a. Principles"},{"level":2,"text":"b. Methods"}]},{"letter":"D","title":"Complement","lines":[{"level":1,"text":"1. Classical and alternative pathway mechanisms"},{"level":1,"text":"2. Biologic properties"}]}]},{"number":"II","title":"Diseases of the Immune System","topics":[{"letter":"A","title":"Autoimmunity","lines":[{"level":1,"text":"1. Systemic (e.g., SLE)"},{"level":1,"text":"2. Organ-specific (e.g., Graves disease)"}]},{"letter":"B","title":"Hypersensitivity","lines":[{"level":1,"text":"1. I, II, III, IV"}]},{"letter":"C","title":"Immunoproliferative Diseases","lines":[{"level":1,"text":"1. Monoclonal gammopathies (e.g., plasma cell myeloma, Waldenström macroglobulinemia)"}]},{"letter":"D","title":"Immunodeficiency","lines":[{"level":1,"text":"1. Hereditary (e.g., SCID)"},{"level":1,"text":"2. Acquired (e.g., HIV)"}]}]},{"number":"III","title":"Transplantation","topics":[{"letter":"A","title":"Graft-versus-host Disease","lines":[]},{"letter":"B","title":"HLA Typing","lines":[]},{"letter":"C","title":"Tumor Immunology","lines":[]}]},{"number":"IV","title":"Infectious Disease Serology","topics":[{"letter":"A","title":"Clinical Significance and Epidemiology of Viral Pathogens (e.g., hepatitis [A, B, C], EBV, HIV, CMV, rubella, measles)","lines":[]},{"letter":"B","title":"Stages of Infection of Treponema pallidum and Borrelia burgdorferi","lines":[]},{"letter":"C","title":"Tuberculosis Infection (e.g., interferon-gamma release assay, PPD)","lines":[]}]},{"number":"V","title":"Serologic Procedures","topics":[{"letter":"A","title":"ANA","lines":[]},{"letter":"B","title":"Thyroid Antibodies","lines":[]},{"letter":"C","title":"Rheumatoid Factor","lines":[]},{"letter":"D","title":"Labeled Immunoassays (e.g., ELISA)","lines":[]},{"letter":"E","title":"Nontreponemal Syphilis Testing (e.g., RPR)","lines":[]},{"letter":"F","title":"Treponemal Syphilis Testing (e.g., MHATP)","lines":[]},{"letter":"G","title":"Cytokine Testing","lines":[]},{"letter":"H","title":"Immunofluorescence","lines":[]}]},{"number":"VI","title":"Test Results","topics":[{"letter":"A","title":"Interpretation","lines":[]},{"letter":"B","title":"Confirmatory Testing","lines":[]},{"letter":"C","title":"Disease State Correlation","lines":[]}]}],"pages":[8,9],"percent":"5 – 10%"},"microbiology":{"sections":[{"number":"I","title":"Preanalytic Procedures","topics":[{"letter":"A","title":"Specimen Collection and Transport","lines":[{"level":1,"text":"1. Patient identification and specimen labeling"},{"level":1,"text":"2. Specimen collection"},{"level":1,"text":"3. Specimen transport systems and conditions for all organisms"}]},{"letter":"B","title":"Specimen Processing","lines":[{"level":1,"text":"1. Specimen prioritization and rejection criteria"},{"level":1,"text":"2. Biosafety cabinet and personal protective equipment"},{"level":1,"text":"3. Specimen preparation methods and applications"},{"level":1,"text":"4. Media"},{"level":1,"text":"5. Inoculation of media"},{"level":1,"text":"6. Incubation conditions (e.g., temperature, atmosphere, duration)"},{"level":1,"text":"7. Preparation methods for slides used for stains"}]},{"letter":"C","title":"Stains: Procedure, Principle, and Interpretation","lines":[{"level":1,"text":"1. Gram"},{"level":1,"text":"2. Acid-fast"},{"level":1,"text":"3. Modified acid-fast"},{"level":1,"text":"4. KOH and calcofluor-white"},{"level":1,"text":"5. Trichrome"},{"level":1,"text":"6. Giemsa"},{"level":1,"text":"7. Acridine orange"}]}]},{"number":"II","title":"Analytic Procedures for Bacteriology","topics":[{"letter":"A","title":"Blood and Bone Marrow","lines":[{"level":1,"text":"1. Specimen sources (e.g., peripheral, intravenous catheters)"},{"level":1,"text":"2. Continuous-monitoring systems"},{"level":1,"text":"3. Rapid identification/resistance detection methods"},{"level":1,"text":"4. Species comprising skin flora and clinical significance"},{"level":1,"text":"5. Colony morphology and identification of major pathogens (e.g., Staphylococcus aureus, other Staphylococcus spp. including coagulase-negative staphylococci, beta-hemolytic streptococci, Enterococcus spp., Candida spp., Streptococcus pneumoniae, Acinetobacter baumannii, Enterobacteriaceae, Pseudomonas spp.)"},{"level":1,"text":"6. Common agents of endocarditis"},{"level":1,"text":"7. Agents of bone marrow infection (e.g., Brucella spp., Salmonella spp.)"},{"level":1,"text":"8. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"B","title":"Cerebrospinal Fluid","lines":[{"level":1,"text":"1. Specimen sources (e.g., lumbar puncture, shunt, reservoir)"},{"level":1,"text":"2. Colony morphology and identification of major pathogens associated with acute meningitis (e.g., Streptococcus pneumoniae, Haemophilus influenzae, Neisseria meningitidis, Escherichia coli, Listeria monocytogenes, Enterobacteriaceae, Staphylococcus aureus, beta-hemolytic streptococci)"},{"level":1,"text":"3. Common agents of shunt infections (e.g., other Staphylococcus spp. including coagulase-negative staphylococci, Corynebacterium spp., Propionibacterium spp., Cutibacterium spp.)"},{"level":1,"text":"4. Correlation with other laboratory results (e.g., glucose, protein, cell count)"},{"level":1,"text":"5. Direct detection and molecular methods"},{"level":1,"text":"6. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"C","title":"Body Fluids from Normally Sterile Sites","lines":[{"level":1,"text":"1. Specimen sources (e.g., pleural, peritoneal, pericardial, vitreous and aqueous humor, synovial, amniotic)"},{"level":1,"text":"2. Indigenous organisms associated with mucosal surfaces and skin"},{"level":1,"text":"3. Colony morphology and identification of major pathogens (e.g., Streptococcus pneumoniae, Haemophilus influenzae, Neisseria spp., Escherichia coli, Listeria monocytogenes, Enterobacteriaceae, Staphylococcus aureus, beta-hemolytic streptococci, Enterococcus spp., Pseudomonas aeruginosa, Acinetobacter spp., Clostridium perfringens, Bacteroides fragilis group)"},{"level":1,"text":"4. Molecular methods"},{"level":1,"text":"5. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"D","title":"Lower Respiratory","lines":[{"level":1,"text":"1. Specimen sources (e.g., sputum, endotracheal aspirate, bronchoalveolar lavage, bronchial wash, bronchial brush)"},{"level":1,"text":"2. Significance of quantitative and semi-quantitative reporting of results"},{"level":1,"text":"3. Species comprising oral flora colony and Gram stain morphology"},{"level":1,"text":"4. Colony morphology and identification of major pathogens"},{"level":1,"text":"5. Direct detection and molecular methods (e.g., Streptococcus pyogenes, Bordetella pertussis)"},{"level":1,"text":"6. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"E","title":"Upper Respiratory","lines":[{"level":1,"text":"1. Specimen sources (e.g., throat, nasopharynx, middle ear, sinus)"},{"level":1,"text":"2. Indigenous flora colony and Gram stain morphology"},{"level":1,"text":"3. Colony morphology and identification of major pathogens"},{"level":1,"text":"4. Direct detection and molecular methods (e.g., Streptococcus pyogenes, Bordetella pertussis)"},{"level":1,"text":"5. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"F","title":"Gastrointestinal","lines":[{"level":1,"text":"1. Colony morphology and identification of major pathogens (e.g., Salmonella spp., Shigella spp., toxigenic Escherichia coli, Campylobacter spp., Vibrio spp., Yersinia enterocolitica, Aeromonas spp., Plesiomonas shigelloides)"},{"level":1,"text":"2. Direct detection and molecular methods (e.g., Clostridioides difficile, Shiga toxin)"},{"level":1,"text":"3. Serotyping of Escherichia coli, Salmonella spp., and Shigella spp."},{"level":1,"text":"4. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"},{"level":1,"text":"5. Detection methods for Helicobacter pylori"}]},{"letter":"G","title":"Skin, Soft Tissue, and Bone","lines":[{"level":1,"text":"1. Specimen sources (e.g., wound, abscess, biopsy)"},{"level":1,"text":"2. Indigenous flora colony and Gram stain morphology"},{"level":1,"text":"3. Colony morphology and identification of major pathogens"},{"level":1,"text":"4. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"H","title":"Genital Tract","lines":[{"level":1,"text":"1. Specimen sources (e.g., vaginal, cervical, urethral, endocervical)"},{"level":1,"text":"2. Indigenous organisms colony and Gram stain morphology"},{"level":1,"text":"3. Methods for detection of pathogens associated with vaginitis (e.g., Trichomonas vaginalis, Candida spp., bacterial vaginosis)"},{"level":1,"text":"4. Culture and/or molecular detection (e.g., Neisseria gonorrhoeae, Chlamydia trachomatis, Streptococcus agalactiae, and Mycoplasma spp.)"},{"level":1,"text":"5. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"I","title":"Urine","lines":[{"level":1,"text":"1. Specimen sources (e.g., mid-stream clean-catch, catheterized, suprapubic, nephrostomy)"},{"level":1,"text":"2. Colony morphology and identification of major urinary pathogens (e.g., Enterobacteriaceae, Enterococcus spp., Streptococcus agalactiae, Candida spp., Staphylococcus saprophyticus)"},{"level":1,"text":"3. Correlation of colony counts with clinical significance"},{"level":1,"text":"4. Correlation of culture with urinalysis results"}]},{"letter":"J","title":"Identification Methods (Theory, Interpretation, and Application)","lines":[{"level":1,"text":"1. Colony morphology"},{"level":1,"text":"2. Rapid tests used for presumptive identification (e.g., coagulase, catalase, oxidase, indole, PYR)"},{"level":1,"text":"3. Conventional biochemical identification (e.g., X and V factors, Neisseria carbohydrate utilization)"},{"level":1,"text":"4. Commercial kits"},{"level":1,"text":"5. Automated methods"},{"level":1,"text":"6. MALDI-TOF MS"},{"level":1,"text":"7. Multiplex molecular methods"},{"level":1,"text":"8. Sequencing (e.g., 16S)"}]},{"letter":"K","title":"Antimicrobial Susceptibility Testing and Antibiotic Resistance","lines":[{"level":1,"text":"1. Method, theory, interpretation, and application"},{"level":1,"text":"2. Phenotypic detection of resistance (e.g., beta-lactamase, ESBL, inducible clindamycin resistance, carbapenamases)"},{"level":1,"text":"3. Mechanisms of action of major antibiotic classes"},{"level":1,"text":"4. Detection of genetic determinants of resistance (e.g., mecA, vanA, blaKPC)"},{"level":1,"text":"5. Intrinsic resistance patterns for common species"}]},{"letter":"L","title":"MRSA/MSSA, VRE, ESBL/CRE Screening","lines":[{"level":1,"text":"1. Specimen sources"},{"level":1,"text":"2. Culture methods"},{"level":1,"text":"3. Molecular methods"}]},{"letter":"M","title":"BSL-3 Pathogens and Select Agents (Bioterrorism)","lines":[{"level":1,"text":"1. Specimen sources (e.g., blood, sputum, tissue, lymph node)"},{"level":1,"text":"2. Colony morphology and rapid tests used for presumptive identification (e.g., Bacillus anthracis, Yersinia pestis, Brucella spp., Francisella tularensis)"},{"level":1,"text":"3. Role of regional laboratory and Laboratory Response Network"},{"level":1,"text":"4. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]}]},{"number":"III","title":"Analytic Procedures for Mycobacteriology, Virology, Parasitology, and Mycology","topics":[{"letter":"A","title":"Mycobacteriology and Nocardia spp.","lines":[{"level":1,"text":"1. Specimen sources (e.g., lower respiratory, blood, soft tissue)"},{"level":1,"text":"2. Major pathogens and disease states (e.g., etiology, epidemiology, transmission)"},{"level":1,"text":"3. Acid-fast reaction, colony morphology, and growth characteristics"},{"level":1,"text":"4. Identification methods (e.g., probes, sequencing, MALDI-TOF MS)"},{"level":1,"text":"5. Direct detection by molecular methods"},{"level":1,"text":"6. Antimicrobial therapy"},{"level":1,"text":"7. Organism pathogenicity (e.g., etiology, transmission, virulence mechanisms)"}]},{"letter":"B","title":"Virology","lines":[{"level":1,"text":"1. Specimen sources"},{"level":1,"text":"2. Major pathogens and disease states (e.g., etiology, epidemiology, transmission)"},{"level":1,"text":"3. Direct detection of pathogens"}]},{"letter":"C","title":"Parasitology","lines":[{"level":1,"text":"1. Specimen sources (e.g., stool, respiratory, blood, tissue)"},{"level":1,"text":"2. Major pathogens and disease states (e.g., etiology, epidemiology, transmission)"},{"level":1,"text":"3. Microscopic and macroscopic identification"},{"level":1,"text":"4. Direct and molecular detection"}]},{"letter":"D","title":"Mycology","lines":[{"level":1,"text":"1. Specimen sources"},{"level":1,"text":"2. Major pathogens and disease states (e.g., etiology, epidemiology, transmission)"},{"level":1,"text":"3. Colony morphology and growth characteristics of major pathogens (e.g., temperature, growth rate, length of incubation)"},{"level":1,"text":"4. Microscopic identification of major pathogens"},{"level":1,"text":"5. Direct and molecular detection"},{"level":1,"text":"6. Other identification methods (e.g., biochemical, automated methods, MALDI-TOF MS)"}]}]},{"number":"IV","title":"Postanalytic Procedures","topics":[{"letter":"A","title":"Documentation Practices","lines":[]},{"letter":"B","title":"Urgent and Critical Value Reporting","lines":[]},{"letter":"C","title":"Result Review and Autoverification","lines":[]},{"letter":"D","title":"Issuing Corrected Reports","lines":[]},{"letter":"E","title":"Reporting to Infection Control/Prevention and Public Health","lines":[]}]}],"pages":[9,10,11,12],"percent":"17 – 22%"},"lab_operations":{"sections":[{"number":"I","title":"Quality Assessment/Troubleshooting","topics":[{"letter":"A","title":"Preanalytical, Analytical, Postanalytical","lines":[]},{"letter":"B","title":"Quality Control","lines":[]},{"letter":"C","title":"Point-of-care Testing (POCT)","lines":[]},{"letter":"D","title":"Compliance","lines":[]},{"letter":"E","title":"Regulation (e.g., proficiency testing, competency assessment, accreditation standards)","lines":[]}]},{"number":"II","title":"Safety","topics":[{"letter":"A","title":"Safety Programs and Practices","lines":[{"level":1,"text":"1. Prevention of infection with bloodborne pathogens"},{"level":1,"text":"2. Use of personal protective equipment (PPE)"},{"level":1,"text":"3. Safe work practices"},{"level":1,"text":"4. Packaging and transportation of specimens and microorganisms"},{"level":1,"text":"5. Safety data sheets (SDS) for chemicals and reagents"}]},{"letter":"B","title":"Emergency Procedures (e.g., needlesticks, splashes to mucous membranes, fire)","lines":[]}]},{"number":"III","title":"Laboratory Mathematics","topics":[{"letter":"A","title":"Concentration, Volume, and Dilutions","lines":[]},{"letter":"B","title":"Molarity, Normality","lines":[]},{"letter":"C","title":"Standard Curves","lines":[]},{"letter":"D","title":"Mean, Median, Mode, and Confidence Intervals","lines":[]},{"letter":"E","title":"Sensitivity, Specificity, and Predictive Value","lines":[]}]},{"number":"IV","title":"Manual/Automated Methodology and Instrumentation","topics":[{"letter":"A","title":"Basic Laboratory Equipment","lines":[]},{"letter":"B","title":"Spectrophotometry and Photometry","lines":[]},{"letter":"C","title":"Mass Spectrometry","lines":[]},{"letter":"D","title":"Osmometry","lines":[]},{"letter":"E","title":"Electrophoresis","lines":[]},{"letter":"F","title":"Chromatography","lines":[]},{"letter":"G","title":"Electrochemistry","lines":[]},{"letter":"H","title":"Fluorometry","lines":[]},{"letter":"I","title":"Nephelometry","lines":[]},{"letter":"J","title":"Flow Cytometry","lines":[]},{"letter":"K","title":"Molecular Methods","lines":[]},{"letter":"L","title":"Automated Microbiology Processors","lines":[]},{"letter":"M","title":"Hematology Instrumentation","lines":[]}]},{"number":"V","title":"Basic Management Principles","topics":[]},{"number":"VI","title":"Education Principles","topics":[]}],"pages":[12,13,14],"percent":"5 – 10%","calculations":["Beer’s law"]},"para_myco":{"percent":"Within Microbiology (17 – 22%)","pages":[12],"sections":[{"number":"III","title":"Analytic Procedures for Parasitology and Mycology","topics":[{"letter":"C","title":"Parasitology","lines":[{"level":1,"text":"1. Specimen sources (e.g., stool, respiratory, blood, tissue)"},{"level":1,"text":"2. Major pathogens and disease states (e.g., etiology, epidemiology, transmission)"},{"level":1,"text":"3. Microscopic and macroscopic identification"},{"level":1,"text":"4. Direct and molecular detection"}]},{"letter":"D","title":"Mycology","lines":[{"level":1,"text":"1. Specimen sources"},{"level":1,"text":"2. Major pathogens and disease states (e.g., etiology, epidemiology, transmission)"},{"level":1,"text":"3. Colony morphology and growth characteristics of major pathogens (e.g., temperature, growth rate, length of incubation)"},{"level":1,"text":"4. Microscopic identification of major pathogens"},{"level":1,"text":"5. Direct and molecular detection"},{"level":1,"text":"6. Other identification methods (e.g., biochemical, automated methods, MALDI-TOF MS)"}]}]}]}};
+
 const BUILT_IN_INTERACTIVE_LINKS=[
   {title:'Guess: MLS Edition',url:'Guess_MLS_Edition.html',description:'Pick a subject, read the clue, and guess the answer',topic:'All Subjects',icon:'MLS',color:'#6b4fd8'},
   {title:"Who's That Blood Group?",url:'Blood_Group_Game.html',description:'Timed blood group cases plus rapid antigen-gated mini rounds',topic:'Blood Bank',icon:'BG',color:'#b22222',preview_url:'assets/interactive-previews/blood_group_game.png?v=20260606-4'},
@@ -4023,9 +4101,10 @@ function activeQuizOverlay(){
   const imageQuizActive=appState.view==='subject'
     && appState.subjectTab==='images'
     && (
-      !appState.imgFlashMode && ((appState.uaImgMode==='quiz'&&!appState.uaQuizDone)
-      || (appState.hemeImgMode==='quiz'&&!appState.hemeQuizDone)
-      || (appState.microImgMode==='quiz'&&!appState.microQuizDone))
+      (appState.imgFlashMode&&appState.imgFlashIdx<appState.imgFlashItems.length)
+      || (appState.uaImgMode==='quiz'&&!appState.uaQuizDone&&!appState.imgFlashMode)
+      || (appState.hemeImgMode==='quiz'&&!appState.hemeQuizDone&&!appState.imgFlashMode)
+      || (appState.microImgMode==='quiz'&&!appState.microQuizDone&&!appState.imgFlashMode)
     );
   const classRecallActive=appState.view==='class'
     && (
@@ -5578,7 +5657,7 @@ function homeAdminIconUpload(key){
 function homeSubjectCardHtml(cfg){
   const displayName=cfg.key==='hematology'
     ?'Hematology/<br>Hemostasis'
-    :(cfg.key==='urinalysis'?'Urinalysis / Body<br>Fluids':esc(cfg.name));
+    :(cfg.key==='urinalysis'?'Urinalysis /<br><span style="white-space:nowrap">Body Fluids</span>':esc(cfg.name));
   const title=cfg.weightLabel?displayName+'<span class="home-subject-weight">'+esc(cfg.weightLabel)+'</span>':displayName;
   return '<div style="position:relative">'
     + '<button class="home-subject-card" style="--subject-color:'+homeSubjectColor(cfg.key)+'" onclick="'+cfg.onclick+'">'
@@ -5599,6 +5678,7 @@ function homePracticeCardHtml(cfg){
     + '</button>';
 }
 
+function openStudyHubs(){if(isAdmin)window.open(HUB_URL,'_blank','noopener');}
 async function renderHome(v){
   const cards = SUBJECTS.filter(s=>!s._hidden).map(s=>{
     const isCombined=s._combined&&s._combined.length;
@@ -5635,8 +5715,8 @@ async function renderHome(v){
         }).join('')
       + '</div></div>'
     : '';
-  const hubsCardAttrs='class="home-hubs-card" onclick="window.open(HUB_URL,\'_blank\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.open(HUB_URL,\'_blank\')}"';
-  const hubsButtonText='Open Lab Simulators <span>›</span>';
+  const hubsCardAttrs=isAdmin?'class="home-hubs-card" onclick="openStudyHubs()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openStudyHubs()}"':'class="home-hubs-card is-admin-locked" aria-disabled="true"';
+  const hubsButtonText=isAdmin?'Open Lab Simulators <span>›</span>':'In progress';
 
   v.innerHTML = '<div class="home-dashboard">'
     + '<section class="home-hero">'
@@ -6186,6 +6266,7 @@ async function loadAttemptsHome(){
 
 // ─── SUBJECT VIEW ─────────────────────────────────────────────────────────────
 function goSubject(key){
+  appState.studySection=null;
   stopQuizMusic(false);
   appState.subjectFlashItems=[];appState.subjectFlashIdx=0;appState.subjectFlashFlipped=false;appState.subjectFlashSubject=null;appState.subjectFlashSignature='';
   if(key==='para_myco'||key==='parasitology'||key==='mycology'){appState.view='subject';appState.subject='para_myco';appState.subjectTab='outline';appState.quizQ=[];appState.quizMasteryQ=[];appState.quizRetryRound=0;appState.quizIdx=0;appState.quizAns=[];appState.quizStarted=false;appState.quizDone=false;appState.quizAllSelected=false;renderView();return;}
@@ -6267,7 +6348,7 @@ async function renderSubjectView(v){
         ${subjectPageMark(key,s)}
         <div class="subject-page-copy">
           <div class="subject-page-kicker">Medical Laboratory Science</div>
-          <h1 class="subject-page-title">${esc(s.name)}</h1>
+          <h1 class="subject-page-title">${appState.subject==='urinalysis'?'Urinalysis /<br><span style="white-space:nowrap">Body Fluids</span>':esc(s.name)}</h1>
           <p class="subject-page-caption">Study, recall, and apply your knowledge.</p>
         </div>
         ${key==='para_myco'&&isAdmin?`<label style="margin-left:auto;cursor:pointer" aria-label="Update subject icon">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
@@ -6330,58 +6411,186 @@ async function loadCustomStudyTopics(subjectKey,force=false){
   if(!force&&window._customStudyTopics[subjectKey])return window._customStudyTopics[subjectKey];
   let rows=[];
   try{
-    let result=await sb.from('mlsboc_cases').select('id,title,scenario,case_data,answer,created_at').eq('subject','study_outline_topic').eq('group_label',subjectKey).order('created_at',{ascending:true});
-    if(result.error)result=await sb.from('mlsboc_cases').select('id,title,scenario,case_data,answer').eq('subject','study_outline_topic').eq('group_label',subjectKey).order('title',{ascending:true});
+    let result=await sb.from('mlsboc_cases').select('id,title,scenario,case_data,answer,steps,images,created_at').eq('subject','study_outline_topic').eq('group_label',subjectKey).order('created_at',{ascending:true});
+    if(result.error)result=await sb.from('mlsboc_cases').select('id,title,scenario,case_data,answer,steps,images').eq('subject','study_outline_topic').eq('group_label',subjectKey).order('title',{ascending:true});
     if(result.error)throw result.error;
     rows=result.data||[];
-  }catch(e){console.warn('Study topics could not be loaded:',e);}
+  }catch(e){console.warn('Study topics could not be loaded:',e);throw e;}
   window._customStudyTopics[subjectKey]=rows;
   return rows;
 }
 
+function studyTopicSection(topic){
+  try{
+    const steps=typeof topic.steps==='string'?JSON.parse(topic.steps):topic.steps;
+    return (Array.isArray(steps)?steps.find(step=>step?.kind==='study_section')?.sectionId:steps?.sectionId)||'';
+  }catch(e){return '';}
+}
+function studyTopicSteps(topic,sectionId,subsection=studyTopicSubsection(topic)){
+  let steps;
+  try{steps=typeof topic?.steps==='string'?JSON.parse(topic.steps):topic?.steps;}catch(e){}
+  if(steps&&typeof steps==='object'&&!Array.isArray(steps))return JSON.stringify({...steps,sectionId,subsection});
+  return JSON.stringify([...(Array.isArray(steps)?steps:[]).filter(step=>step?.kind!=='study_section'),{kind:'study_section',sectionId,subsection}]);
+}
+async function loadStudySections(subjectKey,force=false){
+  window._studySections=window._studySections||{};
+  if(!force&&window._studySections[subjectKey])return window._studySections[subjectKey];
+  const {data,error}=await sb.from('mlsboc_cases').select('id,title,scenario,case_data').eq('subject','study_outline_section').eq('group_label',subjectKey).order('created_at',{ascending:true});
+  if(error)throw error;
+  const rows=data||[];
+  const defaults=(ASCP_SUBJECT_SHEETS[subjectKey]?.sections||[]).map(section=>{
+    const key='ascp:'+section.number;
+    const saved=rows.find(row=>row.case_data===key);
+    return {key,number:section.number,title:saved?.title||section.title,description:saved?.scenario||'',id:saved?.id||'',builtin:true};
+  });
+  const custom=rows.filter(row=>!defaults.some(section=>section.key===row.case_data)).map(row=>({key:row.id,title:row.title,description:row.scenario||'',id:row.id,builtin:false}));
+  return window._studySections[subjectKey]=[...defaults,...custom];
+}
+function openStudySection(subjectKey,key){
+  appState.studySection={subject:subjectKey,key};appState.studyTopicId=null;
+  renderTab();
+}
+function studyTopicCard(topic,index,subjectKey){
+  return `<div class="study-chapter-wrap">
+    <button class="study-chapter-card" type="button" onclick="openCustomStudyTopic('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">
+      <span class="study-chapter-number">${index+1}</span><span class="study-chapter-title">${esc(topic.title)}</span>
+    </button>
+    ${isAdmin?`<div class="study-chapter-admin"><button class="btn btn-ghost btn-xs" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">Edit / move</button><button class="btn btn-danger btn-xs" onclick="deleteStudyTopic('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">Delete</button></div>`:''}
+  </div>`;
+}
+function studyTopicSubsection(topic){
+  try{const steps=typeof topic?.steps==='string'?JSON.parse(topic.steps):topic?.steps;return (Array.isArray(steps)?steps.find(s=>s?.kind==='study_section'):steps)?.subsection||'';}catch(e){return '';}
+}
+function studyNotesHTML(text){
+  return String(text||'').split(/\n/).map(line=>{
+    const heading=line.match(/^(#{1,3})\s+(.+)$/);
+    if(heading)return `<h${heading[1].length+2}>${esc(heading[2])}</h${heading[1].length+2}>`;
+    if(/^\s*[-•]\s+/.test(line))return `<p class="study-note-bullet">• ${esc(line.replace(/^\s*[-•]\s+/,''))}</p>`;
+    return line.trim()?`<p>${esc(line)}</p>`:'<div class="study-note-space"></div>';
+  }).join('');
+}
+function studyVisualsHTML(topic){
+  return imageEntryList(topic.images).map(entry=>{const url=imageEntrySrc(entry);if(!/^(https?:\/\/|data:image\/(?:png|jpeg|webp|gif);base64,)/i.test(url))return '';return `<figure><img src="${esc(url)}" alt="${esc(entry.caption||topic.title||'Study visual')}" loading="lazy">${entry.caption?`<figcaption>${esc(entry.caption)}</figcaption>`:''}</figure>`;}).join('');
+}
+function selectStudyTopic(subject,key,id){appState.studySection={subject,key};appState.studyTopicId=id;renderTab();}
 async function renderStudyOutlineTab(el){
-  const subjectKey=appState.subject;
-  const outline=STUDY_OUTLINES[subjectKey];
-  if(!outline){el.innerHTML='<div class="empty">No study outline is available for this subject.</div>';return;}
-  el.innerHTML='<div class="empty" style="padding:26px">Loading...</div>';
-  const customTopics=await loadCustomStudyTopics(subjectKey);
-  if(appState.subject!==subjectKey||appState.subjectTab!=='outline')return;
-  const cards=customTopics.map((topic,index)=>`
-    <div class="study-chapter-wrap">
-      <button class="study-chapter-card" type="button" onclick="openCustomStudyTopic('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">
-        <span class="study-chapter-number">${index+1}</span>
-        <span class="study-chapter-title">${esc(topic.title)}</span>
-      </button>
-      ${isAdmin?`<div class="study-chapter-admin"><button class="btn btn-ghost btn-xs" type="button" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">Edit</button><button class="btn btn-danger btn-xs" type="button" onclick="deleteStudyTopic('${jsAttr(subjectKey)}','${jsAttr(topic.id)}')">Delete</button></div>`:''}
-    </div>`).join('');
-  const bibliography=outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('');
-  el.innerHTML=`
-    <div class="study-outline-shell" style="--study-accent:${outline.accent}">
-      <section class="study-outline-hero">
-        <div>
-          <div class="study-outline-kicker">Study Outline</div>
-          <h2>${esc(outline.title)}</h2>
-          <p>${esc(outline.description||'Select a section to open its study window.')}</p>
-        </div>
-        <button class="btn btn-ghost btn-sm study-guideline-button" type="button" onclick="openASCPGuideline()">See ASCP Guideline<br><span style="font-size:10px;font-weight:650">Revised September 25, 2025</span></button>
-      </section>
-      ${isAdmin?`<div class="study-outline-actions"><button class="btn btn-primary btn-sm" type="button" onclick="openStudyTopicEditor('${jsAttr(subjectKey)}','')">+ Add Study Topic</button></div>`:''}
-      ${subjectKey==='para_myco'?`<button class="btn btn-ghost" onclick="openASCPStudyOutline('para_myco')">View Parasitology &amp; Mycology outline →</button>`:''}
-      ${cards?`<div class="study-outline-grid">${cards}</div>`:'<div class="study-custom-empty"></div>'}
-      <details class="study-bibliography">
-        <summary>Source bibliography (${outline.bibliography.length} books)</summary>
-        <div class="study-bibliography-body">
-          <ol style="margin-top:14px">${bibliography}</ol>
-        </div>
-      </details>
-    </div>`;
+  const subjectKey=appState.subject,outline=STUDY_OUTLINES[subjectKey];
+  if(!outline){el.innerHTML='<div class="empty">No outline available.</div>';return;}
+  el.innerHTML='<div class="empty">Loading study sections…</div>';
+  let topics,sections;
+  try{[topics,sections]=await Promise.all([loadCustomStudyTopics(subjectKey),loadStudySections(subjectKey)]);}catch(e){if(el.isConnected)el.innerHTML='<div class="empty">Could not load study sections. <button onclick="renderTab()">Try again</button></div>';return;}
+  if(!el.isConnected||appState.subject!==subjectKey||appState.subjectTab!=='outline')return;
+  const sectionFor=t=>sections.some(s=>s.key===studyTopicSection(t))?studyTopicSection(t):'unfiled';
+  if(topics.some(t=>sectionFor(t)==='unfiled'))sections=[...sections,{key:'unfiled',title:'Unfiled topics'}];
+  const requested=appState.studySection?.subject===subjectKey?appState.studySection.key:null;
+  const selected=sections.find(s=>s.key===requested)||sections[0];
+  const shown=topics.filter(t=>sectionFor(t)===selected?.key);
+  const active=shown.find(t=>String(t.id)===String(appState.studyTopicId))||shown[0];
+  const sk=jsAttr(subjectKey),key=jsAttr(selected?.key||'');
+  const tree=sections.map(section=>{
+    const children=topics.filter(t=>sectionFor(t)===section.key),groups=[...new Set(children.map(studyTopicSubsection))];
+    return `<section class="study-nav-section"><button class="outline-section-card study-nav-heading ${selected?.key===section.key?'active':''}" onclick="openStudySection('${sk}','${jsAttr(section.key)}')" aria-expanded="${selected?.key===section.key}">${esc(section.title)} <small>${children.length}</small></button>${selected?.key===section.key?groups.map(group=>`${group?`<h4>${esc(group)}</h4>`:''}${children.filter(t=>studyTopicSubsection(t)===group).map(t=>`<button class="study-nav-topic ${active?.id===t.id?'active':''}" onclick="selectStudyTopic('${sk}','${jsAttr(section.key)}','${jsAttr(t.id)}')" ${active?.id===t.id?'aria-current="page"':''}>${esc(t.title)}</button>`).join('')}`).join(''):''}</section>`;
+  }).join('');
+  const video=active?externalStudyVideoEmbedUrl(active.answer):'';
+  el.innerHTML=`<div class="study-outline-shell" style="--study-accent:${outline.accent}"><section class="study-outline-hero"><div><div class="study-outline-kicker">Study Outline</div><h2>${esc(outline.title)}</h2><p>Choose a section and topic to read the study notes.</p></div><button class="btn btn-ghost btn-sm study-guideline-button" onclick="openSubjectGuideline('${sk}')">ASCP subject sheet<br><small>Handwritten outline · ${esc(ASCP_GUIDELINE_DATE)}</small></button></section>
+  <div class="study-reader-layout"><nav class="study-reader-nav" aria-label="Study sections and topics">${isAdmin?`<button class="btn btn-ghost btn-sm" onclick="openStudySectionEditor('${sk}','')">+ Add section</button>`:''}${tree}</nav>
+  <article class="study-reader-content"><header class="study-reader-header"><div><span class="study-outline-kicker">${esc(selected?.title||'Study notes')}</span>${active?`<h2>${esc(active.title)}</h2>`:''}</div><button class="btn btn-ghost btn-sm" onclick="exportStudySection('${sk}','${key}')" ${shown.length?'':'disabled'}>Export section</button></header>
+  ${isAdmin?`<div class="study-reader-tools"><button class="btn btn-primary btn-sm" onclick="openStudyTopicEditor('${sk}','','${selected?.key==='unfiled'?'':key}')">+ Add topic</button>${selected&&selected.key!=='unfiled'?`<button class="btn btn-ghost btn-sm" onclick="openStudySectionEditor('${sk}','${key}')">Edit section</button>`:''}${active?`<button class="btn btn-ghost btn-sm" onclick="openStudyTopicEditor('${sk}','${jsAttr(active.id)}')">Edit topic / visuals</button><button class="btn btn-danger btn-sm" onclick="deleteStudyTopic('${sk}','${jsAttr(active.id)}')">Delete topic</button>`:''}</div>`:''}
+  ${active?`<div class="study-authored-notes">${studyNotesHTML(active.scenario)}</div><div class="study-authored-visuals">${studyVisualsHTML(active)}</div>${active.case_data?`<p class="study-topic-citation">Source: ${esc(active.case_data)}</p>`:''}${video?`<iframe class="study-topic-video" src="${esc(video)}" title="${esc(active.title)} video" allowfullscreen loading="lazy"></iframe>`:''}`:`<div class="outline-section-empty">No notes have been added to this section yet.${isAdmin?' Use Add topic to write your notes and include visuals.':''}</div>`}
+  </article></div><details class="study-bibliography"><summary>Source bibliography (${outline.bibliography.length} sources)</summary><ol>${outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('')}</ol></details></div>`;
+}
+function renderStudyVisualDraft(){
+  const el=document.getElementById('study-topic-visuals');if(!el)return;
+  el.innerHTML=(window._studyTopicDraft?.images||[]).map((entry,i)=>`<div class="study-visual-editor"><img src="${esc(imageEntrySrc(entry))}" alt="Visual ${i+1}"><label>Caption / image description<input value="${esc(entry.caption||'')}" oninput="window._studyTopicDraft.images[${i}].caption=this.value"></label><button class="btn btn-danger btn-xs" onclick="window._studyTopicDraft.images.splice(${i},1);renderStudyVisualDraft()">Remove</button></div>`).join('');
+}
+async function uploadStudyVisuals(input){
+  if(!isAdmin||!window._studyTopicDraft)return;
+  const draft=window._studyTopicDraft;draft.uploading=true;
+  const button=document.getElementById('study-topic-save');if(button)button.disabled=true;
+  const status=document.getElementById('study-visual-status');if(status)status.textContent='Preparing visuals…';
+  try{for(const file of input.files||[]){if(!/^image\//.test(file.type))throw Error('Please choose image files.');const url=await compressQuestionImageFile(file);if(window._studyTopicDraft!==draft)return;draft.images.push({url,caption:''});}renderStudyVisualDraft();if(status)status.textContent='Visuals ready. Save the topic to keep them.';}
+  catch(error){if(status)status.textContent='Could not add image: '+error.message;}
+  finally{draft.uploading=false;if(button)button.disabled=false;input.value='';}
+}
+async function exportStudySection(subjectKey,key){
+  const [topics,sections]=await Promise.all([loadCustomStudyTopics(subjectKey),loadStudySections(subjectKey)]);
+  const section=sections.find(s=>s.key===key)||{title:'Unfiled topics'};
+  const selected=topics.filter(t=>key==='unfiled'?!sections.some(s=>s.key===studyTopicSection(t)):studyTopicSection(t)===key);
+  if(!selected.length)return;
+  const title=STUDY_OUTLINES[subjectKey].title+' — '+section.title;
+  const content=selected.map(t=>`<article>${studyTopicSubsection(t)?`<p class="subsection">${esc(studyTopicSubsection(t))}</p>`:''}<h2>${esc(t.title)}</h2>${studyNotesHTML(t.scenario)}${studyVisualsHTML(t)}${t.case_data?`<p class="citation">Source: ${esc(t.case_data)}</p>`:''}${/^https?:\/\//i.test(t.answer||'')?`<p>Video: <a href="${esc(t.answer)}">${esc(t.answer)}</a></p>`:''}</article>`).join('');
+  const html=`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>body{font:18px/1.65 Georgia,serif;color:#202538;max-width:850px;margin:40px auto;padding:0 24px}h1,h2,h3{line-height:1.2}h1{border-bottom:3px solid #a2b8cc;padding-bottom:20px}article{margin:38px 0;break-inside:auto}article+article{border-top:1px solid #ccc;padding-top:24px}figure{margin:24px 0;break-inside:avoid}img{max-width:100%;max-height:650px;object-fit:contain}figcaption,.citation,.subsection{font-size:14px;color:#526173}.study-note-space{height:12px}button{padding:12px 18px;cursor:pointer}@media print{button,.export-help{display:none}body{margin:0;max-width:none}h2,h3{break-after:avoid}a{overflow-wrap:anywhere}}</style><button onclick="window.print()">Print / Save as PDF</button><p class="export-help">This export contains only this study section. Use Print to save a PDF.</p><h1>${esc(title)}</h1>${content}</html>`;
+  const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=(subjectKey+'-'+section.title).replace(/[^a-z0-9_-]/gi,'_')+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 
-async function openStudyTopicEditor(subjectKey,id){
+async function openStudySectionEditor(subjectKey,key){
+  if(!isAdmin)return;
+  const sections=await loadStudySections(subjectKey);
+  const section=sections.find(item=>item.key===key)||{title:'',description:''};
+  const modal=document.getElementById('condition-modal');
+  const body=document.getElementById('condition-modal-body');
+  body.innerHTML=`<div class="flex-center gap-8 mb-16"><h2 class="modal-title">${key?'Edit':'Add'} Study Section</h2><button class="btn btn-ghost btn-sm ml-auto" onclick="closeStudyOutlineWindow()">✕</button></div>
+    <div class="form-group"><label for="study-section-title">Section title</label><input id="study-section-title" value="${esc(section.title)}" placeholder="e.g., Blood Group Systems"></div>
+    <div class="form-group"><label for="study-section-description">Description (optional)</label><textarea id="study-section-description">${esc(section.description)}</textarea></div>
+    <div class="flex gap-8 flex-wrap"><button class="btn btn-primary" onclick="saveStudySection('${jsAttr(subjectKey)}','${jsAttr(key)}')">Save section</button><button class="btn btn-ghost" onclick="closeStudyOutlineWindow()">Cancel</button>${key&&!section.builtin?`<button class="btn btn-danger ml-auto" onclick="deleteStudySection('${jsAttr(subjectKey)}','${jsAttr(key)}')">Remove section</button>`:''}</div>`;
+  modal.classList.remove('hidden');
+}
+async function saveStudySection(subjectKey,key){
+  if(!isAdmin)return;
+  const title=document.getElementById('study-section-title')?.value.trim();
+  if(!title){alert('Add a section title.');return;}
+  const sections=await loadStudySections(subjectKey);
+  const current=sections.find(section=>section.key===key);
+  const payload={subject:'study_outline_section',group_label:subjectKey,title,scenario:document.getElementById('study-section-description')?.value.trim()||'',case_data:current?.builtin?key:'',answer:'',steps:'[]',images:[],is_draft:false};
+  const {error}=current?.id?await sb.from('mlsboc_cases').update(payload).eq('id',current.id).eq('subject','study_outline_section').eq('group_label',subjectKey):await sb.from('mlsboc_cases').insert(payload);
+  if(error){alert('Save failed: '+error.message);return;}
+  await loadStudySections(subjectKey,true);closeStudyOutlineWindow();renderTab();
+}
+async function deleteStudySection(subjectKey,key){
+  if(!isAdmin)return;
+  const section=(await loadStudySections(subjectKey)).find(item=>item.key===key);
+  if(!section?.id||section.builtin)return;
+  if(!confirm('Remove this section? Its study topics will remain under Unfiled topics.'))return;
+  const {error}=await sb.from('mlsboc_cases').delete().eq('id',section.id).eq('subject','study_outline_section').eq('group_label',subjectKey);
+  if(error){alert('Remove failed: '+error.message);return;}
+  await loadStudySections(subjectKey,true);appState.studySection=null;closeStudyOutlineWindow();renderTab();
+}
+
+function subjectGuidelineHTML(subjectKey){
+  const sheet=ASCP_SUBJECT_SHEETS[subjectKey];
+  const outline=STUDY_OUTLINES[subjectKey];
+  if(!sheet||!outline)return '';
+  const sections=sheet.sections.map(section=>`<section class="notebook-section" id="sheet-section-${esc(section.number)}"><h2><span>${esc(section.number)}.</span> ${esc(section.title)}</h2>
+    <div class="notebook-topics">${section.topics.map(topic=>`<article class="notebook-topic"><h3>${esc(topic.letter)}. ${esc(topic.title)}</h3><ul class="notebook-lines">${(topic.lines||[]).map(line=>`<li class="notebook-level-${Math.min(4,Math.max(1,line.level||1))}">${esc(line.text)}</li>`).join('')}</ul></article>`).join('')}</div></section>`).join('');
+  const reference=sheet.references?.length?`<section class="notebook-section"><h2>Reference ranges</h2><p class="notebook-range-note">These are the examination ranges in the September 25, 2025 guideline, for examination preparation only—not clinical use.</p>${sheet.references.map(group=>`<h3>${esc(group.title)}</h3><div class="notebook-table-scroll"><table><thead><tr><th scope="col">Finding</th><th scope="col">Conventional units</th><th scope="col">SI units</th></tr></thead><tbody>${group.rows.map(row=>`<tr>${row.map((cell,i)=>i?`<td>${esc(cell)}</td>`:`<th scope="row">${esc(cell)}</th>`).join('')}</tr>`).join('')}</tbody></table></div>`).join('')}</section>`:'';
+  return `<article class="subject-notebook" style="--ink-accent:${outline.accent}">
+    <div class="notebook-heading"><div class="notebook-eyebrow">ASCP / ASCPi · MLS study outline</div><h1>${esc(outline.title)}</h1><p>${esc(sheet.percent)}${subjectKey==='para_myco'?'':' of the examination'}</p></div>
+    ${subjectKey==='blood_bank'?'<p class="notebook-source-note">The source guideline states that donor eligibility questions use regulations current as of June 2023.</p>':''}
+    ${sections}
+    ${sheet.calculations?.length?`<section class="notebook-section"><h2>Calculations to know</h2><ul class="notebook-calculations">${sheet.calculations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></section>`:''}
+    ${reference}
+    <footer class="notebook-source">${esc(ASCP_GUIDELINE_CITATION)} Source pages: ${sheet.pages.join(', ')}. Topic hierarchy and examples are retained from the source.</footer>
+  </article>`;
+}
+function openSubjectGuideline(subjectKey){
+  if(!ASCP_SUBJECT_SHEETS[subjectKey])return;
+  const modal=document.getElementById('condition-modal');
+  const dialog=modal.querySelector('.modal');
+  dialog.classList.remove('study-chapter-modal','ascp-study-modal','ascp-guideline-modal');
+  dialog.classList.add('study-outline-modal','subject-sheet-modal');
+  document.getElementById('condition-modal-body').innerHTML=`<div class="subject-sheet-shell"><div class="subject-sheet-toolbar"><span>${esc(STUDY_OUTLINES[subjectKey].title)} · ASCP subject sheet</span><button class="btn btn-ghost btn-sm" onclick="closeStudyOutlineWindow()" aria-label="Close subject guideline">✕ Close</button></div><div class="subject-sheet-scroll">${subjectGuidelineHTML(subjectKey)}</div></div>`;
+  modal.onclick=event=>{if(event.target===modal)closeStudyOutlineWindow();};
+  modal.classList.remove('hidden');
+}
+
+async function openStudyTopicEditor(subjectKey,id,sectionId=''){
   if(!isAdmin)return;
   const outline=STUDY_OUTLINES[subjectKey];
   const topics=await loadCustomStudyTopics(subjectKey);
   const topic=topics.find(item=>String(item.id)===String(id))||{title:'',scenario:'',case_data:'',answer:''};
+  const sections=await loadStudySections(subjectKey);
+  const selectedSection=id?studyTopicSection(topic):sectionId;
+  window._studyTopicDraft={images:imageEntryList(topic.images).map(entry=>typeof entry==='string'?{url:entry,caption:''}:{...entry}),uploading:false};
   const modal=document.getElementById('condition-modal');
   const dialog=modal?.querySelector('.modal');
   const body=document.getElementById('condition-modal-body');
@@ -6389,31 +6598,38 @@ async function openStudyTopicEditor(subjectKey,id){
   dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal');
   body.innerHTML=`
     <div class="flex-center gap-8 mb-16"><div class="modal-title" style="margin:0">${id?'Edit':'Add'} Study Topic</div><button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">✕</button></div>
+    <div class="form-group"><label for="study-topic-section">Section</label><select id="study-topic-section"><option value="">Unfiled topics</option>${sections.map(section=>`<option value="${esc(section.key)}" ${section.key===selectedSection?'selected':''}>${esc(section.number?section.number+'. ':'')}${esc(section.title)}</option>`).join('')}</select></div>
     <div class="form-group"><label>Topic title</label><input id="study-topic-title" value="${esc(topic.title||'')}"></div>
-    <div class="form-group"><label>Quick summary</label><textarea id="study-topic-summary" rows="8">${esc(topic.scenario||'')}</textarea></div>
+    <div class="form-group"><label for="study-topic-subsection">Subsection heading (optional)</label><input id="study-topic-subsection" value="${esc(studyTopicSubsection(topic))}" placeholder="e.g., Donors"></div><div class="form-group"><label>Your study notes · use # for headings and - for bullets</label><textarea id="study-topic-summary" rows="8">${esc(topic.scenario||'')}</textarea></div>
+    <div class="form-group"><label for="study-topic-upload">Add visuals</label><input id="study-topic-upload" type="file" accept="image/*" multiple onchange="uploadStudyVisuals(this)"><p id="study-visual-status" role="status"></p><div id="study-topic-visuals"></div></div>
     <div class="form-group"><label>Book resource and page citation</label><input id="study-topic-citation" value="${esc(topic.case_data||'')}"></div>
     <div class="form-group"><label>Video URL to embed</label><input id="study-topic-video" value="${esc(topic.answer||'')}" placeholder="YouTube or Vimeo URL"></div>
-    <div class="flex gap-8 mt-16"><button class="btn btn-ghost" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" type="button" onclick="saveStudyTopic('${jsAttr(subjectKey)}','${jsAttr(id||'')}')">Save Topic</button></div>`;
+    <div class="flex gap-8 mt-16"><button class="btn btn-ghost" type="button" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button><button class="btn btn-primary" id="study-topic-save" type="button" onclick="saveStudyTopic('${jsAttr(subjectKey)}','${jsAttr(id||'')}')">Save Topic</button></div>`;
+  renderStudyVisualDraft();
   dialog.style.setProperty('--study-accent',outline?.accent||'var(--accent)');
   modal.classList.remove('hidden');
 }
 
 async function saveStudyTopic(subjectKey,id){
-  if(!isAdmin)return;
+  if(!isAdmin||window._studyTopicDraft?.uploading)return;
   const title=document.getElementById('study-topic-title')?.value.trim()||'';
   if(!title){alert('Add a topic title.');return;}
+  const current=(await loadCustomStudyTopics(subjectKey)).find(topic=>String(topic.id)===String(id));
+  const sectionId=document.getElementById('study-topic-section')?.value||'';
   const payload={
     subject:'study_outline_topic',group_label:subjectKey,title,
     scenario:document.getElementById('study-topic-summary')?.value.trim()||'',
     case_data:document.getElementById('study-topic-citation')?.value.trim()||'',
     answer:document.getElementById('study-topic-video')?.value.trim()||'',
-    steps:'[]',images:[],is_draft:false
+    steps:studyTopicSteps(current,sectionId,document.getElementById('study-topic-subsection')?.value.trim()||''),images:window._studyTopicDraft?.images||imageEntryList(current?.images),is_draft:false
   };
   const result=id
     ?await sb.from('mlsboc_cases').update(payload).eq('id',id)
     :await sb.from('mlsboc_cases').insert(payload);
   if(result.error){alert('Save failed: '+result.error.message);return;}
-  await loadCustomStudyTopics(subjectKey,true);
+  const savedTopics=await loadCustomStudyTopics(subjectKey,true);
+  appState.studySection={subject:subjectKey,key:sectionId||'unfiled'};
+  appState.studyTopicId=id||savedTopics.filter(t=>t.title===title).at(-1)?.id;
   document.getElementById('condition-modal').classList.add('hidden');
   renderTab();
 }
@@ -6657,7 +6873,7 @@ async function openCustomStudyTopic(subjectKey,id){
 function closeStudyOutlineWindow(){
   const modal=document.getElementById('condition-modal');
   const dialog=modal?.querySelector('.modal');
-  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal','ascp-guideline-modal');dialog.style.removeProperty('--study-accent');}
+  if(dialog){dialog.classList.remove('study-outline-modal','study-chapter-modal','ascp-study-modal','ascp-guideline-modal','subject-sheet-modal');dialog.style.removeProperty('--study-accent');}
   if(modal){modal.classList.add('hidden');modal.onclick=null;}
 }
 
@@ -6988,7 +7204,7 @@ async function renderQuizTab(el){
     <div class="bbq-overlay">
       <div class="bbq-header">
         <button class="btn btn-ghost btn-sm" onclick="${appState.view==='monster_mix'?'resetMonsterMixQuiz()':"switchTab('quiz')"}">✕ Exit</button>
-        <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${replaceDisabled?'disabled':''} title="${replaceTitle}"><span class="replace-wide">Already Mastered, Replace Question</span><span class="replace-short">Replace</span></button>
+        <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${replaceDisabled?'disabled':''} title="${replaceTitle}"><span class="replace-wide">Already mastered this question? Click here to replace it.</span><span class="replace-short">Replace</span></button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         ${quizSessionAccuracyBadge()}
         <span class="question-num" style="white-space:nowrap">${appState.quizIdx+1} / ${appState.quizQ.length}</span>
@@ -7614,7 +7830,7 @@ function retryMissedQuestions(isAll=false){
     appState.allReviewUnlocked=false;
     appState.allRetryRound=Number(appState.allRetryRound||0)+1;
     clearInterval(appState.allTimer);
-    appState.allTimer=setInterval(()=>{appState.allSeconds++;updateAllTimer();},1000);
+    appState.allDraft=[];appState.allReviewOpen=false;appState.allTimed=false;appState.allTimedOut=false;startAllClock();
     renderView();
     return;
   }
@@ -7738,6 +7954,18 @@ function exportResultsPDF(isAll=false,includeExplanations=true){
 }
 
 // ─── IMAGES TAB ───────────────────────────────────────────────────────────────
+function imageRecallPrompt(subject=appState.subject){
+  return {hematology:'Which cell or hematologic condition is shown?',microbiology:'Which microorganism is shown?',urinalysis:'Which urine or body-fluid finding is shown?',para_myco:'Which parasite or fungus is shown?',parasitology:'Which parasite is shown?',mycology:'Which fungus is shown?'}[subject]||'Which laboratory finding is shown?';
+}
+function recallImageGallery(images){
+  return `<div class="image-recall-gallery${images.length===1?' is-single':''}">${images.slice(0,4).map((url,index)=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" onerror="retryImageLoad(this)" alt="Laboratory image ${index+1}; select to enlarge">`).join('')}</div>`;
+}
+function exitImageFlashcards(){
+  stopQuizMusic(false);
+  appState.imgFlashMode=false;
+  appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';
+  renderTab();
+}
 function startImageFlashcard(items){
   if(!items||!items.length){alert('No items to study.');return;}
   appState.imgFlashItems=shuffle(items);
@@ -7755,9 +7983,9 @@ function renderImageFlashcard(el){
 
   if(idx>=items.length){
     el.innerHTML=`
-      <div class="bbq-overlay">
+      <div class="bbq-overlay image-flash-overlay">
         <div class="bbq-header">
-          <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">← Back</button>
+          <button class="btn btn-ghost btn-sm" onclick="exitImageFlashcards()">← Back</button>
           <div class="ml-auto" style="color:var(--text);font-size:13px">Done!</div>
         </div>
         <div class="bbq-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center">
@@ -7765,10 +7993,11 @@ function renderImageFlashcard(el){
           <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:24px">All cards reviewed!</div>
           <div class="flex gap-8 flex-wrap" style="justify-content:center">
             <button class="btn btn-primary" onclick="startImageFlashcard(appState.imgFlashItems)">Shuffle & Restart</button>
-            <button class="btn btn-ghost" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">Back</button>
+            <button class="btn btn-ghost" onclick="exitImageFlashcards()">Back</button>
           </div>
         </div>
       </div>`;
+    syncQuizShell();
     return;
   }
 
@@ -7782,12 +8011,8 @@ function renderImageFlashcard(el){
 
   const frontContent=`
     <div style="padding:20px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
-      ${imgs.length
-        ?`<div style="display:grid;grid-template-columns:${imgs.length===1?'1fr':'1fr 1fr'};gap:6px;width:100%;margin-bottom:12px">
-            ${imgs.slice(0,4).map(url=>`<img src="${esc(url)}" onclick="openImgViewer('${jsAttr(url)}')" style="width:100%;height:${imgs.length<=2?'220px':'140px'};object-fit:contain;background:var(--bg3);border-radius:var(--r);cursor:zoom-in" alt="">`).join('')}
-          </div>`
-        :`<div style="font-size:64px;margin-bottom:20px">🖼️</div>`}
-      <div style="font-size:13px;color:var(--text);opacity:.5;text-transform:uppercase;letter-spacing:.8px;font-weight:600">What is this?</div>
+      ${imgs.length?recallImageGallery(imgs):'<div class="empty">No image available.</div>'}
+      <div class="image-recall-prompt">${esc(imageRecallPrompt())}</div>
     </div>`;
 
   const backContent=`
@@ -7847,9 +8072,9 @@ function renderImageFlashcard(el){
   };
 
   el.innerHTML=`
-    <div class="bbq-overlay">
+    <div class="bbq-overlay image-flash-overlay">
       <div class="bbq-header">
-        <button class="btn btn-ghost btn-sm" onclick="appState.imgFlashMode=false;appState.uaImgMode='browse';appState.hemeImgMode='browse';appState.microImgMode='browse';requestAnimationFrame(()=>renderTab())">✕ Exit</button>
+        <button class="btn btn-ghost btn-sm" onclick="exitImageFlashcards()">✕ Exit</button>
         <div class="progress-bar" style="flex:1;margin:0 8px"><div class="progress-fill" style="width:${pct}%"></div></div>
         <span style="white-space:nowrap;font-size:13px;color:var(--text);font-family:var(--mono)">${idx+1} / ${items.length}</span>
       </div>
@@ -7865,6 +8090,7 @@ function renderImageFlashcard(el){
         </div>
       </div>
     </div>`;
+  syncQuizShell();
 }
 
 async function renderImagesTab(el){
@@ -8911,10 +9137,7 @@ function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswe
   if(!window._kqOpts[optKey])window._kqOpts[optKey]=shuffle([item,...wrongItems]);
   const opts=window._kqOpts[optKey];
 
-  const imgsHtml=imgs.length
-    ?'<div style="display:grid;grid-template-columns:'+(imgs.length===1?'1fr':'1fr 1fr')+';gap:6px;margin-bottom:16px">'
-      +imgs.slice(0,4).map(url=>'<img src="'+esc(url)+'" onclick="openImgViewer(\''+jsAttr(url)+'\')" onerror="retryImageLoad(this)" style="width:100%;height:'+(imgs.length<=2?'200px':'140px')+';object-fit:contain;border-radius:var(--r);border:1px solid var(--border);cursor:zoom-in;background:var(--bg3)" alt="">').join('')+'</div>'
-    :'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:12px">'+placeholder+'</div>';
+  const imgsHtml=imgs.length?recallImageGallery(imgs):'<div class="empty">No image available.</div>';
 
   const optsHtml=opts.map((o,oi)=>{
     let extra='';
@@ -13789,7 +14012,7 @@ function generateFormulasPDF(){
 
 // ─── ALL SUBJECTS ─────────────────────────────────────────────────────────────
 async function renderAllView(v){
-  if(appState.allDone){renderAllDone(v);return;}
+  if(appState.allDone&&!appState.allReviewOpen){renderAllDone(v);return;}
   if(!appState.allStarted){renderAllStart(v);return;}
   renderAllExam(v);
 }
@@ -13837,7 +14060,7 @@ async function renderAllStart(v){
     </div>
     <div class="exam-sim-start">
       <h2>Practice Exam Simulator</h2>
-      <p><strong>${plannedTotal} timed practice questions from <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr.</strong></p>
+      <p><strong>${plannedTotal} practice questions from <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr.</strong></p>
       <p>The subject mix mimics BOC-style weighting for practice only.</p>
       <p>This is a fixed weighted mix of questions. It does not adapt to your performance or change difficulty as you progress.</p>
       <p class="exam-sim-coverage-note">Results are not saved. Export your report before starting another exam.</p>
@@ -13849,6 +14072,7 @@ async function renderAllStart(v){
             <span>${bocWeightLabel(s)} · ${practiceExamPlannedCount(s,available)} Q</span>
           </div>`).join('')}
       </div>
+      <div class="exam-settings"><fieldset><legend>When do you want feedback?</legend><label><input type="radio" name="exam-feedback" value="immediate"> Show the answer after each submission</label><label><input type="radio" name="exam-feedback" value="end" checked> Show answers and score at the end</label></fieldset><fieldset><legend>Exam timing</legend><label><input type="radio" name="exam-timing" value="timed" checked> Timed · 150 minutes</label><label><input type="radio" name="exam-timing" value="untimed"> Untimed · show elapsed time</label></fieldset></div>
       <button class="btn btn-primary" onclick="startAllExam()" ${plannedTotal?'':'disabled'}>Start ${plannedTotal}-Question Practice Exam</button>
       <p class="exam-sim-footnote">Coverage note: Book Sections 9–10 were not added to this practice exam.</p>
     </div>
@@ -13875,9 +14099,15 @@ function addUniquePracticeQuestion(target,q,used){
   return true;
 }
 async function startAllExam(){
+  if(appState.allLoading)return;
+  const feedback=document.querySelector('input[name="exam-feedback"]:checked')?.value||'end';
+  const timed=document.querySelector('input[name="exam-timing"]:checked')?.value==='timed';
+  appState.allLoading=true;
+  try{
   const weightedKeys=Object.keys(BOC_WEIGHTS);
   const pools={};
   await Promise.all(weightedKeys.map(async key=>{pools[key]=await fetchPracticeExamPool(key);}));
+  if(appState.view!=='all')return;
   const selected=[];
   const used=new Set();
   weightedKeys.forEach(key=>{
@@ -13899,15 +14129,12 @@ async function startAllExam(){
   appState.allDone=false;
   appState.allReviewUnlocked=false;
   appState.allSeconds=0;
-  clearInterval(appState.allTimer);
-  appState.allTimer=setInterval(()=>{appState.allSeconds++;updateAllTimer();},1000);
-  renderView();
+  appState.allTimed=timed;appState.allFeedback=feedback;appState.allDraft=[];
+  appState.allReviewOpen=false;appState.allCalcOpen=false;appState.allCalcValue='';appState.allTimedOut=false;
+  startAllClock();renderView();
+  }catch(error){alert('Could not start the exam. Please try again.');}finally{appState.allLoading=false;}
 }
 
-function updateAllTimer(){
-  const el=document.getElementById('all-timer');
-  if(el)el.textContent=fmtExamElapsed(appState.allSeconds);
-}
 function fmtExamElapsed(seconds){
   const h=Math.floor(seconds/3600);
   const m=Math.floor((seconds%3600)/60);
@@ -13923,112 +14150,145 @@ function allExamTopicPath(q){
   String(raw||'').split(/[>\/|]+/).map(p=>p.trim()).filter(Boolean).forEach(p=>parts.push(p));
   return parts.filter((p,i,a)=>a.indexOf(p)===i).join(' → ');
 }
-function allQuestionSnippet(q){
-  const text=questionPlainText(q).replace(/\s+/g,' ').trim();
-  return text.length>54?text.slice(0,54).trim()+'[...]':text;
+function startAllClock(){
+  clearInterval(appState.allTimer);
+  appState.allStartedAt=Date.now()-Number(appState.allSeconds||0)*1000;
+  appState.allDeadline=appState.allTimed?Date.now()+150*60*1000:null;
+  appState.allTimer=setInterval(updateAllTimer,1000);
 }
-function allJump(idx){
-  if(!appState.allReviewUnlocked)return;
-  if(idx<0||idx>=appState.allQ.length||idx>appState.allIdx)return;
-  appState.allIdx=idx;
-  appState.allPending=null;
-  renderView();
+function updateAllTimer(){
+  if(!appState.allStarted||appState.allDone)return;
+  appState.allSeconds=Math.max(0,Math.floor((Date.now()-appState.allStartedAt)/1000));
+  const remaining=appState.allTimed?Math.max(0,Math.ceil((appState.allDeadline-Date.now())/1000)):null;
+  const el=document.getElementById('all-timer');
+  if(el){el.textContent=fmtExamElapsed(remaining??appState.allSeconds);el.classList.toggle('time-low',remaining!==null&&remaining<=300);}
+  if(remaining===0){appState.allTimedOut=true;finishAll(true);}
 }
-
+function allQuestionState(index){
+  const answer=appState.allAns[index];
+  if(!answer)return 'unanswered';
+  if(!appState.allDone&&appState.allFeedback!=='immediate')return 'answered';
+  return answer===appState.allQ[index].correct_answer?'correct':'incorrect';
+}
+function allQuestionNumbers(review=false){
+  return `<div class="exam-number-grid">${appState.allQ.map((q,index)=>{
+    const status=allQuestionState(index);
+    return `<button class="exam-number ${status}${!review&&index===appState.allIdx?' current':''}" aria-label="Question ${index+1}, ${status}" ${!review&&index===appState.allIdx?'aria-current="step"':''} onclick="${review?'reviewAllQuestion':'allJump'}(${index})">${index+1}</button>`;
+  }).join('')}</div>`;
+}
+function allJump(index){
+  if(index<0||index>=appState.allQ.length)return;
+  appState.allIdx=index;appState.allPending=null;renderView();
+}
+function allNext(){allJump(Math.min(appState.allIdx+1,appState.allQ.length-1));}
+function allPrev(){allJump(Math.max(0,appState.allIdx-1));}
+function reviewAllQuestion(index){
+  if(!appState.allDone)return;
+  appState.allReviewOpen=true;allJump(index);
+}
 function renderAllExam(v){
-  if(!appState.allQ.length){v.innerHTML='<div class="empty">No questions available. Add questions to subject banks first.</div>';return;}
-  const q=appState.allQ[appState.allIdx];
-  const answered=appState.allAns[appState.allIdx];
-  const pending=appState.allPending||answered||'';
-  const answeredCount=appState.allAns.filter(Boolean).length;
-  const pct=Math.round(answeredCount/appState.allQ.length*100);
-  const opts=['a','b','c','d'];
-  const review=appState.allReviewUnlocked;
-  const canReplace=!review&&!answered;
+  if(!appState.allQ.length){v.innerHTML='<div class="empty">No questions available.</div>';return;}
+  const index=appState.allIdx,q=appState.allQ[index],answered=appState.allAns[index];
+  const draft=appState.allDraft?.[index]||answered||'';
+  const reviewing=appState.allDone;
+  const reveal=reviewing||(appState.allFeedback==='immediate'&&!!answered);
+  const locked=reviewing||(appState.allFeedback==='immediate'&&!!answered);
+  const count=appState.allAns.filter(Boolean).length;
+  const correct=answered===q.correct_answer;
   const media=renderQuestionMedia(q);
-  const unanswered=Math.max(0,appState.allQ.length-answeredCount);
-  v.innerHTML=`
-    <div class="exam-sim-shell">
-      <div class="exam-sim-topbar">
-        <div class="exam-sim-logo">MLS</div>
-        <div class="exam-sim-brand">MLS Prep <span>Exam Simulator</span></div>
-        <div class="exam-sim-user">Practice Mode</div>
-      </div>
-      <div class="exam-sim-subbar">
-        <button class="exam-sim-link" onclick="goHome()">⌂ Exit</button>
-        <div class="exam-sim-navgroup">
-          <button class="exam-sim-link" onclick="allPrev()" ${review&&appState.allIdx>0?'':'disabled'}>◴ Back</button>
-          <button class="exam-sim-link" disabled>Next ◷</button>
-        </div>
-      </div>
-      <div class="exam-sim-layout">
-        <aside class="exam-sim-sidebar">
-          <div class="exam-sim-stat-row"><span>Time Elapsed</span><span id="all-timer">${fmtExamElapsed(appState.allSeconds)}</span></div>
-          <div style="font-size:14px;font-weight:700;margin:20px 0 8px">Question Details</div>
-          <div class="exam-sim-stat-row"><strong>Answer Provided</strong><span>${answeredCount}</span></div>
-          <div class="exam-sim-stat-row"><span>Answer Not Yet Provided</span><span>${unanswered}</span></div>
-          <div class="exam-sim-stat-row"><span>Correct</span><span style="color:#059669">0</span></div>
-          <div class="exam-sim-stat-row"><span>Incorrect</span><span style="color:#dc2626">0</span></div>
-          <button class="exam-sim-finalize" onclick="finishAll()" ${review?'':'disabled'}>Finalize</button>
-          <button class="exam-sim-mastered" onclick="replaceCurrentAllQuestion()" ${canReplace?'':'disabled'}>Already Mastered, Replace Question</button>
-          <div class="exam-sim-list-title">Questions</div>
-          <div class="exam-sim-question-list">
-            ${appState.allQ.map((qq,i)=>{
-              const enabled=review&&i<=appState.allIdx;
-              const cls=['exam-sim-list-item',i===appState.allIdx?'current':'',appState.allAns[i]?'answered':''].filter(Boolean).join(' ');
-              return `<button class="${cls}" onclick="allJump(${i})" ${enabled?'':'disabled'}><span class="exam-sim-dot"></span><span>${i+1}. ${esc(allQuestionSnippet(qq))}</span></button>`;
-            }).join('')}
-          </div>
-        </aside>
-        <main class="exam-sim-content">
-          <h1 class="exam-sim-qnum">Question ${appState.allIdx+1} of ${appState.allQ.length}</h1>
-          <div class="exam-sim-topic">${esc(allExamTopicPath(q))}</div>
-          <div class="exam-sim-question-row ${media?'':'no-media'}">
-            <section>
-              <div class="exam-sim-stem">${renderStructuredQuizQuestion(q)}</div>
-              <div class="exam-sim-directions">Please select the single best answer</div>
-              <div class="exam-sim-options">
-                ${opts.map(opt=>`
-                  <label class="exam-sim-option">
-                    <input type="radio" name="exam-answer" value="${opt}" ${pending===opt?'checked':''} ${answered||review?'disabled':''} onchange="selectAllAnswer('${opt}')">
-                    <span>${esc(q['option_'+opt]||'')}</span>
-                  </label>`).join('')}
-              </div>
-              <button class="exam-sim-submit" onclick="submitAllAnswer()" ${(!pending||answered||review)?'disabled':''}>Submit Answer</button>
-              ${review?`<div style="margin-top:18px;color:#4b5563;font-size:13px">Back review is unlocked. Use Back or the question list to review earlier questions, then finalize when ready.</div>`:''}
-            </section>
-            ${media?`<aside class="exam-sim-media">${media}</aside>`:''}
-          </div>
-        </main>
-        </div>
+  const remaining=appState.allTimed?Math.max(0,Math.ceil((appState.allDeadline-Date.now())/1000)):null;
+  const explanation=quizBookExplanation(q);
+  v.innerHTML=`<div class="exam-sim-shell">
+    <div class="exam-sim-topbar"><div class="exam-sim-logo">MLS</div><div class="exam-sim-brand">MLS Prep <span>Exam Simulator</span></div>
+      <button class="exam-calculator-toggle" onclick="toggleExamCalculator()" aria-label="Open calculator" aria-expanded="${!!appState.allCalcOpen}">▦ Calculator</button>
     </div>
-  `;
+    <div class="exam-sim-subbar"><button class="exam-sim-link" onclick="${reviewing?"appState.allReviewOpen=false;renderView()":"goHome()"}">${reviewing?'← Results':'← Exit'}</button>
+      <div class="exam-clock"><span>${reviewing?'Time used':appState.allTimed?'Time remaining':'Time elapsed · untimed'}</span><strong id="all-timer">${fmtExamElapsed(reviewing?appState.allSeconds:(remaining??appState.allSeconds))}</strong></div>
+      <div class="exam-sim-navgroup"><button class="exam-sim-link" onclick="allPrev()" ${index?'':'disabled'}>← Back</button><button class="exam-sim-link" onclick="allNext()" ${index<appState.allQ.length-1?'':'disabled'}>Next →</button></div>
+    </div>
+    <div class="exam-sim-layout"><aside class="exam-sim-sidebar">
+      <div class="exam-sim-stat-row"><strong>Answered</strong><span>${count} / ${appState.allQ.length}</span></div>
+      <div class="exam-sim-stat-row"><span>Unanswered</span><span>${appState.allQ.length-count}</span></div>
+      ${!reviewing?`<button class="exam-sim-finalize" onclick="finishAll()">Finish exam</button><button class="exam-sim-mastered" onclick="replaceCurrentAllQuestion()" ${answered?'disabled':''}>Already mastered this question?<br><strong>Click here to replace it.</strong></button>`:''}
+      <h2 class="exam-sim-list-title">Questions</h2>
+      <div class="exam-number-legend"><span><i class="unanswered"></i>Unanswered</span>${reviewing||appState.allFeedback==='immediate'?'<span><i class="correct"></i>Correct</span><span><i class="incorrect"></i>Incorrect</span>':'<span><i class="answered"></i>Answered</span>'}</div>
+      ${allQuestionNumbers()}
+    </aside><main class="exam-sim-content">
+      <h1 class="exam-sim-qnum">Question ${index+1} of ${appState.allQ.length}</h1><div class="exam-sim-topic">${esc(allExamTopicPath(q))}</div>
+      <div class="exam-sim-question-row ${media?'':'no-media'}"><section>
+        <div class="exam-sim-stem">${renderStructuredQuizQuestion(q)}</div><div class="exam-sim-directions">Please select the single best answer</div>
+        <div class="exam-sim-options">${['a','b','c','d'].map(opt=>`<label class="exam-sim-option ${reveal?(opt===q.correct_answer?'is-correct':opt===answered?'is-incorrect':''):''}"><input type="radio" name="exam-answer" value="${opt}" ${draft===opt?'checked':''} ${locked?'disabled':''} onchange="selectAllAnswer('${opt}')"><span><b>${opt.toUpperCase()}.</b> ${esc(q['option_'+opt]||'')}</span></label>`).join('')}</div>
+        ${!reviewing?`<div class="exam-question-actions"><button class="exam-sim-submit" onclick="submitAllAnswer()" ${!draft||locked||draft===answered?'disabled':''}>${answered?'Update answer':'Submit answer'}</button><button class="btn btn-ghost" onclick="${index<appState.allQ.length-1?'allNext()':'finishAll()'}">${index<appState.allQ.length-1?'Next question →':'Finish exam'}</button></div>`:''}
+        ${reveal?`<div class="exam-answer-feedback ${correct?'correct':'incorrect'}"><strong>${!answered?'Not answered':correct?'Correct':'Incorrect'}</strong><p>Correct answer: ${q.correct_answer.toUpperCase()}. ${esc(q['option_'+q.correct_answer])}</p>${explanation?`<div>${escNL(explanation)}</div>`:''}</div>`:answered?'<p class="exam-answer-saved">Answer saved. Results will be shown after you finish the exam.</p>':''}
+      </section>${media?`<aside class="exam-sim-media">${media}</aside>`:''}</div>
+    </main></div>
+    <div id="exam-calculator" class="exam-calculator${appState.allCalcOpen?'':' hidden'}" role="dialog" aria-label="Calculator" onkeydown="examCalculatorKey(event)">${examCalculatorHTML()}</div>
+  </div>`;
 }
-
 function selectAllAnswer(opt){
-  if(appState.allDone||appState.allReviewUnlocked||appState.allAns[appState.allIdx])return;
-  appState.allPending=opt;
-  renderView();
+  if(appState.allDone||!['a','b','c','d'].includes(opt)||(appState.allFeedback==='immediate'&&appState.allAns[appState.allIdx]))return;
+  appState.allDraft=appState.allDraft||[];appState.allDraft[appState.allIdx]=opt;appState.allPending=opt;renderView();
 }
 function submitAllAnswer(){
-  if(!appState.allPending){alert('Please select an answer before submitting.');return;}
-  answerAll(appState.allPending);
+  const answer=appState.allDraft?.[appState.allIdx];
+  if(!answer){alert('Please select an answer before submitting.');return;}
+  answerAll(answer);
 }
 function answerAll(opt){
-  if(appState.allDone||appState.allReviewUnlocked||appState.allAns[appState.allIdx])return;
+  if(appState.allDone||!['a','b','c','d'].includes(opt)||(appState.allFeedback==='immediate'&&appState.allAns[appState.allIdx]))return;
   if(!appState.allAns[appState.allIdx])noteQuizSeen(appState.allQ[appState.allIdx]);
-  appState.allAns[appState.allIdx]=opt;
-  appState.allPending=null;
-  const answeredCount=appState.allAns.filter(Boolean).length;
-  if(answeredCount>=appState.allQ.length){
-    appState.allReviewUnlocked=true;
-  }else{
-    appState.allIdx=Math.min(appState.allIdx+1,appState.allQ.length-1);
-  }
-  renderView();
+  appState.allAns[appState.allIdx]=opt;appState.allDraft=appState.allDraft||[];appState.allDraft[appState.allIdx]=opt;appState.allPending=null;
+  appState.allReviewUnlocked=appState.allAns.filter(Boolean).length===appState.allQ.length;renderView();
 }
+function finishAll(force=false){
+  if(appState.allDone)return;
+  const unanswered=appState.allQ.length-appState.allAns.filter(Boolean).length;
+  if(!force&&unanswered&&!confirm(`Finish with ${unanswered} unanswered ${unanswered===1?'question':'questions'}? These will be marked incorrect.`))return;
+  if(appState.allStartedAt)appState.allSeconds=Math.max(0,Math.floor((Date.now()-appState.allStartedAt)/1000));
+  if(appState.allTimed)appState.allSeconds=Math.min(appState.allSeconds,150*60);
+  clearInterval(appState.allTimer);appState.allTimer=null;appState.allDone=true;appState.allReviewOpen=false;appState.allCalcOpen=false;renderView();
+}
+function evaluateExamCalculation(expression){
+  const text=String(expression).replace(/\s/g,'');
+  if(!text||text.length>80||/[^\d.+\-*/()]/.test(text))throw Error('Invalid expression');
+  const tokens=text.match(/\d*\.?\d+|[()+\-*/]/g)||[];
+  if(tokens.join('')!==text)throw Error('Invalid expression');
+  let i=0;
+  const factor=()=>{
+    if(tokens[i]==='+'){i++;return factor();}if(tokens[i]==='-'){i++;return -factor();}
+    if(tokens[i]==='('){i++;const value=expressionValue();if(tokens[i++]!==')')throw Error('Missing parenthesis');return value;}
+    const token=tokens[i++];if(!token||!/^\d*\.?\d+$/.test(token))throw Error('Invalid number');return Number(token);
+  };
+  const term=()=>{let value=factor();while(tokens[i]==='*'||tokens[i]==='/'){const op=tokens[i++],right=factor();value=op==='*'?value*right:value/right;}return value;};
+  const expressionValue=()=>{let value=term();while(tokens[i]==='+'||tokens[i]==='-'){const op=tokens[i++],right=term();value=op==='+'?value+right:value-right;}return value;};
+  const value=expressionValue();if(i!==tokens.length||!Number.isFinite(value))throw Error('Invalid result');return Number(value.toPrecision(12)).toString();
+}
+function examCalculatorHTML(){
+  return `<div class="exam-calculator-head"><strong>Calculator</strong><button onclick="toggleExamCalculator()" aria-label="Close calculator">✕</button></div><output id="exam-calc-display" aria-live="polite">${esc(appState.allCalcValue||'0')}</output><div class="exam-calculator-keys">${['C','⌫','(',')','7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'].map(key=>`<button onclick="examCalculatorPress('${key}')" aria-label="${{'⌫':'Backspace','C':'Clear','*':'Multiply','/':'Divide','=':'Equals'}[key]||key}">${key}</button>`).join('')}</div>`;
+}
+function toggleExamCalculator(){
+  appState.allCalcOpen=!appState.allCalcOpen;
+  const panel=document.getElementById('exam-calculator');
+  if(panel){panel.classList.toggle('hidden',!appState.allCalcOpen);if(appState.allCalcOpen)panel.querySelector('button').focus();}
+  document.querySelector('.exam-calculator-toggle')?.setAttribute('aria-expanded',String(appState.allCalcOpen));
+}
+function examCalculatorPress(key){
+  let text=appState.allCalcValue||'';
+  if(key==='C')text='';else if(key==='⌫')text=text==='Error'?'':text.slice(0,-1);
+  else if(key==='='){try{text=evaluateExamCalculation(text);}catch(e){text='Error';}}
+  else if(/^[\d.+\-*/()]$/.test(key)){if(text==='Error')text='';if(text.length<80)text+=key;}
+  appState.allCalcValue=text;const display=document.getElementById('exam-calc-display');if(display)display.textContent=text||'0';
+}
+function examCalculatorKey(event){
+  const key=event.key;
+  if(key==='Escape'){event.preventDefault();toggleExamCalculator();return;}
+  if(/^[\d.+\-*/()]$/.test(key)||['Enter','Backspace','Delete'].includes(key)){
+    event.preventDefault();examCalculatorPress(key==='Enter'?'=':key==='Backspace'?'⌫':key==='Delete'?'C':key);
+  }
+}
+
 function replaceCurrentAllQuestion(){
-  if(!appState.allStarted||appState.allDone||appState.allReviewUnlocked||!appState.allQ.length)return;
+  if(!appState.allStarted||appState.allDone||!appState.allQ.length)return;
   if(appState.allAns[appState.allIdx]){alert('This question is already answered. Replace before answering so the exam stays clean.');return;}
   const idx=appState.allIdx;
   const current=appState.allQ[idx];
@@ -14040,29 +14300,23 @@ function replaceCurrentAllQuestion(){
     return q?.subject===currentSubject&&key&&key!==currentKey&&!used.has(key);
   });
   if(!candidates.length){alert('No unused replacement questions are available for '+subjectDisplayName(currentSubject)+'.');return;}
-  appState.allQ[idx]=pickQuizQuestions(candidates,1)[0];
+  const replacement=pickQuizQuestions(candidates,1)[0];
+  const masteryIndex=(appState.allMasteryQ||[]).findIndex(q=>quizQuestionKey(q)===currentKey);
+  if(masteryIndex>=0)appState.allMasteryQ[masteryIndex]=replacement;
+  appState.allQ[idx]=replacement;
+  if(appState.allDraft)appState.allDraft[idx]=null;
   appState.allAns[idx]=null;
   appState.allPending=null;
   renderView();
 }
-function allNext(){renderView();}
-function allPrev(){if(appState.allReviewUnlocked&&appState.allIdx>0){appState.allIdx--;appState.allPending=null;}renderView();}
-
-function finishAll(){
-  if(!appState.allReviewUnlocked){alert('Finish all questions before finalizing the exam.');return;}
-  clearInterval(appState.allTimer);
-  appState.allDone=true;
-  // Results are NOT saved to the database — export PDF to keep a record
-  renderView();
-}
-
 function renderAllDone(v){
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
       <div class="section-title">Practice Exam Simulator Results</div>
     </div>
-    <div id="all-results"></div>
+    ${appState.allTimedOut?'<p class="exam-timeout-note">The 150-minute time limit has ended. Submitted answers were scored; unanswered questions count as incorrect.</p>':''}
+    <div id="all-results"></div><section class="exam-results-review"><h2>Review each question</h2>${allQuestionNumbers(true)}</section>
   `;
   renderQuizResults(document.getElementById('all-results'),true);
 }
