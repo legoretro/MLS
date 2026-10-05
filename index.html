@@ -1898,10 +1898,10 @@ body:not(.light-mode) .subject-notebook{--paper:#202b3b;--ink:#eaf0fa;--rule:#b6
     if(typeof supabase!=='undefined'||window.__sbLoaded)return;
     window.__sbLoaded=true;
     var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js';
     s.onerror=function(){
       var s2=document.createElement('script');
-      s2.src='https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      s2.src='https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js';
       s2.onload=window.__appInit;
       document.head.appendChild(s2);
     };
@@ -4812,6 +4812,65 @@ async function resetQuizBackground(){
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+const contentReads=new Map(),pendingReads=new Map();
+async function boundedContentFetch(input,init={}){
+  const url=String(input),method=(init.method||'GET').toUpperCase();
+  const canCache=method==='GET'&&url.includes('/rest/v1/');
+  if(!['GET','HEAD'].includes(method))contentReads.clear();
+  const key=url+'|'+JSON.stringify(init.headers||{});
+  const cached=contentReads.get(key);
+  if(canCache&&cached&&cached.until>Date.now())return new Response(cached.body,{status:cached.status,headers:cached.headers});
+  if(canCache&&pendingReads.has(key))return (await pendingReads.get(key)).clone();
+  const task=(async()=>{
+    const controller=new AbortController();
+    const abort=()=>controller.abort();
+    if(init.signal?.aborted)controller.abort();init.signal?.addEventListener('abort',abort,{once:true});
+    const timer=setTimeout(abort,15000);
+    try{
+      const response=await fetch(input,{...init,signal:controller.signal});
+      const body=await response.arrayBuffer();
+      const result=new Response([204,205,304].includes(response.status)?null:body,{status:response.status,headers:response.headers});
+      if(canCache&&response.ok&&body.byteLength<800000){if(contentReads.size>=40)contentReads.delete(contentReads.keys().next().value);contentReads.set(key,{body,status:response.status,headers:[...response.headers],until:Date.now()+60000});}
+      return result;
+    }finally{clearTimeout(timer);init.signal?.removeEventListener('abort',abort);}
+  })();
+  if(canCache)pendingReads.set(key,task);
+  try{return (await task).clone();}finally{if(pendingReads.get(key)===task)pendingReads.delete(key);}
+}
+async function loadImageCatalog(table){
+  const [meta,available]=await Promise.all([
+    sb.from(table).select('id,name,folder,key_features,notes').order('name'),
+    sb.from(table).select('id').not('images','is',null).neq('images','[]')
+  ]);
+  if(meta.error||available.error)throw meta.error||available.error;
+  const ids=new Set((available.data||[]).map(x=>x.id));
+  return (meta.data||[]).map(row=>({...row,_imageTable:table,_hasImages:ids.has(row.id)}));
+}
+async function hydrateCatalogItem(item){
+  if(!item?._imageTable||Object.prototype.hasOwnProperty.call(item,'images'))return item;
+  if(item._imagePending)return item._imagePending;
+  item._imagePending=(async()=>{const {data,error}=await sb.from(item._imageTable).select('images').eq('id',item.id).single();if(error)throw error;item.images=data?.images||[];return item;})();
+  try{return await item._imagePending;}finally{delete item._imagePending;}
+}
+function deferCatalogImage(el,item,draw){
+  const ticket={};el._imageTicket=ticket;
+  if(!item?._imageTable||Object.prototype.hasOwnProperty.call(item,'images'))return false;
+  el.innerHTML='<div class="empty">Loading this image… <button class="btn btn-ghost" onclick="exitImageFlashcards()">← Back</button></div>';
+  hydrateCatalogItem(item).then(()=>{if(el.isConnected&&el._imageTicket===ticket)draw();}).catch(()=>{
+    if(!el.isConnected||el._imageTicket!==ticket)return;
+    el.innerHTML='<div class="empty">This image could not load. <button class="btn btn-primary image-retry">Retry</button> <button class="btn btn-ghost" onclick="exitImageFlashcards()">← Back</button></div>';
+    el.querySelector('.image-retry').onclick=draw;
+  });return true;
+}
+function observeCatalogImages(el,items,selector,thumbs){
+  const queue=[];let running=0;
+  const pump=()=>{while(running<2&&queue.length){const card=queue.shift();if(!card.isConnected)continue;const item=items.find(x=>String(x.id)===card.dataset.catalogId);if(!item)continue;running++;hydrateCatalogItem(item).then(()=>{if(card.isConnected)card.querySelector('.condition-imgs').innerHTML=thumbs(item);}).catch(()=>{if(card.isConnected)card.querySelector('.condition-imgs').innerHTML='<span style="font-size:12px;padding:8px">Open to load image</span>';}).finally(()=>{running--;pump();});}};
+  const observer=typeof IntersectionObserver!=='undefined'?new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){observer.unobserve(entry.target);queue.push(entry.target);}pump();},{rootMargin:'100px'}):null;
+  el._catalogObserver=observer;
+  el.querySelectorAll(selector).forEach(card=>{if(observer)observer.observe(card);else queue.push(card);});
+  if(!observer)pump();
+}
+
 window.__appInit = async function(){
   // Guard: only run once even if called multiple times
   if(window.__appInitDone)return;
@@ -4820,7 +4879,7 @@ window.__appInit = async function(){
   applyQuizBackgroundFromStorage();
   applySavedTheme();
   try{
-    sb = supabase.createClient(SB_URL, SB_KEY);
+    sb = supabase.createClient(SB_URL, SB_KEY, {accessToken:async()=>SB_KEY,global:{fetch:boundedContentFetch}});
     const _t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('to'),ms));
     localStorage.setItem('mlsboc_seeded','disabled');
     await Promise.race([
@@ -6388,12 +6447,11 @@ async function renderSubjectView(v){
         <div class="subject-page-copy">
           <div class="subject-page-kicker">Medical Laboratory Science</div>
           <h1 class="subject-page-title">${appState.subject==='urinalysis'?'Urinalysis /<br><span style="white-space:nowrap">Body Fluids</span>':esc(s.name).replace('/', '/<wbr>')}</h1>
-          <p class="subject-page-caption">Study, recall, and apply your knowledge.${key==='microbiology'?' <span class="subject-scope-note">(Includes mycobacteriology, virology, parasitology, and mycology.)</span>':''}</p>
+          <p class="subject-page-caption">${key==='para_myco'?'Microbiology includes mycobacteriology, virology, parasitology, and mycology.':'Study, recall, and apply your knowledge.'}</p>
         </div>
         ${key==='para_myco'&&isAdmin?`<label style="margin-left:auto;cursor:pointer" aria-label="Update subject icon">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
       </div>
     </div>
-    ${key==='para_myco'?'<div style="font-size:12px;color:var(--text2);margin-bottom:16px">Per ASCP BOC 2025, Parasitology &amp; Mycology are subcategories of Microbiology.</div>':''}
     <nav class="subject-tabs" aria-label="Subject sections">
       ${tabs.map(([tab,label])=>`<button class="tab ${appState.subjectTab===tab?'active':''}" data-tab="${tab}" aria-current="${appState.subjectTab===tab?'page':'false'}" onclick="switchTab('${tab}')">${label}</button>`).join('')}
     </nav>
@@ -6435,12 +6493,15 @@ function switchTab(tab){
 
 async function renderTab(){
   const el=document.getElementById('tab-content');if(!el)return;
-  syncQuizShell();
+  syncQuizShell();el._catalogObserver?.disconnect();
+  const subject=appState.subject,tab=appState.subjectTab;el._imageTicket={};
+  try{
   if(appState.subjectTab==='quiz')await renderQuizTab(el);
   else if(appState.subjectTab==='flashcards')await renderFlashcardsTab(el);
   else if(appState.subjectTab==='outline')await renderStudyOutlineTab(el);
   else if(appState.subjectTab==='images')await renderImagesTab(el);
   else if(appState.subjectTab==='cases')await renderCasesTab(el);
+  }catch(error){if(el.isConnected&&appState.subject===subject&&appState.subjectTab===tab)el.innerHTML='<div class="empty">Content could not load. <button class="btn btn-primary" onclick="renderTab()">Try again</button></div>';console.warn('Content load failed',error);}
   requestAnimationFrame(syncQuizShell);
 }
 
@@ -6601,13 +6662,12 @@ function subjectGuidelineHTML(subjectKey){
   if(!sheet||!outline)return '';
   const sections=sheet.sections.map(section=>`<section class="notebook-section" id="sheet-section-${esc(section.number)}"><h2><span>${esc(section.number)}.</span> ${esc(section.title)}</h2>
     <div class="notebook-topics">${section.topics.map(topic=>`<article class="notebook-topic"><h3>${esc(topic.letter)}. ${esc(topic.title)}</h3><ul class="notebook-lines">${(topic.lines||[]).map(line=>`<li class="notebook-level-${Math.min(4,Math.max(1,line.level||1))}">${esc(line.text)}</li>`).join('')}</ul></article>`).join('')}</div></section>`).join('');
-  const reference=sheet.references?.length?`<section class="notebook-section"><h2>Reference ranges</h2><p class="notebook-range-note">These are the examination ranges in the September 25, 2025 guideline, for examination preparation only—not clinical use.</p>${sheet.references.map(group=>`<h3>${esc(group.title)}</h3><div class="notebook-table-scroll"><table><thead><tr><th scope="col">Finding</th><th scope="col">Conventional units</th><th scope="col">SI units</th></tr></thead><tbody>${group.rows.map(row=>`<tr>${row.map((cell,i)=>i?`<td>${esc(cell)}</td>`:`<th scope="row">${esc(cell)}</th>`).join('')}</tr>`).join('')}</tbody></table></div>`).join('')}</section>`:'';
+
   return `<article class="subject-notebook" style="--ink-accent:${homeSubjectColor(subjectKey)}">
     <div class="notebook-heading"><div class="notebook-eyebrow">ASCP / ASCPi · MLS study outline</div><h1>${esc(outline.title)}</h1><p>${esc(sheet.percent)}${subjectKey==='para_myco'?'':' of the examination'}</p></div>
     ${subjectKey==='blood_bank'?'<p class="notebook-source-note">The source guideline states that donor eligibility questions use regulations current as of June 2023.</p>':''}
     ${sections}
     ${sheet.calculations?.length?`<section class="notebook-section"><h2>Calculations to know</h2><ul class="notebook-calculations">${sheet.calculations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></section>`:''}
-    ${reference}
     <footer class="notebook-source">${esc(ASCP_GUIDELINE_CITATION)} Source pages: ${sheet.pages.join(', ')}. Topic hierarchy and examples are retained from the source.</footer>
   </article>`;
 }
@@ -7235,6 +7295,7 @@ async function renderQuizTab(el){
   const replaceDisabled=!!answered||replacementUnavailable;
   const replaceTitle=replacementUnavailable?'All available questions are already included in this quiz.':(answered?'Answered questions stay in your results.':`Swap this for another question from this ${appState.view==='monster_mix'?'mix':'subject'}.`);
   const pct=Math.round((appState.quizIdx+1)/appState.quizQ.length*100);
+  if(!done&&deferCatalogImage(el,items[idx],()=>renderKahootImageQuiz(el,arguments[1])))return;
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const emojis=['🔴','🔵','🟡','🟢'];
@@ -8017,6 +8078,7 @@ function startImageFlashcard(items){
 function renderImageFlashcard(el){
   const items=appState.imgFlashItems||[];
   const idx=appState.imgFlashIdx;
+  if(deferCatalogImage(el,items[idx],()=>renderImageFlashcard(el)))return;
   const flipped=appState.imgFlashFlipped;
   const pct=Math.round((idx+1)/items.length*100);
 
@@ -9084,6 +9146,7 @@ function uaQuizNext(){appState.uaQuizIdx++;renderTab();}
 
 // ─── SHARED KAHOOT IMAGE QUIZ RENDERER ───────────────────────────────────────
 function renderKahootImageQuiz(el,{items,idx,ans,done,prompt,placeholder,onAnswer,onPrev,onNext,onDone,onRetry,onExit,onRetryWrong}){
+  if(!done&&deferCatalogImage(el,items[idx],()=>renderKahootImageQuiz(el,arguments[1])))return;
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const emojis=['🔴','🔵','🟡','🟢'];
@@ -9268,7 +9331,7 @@ async function renderHemeImages(el){
   el.innerHTML=imageLoadingHTML();
   if(!Array.isArray(window._hemeCondsCache)||window._hemeCondsLoadFailed||window._hemeCondsCache.length===0){
     try{
-      const rows=await fetchRowsWithRetry(()=>sb.from('mlsboc_heme_conditions').select('*').order('name'),3,true);
+      const rows=await loadImageCatalog('mlsboc_heme_conditions');
       window._hemeCondsCache=hemeConditionsOrDefaults(rows);
       window._hemeCondsLoadFailed=false;
     }catch(e){
@@ -9280,6 +9343,7 @@ async function renderHemeImages(el){
     }
   }
   // Flat view — load all conditions, group by folder inline
+  if(!el.isConnected||appState.subject!=='hematology'||appState.subjectTab!=='images')return;
   const allConditions=window._hemeCondsCache||[];
   const _dummy=null; // placeholder to avoid unused var warning
   const conditions=allConditions||[];
@@ -9323,7 +9387,7 @@ async function renderHemeImages(el){
                 const features=(c.key_features||[]).filter(Boolean);
                 const missing=!features.length;
                 return `
-                <div class="condition-card heme-item ${missing?'heme-missing-features':''}" data-name="${esc((c.name||'').toLowerCase())}" onclick="openCondition('${c.id}')">
+                <div class="condition-card heme-item ${missing?'heme-missing-features':''}" data-catalog-id="${esc(c.id)}" data-name="${esc((c.name||'').toLowerCase())}" onclick="openCondition('${c.id}')">
                   <div class="condition-imgs">${buildConditionThumbs(c)}</div>
                   <div class="condition-body">
                     <div class="condition-name">${esc(c.name||'')}</div>
@@ -9341,6 +9405,7 @@ async function renderHemeImages(el){
     </div>
     ${isAdmin?`<div class="mt-16">${adminHemeImageControls()}</div>`:''}
   `;
+  observeCatalogImages(el,conditions,'.heme-item',buildConditionThumbs);
 }
 
 function filterHemeConditions(query){
@@ -9359,8 +9424,7 @@ function filterHemeConditions(query){
 async function openHemeExportModal(){
   let conditions=[];
   try{
-    const res=await sb.from('mlsboc_heme_conditions').select('*').order('name');
-    conditions=hemeConditionsOrDefaults(res.data||[]);
+    conditions=window._hemeCondsCache||await loadImageCatalog('mlsboc_heme_conditions');
   }catch(error){
     conditions=hemeDefaultConditions();
   }
@@ -9425,6 +9489,7 @@ async function generateHemeConditionsPDF(){
     if(!all||!all.length){alert('Could not load conditions.');return;}
     const {jsPDF}=window.jspdf;
     const ordered=selectedIds.map(id=>all.find(item=>item.id===id)).filter(Boolean);
+    for(const item of ordered)await hydrateCatalogItem(item);
 
     await generateImageSectionPDF(ordered,'Hematology Conditions','hematology_conditions.pdf',{
       showImageMeta:true,
@@ -9666,7 +9731,7 @@ function openHemeFolder(key){
 // Hematology image quiz
 async function startHemeQuiz(){
   let data=[];
-  try{const res=await sb.from('mlsboc_heme_conditions').select('*').not('images','is',null);data=hemeConditionsOrDefaults(res.data||[]);}
+  try{data=window._hemeCondsCache||await loadImageCatalog('mlsboc_heme_conditions');}
   catch(error){data=hemeDefaultConditions();}
   const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No conditions with images to quiz on yet.');return;}
@@ -9677,13 +9742,13 @@ async function startHemeQuiz(){
 }
 
 async function startHemeFlashcard(){
-  if(!window._hemeCondsCache){try{const r=await sb.from('mlsboc_heme_conditions').select('*').order('name');window._hemeCondsCache=hemeConditionsOrDefaults(r.data||[]);}catch(e){window._hemeCondsCache=hemeDefaultConditions();}}
+  if(!window._hemeCondsCache){try{window._hemeCondsCache=await loadImageCatalog('mlsboc_heme_conditions');}catch(e){window._hemeCondsCache=hemeDefaultConditions();}}
   if(!window._hemeCondsCache||!window._hemeCondsCache.length){alert('No conditions to study yet.');return;}
   startImageFlashcard(window._hemeCondsCache);
 }
 
 async function startMicroFlashcard(){
-  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{window._microOrgsCache=await loadImageCatalog('mlsboc_micro_organisms');}catch(e){}}
   const data=window._microOrgsCache||[];
   if(!data.length){alert('No organisms to study yet.');return;}
   startImageFlashcard(data);
@@ -9703,7 +9768,7 @@ async function startUAFlashcard(){
 
 async function startHemeQuizFolder(folder){
   let data=[];
-  try{const res=await sb.from('mlsboc_heme_conditions').select('*').eq('folder',folder);data=hemeConditionsOrDefaults(res.data||[]).filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
+  try{data=(window._hemeCondsCache||await loadImageCatalog('mlsboc_heme_conditions')).filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
   catch(error){data=hemeDefaultConditions().filter(item=>normalizeHemeFolderKey(item.folder)===folder);}
   const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No conditions with images in this folder yet.');return;}
@@ -9752,7 +9817,7 @@ async function renderMicroImages(el){
   // Flat view — cache organisms to avoid refetch on tab switch
   if(!Array.isArray(window._microOrgsCache)||window._microOrgsLoadFailed||window._microOrgsCache.length===0){
     try{
-      window._microOrgsCache=await fetchRowsWithRetry(()=>sb.from('mlsboc_micro_organisms').select('*').order('name'),3,true);
+      window._microOrgsCache=await loadImageCatalog('mlsboc_micro_organisms');
       window._microOrgsLoadFailed=false;
     }catch(e){
       window._microOrgsLoadFailed=true;
@@ -9762,6 +9827,7 @@ async function renderMicroImages(el){
       }
     }
   }
+  if(!el.isConnected||appState.subject!=='microbiology'||appState.subjectTab!=='images')return;
   const all=window._microOrgsCache||[];
   const byFolder={};
   all.forEach(o=>{const f=o.folder||'misc';if(!byFolder[f])byFolder[f]=[];byFolder[f].push(o);});
@@ -9791,7 +9857,7 @@ async function renderMicroImages(el){
             <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${label} <span style="font-weight:400;font-size:11px">(${items.length})</span></div>
             <div class="condition-grid">
               ${items.map(o=>`
-                <div class="condition-card micro-item" data-name="${esc(o.name.toLowerCase())}" onclick="openOrganism('${o.id}')">
+                <div class="condition-card micro-item" data-catalog-id="${esc(o.id)}" data-name="${esc(o.name.toLowerCase())}" onclick="openOrganism('${o.id}')">
                   <div class="condition-imgs">${buildOrganismThumbs(o)}</div>
                   <div class="condition-body">
                     <div class="condition-name">${o.name}</div>
@@ -9811,6 +9877,7 @@ async function renderMicroImages(el){
   `;
   // Clear the cache entry if it seems stale (will refetch next time)
   if(!all.length) window._microOrgsCache=null;
+  observeCatalogImages(el,all,'.micro-item',buildOrganismThumbs);
 }
 
 function filterMicroItems(query){
@@ -9825,7 +9892,7 @@ function filterMicroItems(query){
 }
 
 async function openMicroExportModal(){
-  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{window._microOrgsCache=await loadImageCatalog('mlsboc_micro_organisms');}catch(e){}}
   const all=window._microOrgsCache||[];
   if(!all.length){alert('No organisms to export.');return;}
   const byFolder={};
@@ -10064,8 +10131,8 @@ async function handleOrganismImgDrop(e,orgId,slot){
 }
 
 async function startMicroQuiz(){
-  if(!window._microOrgsCache||!window._microOrgsCache.length){try{const r=await sb.from('mlsboc_micro_organisms').select('*').order('name');window._microOrgsCache=r.data||[];}catch(e){}}
-  const valid=(window._microOrgsCache||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  if(!window._microOrgsCache||!window._microOrgsCache.length){try{window._microOrgsCache=await loadImageCatalog('mlsboc_micro_organisms');}catch(e){}}
+  const valid=(window._microOrgsCache||[]).filter(hasUsableImages);
   if(!valid.length){alert('No organisms with images to quiz on yet.');return;}
   appState.microImgMode='quiz';
   window._kqOpts={};appState.microQuizItems=shuffle(valid);
@@ -10074,8 +10141,8 @@ async function startMicroQuiz(){
 }
 
 async function startMicroQuizFolder(folder){
-  const {data}=await sb.from('mlsboc_micro_organisms').select('*').eq('folder',folder);
-  const valid=(data||[]).filter(o=>o.images&&o.images.filter(Boolean).length>0);
+  const data=(window._microOrgsCache||await loadImageCatalog('mlsboc_micro_organisms')).filter(item=>item.folder===folder);
+  const valid=(data||[]).filter(hasUsableImages);
   if(!valid.length){alert('No organisms with images in this folder yet.');return;}
   appState.microImgMode='quiz';
   window._kqOpts={};appState.microQuizItems=shuffle(valid);
@@ -15593,6 +15660,7 @@ function renderClassQuiz(v){
   const answered=appState.classQuizAns[idx]!==undefined;
   const chosen=appState.classQuizAns[idx];
   const pct=Math.round((idx+1)/questions.length*100);
+  if(!done&&deferCatalogImage(el,items[idx],()=>renderKahootImageQuiz(el,arguments[1])))return;
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const optionLabels=['A','B','C','D'];
@@ -16177,7 +16245,7 @@ async function fetchRowsWithRetry(fetcher, attempts=3, retryEmpty=false){
   throw lastError||new Error('Load failed');
 }
 function imageLoadingHTML(){
-  return '<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>Loading the complete image library...</span></div>';
+  return '<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>Loading image list…</span></div>';
 }
 function imageLoadRetryHTML(label,retryAction){
   return `<div style="padding:16px;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="width:18px;height:18px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><span>${label} images did not load this time. Try this tab again; if it still looks blank, refresh once.</span><button class="btn btn-primary btn-sm" onclick="${retryAction}">Try loading again</button></div>`;
@@ -16231,7 +16299,7 @@ function hemeImageEntry(url, existing, slot){
   return {url, mag:imageEntryMag(existing,slot), specimen:imageEntrySpecimen(existing,slot)};
 }
 function hasUsableImages(item){
-  return !!(item&&imageEntryList(item.images).some(imageEntrySrc));
+  return !!(item&&(item._hasImages||imageEntryList(item.images).some(imageEntrySrc)));
 }
 function normalizeQuizCSVRow(row){
   const payload={
