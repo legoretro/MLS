@@ -4156,7 +4156,7 @@ function activeQuizOverlay(){
     || imageQuizActive
     || caseQuizActive
   );
-  return active?(overlay||document.body):null;
+  return active&&overlay?overlay:null;
 }
 
 function syncQuizShell(){
@@ -7312,7 +7312,6 @@ async function renderQuizTab(el){
   const replaceDisabled=!!answered||replacementUnavailable;
   const replaceTitle=replacementUnavailable?'All available questions are already included in this quiz.':(answered?'Answered questions stay in your results.':`Swap this for another question from this ${appState.view==='monster_mix'?'mix':'subject'}.`);
   const pct=Math.round((appState.quizIdx+1)/appState.quizQ.length*100);
-  if(!done&&deferCatalogImage(el,items[idx],()=>renderKahootImageQuiz(el,arguments[1])))return;
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const emojis=['🔴','🔵','🟡','🟢'];
@@ -15645,7 +15644,6 @@ function renderClassQuiz(v){
   const answered=appState.classQuizAns[idx]!==undefined;
   const chosen=appState.classQuizAns[idx];
   const pct=Math.round((idx+1)/questions.length*100);
-  if(!done&&deferCatalogImage(el,items[idx],()=>renderKahootImageQuiz(el,arguments[1])))return;
   const colors=['#e63946','#2196f3','#f5a623','#3ddc84'];
   const textColors=['#fff','#fff','#fff','#1a2a1a'];
   const optionLabels=['A','B','C','D'];
