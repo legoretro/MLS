@@ -4816,7 +4816,7 @@ const contentReads=new Map(),pendingReads=new Map();
 async function boundedContentFetch(input,init={}){
   const url=String(input),method=(init.method||'GET').toUpperCase();
   const canCache=method==='GET'&&url.includes('/rest/v1/');
-  if(!['GET','HEAD'].includes(method))contentReads.clear();
+  if(!['GET','HEAD'].includes(method)){contentReads.clear();questionBankCache.clear();}
   const key=url+'|'+JSON.stringify(init.headers||{});
   const cached=contentReads.get(key);
   if(canCache&&cached&&cached.until>Date.now())return new Response(cached.body,{status:cached.status,headers:cached.headers});
@@ -7097,9 +7097,26 @@ function quizBankKeys(subjectKey){
   return subjectKey==='para_myco'?['parasitology','mycology']:[subjectKey];
 }
 
+const questionBankLoads=new Map(),questionBankCache=new Map();
+async function readQuestionBank(subject){
+  const cached=questionBankCache.get(subject);
+  if(cached&&cached.until>Date.now())return cached.rows;
+  if(questionBankLoads.has(subject))return questionBankLoads.get(subject);
+  let timer;
+  const live=(async()=>{const result=await sb.from('mlsboc_questions').select('*').eq('subject',subject);if(result.error)throw result.error;return result.data||[];})();
+  const backup=new Promise((resolve,reject)=>{
+    timer=setTimeout(async()=>{try{
+      const response=await boundedContentFetch('assets/questions/'+encodeURIComponent(subject)+'.json?v=20261005');
+      if(!response.ok)throw Error('Backup question bank unavailable');
+      const rows=await response.json();if(!Array.isArray(rows)||rows.some(row=>row.subject!==subject))throw Error('Invalid backup question bank');resolve(rows);
+    }catch(error){reject(error);}},2000);
+  });
+  const task=Promise.any([live,backup]).then(rows=>{questionBankCache.set(subject,{rows,until:Date.now()+60000});return rows;}).finally(()=>{clearTimeout(timer);questionBankLoads.delete(subject);});
+  questionBankLoads.set(subject,task);return task;
+}
+
 async function fetchQuizSubjectPool(subjectKey){
-  const results=await Promise.all(quizBankKeys(subjectKey).map(key=>sb.from('mlsboc_questions').select('*').eq('subject',key)));
-  return results.flatMap(result=>result.data||[]);
+  const results=await Promise.all(quizBankKeys(subjectKey).map(readQuestionBank));return results.flat();
 }
 
 async function fetchQuizSubjectCount(subjectKey){
@@ -7440,13 +7457,8 @@ function sortQuestionsForAdmin(questions){
   });
 }
 async function loadCurrentQuizQuestions(){
-  const keys=quizSubjectKeys();
-  const results=await Promise.all(keys.map(key=>
-    sb.from('mlsboc_questions').select('*').eq('subject',key)
-  ));
-  const failed=results.find(result=>result.error);
-  if(failed)throw failed.error;
-  return sortQuestionsForAdmin(results.flatMap((res,idx)=>(res.data||[]).map(q=>({...q,_subject:q.subject||keys[idx]}))));
+  const rows=await fetchQuizSubjectPool(appState.subject);
+  return sortQuestionsForAdmin(rows.map(q=>({...q,_subject:q.subject})));
 }
 
 function renderQuizQuestionBank(questions){
@@ -10239,6 +10251,7 @@ async function deleteOrganism(id){
   renderTab();
 }
 async function renderCasesTab(el){
+  for(const key of ['bbQuizMode','uaQuizMode','immQuizMode','chemQuizMode','paraQuizMode','mycoQuizMode'])appState[key]=false;
   if(appState.subject==='microbiology'){
     await renderMicroCases(el);
   }else if(appState.subject==='blood_bank'){
@@ -10391,7 +10404,7 @@ function selectHemeCaseQ(caseId,qi,letter){
   renderTab();
 }
 function checkAllHC(caseId,count){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};
   if(!appState.hemeCaseAnswers[caseId])appState.hemeCaseAnswers[caseId]={};
   for(let i=0;i<count;i++){
@@ -10402,7 +10415,7 @@ function checkAllHC(caseId,count){
 }
 function resetAllHC(caseId){if(!appState.hemeCaseAnswers)appState.hemeCaseAnswers={};appState.hemeCaseAnswers[caseId]={};renderTab();}
 function checkHemeCaseQ(caseId,qi){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(appState.hemeCaseAnswers?.[caseId]?.[qi])appState.hemeCaseAnswers[caseId][qi].checked=true;renderTab();
 }
 function resetHemeCaseQ(caseId,qi){if(appState.hemeCaseAnswers?.[caseId])delete appState.hemeCaseAnswers[caseId][qi];renderTab();}
@@ -10883,7 +10896,6 @@ async function renderSubjectCases(el, cfg){
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
         <button class="btn btn-ghost btn-sm" onclick="openSubjectExportModal('${cfg.dbTable}','${cfg.tableField}','${cfg.tableLabel}','${cfg.exportTitle}')">📄 Export</button>
-        ${allQs.length?`<button class="btn btn-primary" onclick="startSubjectCaseQuiz('${qmKey}','${cfg.dbTable}','${cfg.tableField}')">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
@@ -10995,7 +11007,7 @@ function selectSubjectCaseQ(caseId,qi,letter,key){
   renderTab();
 }
 function checkAllSC(caseId,count,key){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(!appState[key])appState[key]={};
   if(!appState[key][caseId])appState[key][caseId]={};
   for(let i=0;i<count;i++){
@@ -11006,30 +11018,17 @@ function checkAllSC(caseId,count,key){
 }
 function resetAllSC(caseId,key){if(!appState[key])appState[key]={};appState[key][caseId]={};renderTab();}
 function checkSubjectCaseQ(caseId,qi,key){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(appState[key]?.[caseId]?.[qi])appState[key][caseId][qi].checked=true;renderTab();
 }
 function resetSubjectCaseQ(caseId,qi,key){if(appState[key]?.[caseId])delete appState[key][caseId][qi];renderTab();}
 
 // ─── SUBJECT CASE QUIZ MODE ────────────────────────────────────────────────────
-async function startSubjectCaseQuiz(qmKey,dbTable,tableField){
-  const {data}=await sb.from(dbTable).select('*').order('created_at');
-  const cases=(data||[]).map(withTableData);
-  const allQs=cases.flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
-  if(!allQs.length){alert('No questions found yet.');return;}
-  appState[qmKey]=true;
-  appState[qmKey+'Items']=shuffle(allQs);
-  appState[qmKey+'Idx']=0;
-  appState[qmKey+'Chosen']=null;
-  appState[qmKey+'Answered']=false;
-  appState[qmKey+'Score']=0;
-  appState[qmKey+'Done']=false;
-  appState[qmKey+'Answers']={};
-  renderTab();
-}
+async function startSubjectCaseQuiz(qmKey,dbTable,tableField){return;}
 
 // These keys for quiz dispatch - called by the renderSubjectCases routing
 function renderSubjectCaseQuiz(el,cfg){
+  if(!caseAnswersAvailable()){el.innerHTML=caseAnswerNoticeHTML();return;}
   const qmKey=cfg.quizModeKey;
   if(appState[qmKey+'Done']){renderSubjectCaseQuizResults(el,cfg);return;}
   const items=appState[qmKey+'Items']||[];
@@ -11128,6 +11127,7 @@ function subjectCaseQuizPrev(qmKey){
 }
 
 function renderSubjectCaseQuizResults(el,cfg){
+  if(!caseAnswersAvailable()){el.innerHTML=caseAnswerNoticeHTML();return;}
   const qmKey=cfg.quizModeKey;
   const total=(appState[qmKey+'Items']||[]).length;
   const answers=appState[qmKey+'Answers']||{};
@@ -11446,7 +11446,7 @@ async function openSubjectExportModal(dbTable,tableField,tableLabel,exportTitle)
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Select cases to include.</div>
       ${hasQuestions&&caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Admin export includes an answer key page after the case pages.</div>`:''}
-      ${hasQuestions&&!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answer-key export is Admin only. Regular exports include cases and options only.</div>`:''}
+      ${hasQuestions&&!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.sc-export-cb').forEach(c=>c.checked=false)">Deselect All</button>
@@ -12101,7 +12101,7 @@ function selectCaseOpt(caseId,key,val,type){
 }
 
 function submitGenericCase(caseId,answer){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(!appState.caseSelections[caseId])appState.caseSelections[caseId]={steps:{}};
   const allVals=Object.values(appState.caseSelections[caseId].steps||{}).flat().join(' ').toLowerCase();
   const correct=answer&&allVals.includes(answer.toLowerCase().split(' ')[0]);
@@ -12226,7 +12226,7 @@ function selectMCQ(caseId,qi,letter){
   renderTab();
 }
 function checkAllMC(caseId,count){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(!appState.microCaseAnswers)appState.microCaseAnswers={};
   if(!appState.microCaseAnswers[caseId])appState.microCaseAnswers[caseId]={};
   for(let i=0;i<count;i++){
@@ -12237,7 +12237,7 @@ function checkAllMC(caseId,count){
 }
 function resetAllMC(caseId){if(!appState.microCaseAnswers)appState.microCaseAnswers={};appState.microCaseAnswers[caseId]={};renderTab();}
 function checkMCQ(caseId,qi){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(appState.microCaseAnswers?.[caseId]?.[qi])appState.microCaseAnswers[caseId][qi].checked=true;renderTab();
 }
 function resetMCQ(caseId,qi){if(appState.microCaseAnswers?.[caseId])delete appState.microCaseAnswers[caseId][qi];renderTab();}
@@ -12501,7 +12501,6 @@ async function renderBloodBankCases(el){
       </div>
       <div class="flex gap-8 ml-auto flex-wrap">
         <button class="btn btn-ghost btn-sm" onclick="openExportModal('bb')">📄 Export</button>
-        ${allQs.length?`<button class="btn btn-primary" onclick="startBBQuiz()" style="gap:8px">⚡ Quiz Mode <span style="font-size:11px;opacity:.8">${allQs.length} questions</span></button>`:''}
       </div>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
@@ -12511,22 +12510,7 @@ async function renderBloodBankCases(el){
 }
 
 // ─── BLOOD BANK QUIZ MODE ─────────────────────────────────────────────────────
-async function startBBQuiz(){
-  const {data:_bq1}=await sb.from('mlsboc_bb_cases').select('*').order('created_at');
-  const data=(_bq1||[]).map(withTableData);
-  const allQs=(data||[]).flatMap(c=>(c.questions||[]).filter(q=>q.question).map(q=>({...q,_caseTitle:c.title,_scenario:c.scenario,_tableData:c.table_data||null,_imgs:imageEntryList(c.images)})));
-  if(!allQs.length){alert('No questions found in any case yet.');return;}
-  appState.bbQuizMode=true;
-  appState.bbQuizItems=shuffle(allQs);
-  appState.bbQuizIdx=0;
-  appState.bbQuizChosen=null;
-  appState.bbQuizAnswered=false;
-  appState.bbQuizScore=0;
-  appState.bbQuizDone=false;
-  appState.bbQuizAnswers={};
-  
-  renderTab();
-}
+async function startBBQuiz(){return;}
 
 function exitBBQuiz(){
   
@@ -12536,6 +12520,7 @@ function exitBBQuiz(){
 }
 
 function renderBBQuiz(el){
+  if(!caseAnswersAvailable()){el.innerHTML=caseAnswerNoticeHTML();return;}
   if(appState.bbQuizDone){renderBBQuizResults(el);return;}
 
   const items=appState.bbQuizItems;
@@ -12638,6 +12623,7 @@ function bbQuizPrev(){
 }
 
 function renderBBQuizResults(el){
+  if(!caseAnswersAvailable()){el.innerHTML=caseAnswerNoticeHTML();return;}
   const total=appState.bbQuizItems.length;
   const answers=appState.bbQuizAnswers||{};
   const score=appState.bbQuizItems.reduce((sum,item,i)=>sum+(answers[i]===item.correct?1:0),0);
@@ -12725,7 +12711,6 @@ function renderBBQuizResults(el){
           <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${pct}%</div><div class="stat-label">Score</div></div>
         </div>
         <div class="flex gap-8 mb-20 flex-wrap">
-          <button class="btn btn-primary" onclick="startBBQuiz()">🔄 Retry All</button>
           ${missed.length?`<button class="btn btn-warn" onclick="(${retryWrongOnly.toString()})()">⚡ Retry Wrong Only (${missed.length})</button>`:''}
           ${missed.length?`<button class="btn btn-ghost btn-sm" onclick="(${exportBBMissed.toString()})()">📥 Export Missed</button>`:''}
           <button class="btn btn-ghost" onclick="exitBBQuiz()">Back to Cases</button>
@@ -12831,7 +12816,7 @@ function selectBBQ(caseId,qi,letter){
   renderTab();
 }
 function checkAllBB(caseId,count){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(!appState.bbAnswers[caseId])appState.bbAnswers[caseId]={};
   for(let i=0;i<count;i++){
     if(appState.bbAnswers[caseId][i]?.choice&&!appState.bbAnswers[caseId][i]?.checked)
@@ -12841,7 +12826,7 @@ function checkAllBB(caseId,count){
 }
 function resetAllBB(caseId){appState.bbAnswers[caseId]={};renderTab();}
 function checkBBQ(caseId,qi){
-  if(!caseAnswersAvailable()){alert('Answers are available in Admin mode only for case activities.');return;}
+  if(!caseAnswersAvailable()){alert('Questions and options available only.');return;}
   if(appState.bbAnswers[caseId]?.[qi])appState.bbAnswers[caseId][qi].checked=true;renderTab();
 }
 function resetBBQ(caseId,qi){if(appState.bbAnswers[caseId])delete appState.bbAnswers[caseId][qi];renderTab();}
@@ -14862,7 +14847,7 @@ async function openExportModal(sourceKeys){
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Select cases to include — all go into one PDF.</div>
       ${hasQuestions&&caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Admin export includes an answer key page after the case pages.</div>`:''}
-      ${hasQuestions&&!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available. Answer-key export is Admin only. Regular exports include cases and options only.</div>`:''}
+      ${hasQuestions&&!caseAnswersAvailable()?`<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px">Questions and options available only.</div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(true)">Select All</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectAll(false)">Deselect All</button>
@@ -16269,10 +16254,10 @@ function retryImageLoad(img){
   setTimeout(()=>{img.src=src+joiner+'retry='+Date.now();},250);
 }
 function caseAnswersAvailable(){
-  return !!isAdmin;
+  return false;
 }
 function caseAnswerNoticeHTML(){
-  return '<div class="case-answer-notice" style="background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin:0 0 14px;color:var(--text2);font-size:13px;font-weight:600">Questions and options available. Answers not available in regular view.</div>';
+  return '<div class="case-answer-notice" style="background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);padding:10px 12px;margin:0 0 14px;color:var(--text2);font-size:13px;font-weight:600">Questions and options available only.</div>';
 }
 function caseImageRowHTML(images, extraStyle=''){
   const urls=imageEntryList(images).map(imageEntrySrc).filter(Boolean);
