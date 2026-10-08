@@ -1358,6 +1358,75 @@ html[data-mls-theme="dark"] body.ua-case-files .patient-clipboard .status-card.b
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+/* Patient doors, one compact chart, and department-level answer cards. */
+.hallway-stage{min-height:0;background:#f4f6fb;color:#1e293b}
+.hallway-stage .stage-topbar{padding:14px 18px}
+.hallway-stage .stage-topbar h2{font-size:1.18rem;line-height:1.25}
+.hallway-stage .stage-topbar p{font-size:.82rem}
+.department-workspace{display:grid;grid-template-columns:minmax(240px,38%) minmax(0,1fr);gap:16px;padding:16px;align-items:start}
+.department-rooms,.department-desk{min-width:0}
+.department-rooms,.department-diagnoses{border:1px solid #d7deeb;border-radius:14px;background:#fff;padding:14px;box-shadow:0 6px 20px rgba(20,34,60,.06)}
+.department-panel-label{display:flex;justify-content:space-between;gap:8px;margin:0 0 12px;font-size:.78rem;font-weight:800;color:#334155}
+.department-panel-label span{font-weight:600;color:#64748b}
+.hallway-stage .room-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr));gap:8px}
+.hallway-stage .room-card{min-height:120px;padding:6px;border:1px solid #cad4e3;border-radius:10px;background:#f8fafc;box-shadow:none}
+.hallway-stage .room-card:hover,.hallway-stage .room-card.selected{transform:none;border-color:#b99b17;box-shadow:0 0 0 2px rgba(200,168,0,.15)}
+.hallway-stage .room-card .room-door,.hallway-stage .room-card::before{top:23px;width:50px;height:64px}
+.hallway-stage .room-card .room-door{border-width:3px;border-bottom-width:4px}
+.hallway-stage .room-card .room-door-window{top:8px;width:27px;height:13px}
+.hallway-stage .room-card .room-door-handle{top:38px;right:7px;width:6px;height:6px}
+.hallway-stage .room-card .room-number{top:2px;font-size:.63rem;padding:2px 6px}
+.hallway-stage .room-card .enter-unit-label,.hallway-stage .room-review-label{bottom:6px;font-size:.59rem;padding:2px 5px;background:transparent;color:#49566b;text-transform:none;letter-spacing:0}
+.hallway-stage .room-card .closed-stamp{bottom:25px;right:50%;font-size:.49rem;padding:2px 4px}
+.hallway-stage .room-card.selected::after{display:none}
+.department-desk{display:grid;gap:14px}
+.case-empty{display:flex;flex-direction:column;justify-content:center;gap:5px;min-height:110px;padding:18px;border:1px dashed #bdc9da;border-radius:14px;background:#fff;color:#334155}
+.case-empty strong{font-size:.94rem}.case-empty span{font-size:.81rem;color:#64748b}
+.case-popup{position:relative;min-width:0;border:1px solid #b8c6d8;border-radius:14px;background:#fff;box-shadow:0 12px 28px rgba(20,34,60,.12);overflow:hidden}
+.case-popup-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 15px;border-bottom:1px solid #e2e8f0;color:#1e293b}
+.case-popup-head span{font-size:.72rem;font-weight:700;color:#64748b}.case-popup-head h3{margin:2px 0 0;font-size:1rem;line-height:1.3;color:#1e293b}
+.case-popup-close{width:30px;height:30px;border:0;border-radius:7px;background:#f1f5f9;color:#334155;font-size:1.25rem;line-height:1;cursor:pointer}
+.case-popup-close:hover{background:#e2e8f0}
+.case-popup-paper{padding:11px 15px;background:#fff}
+.case-popup-clues{margin:0;padding-left:20px;display:grid;gap:7px;color:#263244;font-size:.82rem;line-height:1.45}
+.case-popup-clues li{padding-left:2px}
+.case-popup-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 15px;border-top:1px solid #e2e8f0;background:#fafbfc}
+.case-popup-actions .game-btn{flex:0 0 auto;border-radius:8px;padding:9px 12px;font-size:.78rem}
+.case-popup-status{font-size:.78rem;line-height:1.3;color:#58667a}
+.case-popup-status.bad{color:#aa2537;font-weight:700}.case-popup-status.good{padding:11px 15px;border-top:1px solid #d4eadc;background:#f0faf3;color:#166534;font-weight:800}
+.department-diagnoses{padding:13px}
+.department-diagnosis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.department-diagnoses .diagnosis-token{width:100%;min-height:42px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#243247;box-shadow:none;font:.72rem/1.25 "Trebuchet MS",Arial,sans-serif;text-align:left;overflow-wrap:anywhere}
+.department-diagnoses .diagnosis-token:hover:not(:disabled){background:#fff8d9;border-color:#c8a800}
+.department-diagnoses .diagnosis-token.selected{outline:2px solid rgba(47,107,216,.18);border-color:#2f6bd8;background:#edf4ff;color:#18366c}
+.department-diagnoses .diagnosis-token:disabled{cursor:default;opacity:.64}
+.department-diagnoses .diagnosis-token.used{background:#eef6f0;color:#286143;border-color:#c8dfce}
+.department-diagnoses .diagnosis-token small{display:block;margin-top:3px;font-size:.64rem;color:#2f7b4b}
+.hallway-stage .completion{margin:0 16px 16px}
+html[data-mls-theme="dark"] body.ua-case-files .department-rooms,html[data-mls-theme="dark"] body.ua-case-files .department-diagnoses,html[data-mls-theme="dark"] body.ua-case-files .case-popup,html[data-mls-theme="dark"] body.ua-case-files .case-empty{background:#202b3d;border-color:#46556f;color:#eef3fb}
+html[data-mls-theme="dark"] body.ua-case-files .case-popup-head,html[data-mls-theme="dark"] body.ua-case-files .case-popup-head h3,html[data-mls-theme="dark"] body.ua-case-files .case-popup-clues,html[data-mls-theme="dark"] body.ua-case-files .department-panel-label{color:#eef3fb}
+html[data-mls-theme="dark"] body.ua-case-files .case-popup-paper{background:#202b3d}
+html[data-mls-theme="dark"] body.ua-case-files .case-popup-actions{background:#263348;border-color:#46556f}
+html[data-mls-theme="dark"] body.ua-case-files .case-popup-status.good{background:#153528;color:#b7f2ca}
+@media(max-width:820px){.department-workspace{grid-template-columns:1fr}.hallway-stage .room-grid{grid-template-columns:repeat(auto-fit,minmax(75px,1fr))}}
+@media(max-width:480px){.department-workspace{padding:10px;gap:10px}.department-rooms,.department-diagnoses{padding:10px}.hallway-stage .room-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.hallway-stage .room-card{min-height:103px}.hallway-stage .room-card .room-door,.hallway-stage .room-card::before{width:44px;height:53px}.hallway-stage .room-card .room-door-handle{top:30px}.hallway-stage .room-card .enter-unit-label,.hallway-stage .room-review-label{font-size:.52rem}.department-diagnosis-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.department-diagnoses .diagnosis-token{font-size:.69rem}.case-popup-clues{font-size:.78rem}.case-popup-actions{align-items:stretch;flex-direction:column}}
+.game-hero{min-height:300px;padding:28px;background:#fffdf2;border-radius:18px;box-shadow:0 10px 24px rgba(42,55,105,.08)}
+.game-hero::before,.game-hero::after,.hero-badge{display:none}
+.game-hero h1{font-size:clamp(2.2rem,5vw,3.5rem);line-height:1.1;text-shadow:none}
+.game-hero p{font-size:1rem;font-weight:600;color:#475569}
+.game-btn.enter{min-width:0;padding:13px 20px;font-size:1rem;box-shadow:none;transform:none}
+.lobby-stage{background:#f4f6fb}
+.lobby-stage .unit-grid{grid-template-columns:repeat(3,minmax(0,1fr));background:transparent;padding:14px;gap:10px}
+.lobby-stage .unit-card{min-height:140px;padding:14px;border-color:#d7deeb;border-radius:12px;background:#fff;color:#1e293b;box-shadow:0 6px 18px rgba(20,34,60,.06)}
+.lobby-stage .unit-card:hover{transform:none;border-color:#c8a800;box-shadow:0 6px 18px rgba(20,34,60,.1)}
+.lobby-stage .unit-card .department-entry{display:none}
+.lobby-stage .unit-card h2{color:#1e293b;font-size:.95rem}
+.lobby-stage .unit-card p{color:#64748b}
+.lobby-stage .unit-card .progress-track{background:#e2e8f0;border-color:#cbd5e1}
+.lobby-stage .unit-card .progress-copy{color:#64748b}
+.lobby-stage .unit-card .enter-unit-label{background:#f7edb4;color:#675400}
+@media(max-width:820px){.lobby-stage .unit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.game-hero{min-height:250px;padding:22px}.lobby-stage .unit-grid{grid-template-columns:1fr}}
 @media print{
   @page{size:letter landscape;margin:.25in}
   @page uaSingleCaseCard{size:4in 6in;margin:0}
@@ -2258,17 +2327,15 @@ function shuffleList(list){
   return items;
 }
 
-function diagnosisBankFor(item){
-  const key = caseKey(item);
-  if(!diagnosisBankOrders[key]){
-    diagnosisBankOrders[key] = shuffleList(casesForUnit(item.unitId).map(caseFile => caseFile.diagnosis));
-  }
+function diagnosisBankForUnit(unitId){
+  const key=`unit-${unitId}`;
+  if(!diagnosisBankOrders[key])diagnosisBankOrders[key]=shuffleList([...new Set(casesForUnit(unitId).map(caseFile=>caseFile.diagnosis))]);
   return diagnosisBankOrders[key];
 }
 
 function render(){
   const root = document.getElementById("gameRoot");
-  root.innerHTML = !gameStarted ? renderCover() : (activeRoom ? renderRoom(activeRoom) : (activeUnitId ? renderUnit() : renderStart()));
+  root.innerHTML = !gameStarted ? renderCover() : (activeUnitId ? renderUnit() : renderStart());
   document.querySelectorAll(".diagnosis-token").forEach(button => {
     button.addEventListener("click", () => selectDiagnosis(button.dataset.diagnosis, button));
   });
@@ -2279,7 +2346,7 @@ function renderCover(){
     <div>
       <div class="eyebrow">Urinalysis Case Game</div>
       <h1 class="game-font">UA Case Game</h1>
-      <p>Choose a department, review each patient clipboard, and close the cases.</p>
+      <p>Open patient rooms and match the findings to a diagnosis.</p>
       <div class="action-row">
         <button class="game-btn enter" type="button" onclick="enterDepartments()">Enter Departments</button>
         <button class="game-btn ghost" type="button" onclick="printMode('full')">Print Whole Game</button>
@@ -2339,127 +2406,72 @@ function renderStart(){
       }).join("")}
     </div>
     ${completeMessage}
-    ${renderAnswerKey()}
   </section>`;
 }
 
 function renderUnit(){
   const unitCases = casesForUnit(activeUnitId);
   const unit = units().find(item => item.unitId === activeUnitId);
-  if(!unitCases.length){return renderStart();}
+  if(!unitCases.length)return renderStart();
   const closed = closedCases(activeUnitId).length;
-  const unitLabel = unit.unitName.replace(/^Hospital\s+/i, "");
   const completion = closed === unitCases.length
-    ? `<div class="completion">${esc(unit.department)} Complete - ${closed}/${unitCases.length} cases closed.</div>`
-    : "";
-  return `<section class="game-stage hallway-stage" aria-label="${esc(unit.department)} hallway">
+    ? `<div class="completion">${esc(unit.department)} complete — ${closed}/${unitCases.length} cases closed.</div>` : '';
+  return `<section class="game-stage hallway-stage" aria-label="${esc(unit.department)}">
     <header class="stage-topbar">
-      <div>
-        <h2>${esc(unitLabel)}: ${esc(unit.department)}</h2>
-        <p>Open a patient room and review its UA pattern.</p>
-      </div>
+      <div><div class="stage-kicker">UA Case Game</div><h2>${esc(unit.department)}</h2><p>Open a door, read the findings, and choose a diagnosis card.</p></div>
       <div class="stage-actions">
         <button class="game-btn ghost" type="button" onclick="backToUnits()">← Departments</button>
-        <button class="game-btn warn" type="button" onclick="resetUnit(${activeUnitId})">Reset This Unit</button>
-        <button class="game-btn warn" type="button" onclick="resetWholeGame()">Reset Game</button>
+        <button class="game-btn warn" type="button" onclick="resetUnit(${activeUnitId})">Reset department</button>
       </div>
     </header>
-    <div class="stage-path"><span>Departments</span><span aria-hidden="true">›</span><strong>${esc(unit.department)}</strong><span aria-hidden="true">›</span><span>Choose a room</span></div>
-    <div class="hallway-perspective">
-      <div class="room-panel">
-        <div class="room-grid immersive-room-grid">${unitCases.map(renderRoomCard).join("")}</div>
-      </div>
-      <div class="hallway-progress">
-        <div class="progress-track"><div class="progress-fill" style="--progress:${Math.round((closed / unitCases.length) * 100)}%"></div></div>
-        <div class="progress-copy">Cases Closed ${closed}/${unitCases.length}</div>
-      </div>
+    <div class="department-workspace">
+      <section class="department-rooms" aria-label="Patient rooms">
+        <div class="department-panel-label">Patient rooms <span>${closed}/${unitCases.length} complete</span></div>
+        <div class="room-grid immersive-room-grid">${unitCases.map(renderRoomCard).join('')}</div>
+      </section>
+      <section class="department-desk" aria-label="Case and diagnosis options">
+        ${activeRoom ? renderChart(activeRoom) : '<div class="case-empty"><strong>Choose a patient room</strong><span>The symptoms and findings will open here.</span></div>'}
+        ${renderDiagnosisCards(unitCases)}
+      </section>
     </div>
     ${completion}
   </section>`;
 }
 
+function renderDiagnosisCards(unitCases){
+  const used=usedDiagnoses(activeUnitId);
+  const order=diagnosisBankForUnit(activeUnitId);
+  return `<section class="department-diagnoses" aria-label="Diagnosis options">
+    <div class="department-panel-label">Diagnosis cards</div>
+    <div class="department-diagnosis-grid">${order.map(diagnosis=>{
+      const solved=used.has(diagnosis);
+      return `<button type="button" class="diagnosis-token ${selectedDiagnosis===diagnosis?'selected':''} ${solved?'used':''}" data-diagnosis="${esc(diagnosis)}" ${!activeRoom||solved?'disabled':''} aria-pressed="${selectedDiagnosis===diagnosis}">${esc(diagnosis)}${solved?'<small>Matched</small>':''}</button>`;
+    }).join('')}</div>
+  </section>`;
+}
+
 function renderRoomCard(item){
   const closed = progress.closed[caseKey(item)];
-  return `<button class="room-card ${closed ? "closed" : ""}" type="button" onclick="openRoom(${item.unitId},${item.room},this)" aria-label="${closed ? "Open closed case for review" : "Enter"} room ${caseCode(item)}">
+  return `<button class="room-card ${closed ? "closed" : ""} ${activeRoom&&caseKey(activeRoom)===caseKey(item)?"selected":""}" type="button" onclick="openRoom(${item.unitId},${item.room},this)" data-room-key="${caseKey(item)}" aria-label="${closed ? "Open closed case for review" : "Enter"} room ${caseCode(item)}">
     <div class="room-door" aria-hidden="true">
       <div class="room-door-window"></div>
       <div class="room-door-handle"></div>
     </div>
     <span class="room-number">${caseCode(item)}</span>
-    <h3>Case Room ${caseCode(item)}</h3>
-    <p>${esc(item.caseTitle)}</p>
+    <h3>Room ${caseCode(item)}</h3>
     ${closed ? '<span class="closed-stamp">Case Closed</span>' : ""}
     ${closed ? '<span class="room-review-label">Open to review</span>' : '<span class="enter-unit-label">Enter room</span>'}
   </button>`;
 }
 
-function renderRoom(item){
-  const unit = unitFor(item);
-  return `<section class="game-stage patient-room-stage" aria-label="Patient room ${caseCode(item)}">
-    <header class="stage-topbar">
-      <div>
-        <div class="stage-kicker">Patient Room ${caseCode(item)}</div>
-        <h2>${esc(item.caseTitle)}</h2>
-        <p>Review the clipboard, choose a diagnosis, and close the case.</p>
-      </div>
-      <div class="stage-actions">
-        <button class="game-btn ghost" type="button" onclick="closeChart()">← ${esc(unit.department)}</button>
-        <button class="game-btn ghost" type="button" onclick="backToUnits()">Departments</button>
-        <button class="game-btn warn" type="button" onclick="resetWholeGame()">Reset Game</button>
-      </div>
-    </header>
-    <div class="patient-room-scene">
-      <div class="room-bed" aria-hidden="true"></div>
-      <div class="vital-monitor" aria-hidden="true"></div>
-      ${renderChart(item)}
-    </div>
-  </section>`;
-}
 
 function renderChart(item){
-  const closed = progress.closed[caseKey(item)];
-  const unitUsed = usedDiagnoses(item.unitId);
-  const available = diagnosisBankFor(item)
-    .filter(diagnosis => !unitUsed.has(diagnosis));
-  const message = closed
-    ? (chartMessage || `Case closed. Correct diagnosis: ${item.diagnosis}. You can review this patient chart any time.`)
-    : (chartMessage || "Choose a diagnosis token, then confirm the case.");
-  const messageState = closed ? "good" : chartMessageState;
-  return `<article class="patient-clipboard" id="patientChart">
-    <div class="clipboard-clip" aria-hidden="true"></div>
-    <div class="clipboard-paper">
-      <header class="clipboard-title-row">
-        <div>
-          <h2>Patient Clipboard - ${caseCode(item)}</h2>
-          <p>${esc(unitNameFor(item))} / ${esc(item.department)}</p>
-        </div>
-        <span class="chart-status-badge ${closed ? "closed" : ""}">${closed ? "Case closed" : "Active case"}</span>
-      </header>
-      <div class="patient-id-grid">
-        <div class="patient-id-item"><span>Patient</span><strong>Case ${caseCode(item)}</strong></div>
-        <div class="patient-id-item"><span>Location</span><strong>Room ${caseCode(item)}</strong></div>
-        <div class="patient-id-item"><span>Service</span><strong>${esc(item.caseTitle)}</strong></div>
-      </div>
-      <div class="chart-layout">
-        <section class="clipboard" aria-label="Patient evidence">
-          <div class="clipboard-head"><span>Patient Pattern</span><span>UA Evidence</span></div>
-          <ul class="evidence-list">${caseClues(item).map(result => `<li>${esc(result)}</li>`).join("")}</ul>
-        </section>
-        <aside class="diagnosis-bank">
-          ${closed ? `<div class="case-resolution">
-            <span class="resolution-check">✓</span>
-            <strong>${esc(message)}</strong>
-            <p>This chart remains available for review. Return to the hallway when you are ready.</p>
-          </div>` : `<h3>Choose the diagnosis</h3>
-            <p>Select one diagnosis from the chart, then confirm the case.</p>
-            <div class="token-grid">
-              ${available.map(diagnosis => `<button type="button" class="diagnosis-token ${selectedDiagnosis === diagnosis ? "selected" : ""}" data-diagnosis="${esc(diagnosis)}">${esc(diagnosis)}</button>`).join("")}
-            </div>
-            <div class="status-card ${messageState}">${esc(message)}</div>
-            <div class="action-row"><button class="game-btn primary" type="button" onclick="confirmDiagnosis()">Confirm Diagnosis</button></div>`}
-        </aside>
-      </div>
-    </div>
+  const closed=Boolean(progress.closed[caseKey(item)]);
+  const message=closed ? (chartMessage||`Matched: ${item.diagnosis}`) : (chartMessage||'Select a diagnosis card below.');
+  return `<article class="case-popup" id="patientChart" role="dialog" aria-modal="false" aria-labelledby="casePopupTitle">
+    <header class="case-popup-head"><div><span>Patient ${caseCode(item)}</span><h3 id="casePopupTitle" tabindex="-1">Symptoms &amp; findings</h3></div><button type="button" class="case-popup-close" onclick="closeChart()" aria-label="Close patient chart">×</button></header>
+    <div class="case-popup-paper"><ul class="case-popup-clues">${caseClues(item).map(result=>`<li>${esc(result)}</li>`).join('')}</ul></div>
+    ${closed ? `<div class="case-popup-status good" role="status">${esc(message)}</div>` : `<div class="case-popup-actions"><div class="case-popup-status ${chartMessageState}" role="status">${esc(message)}</div><button class="game-btn primary" type="button" onclick="confirmDiagnosis()">Check answer</button></div>`}
   </article>`;
 }
 
@@ -2514,24 +2526,30 @@ function openRoom(unitId, room, doorCard){
   chartMessage = "";
   chartMessageState = "";
   render();
+  document.getElementById("casePopupTitle")?.focus({preventScroll:true});
+  if(window.innerWidth<820)document.querySelector(".department-desk")?.scrollIntoView({block:"nearest",behavior:"smooth"});
 }
 
 function closeChart(){
+  const roomKey=activeRoom&&caseKey(activeRoom);
   activeRoom = null;
   selectedDiagnosis = "";
   chartMessage = "";
   chartMessageState = "";
   render();
+  if(roomKey)document.querySelector(`[data-room-key="${roomKey}"]`)?.focus({preventScroll:true});
 }
 
 function selectDiagnosis(diagnosis, selectedButton){
+  if(!activeRoom || progress.closed[caseKey(activeRoom)])return;
   selectedDiagnosis = diagnosis;
-  chartMessage = "Diagnosis selected. Confirm when ready.";
+  chartMessage = "Ready to check.";
   chartMessageState = "";
   document.querySelectorAll(".diagnosis-token").forEach(button => {
     button.classList.toggle("selected", button === selectedButton);
+    button.setAttribute("aria-pressed", String(button === selectedButton));
   });
-  const status = document.querySelector(".status-card");
+  const status = document.querySelector(".case-popup-status");
   if(status){
     status.textContent = chartMessage;
     status.classList.remove("good", "bad");
@@ -2541,7 +2559,7 @@ function selectDiagnosis(diagnosis, selectedButton){
 function confirmDiagnosis(){
   if(!activeRoom){return;}
   if(!selectedDiagnosis){
-    chartMessage = "Choose a diagnosis token first.";
+    chartMessage = "Choose a diagnosis card first.";
     chartMessageState = "bad";
     render();
     return;
@@ -2549,13 +2567,13 @@ function confirmDiagnosis(){
   if(selectedDiagnosis === activeRoom.diagnosis){
     progress.closed[caseKey(activeRoom)] = selectedDiagnosis;
     saveProgress();
-    chartMessage = `Yes - congrats! It is ${activeRoom.diagnosis}. Case closed.`;
+    chartMessage = `Matched: ${activeRoom.diagnosis}`;
     chartMessageState = "good";
     selectedDiagnosis = "";
     render();
     return;
   }
-  chartMessage = "Not quite. Review the patient clipboard and try again.";
+  chartMessage = "Try another card. Review the findings above.";
   chartMessageState = "bad";
   render();
 }
@@ -2568,7 +2586,7 @@ function resetUnit(unitId){
   chartMessage = "";
   chartMessageState = "";
   Object.keys(diagnosisBankOrders).forEach(key => {
-    if(key.startsWith(`${unitId}-`)){delete diagnosisBankOrders[key];}
+    if(key===`unit-${unitId}`){delete diagnosisBankOrders[key];}
   });
   render();
 }
@@ -2583,17 +2601,6 @@ function resetWholeGame(){
   render();
 }
 
-function renderAnswerKey(){
-  return `<details class="answer-key-panel">
-    <summary>Answer Sheet - check only, not printed</summary>
-    <div class="answer-key-grid">
-      ${renalCaseFiles.map(item => `<div class="answer-key-item">
-        <strong>${caseCode(item)}</strong>
-        <span>${esc(item.diagnosis)}</span>
-      </div>`).join("")}
-    </div>
-  </details>`;
-}
 
 function renderPrintable(){
   const cardPages = [];
@@ -2678,6 +2685,7 @@ function printMode(mode){
   setTimeout(() => window.print(), 80);
 }
 
+document.addEventListener("keydown", event => {if(event.key === "Escape" && activeRoom)closeChart();});
 window.addEventListener("afterprint", () => {
   document.body.classList.remove("print-cases","print-cases-single","print-tokens","print-full");
 });
