@@ -1578,9 +1578,9 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
 .bbq-options.bbq-options--four{grid-template-columns:repeat(2,minmax(0,1fr));max-width:900px;margin-left:auto;margin-right:auto;padding:12px;gap:10px}
 .bbq-options--four .bbq-opt{min-height:84px!important;padding:12px 16px!important}
 .quiz-correction-actions{display:flex;justify-content:flex-end;margin:-4px 0 12px}
-.quiz-correction-button{border:1px solid var(--border);border-radius:999px;background:var(--bg2);color:var(--text2);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer}
-.quiz-correction-button:hover,.quiz-correction-button:focus-visible{border-color:var(--warn);color:var(--text)}
-.quiz-correction-button.is-flagged{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 13%,var(--bg2));color:var(--text)}
+.quiz-correction-button{border:1px solid #c99600;border-radius:999px;background:#ffd84d;color:#342600;padding:7px 12px;font-size:12px;font-weight:800;box-shadow:0 3px 9px rgba(130,92,0,.2);cursor:pointer}
+.quiz-correction-button:hover,.quiz-correction-button:focus-visible{background:#ffcb24;border-color:#a77900;color:#241900}
+.quiz-correction-button.is-flagged{border-color:#61b787;background:#d9f5e6;color:#145d38;box-shadow:none}
 .quiz-correction-button:disabled{cursor:default}
 .needs-correction-queue{border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin:12px 0;background:var(--bg2)}
 .needs-correction-queue summary{cursor:pointer;font-size:13px;font-weight:750;color:var(--text)}
@@ -1703,6 +1703,7 @@ body:not(.light-mode) .quiz-audio-dock{background:rgba(20,23,32,.90);border-colo
 .quiz-theme-switch{display:flex;align-items:center;padding:8px 11px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:12px;font-weight:850;white-space:nowrap;cursor:pointer}
 .quiz-theme-switch:hover{background:var(--bg3)}
 .quiz-accuracy-badge{display:inline-flex;align-items:center;justify-content:center;min-width:76px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap;border:1px solid transparent}
+.quiz-accuracy-badge strong{font-weight:900}
 .quiz-accuracy-low{background:#ffe2e5;color:#a51f2d;border-color:#e9a1aa}
 .quiz-accuracy-mid{background:#fff1b8;color:#705500;border-color:#d8b842}
 .quiz-accuracy-high{background:#d9f5e6;color:#17633f;border-color:#76c59a}
@@ -1756,7 +1757,6 @@ body:not(.light-mode) .quiz-accuracy-high{background:#174d35;color:#d8ffea;borde
 body.light-mode .option-letter{color:var(--text3) !important}
 /* Desktop quiz sizing */
 @media(min-width:768px){
-  .bbq-practice-overlay .bbq-body{zoom:.9}
   .case-scenario{font-size:16px !important;line-height:1.9 !important}
   .bbq-context{font-size:16px !important;padding:20px 24px !important}
   .bbq-context-title{font-size:13px !important}
@@ -7289,7 +7289,7 @@ async function renderQuizTab(el){
   const emojis=['🔴','🔵','🟡','🟢'];
   const opts=['a','b','c','d'];
   el.innerHTML=`
-    <div class="bbq-overlay bbq-practice-overlay">
+    <div class="bbq-overlay">
       <div class="bbq-header">
         <button class="btn btn-ghost btn-sm" onclick="${appState.view==='monster_mix'?'resetMonsterMixQuiz()':"switchTab('quiz')"}">✕ Exit</button>
         <button class="btn btn-sm quiz-mastered-replace" onclick="replaceCurrentQuizQuestion()" ${replaceDisabled?'disabled':''} title="${replaceTitle}"><span class="replace-wide">Already mastered this question? Click here to replace it.</span><span class="replace-short">Replace</span></button>
@@ -7766,7 +7766,7 @@ function quizSessionAccuracy(){
 function quizSessionAccuracyBadge(){
   const score=quizSessionAccuracy();
   const level=score.pct>=75?'high':score.pct>=50?'mid':'low';
-  return `<span class="quiz-accuracy-badge quiz-accuracy-${level}" title="${score.correct} correct out of ${score.answered} answered">${score.pct}% right</span>`;
+  return `<span class="quiz-accuracy-badge quiz-accuracy-${level}" title="${score.correct} correct out of ${score.answered} answered"><strong>Current Score: ${score.pct}%</strong></span>`;
 }
 function quizSeenCounts(){
   try{return JSON.parse(localStorage.getItem(QUIZ_SEEN_KEY)||'{}')||{};}catch{return {};}
