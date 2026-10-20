@@ -1720,7 +1720,7 @@ body:not(.light-mode) .quiz-accuracy-high{background:#174d35;color:#d8ffea;borde
   .bbq-header .question-num{order:4;flex:0 0 auto}
   .bbq-header .quiz-mastered-replace{margin-left:auto;max-width:42vw;white-space:nowrap;padding-left:10px;padding-right:10px}
   .replace-wide{display:none}.replace-short{display:inline}
-  .bbq-body{padding:22px 12px 38px}
+  .bbq-body{padding:22px 12px calc(138px + env(safe-area-inset-bottom, 0px))}
   .bbq-question{font-size:18px;padding:18px 16px;margin-bottom:16px}
   .quiz-question-table-block{margin-top:12px}
   .quiz-question-table{min-width:460px}
@@ -7308,16 +7308,14 @@ async function renderQuizTab(el){
             </button>`).join('')}
         </div>
         ${answered?`
-          <div style="text-align:left;margin-bottom:18px">
-            <div style="font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:10px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
-            ${quizBookExplanation(q)?`<div class="explanation" style="text-align:left;max-width:none;margin:14px 0 0;white-space:pre-wrap">${escNL(quizBookExplanation(q))}</div>`:''}
-          </div>
-          <div style="text-align:left;display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap">
+          <div style="text-align:left;font-size:20px;font-weight:800;color:${answered===q.correct_answer?'var(--success)':'var(--danger)'};margin-bottom:12px">${answered===q.correct_answer?'✓ Correct!':'✗ Incorrect — '+q['option_'+q.correct_answer]}</div>
+          <div class="bbq-answer-nav" style="text-align:left;display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap;margin-bottom:18px">
             ${appState.quizIdx>0?`<button class="btn btn-ghost" onclick="qPrev()">← Prev</button>`:''}
             ${appState.quizIdx<appState.quizQ.length-1
               ?`<button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="qNext()">Next →</button>`
               :`<button class="btn btn-success" style="font-size:15px;padding:12px 32px" onclick="appState.quizDone=true;renderTab()">See Results</button>`}
-          </div>`:''}
+          </div>
+          ${quizBookExplanation(q)?`<div class="explanation" style="text-align:left;max-width:none;margin:0 0 18px;white-space:pre-wrap">${escNL(quizBookExplanation(q))}</div>`:''}`:''}
       </div>
     </div>
   `;
