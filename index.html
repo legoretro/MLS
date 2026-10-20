@@ -1573,8 +1573,19 @@ body:not(.light-mode) .question-media img{border-color:rgba(255,255,255,.18)}
   border-radius:18px;
   box-shadow:0 20px 46px rgba(22,34,74,.14);
 }
+.bbq-options.bbq-options--four{grid-template-columns:repeat(2,minmax(0,1fr));max-width:900px;margin-left:auto;margin-right:auto}
+.bbq-options--four .bbq-opt{min-height:150px!important}
+.quiz-correction-actions{display:flex;justify-content:flex-end;margin:-4px 0 12px}
+.quiz-correction-button{border:1px solid var(--border);border-radius:999px;background:var(--bg2);color:var(--text2);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.quiz-correction-button:hover,.quiz-correction-button:focus-visible{border-color:var(--warn);color:var(--text)}
+.quiz-correction-button.is-flagged{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 13%,var(--bg2));color:var(--text)}
+.quiz-correction-button:disabled{opacity:.65;cursor:wait}
+.needs-correction-queue{border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin:12px 0;background:var(--bg2)}
+.needs-correction-queue summary{cursor:pointer;font-size:13px;font-weight:750;color:var(--text)}
+.needs-correction-list{display:grid;gap:10px;max-height:400px;overflow:auto;padding:10px 4px 2px}
+.needs-correction-row{border-left-color:var(--warn)!important}
 body:not(.light-mode) .bbq-options{background:rgba(20,23,32,.88);border-color:rgba(255,255,255,.12)}
-@media(max-width:520px){.bbq-options{grid-template-columns:1fr}}
+@media(max-width:520px){.bbq-options:not(.bbq-options--four){grid-template-columns:1fr}.bbq-options--four{gap:8px;padding:9px}.bbq-options--four .bbq-opt{min-height:112px;align-items:flex-start;flex-direction:column;gap:5px;padding:10px!important;font-size:13px!important}.bbq-options--four .bbq-opt-letter{font-size:18px}}
 .bbq-opt{
   border:none;
   border-radius:16px;
@@ -7204,6 +7215,7 @@ async function renderQuizTab(el){
   if(!appState.quizStarted){
     const subject=appState.subject;
     const questions=await loadCurrentQuizQuestions();
+    const correctionQueue=isAdmin?await loadNeedsCorrectionQuestions().catch(error=>{console.warn('Correction queue could not load',error);return null;}):[];
     if(!el.isConnected||appState.subject!==subject||appState.subjectTab!=='quiz'||appState.quizStarted)return;
     const count=questions.length;
     const quizCountControls=`
@@ -7253,12 +7265,17 @@ async function renderQuizTab(el){
         </div>
         ${isAdmin?adminQuizControls():''}
       </div>
-      ${isAdmin?renderQuizQuestionBank(questions):renderHiddenQuestionBankNote()}
+      ${isAdmin?renderQuizQuestionBank(questions,correctionQueue):renderHiddenQuestionBankNote()}
     `;
     return;
   }
   if(!appState.quizQ.length){el.innerHTML='<div class="empty">No questions found for this subject.</div>';return;}
   const q=appState.quizQ[appState.quizIdx];
+  if(q.needs_correction===undefined&&q.id){
+    const {data}=await sb.from('mlsboc_questions').select('needs_correction').eq('id',q.id).maybeSingle();
+    if(data)q.needs_correction=data.needs_correction;
+    if(!el.isConnected||appState.quizQ[appState.quizIdx]!==q)return;
+  }
   const answered=appState.quizAns[appState.quizIdx];
   const replacementUnavailable=appState.quizAllSelected||appState.quizQ.length>=(appState.quizPool||[]).length;
   const replaceDisabled=!!answered||replacementUnavailable;
@@ -7279,9 +7296,10 @@ async function renderQuizTab(el){
       </div>
       <div class="bbq-body">
         ${quizSourceLabel(q)?`<div class="quiz-source-label">${esc(quizSourceLabel(q))}</div>`:''}
+        <div class="quiz-correction-actions"><button type="button" class="quiz-correction-button${q.needs_correction?' is-flagged':''}" aria-pressed="${!!q.needs_correction}" onclick="toggleQuestionNeedsCorrection('${q.id}',${!q.needs_correction},this)">${q.needs_correction?'↶ Undo Needs Correction':'⚑ Needs Correction'}</button></div>
         <div class="bbq-question">${renderStructuredQuizQuestion(q)}</div>
         ${renderQuestionMedia(q)}
-        <div class="bbq-options">
+        <div class="bbq-options bbq-options--four">
           ${opts.map((opt,oi)=>`
             <button class="bbq-opt${answered?(opt===q.correct_answer?' correct-ans':(opt===answered&&answered!==q.correct_answer?' wrong-ans':'')):''}
               " style="background:${colors[oi]};color:${textColors[oi]}" onclick="answerQ('${opt}')" ${answered?'disabled':''}>
@@ -7412,7 +7430,38 @@ async function loadCurrentQuizQuestions(){
   return sortQuestionsForAdmin(rows.map(q=>({...q,_subject:q.subject})));
 }
 
-function renderQuizQuestionBank(questions){
+async function loadNeedsCorrectionQuestions(){
+  const rows=[];
+  for(let start=0;;start+=1000){
+    const {data,error}=await sb.from('mlsboc_questions').select('*').eq('needs_correction',true).order('subject').order('created_at').range(start,start+999);
+    if(error)throw error;
+    rows.push(...(data||[]));
+    if(!data||data.length<1000)return rows;
+  }
+}
+
+async function toggleQuestionNeedsCorrection(id,needsCorrection,button){
+  if(!id||!sb)return;
+  if(button)button.disabled=true;
+  const {data,error}=await sb.from('mlsboc_questions').update({needs_correction:needsCorrection}).eq('id',id).select('id,subject,needs_correction').single();
+  if(button)button.disabled=false;
+  if(error||!data){alert('Could not update this question. Please try again.');return;}
+  questionBankCache.delete(data.subject);
+  for(const list of [appState.quizQ,appState.quizPool,appState.quizMasteryQ,appState.allQ,appState.allPool]){
+    for(const question of list||[])if(question.id===id)question.needs_correction=data.needs_correction;
+  }
+  if(isAdmin&&appState.view==='subject'&&appState.subjectTab==='quiz'&&!appState.quizStarted){renderTab();return;}
+  if(button?.isConnected){
+    button.classList.toggle('is-flagged',data.needs_correction);
+    button.setAttribute('aria-pressed',String(data.needs_correction));
+    button.textContent=data.needs_correction?'↶ Undo Needs Correction':'⚑ Needs Correction';
+    button.setAttribute('onclick',`toggleQuestionNeedsCorrection('${id}',${!data.needs_correction},this)`);
+  }
+}
+
+function renderQuizQuestionBank(questions,correctionQueue=[]){
+  const correctionIds=new Set((correctionQueue||[]).map(question=>question.id));
+  if(correctionQueue)questions.forEach(question=>{question.needs_correction=correctionIds.has(question.id);});
   return `
     <div class="card mt-16">
       <div class="flex-center gap-8 mb-12 flex-wrap">
@@ -7422,6 +7471,12 @@ function renderQuizQuestionBank(questions){
         </div>
         <span class="tag tag-info ml-auto">${questions.length} total</span>
       </div>
+      <details class="needs-correction-queue">
+        <summary>Needs Correction · ${correctionQueue?correctionQueue.length:'unavailable'} across all subjects</summary>
+        <div class="needs-correction-list">
+          ${correctionQueue===null?'<div class="text-muted text-sm">Could not load correction marks. Reload this page to try again.</div>':correctionQueue.length?correctionQueue.map((q,i)=>renderQuizQuestionRow(q,i,true)).join(''):'<div class="text-muted text-sm">No questions marked for correction.</div>'}
+        </div>
+      </details>
       ${questions.length?`
         <div style="display:grid;gap:10px;max-height:560px;overflow:auto;padding-right:4px">
           ${questions.map((q,i)=>renderQuizQuestionRow(q,i)).join('')}
@@ -7439,22 +7494,24 @@ function renderHiddenQuestionBankNote(){
   `;
 }
 
-function renderQuizQuestionRow(q,i){
+function renderQuizQuestionRow(q,i,showSubject=false){
   const correct=q.correct_answer||'a';
   const correctText=q['option_'+correct]||'';
   const sourceLabel=quizSourceLabel(q);
   const explanation=quizBookExplanation(q);
   const hasExplanation=!!explanation;
   return `
-    <div class="card-sm" style="border-left:4px solid var(--accent);padding:12px">
+    <div class="card-sm${q.needs_correction?' needs-correction-row':''}" style="border-left:4px solid ${q.needs_correction?'var(--warn)':'var(--accent)'};padding:12px">
       <div class="flex-center gap-8 mb-8 flex-wrap">
         <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700">#${quizBookOrderNumber(q,i)}</span>
         ${sourceLabel?`<span class="tag tag-info">${esc(sourceLabel)}</span>`:''}
-        ${appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
+        ${showSubject||appState.subject==='para_myco'?`<span class="tag tag-info">${esc(subjectLabel(q._subject||q.subject))}</span>`:''}
+        ${q.needs_correction?'<span class="tag tag-warn">Needs Correction</span>':''}
         <span class="tag tag-success">Answer ${String(correct).toUpperCase()}</span>
         <span class="tag ${hasExplanation?'tag-success':'tag-warn'}">${hasExplanation?'Explanation added':'Explanation missing'}</span>
         ${isAdmin?`<div class="flex gap-6 ml-auto">
           <button class="btn btn-ghost btn-xs" onclick="openQuizQuestionEditor('${q.id}')">Edit</button>
+          ${q.needs_correction?`<button class="btn btn-ghost btn-xs" onclick="toggleQuestionNeedsCorrection('${q.id}',false,this)">Mark corrected</button>`:''}
           <button class="btn btn-danger btn-xs" onclick="deleteQuizQuestion('${q.id}')">Delete</button>
         </div>`:''}
       </div>
@@ -14044,6 +14101,12 @@ function generateFormulasPDF(){
 async function renderAllView(v){
   if(appState.allDone&&!appState.allReviewOpen){renderAllDone(v);return;}
   if(!appState.allStarted){renderAllStart(v);return;}
+  const question=appState.allQ[appState.allIdx];
+  if(question?.id&&question.needs_correction===undefined){
+    const {data}=await sb.from('mlsboc_questions').select('needs_correction').eq('id',question.id).maybeSingle();
+    if(data)question.needs_correction=data.needs_correction;
+    if(appState.allQ[appState.allIdx]!==question||appState.view!=='all')return;
+  }
   renderAllExam(v);
 }
 
@@ -14245,6 +14308,7 @@ function renderAllExam(v){
       ${allQuestionNumbers()}
     </aside><main class="exam-sim-content">
       <h1 class="exam-sim-qnum">Question ${index+1} of ${appState.allQ.length}</h1><div class="exam-sim-topic">${esc(allExamTopicPath(q))}</div>
+      <div class="quiz-correction-actions"><button type="button" class="quiz-correction-button${q.needs_correction?' is-flagged':''}" aria-pressed="${!!q.needs_correction}" onclick="toggleQuestionNeedsCorrection('${q.id}',${!q.needs_correction},this)">${q.needs_correction?'↶ Undo Needs Correction':'⚑ Needs Correction'}</button></div>
       <div class="exam-sim-question-row ${media?'':'no-media'}"><section>
         <div class="exam-sim-stem">${renderStructuredQuizQuestion(q)}</div><div class="exam-sim-directions">Please select the single best answer</div>
         <div class="exam-sim-options">${['a','b','c','d'].map(opt=>`<label class="exam-sim-option ${reveal?(opt===q.correct_answer?'is-correct':opt===answered?'is-incorrect':''):''}"><input type="radio" name="exam-answer" value="${opt}" ${draft===opt?'checked':''} ${locked?'disabled':''} onchange="selectAllAnswer('${opt}')"><span><b>${opt.toUpperCase()}.</b> ${esc(q['option_'+opt]||'')}</span></label>`).join('')}</div>
