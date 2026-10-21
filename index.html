@@ -1474,6 +1474,12 @@ body:not(.light-mode) .bbq-question{color:var(--text);background:rgba(20,23,32,.
 .quiz-question-table th{background:var(--bg3);color:var(--text2);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
 .quiz-question-table td{color:var(--text);font-size:13px;font-weight:650}
 .quiz-question-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--accent) 3%,var(--bg2))}
+.quiz-table-editor{border:1px solid var(--border);border-radius:var(--r);padding:12px;background:var(--bg2)}
+.quiz-table-editor-tools{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.quiz-table-editor-scroll{max-width:100%;overflow-x:auto}
+.quiz-table-editor table{border-collapse:collapse;min-width:360px;width:100%}
+.quiz-table-editor th,.quiz-table-editor td{border:1px solid var(--border);padding:4px;min-width:110px}
+.quiz-table-editor input{width:100%;min-width:90px;margin:0}
 .bbq-question .quiz-question-table-block{font-size:14px}
 .bbq-question .quiz-question-prose{font-size:inherit;font-weight:inherit;line-height:inherit}
 .question-media{
@@ -7551,8 +7557,11 @@ async function openQuizQuestionEditor(id){
     return;
   }
   const explanationParts=quizExplanationParts(q);
+  const tableEdit=q.subject==='blood_bank'?extractEditableQuizTable(q):{question:cleanQuestionText(q),table:null};
   window._quizQuestionEdit={
     id:q.id,
+    subject:q.subject,
+    table:tableEdit.table,
     media:questionMediaUrls(q),
     originalExplanation:explanationParts.text,
     originalExplanationRaw:explanationParts.raw,
@@ -7570,7 +7579,8 @@ async function openQuizQuestionEditor(id){
     <div class="card-sm mb-16" style="font-size:12px;color:var(--text2);line-height:1.55">
       Book section, book question number, subject, and source information remain unchanged.
     </div>
-    <div class="form-group"><label>Question</label><textarea id="edit-quiz-question" rows="6">${esc(cleanQuestionText(q))}</textarea></div>
+    <div class="form-group"><label>Question</label><textarea id="edit-quiz-question" rows="6">${esc(tableEdit.question)}</textarea></div>
+    ${q.subject==='blood_bank'?'<div class="form-group"><label>Reaction table (optional)</label><div id="edit-quiz-table"></div></div>':''}
     <div class="form-group">
       <label>Images or structures</label>
       <div id="edit-quiz-media"></div>
@@ -7594,11 +7604,74 @@ async function openQuizQuestionEditor(id){
       <button class="btn btn-primary ml-auto" id="edit-quiz-save" onclick="saveQuizQuestionEdit()">Save Changes</button>
     </div>`;
   refreshQuizQuestionMediaEditor();
+  refreshQuizQuestionTableEditor();
 }
 
 function closeQuizQuestionEditor(){
   document.getElementById('question-edit-modal')?.classList.add('hidden');
   window._quizQuestionEdit=null;
+}
+
+function extractEditableQuizTable(q){
+  const question=cleanQuestionText(q);
+  const marker=/\[\[quiz-table:([^\]]+)\]\]\s*([\s\S]*?)\s*\[\[\/quiz-table\]\]/;
+  const match=question.match(marker);
+  if(!match)return {question,table:null};
+  const lines=match[2].split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+  const cells=lines.map(line=>line.split('|').map(value=>value.trim()));
+  const headers=cells.shift()||[];
+  if(!headers.length||!cells.length)return {question,table:null};
+  const width=Math.max(2,headers.length,...cells.map(row=>row.length));
+  return {
+    question:question.replace(match[0],'').trim(),
+    table:{title:match[1].trim(),headers:Array.from({length:width},(_,i)=>headers[i]||''),rows:cells.map(row=>Array.from({length:width},(_,i)=>row[i]||''))}
+  };
+}
+
+function refreshQuizQuestionTableEditor(){
+  const el=document.getElementById('edit-quiz-table');
+  if(!el)return;
+  const table=window._quizQuestionEdit?.table;
+  if(!table){el.innerHTML='<button type="button" class="btn btn-ghost btn-sm" onclick="addQuizQuestionTable()">+ Add table</button><div class="text-muted" style="font-size:12px;margin-top:6px">Use a table for typing or reaction results. Existing images stay attached.</div>';return;}
+  el.innerHTML=`<div class="quiz-table-editor">
+    <label>Table title<input type="text" value="${esc(table.title)}" oninput="updateQuizQuestionTableCell('title',0,0,this.value)" placeholder="e.g. Blood typing results"></label>
+    <div class="quiz-table-editor-tools">
+      <button type="button" class="btn btn-ghost btn-xs" onclick="changeQuizQuestionTable('row',1)">+ Row</button>
+      <button type="button" class="btn btn-ghost btn-xs" onclick="changeQuizQuestionTable('column',1)" ${table.headers.length>=12?'disabled':''}>+ Column</button>
+      <button type="button" class="btn btn-ghost btn-xs" onclick="changeQuizQuestionTable('row',-1)" ${table.rows.length<=1?'disabled':''}>− Row</button>
+      <button type="button" class="btn btn-ghost btn-xs" onclick="changeQuizQuestionTable('column',-1)" ${table.headers.length<=2?'disabled':''}>− Column</button>
+      <button type="button" class="btn btn-danger btn-xs" onclick="removeQuizQuestionTable()">Remove table</button>
+    </div>
+    <div class="quiz-table-editor-scroll"><table aria-label="Reaction table editor"><thead><tr>${table.headers.map((value,i)=>`<th><input type="text" aria-label="Column ${i+1} heading" value="${esc(value)}" oninput="updateQuizQuestionTableCell('header',0,${i},this.value)" placeholder="Heading ${i+1}"></th>`).join('')}</tr></thead><tbody>${table.rows.map((row,r)=>`<tr>${table.headers.map((_,c)=>`<td><input type="text" aria-label="Row ${r+1} column ${c+1}" value="${esc(row[c]||'')}" oninput="updateQuizQuestionTableCell('row',${r},${c},this.value)" placeholder="Reaction"></td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  </div>`;
+}
+
+function addQuizQuestionTable(){
+  if(!window._quizQuestionEdit||window._quizQuestionEdit.subject!=='blood_bank')return;
+  window._quizQuestionEdit.table={title:'Reaction results',headers:['Test','Reaction'],rows:[['','']]};
+  refreshQuizQuestionTableEditor();
+}
+function removeQuizQuestionTable(){
+  if(!window._quizQuestionEdit)return;
+  window._quizQuestionEdit.table=null;
+  refreshQuizQuestionTableEditor();
+}
+function updateQuizQuestionTableCell(part,row,column,value){
+  const table=window._quizQuestionEdit?.table;if(!table)return;
+  if(part==='title')table.title=value;
+  else if(part==='header')table.headers[column]=value;
+  else if(part==='row')table.rows[row][column]=value;
+}
+function changeQuizQuestionTable(part,direction){
+  const table=window._quizQuestionEdit?.table;if(!table)return;
+  if(part==='row'){
+    if(direction>0)table.rows.push(table.headers.map(() => ''));
+    else if(table.rows.length>1)table.rows.pop();
+  }else if(part==='column'){
+    if(direction>0&&table.headers.length<12){table.headers.push('');table.rows.forEach(row=>row.push(''));}
+    else if(direction<0&&table.headers.length>2){table.headers.pop();table.rows.forEach(row=>row.pop());}
+  }
+  refreshQuizQuestionTableEditor();
 }
 
 function refreshQuizQuestionMediaEditor(){
@@ -7686,8 +7759,14 @@ async function saveQuizQuestionEdit(){
     if(errorEl)errorEl.textContent='Question, all four answer choices, and the correct answer are required.';
     return;
   }
+  const table=window._quizQuestionEdit.subject==='blood_bank'?window._quizQuestionEdit.table:null;
+  if(table&&(!table.title.trim()||table.headers.some(value=>!value.trim())||[table.title,...table.headers,...table.rows.flat()].some(value=>/[|\r\n\[\]]/.test(value)))){
+    if(errorEl)errorEl.textContent='Add a table title and every column heading. Table cells cannot contain |, brackets, or line breaks.';
+    return;
+  }
   const media=(window._quizQuestionEdit.media||[]).filter(Boolean);
-  const fullQuestion=`${media.map(url=>`[[media:${url}]]`).join('\n')}${media.length?'\n':''}${question}`;
+  const tableMarkup=table?`\n\n[[quiz-table:${table.title.trim()}]]\n${table.headers.map(value=>value.trim()).join(' | ')}\n${table.rows.map(row=>row.map(value=>value.trim()).join(' | ')).join('\n')}\n[[/quiz-table]]`:'';
+  const fullQuestion=`${media.map(url=>`[[media:${url}]]`).join('\n')}${media.length?'\n':''}${question}${tableMarkup}`;
   const editState=window._quizQuestionEdit;
   const explanationRaw=explanation===editState.originalExplanation
     ? editState.originalExplanationRaw
