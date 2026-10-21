@@ -3930,44 +3930,44 @@ const RESOURCES=[
 ];
 
 const CALC_PLACEHOLDERS=[
-  {id:'builtin-calc-anion-gap',type:'calc',_placeholder:true,name:'Anion Gap',category:'Chemistry',steps:['Na+ - (Cl- + HCO3-)'],notes:'Typical adult interval: 8-16 mmol/L. Verify with your course/book.',example:'Na 140, Cl 104, HCO3 24 -> 12 mmol/L'},
-  {id:'builtin-calc-corrected-calcium',type:'calc',_placeholder:true,name:'Corrected Calcium',category:'Chemistry',steps:['Measured calcium + 0.8 x (4.0 - albumin in g per dL)'],notes:'Used when albumin is low; lab policies may vary.',example:'Ca 7.8, albumin 2.5 -> 7.8 + 0.8(1.5) = 9.0 mg per dL'},
-  {id:'builtin-calc-serum-osm',type:'calc',_placeholder:true,name:'Calculated Serum Osmolality',category:'Chemistry',steps:['2(Na+) + glucose/18 + BUN/2.8'],notes:'Calculated adult serum osmolality estimate.',example:'Na 140, glucose 90, BUN 14 -> 280 + 5 + 5 = 290 mOsm/kg'},
-  {id:'builtin-calc-crcl',type:'calc',_placeholder:true,name:'Creatinine Clearance',category:'Chemistry',result_label:'CrCl',numerator:'Urine creatinine x urine volume (mL per min)',denominator:'Serum creatinine',steps:['Convert timed urine volume to mL per minute first.'],notes:'May be normalized to body surface area depending on assignment.',example:'Use timed urine volume, urine creatinine, and serum creatinine.'},
+  {id:'builtin-calc-anion-gap',type:'calc',_placeholder:true,name:'Anion Gap',category:'Chemistry',steps:['Na+ - (Cl- + HCO3-)'],notes:'',example:'Na 140, Cl 104, HCO3 24 -> 12 mmol/L'},
+  {id:'builtin-calc-corrected-calcium',type:'calc',_placeholder:true,name:'Corrected Calcium',category:'Chemistry',steps:['Measured calcium + 0.8 x (4.0 - albumin in g per dL)'],notes:'',example:'Ca 7.8, albumin 2.5 -> 7.8 + 0.8(1.5) = 9.0 mg per dL'},
+  {id:'builtin-calc-serum-osm',type:'calc',_placeholder:true,name:'Calculated Serum Osmolality',category:'Chemistry',steps:['2(Na+) + glucose/18 + BUN/2.8'],notes:'',example:'Na 140, glucose 90, BUN 14 -> 280 + 5 + 5 = 290 mOsm/kg'},
+  {id:'builtin-calc-crcl',type:'calc',_placeholder:true,name:'Creatinine Clearance',category:'Chemistry',result_label:'CrCl',numerator:'Urine creatinine x urine volume (mL per min)',denominator:'Serum creatinine',steps:['Convert timed urine volume to mL per minute first.'],notes:'',example:'Use timed urine volume, urine creatinine, and serum creatinine.'},
   {id:'builtin-calc-ldl',type:'calc',_placeholder:true,name:'LDL Cholesterol (Friedewald)',category:'Chemistry',steps:['LDL = total cholesterol - HDL - (triglycerides/5)'],notes:'',example:'TC 200, HDL 50, TG 150 -> LDL 120 mg/dL'},
-  {id:'builtin-calc-transferrin-sat',type:'calc',_placeholder:true,name:'Percent Transferrin Saturation',category:'Chemistry',result_label:'% Saturation',numerator:'Serum iron',denominator:'TIBC',multiplier:'100',steps:['Serum iron / TIBC x 100'],notes:'Often used with ferritin, TIBC, and clinical picture.',example:'Iron 80, TIBC 320 -> 25%'},
+  {id:'builtin-calc-transferrin-sat',type:'calc',_placeholder:true,name:'Percent Transferrin Saturation',category:'Chemistry',result_label:'% Saturation',numerator:'Serum iron',denominator:'TIBC',multiplier:'100',steps:['Serum iron / TIBC x 100'],notes:'',example:'Iron 80, TIBC 320 -> 25%'},
   {id:'builtin-calc-uibc',type:'calc',_placeholder:true,name:'UIBC & TIBC',category:'Chemistry',steps:['UIBC = TIBC - serum iron','TIBC = serum iron + UIBC'],notes:'',example:''},
   {id:'builtin-calc-indirect-bilirubin',type:'calc',_placeholder:true,name:'Unconjugated (Indirect) Bilirubin',category:'Chemistry',steps:['Indirect bilirubin = total bilirubin - direct bilirubin'],notes:'',example:''},
   {id:'builtin-calc-non-hdl',type:'calc',_placeholder:true,name:'Non-HDL Cholesterol',category:'Chemistry',steps:['Non-HDL = total cholesterol - HDL'],notes:'',example:''},
   {id:'builtin-calc-ag-ratio',type:'calc',_placeholder:true,name:'Albumin-Globulin Ratio (A:G)',category:'Chemistry',result_label:'A:G ratio',numerator:'Albumin',denominator:'Globulin',steps:[],notes:'',example:''},
   {id:'builtin-calc-timed-urine',type:'calc',_placeholder:true,name:'Timed Urine Flow Rate',category:'Chemistry',result_label:'Urine flow',numerator:'Total urine volume',denominator:'Collection time (minutes)',steps:[],notes:'',example:''},
-  {id:'builtin-calc-henderson-hasselbalch',type:'calc',_placeholder:true,name:'Henderson-Hasselbalch Equation',category:'Chemistry',steps:['pH = 6.1 + log of bicarbonate over 0.03 x pCO2'],notes:'Blood-gas form of the Henderson-Hasselbalch equation.',example:''},
+  {id:'builtin-calc-henderson-hasselbalch',type:'calc',_placeholder:true,name:'Henderson-Hasselbalch Equation',category:'Chemistry',steps:['pH = 6.1 + log of bicarbonate over 0.03 x pCO2'],notes:'',example:''},
   {id:'builtin-calc-ph-hydrogen',type:'calc',_placeholder:true,name:'pH & Hydrogen Ion Concentration',category:'Chemistry',steps:['pH = -log10[H+]','[H+] = 10^-pH'],notes:'',example:''},
-  {id:'builtin-calc-egfr',type:'calc',_placeholder:true,name:'Estimated Glomerular Filtration Rate (eGFR)',category:'Chemistry',steps:['eGFR uses SCr over k in the 2021 CKD-EPI equation','k = 0.7 female or 0.9 male; a = -0.241 female or -0.302 male'],notes:'2021 CKD-EPI equation. SCr in mg per dL; eGFR in mL per min per 1.73 m^2.',example:''},
+  {id:'builtin-calc-egfr',type:'calc',_placeholder:true,name:'Estimated Glomerular Filtration Rate (eGFR)',category:'Chemistry',steps:['eGFR uses SCr over k in the 2021 CKD-EPI equation','k = 0.7 female or 0.9 male; a = -0.241 female or -0.302 male'],notes:'',example:''},
   {id:'builtin-calc-wbc-manual',type:'calc',_placeholder:true,name:'WBC Manual Count * Hemocytometer',category:'Hematology',result_label:'WBC per mm^3',numerator:'# cells counted x dilution',denominator:'# squares x area per square (mm^2) x depth (0.1 mm)',steps:[],notes:'',example:''},
   {id:'builtin-calc-rbc-manual',type:'calc',_placeholder:true,name:'RBC Manual Count * Hemocytometer',category:'Hematology',result_label:'RBC per mm^3',numerator:'# cells counted x dilution',denominator:'# squares x area per square (mm^2) x depth (0.1 mm)',steps:[],notes:'',example:''},
   {id:'builtin-calc-plt-manual',type:'calc',_placeholder:true,name:'Platelet Manual Count * Hemocytometer',category:'Hematology',result_label:'PLT per mm^3',numerator:'# cells counted x dilution',denominator:'# squares x area per square (mm^2) x depth (0.1 mm)',steps:[],notes:'',example:''},
-  {id:'builtin-calc-volume-conversion',type:'calc',_placeholder:true,name:'Microliter Volume Conversion',category:'Hematology',steps:['uL = mm^3 = 10^-3 mL = 10^-6 L'],notes:'Equivalent volume units used in manual cell counting.',example:''},
-  {id:'builtin-calc-mcv',type:'calc',_placeholder:true,name:'Mean Cell Volume (MCV)',category:'Hematology',result_label:'MCV',numerator:'Hct x 10',denominator:'RBC in millions',steps:[],notes:'Report in fL.',example:''},
-  {id:'builtin-calc-mch',type:'calc',_placeholder:true,name:'Mean Cell Hemoglobin (MCH)',category:'Hematology',result_label:'MCH',numerator:'Hgb x 10',denominator:'RBC in millions',steps:[],notes:'Report in pg.',example:''},
-  {id:'builtin-calc-mchc',type:'calc',_placeholder:true,name:'Mean Cell Hemoglobin Concentration (MCHC)',category:'Hematology',result_label:'MCHC',numerator:'Hgb',denominator:'Hct',multiplier:'100',steps:[],notes:'Use Hct as a percentage; report as percent or g/dL per course convention.',example:''},
-  {id:'builtin-calc-raw-retic',type:'calc',_placeholder:true,name:'Raw Reticulocyte Percent',category:'Hematology',result_label:'Raw retic %',numerator:'Reticulocytes counted',denominator:'10',steps:[],notes:'Applies when 1,000 RBCs are counted.',example:''},
-  {id:'builtin-calc-maturation-days',type:'calc',_placeholder:true,name:'Reticulocyte Maturation Days',category:'Hematology',result_label:'Days to mature',numerator:'65 - patient Hct',denominator:'20',steps:[],notes:'* Derived formula.',example:''},
-  {id:'builtin-calc-beers-law',type:'calc',_placeholder:true,name:"Beer's Law",category:'Hematology',steps:['Concentration unknown / concentration known = absorbance unknown / absorbance known'],notes:'Rearrange the proportion to solve for the unknown concentration.',example:''},
-  {id:'builtin-calc-absolute-cell',type:'calc',_placeholder:true,name:'Absolute Cell Count',category:'Hematology',steps:['WBC count x differential percent / 100'],notes:'Use the cell percent as a whole number, then divide by 100.',example:'WBC 10.0 x 10^3/uL, neutrophils 60% -> ANC 6.0 x 10^3/uL'},
-  {id:'builtin-calc-corrected-wbc',type:'calc',_placeholder:true,name:'Corrected WBC Count',category:'Hematology',result_label:'Corrected WBC',numerator:'Observed WBC x 100',denominator:'100 + NRBC per 100 WBC',steps:['Correct when many NRBCs are counted as WBCs by the instrument.'],notes:'Used when NRBCs are reported per 100 WBC.',example:'WBC 20.0, NRBC 25 -> 20 x 100 / 125 = 16.0 x 10^3/uL'},
-  {id:'builtin-calc-corrected-retic',type:'calc',_placeholder:true,name:'Corrected Reticulocyte Count',category:'Hematology',result_label:'Corrected retic %',numerator:'Retic % x patient Hct',denominator:'Normal Hct',steps:['Normal Hct commonly estimated as 45%.'],notes:'Use assigned normal Hct if your instructor gives one.',example:'Retic 6%, Hct 30 -> 6 x 30 / 45 = 4%'},
-  {id:'builtin-calc-rpi',type:'calc',_placeholder:true,name:'Reticulocyte Production Index',category:'Hematology',result_label:'RPI',numerator:'Corrected retic %',denominator:'Maturation factor',steps:['Maturation factor increases as Hct falls.'],notes:'Approx factors: Hct 45=1, 35=1.5, 25=2, 15=2.5.',example:'Corrected retic 4%, maturation factor 2 -> RPI 2'},
-  {id:'builtin-calc-body-fluid-correction',type:'calc',_placeholder:true,name:'Body Fluid WBC Correction',category:'Urinalysis / Body Fluids',steps:['Corrected WBC = observed fluid WBC - (blood WBC x fluid RBC / blood RBC)'],notes:'Used when a traumatic tap or blood contamination is considered.',example:'Apply only when your course asks for correction.'},
-  {id:'builtin-calc-rhig-dose',type:'calc',_placeholder:true,name:'RhIG (RhoGAM) Dose',category:'Blood Bank',steps:['Fetal bleed (mL) = % fetal cells x 50','RhIG vials use fetal bleed (mL) over 30'],notes:'Decimal < 0.5: round down and add 1 vial; decimal >= 0.5: round up and add 1 vial.',example:''},
-  {id:'builtin-calc-cv',type:'calc',_placeholder:true,name:'Coefficient of Variation (CV)',category:'Lab Operations',result_label:'CV %',numerator:'Standard deviation',denominator:'Mean',multiplier:'100',steps:['SD / mean x 100'],notes:'Measures imprecision relative to the mean.',example:'SD 2, mean 100 -> CV 2%'},
-  {id:'builtin-calc-standard-deviation',type:'calc',_placeholder:true,name:'Standard Deviation',category:'Lab Operations',steps:['s = square root of sum(x - mean)^2 over (n - 1)'],notes:'Sample standard deviation.',example:''},
-  {id:'builtin-calc-sdi',type:'calc',_placeholder:true,name:'Standard Deviation Index (SDI)',category:'Lab Operations',result_label:'SDI',numerator:'Lab mean - peer mean',denominator:'Peer SD',steps:['Compare lab performance to peer group.'],notes:'Values near 0 are ideal; +/-2 may indicate concern.',example:'Lab 102, peer 100, peer SD 2 -> SDI +1'},
-  {id:'builtin-calc-sensitivity',type:'calc',_placeholder:true,name:'Sensitivity',category:'Lab Operations',result_label:'Sensitivity',numerator:'True positives',denominator:'True positives + false negatives',multiplier:'100',steps:['TP / (TP + FN) x 100'],notes:'Ability to detect disease when disease is present.',example:'High sensitivity helps rule out when negative.'},
-  {id:'builtin-calc-specificity',type:'calc',_placeholder:true,name:'Specificity',category:'Lab Operations',result_label:'Specificity',numerator:'True negatives',denominator:'True negatives + false positives',multiplier:'100',steps:['TN / (TN + FP) x 100'],notes:'Ability to detect absence of disease when disease is absent.',example:'High specificity helps rule in when positive.'},
-  {id:'builtin-calc-ppv',type:'calc',_placeholder:true,name:'Positive Predictive Value (PPV)',category:'Lab Operations',result_label:'PPV',numerator:'True positives',denominator:'True positives + false positives',multiplier:'100',steps:['TP / (TP + FP) x 100'],notes:'Chance a positive result reflects disease in the tested population.',example:'Affected by prevalence.'},
-  {id:'builtin-calc-npv',type:'calc',_placeholder:true,name:'Negative Predictive Value (NPV)',category:'Lab Operations',result_label:'NPV',numerator:'True negatives',denominator:'True negatives + false negatives',multiplier:'100',steps:['TN / (TN + FN) x 100'],notes:'Chance a negative result reflects no disease in the tested population.',example:'Affected by prevalence.'},
-  {id:'builtin-calc-dilution',type:'calc',_placeholder:true,name:'Dilution & Concentration',category:'Lab Operations',steps:['C1V1 = C2V2','Dilution factor uses total volume over sample volume'],notes:'Use the same units across the equation.',example:'1 mL sample + 9 mL diluent = 1:10 dilution'},
+  {id:'builtin-calc-volume-conversion',type:'calc',_placeholder:true,name:'Microliter Volume Conversion',category:'Hematology',steps:['uL = mm^3 = 10^-3 mL = 10^-6 L'],notes:'',example:''},
+  {id:'builtin-calc-mcv',type:'calc',_placeholder:true,name:'Mean Cell Volume (MCV)',category:'Hematology',result_label:'MCV',numerator:'Hct x 10',denominator:'RBC in millions',steps:[],notes:'',example:''},
+  {id:'builtin-calc-mch',type:'calc',_placeholder:true,name:'Mean Cell Hemoglobin (MCH)',category:'Hematology',result_label:'MCH',numerator:'Hgb x 10',denominator:'RBC in millions',steps:[],notes:'',example:''},
+  {id:'builtin-calc-mchc',type:'calc',_placeholder:true,name:'Mean Cell Hemoglobin Concentration (MCHC)',category:'Hematology',result_label:'MCHC',numerator:'Hgb',denominator:'Hct',multiplier:'100',steps:[],notes:'',example:''},
+  {id:'builtin-calc-raw-retic',type:'calc',_placeholder:true,name:'Raw Reticulocyte Percent',category:'Hematology',result_label:'Raw retic %',numerator:'Reticulocytes counted',denominator:'10',steps:[],notes:'',example:''},
+  {id:'builtin-calc-maturation-days',type:'calc',_placeholder:true,name:'Reticulocyte Maturation Days',category:'Hematology',result_label:'Days to mature',numerator:'65 - patient Hct',denominator:'20',steps:[],notes:'* Derived formula',example:''},
+  {id:'builtin-calc-beers-law',type:'calc',_placeholder:true,name:"Beer's Law",category:'Hematology',steps:['Concentration unknown / concentration known = absorbance unknown / absorbance known'],notes:'',example:''},
+  {id:'builtin-calc-absolute-cell',type:'calc',_placeholder:true,name:'Absolute Cell Count',category:'Hematology',steps:['WBC count x differential percent / 100'],notes:'',example:'WBC 10.0 x 10^3/uL, neutrophils 60% -> ANC 6.0 x 10^3/uL'},
+  {id:'builtin-calc-corrected-wbc',type:'calc',_placeholder:true,name:'Corrected WBC Count',category:'Hematology',result_label:'Corrected WBC',numerator:'Observed WBC x 100',denominator:'100 + NRBC per 100 WBC',steps:['Correct when many NRBCs are counted as WBCs by the instrument.'],notes:'',example:'WBC 20.0, NRBC 25 -> 20 x 100 / 125 = 16.0 x 10^3/uL'},
+  {id:'builtin-calc-corrected-retic',type:'calc',_placeholder:true,name:'Corrected Reticulocyte Count',category:'Hematology',result_label:'Corrected retic %',numerator:'Retic % x patient Hct',denominator:'Normal Hct',steps:['Normal Hct commonly estimated as 45%.'],notes:'',example:'Retic 6%, Hct 30 -> 6 x 30 / 45 = 4%'},
+  {id:'builtin-calc-rpi',type:'calc',_placeholder:true,name:'Reticulocyte Production Index',category:'Hematology',result_label:'RPI',numerator:'Corrected retic %',denominator:'Maturation factor',steps:['Maturation factor increases as Hct falls.'],notes:'',example:'Corrected retic 4%, maturation factor 2 -> RPI 2'},
+  {id:'builtin-calc-body-fluid-correction',type:'calc',_placeholder:true,name:'Body Fluid WBC Correction',category:'Urinalysis / Body Fluids',steps:['Corrected WBC = observed fluid WBC - (blood WBC x fluid RBC / blood RBC)'],notes:'* Corrects for blood contamination from a traumatic tap.',example:'Apply only when your course asks for correction.'},
+  {id:'builtin-calc-rhig-dose',type:'calc',_placeholder:true,name:'RhIG (RhoGAM) Dose',category:'Blood Bank',steps:['Fetal bleed (mL) = % fetal cells x 50','RhIG vials use fetal bleed (mL) over 30'],notes:'* Derived formula',example:''},
+  {id:'builtin-calc-cv',type:'calc',_placeholder:true,name:'Coefficient of Variation (CV)',category:'Lab Operations',result_label:'CV %',numerator:'Standard deviation',denominator:'Mean',multiplier:'100',steps:['SD / mean x 100'],notes:'',example:'SD 2, mean 100 -> CV 2%'},
+  {id:'builtin-calc-standard-deviation',type:'calc',_placeholder:true,name:'Standard Deviation',category:'Lab Operations',steps:['s = square root of sum(x - mean)^2 over (n - 1)'],notes:'',example:''},
+  {id:'builtin-calc-sdi',type:'calc',_placeholder:true,name:'Standard Deviation Index (SDI)',category:'Lab Operations',result_label:'SDI',numerator:'Lab mean - peer mean',denominator:'Peer SD',steps:['Compare lab performance to peer group.'],notes:'',example:'Lab 102, peer 100, peer SD 2 -> SDI +1'},
+  {id:'builtin-calc-sensitivity',type:'calc',_placeholder:true,name:'Sensitivity',category:'Lab Operations',result_label:'Sensitivity',numerator:'True positives',denominator:'True positives + false negatives',multiplier:'100',steps:['TP / (TP + FN) x 100'],notes:'',example:'High sensitivity helps rule out when negative.'},
+  {id:'builtin-calc-specificity',type:'calc',_placeholder:true,name:'Specificity',category:'Lab Operations',result_label:'Specificity',numerator:'True negatives',denominator:'True negatives + false positives',multiplier:'100',steps:['TN / (TN + FP) x 100'],notes:'',example:'High specificity helps rule in when positive.'},
+  {id:'builtin-calc-ppv',type:'calc',_placeholder:true,name:'Positive Predictive Value (PPV)',category:'Lab Operations',result_label:'PPV',numerator:'True positives',denominator:'True positives + false positives',multiplier:'100',steps:['TP / (TP + FP) x 100'],notes:'',example:'Affected by prevalence.'},
+  {id:'builtin-calc-npv',type:'calc',_placeholder:true,name:'Negative Predictive Value (NPV)',category:'Lab Operations',result_label:'NPV',numerator:'True negatives',denominator:'True negatives + false negatives',multiplier:'100',steps:['TN / (TN + FN) x 100'],notes:'',example:'Affected by prevalence.'},
+  {id:'builtin-calc-dilution',type:'calc',_placeholder:true,name:'Dilution & Concentration',category:'Lab Operations',steps:['C1V1 = C2V2','Dilution factor uses total volume over sample volume'],notes:'',example:'1 mL sample + 9 mL diluent = 1:10 dilution'},
   {id:'builtin-calc-molarity-normality',type:'calc',_placeholder:true,name:'Molarity & Normality',category:'Lab Operations',steps:['M = moles of solute over liters of solution','N = equivalents over liters of solution'],notes:'',example:''},
   {id:'builtin-calc-mean-median-mode',type:'calc',_placeholder:true,name:'Mean, Median & Mode',category:'Lab Operations',steps:['Mean uses sum of values over n','Median = middle ordered value','Mode = most frequent value'],notes:'',example:''},
   {id:'builtin-calc-confidence-interval',type:'calc',_placeholder:true,name:'95% Confidence Interval',category:'Lab Operations',steps:['Mean ± 1.96 x standard error'],notes:'',example:''}
@@ -13439,7 +13439,6 @@ async function calcResetOrder(){
 function renderCalcTab(cats,all){
   if(!all.length)return '<div class="empty">No calculations yet. Use Admin mode to add some.</div>';
   window._calcOrderItems=all;
-  const hemocytometerNote='* Hemocytometer: chamber depth is 0.1 mm. Use the area of the square counted: large square = 1 mm^2; RBC group square = 0.04 mm^2; smallest RBC square = 0.0025 mm^2. Only the cells counted, dilution, and number of squares change.';
   const cell=(f,wide=false,groupName='')=>{
     if(!f)return '';
     const key=calcFormulaOrderKey(f);
@@ -13448,15 +13447,14 @@ function renderCalcTab(cats,all){
     ${isAdmin?`<span class="calc-template-admin"><span class="calc-order-grip" title="Drag to reorder" aria-label="Drag to reorder">↕</span><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move up" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',-1)">↑</button><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move down" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',1)">↓</button><button class="btn btn-ghost btn-xs" type="button" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>${!f._placeholder?`<button class="btn btn-danger btn-xs" type="button" onclick="deleteFormula('${f.id}')">Delete</button>`:''}</span>`:''}
     <div class="calc-template-name">${esc(calcDisplayName(f))}</div>
     <div class="calc-template-equation">${renderCalcEquationCell(f)}</div>
-    ${String(f.notes||'').trim().startsWith('*')?`<div class="calc-template-note">${esc(String(f.notes).trim())}</div>`:''}
+    ${String(f.notes||'').trim()?`<div class="calc-template-note">${esc(String(f.notes).trim())}</div>`:''}
   </article>`;};
   return `<section class="study-template-sheet calc-template-sheet">
     <div class="study-template-title">ASCP Formula Sheet</div>
     ${isAdmin?`<div class="calc-order-toolbar"><span>Drag formulas or use ↑ ↓ to arrange them. Your order is used here, in Calculation Examples, and in the PDF.</span><button class="btn btn-ghost btn-xs" type="button" onclick="calcResetOrder()">Reset order</button></div>`:''}
     <div class="calc-template-groups">${calcFormulaGroups(all).map(group=>{
       const rows=Math.ceil(group.items.length/2);
-      const hasHemocytometer=group.items.some(item=>/hemocytometer/i.test(String(item.name||'')));
-      return `<section class="calc-template-group"><div class="study-template-section-title">${esc(group.name)}</div><div class="calc-template-rows">${Array.from({length:rows},(_,index)=>{const first=group.items[index*2],second=group.items[index*2+1];return `<div class="calc-template-row">${cell(first,!second,group.name)}${cell(second,false,group.name)}</div>`;}).join('')}</div>${hasHemocytometer?`<div class="calc-template-group-note">${esc(hemocytometerNote)}</div>`:''}</section>`;
+      return `<section class="calc-template-group"><div class="study-template-section-title">${esc(group.name)}</div><div class="calc-template-rows">${Array.from({length:rows},(_,index)=>{const first=group.items[index*2],second=group.items[index*2+1];return `<div class="calc-template-row">${cell(first,!second,group.name)}${cell(second,false,group.name)}</div>`;}).join('')}</div></section>`;
     }).join('')}</div>
   </section>`;
 }
@@ -13730,6 +13728,14 @@ function calcDisplaySpec(f){
 function calcExplanatorySteps(f){
   return (Array.isArray(f?.steps)?f.steps:[]).map(String).filter(step=>step.trim()&&!/[=\/]/.test(step));
 }
+function calcOperationText(value){
+  const raw=String(value||'').trim();
+  if(!raw)return '';
+  const match=raw.match(/^([+\-−×*xX÷/])\s*(.+)$/);
+  if(!match)return `× ${raw}`;
+  const operator={'*':'×',x:'×',X:'×','-':'−','/':'÷'}[match[1]]||match[1];
+  return `${operator} ${match[2]}`;
+}
 function calcInlineFractionHtml(part){
   return `<span class="calc-inline-fraction" aria-label="${esc(part.top)} divided by ${esc(part.bottom)}"><span class="calc-inline-fraction-top">${esc(part.top)}</span><span class="calc-inline-fraction-bottom">${esc(part.bottom)}</span></span>`;
 }
@@ -13744,7 +13750,7 @@ function renderCalcEquationCell(f){
   if(displaySpec)return calcDisplaySpecHtml(displaySpec);
   if(f.numerator||f.denominator){
     const label=f.result_label||f.name;
-    return `<div class="calc-formula-board"><span class="calc-equation-label">${esc(label)}</span><span class="calc-equals">=</span><div class="calc-fraction" aria-label="${esc((f.numerator||'')+' divided by '+(f.denominator||''))}"><div class="calc-fraction-top">${esc(f.numerator||'...')}</div><div class="calc-fraction-bottom">${esc(f.denominator||'...')}</div></div>${f.multiplier?`<span class="calc-equation-text">x ${esc(f.multiplier)}</span>`:''}</div>`;
+    return `<div class="calc-formula-board"><span class="calc-equation-label">${esc(label)}</span><span class="calc-equals">=</span><div class="calc-fraction" aria-label="${esc((f.numerator||'')+' divided by '+(f.denominator||''))}"><div class="calc-fraction-top">${esc(f.numerator||'...')}</div><div class="calc-fraction-bottom">${esc(f.denominator||'...')}</div></div>${f.multiplier?`<span class="calc-equation-text">${esc(calcOperationText(f.multiplier))}</span>`:''}</div>`;
   }
   return `<div class="calc-formula-board"><div class="calc-equation-text">${steps.length?steps.map(esc).join('<span class="calc-step-separator">•</span>'):esc(f.formula||f.name||'')}</div></div>`;
 }
@@ -13754,7 +13760,7 @@ function renderCalcCard(f,index=0){
   const hasFraction=!!(f.numerator||f.denominator);
   const displaySpec=calcDisplaySpec(f);
   const label=f.result_label||f.name;
-  const support=[...(hasFraction?calcExplanatorySteps(f):[]),String(f.notes||'').trim()].filter(Boolean);
+  const support=String(f.notes||'').trim();
   return `
     <article class="calc-card">
       <span class="calc-row-index">${String(index+1).padStart(2,'0')}</span>
@@ -13773,13 +13779,13 @@ function renderCalcCard(f,index=0){
             <div class="calc-fraction-top">${esc(f.numerator||'...')}</div>
             <div class="calc-fraction-bottom">${esc(f.denominator||'...')}</div>
           </div>
-          ${f.multiplier?`<div class="calc-equation-text">x ${esc(f.multiplier)}</div>`:''}
+          ${f.multiplier?`<div class="calc-equation-text">${esc(calcOperationText(f.multiplier))}</div>`:''}
         </div>`:''}
       ${!displaySpec&&!hasFraction&&steps.length?`
         <div class="calc-formula-board">
           <div class="calc-equation-text">${steps.map(esc).join('<span class="calc-step-separator">•</span>')}</div>
         </div>`:''}
-      ${support.length?`<div class="calc-support-note">${support.map(esc).join(' • ')}</div>`:''}
+      ${support?`<div class="calc-support-note">${esc(support)}</div>`:''}
     </article>`;
 }
 
@@ -13835,13 +13841,13 @@ async function openFormulaEditor(id,type){
           <div class="form-group"><label>Numerator</label><input type="text" id="fm-numerator" value="${esc(f.numerator||'')}" placeholder="e.g. Serum Iron"></div>
           <div class="form-group"><label>Denominator</label><input type="text" id="fm-denominator" value="${esc(f.denominator||'')}" placeholder="e.g. TIBC"></div>
         </div>
-        <div class="form-group" style="margin-bottom:0"><label>× Multiplier (optional)</label><input type="text" id="fm-multiplier" value="${esc(f.multiplier||'')}" placeholder="e.g. 100"></div>
+        <div class="form-group" style="margin-bottom:0"><label>Operation (optional)</label><input type="text" id="fm-multiplier" value="${esc(f.multiplier||'')}" placeholder="e.g. × 100, + 1, − 2, or ÷ 30"></div>
       </div>
       <div class="form-group">
         <label>Steps (optional — each step shown in sequence)</label>
         ${steps.map((s,i)=>`<input type="text" id="fm-step-${i}" value="${esc(s||'')}" placeholder="Step ${i+1} (leave blank to skip)" style="margin-bottom:6px;font-family:var(--mono)">`).join('')}
       </div>
-      <div class="form-group"><label>Notes (optional)</label><textarea id="fm-notes" style="min-height:60px">${f.notes||''}</textarea></div>
+      <div class="form-group"><label>Notes (optional — displayed in red)</label><textarea id="fm-notes" style="min-height:60px">${esc(f.notes||'')}</textarea></div>
     `}
     <div class="flex gap-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
@@ -13936,7 +13942,7 @@ function calcFormulaText(f){
   const left=f.result_label?f.result_label+' = ':'';
   if(f.numerator||f.denominator){
     const frac=(f.numerator||'...')+' / '+(f.denominator||'...');
-    return left+frac+(f.multiplier?' x '+f.multiplier:'');
+    return left+frac+(f.multiplier?' '+calcOperationText(f.multiplier):'');
   }
   if((f.steps||[]).filter(Boolean).length)return (f.steps||[]).filter(Boolean).join(' | ');
   return f.formula||f.name||'';
@@ -14000,7 +14006,7 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
     const label=String(f.result_label||f.name||'');
     const numerator=String(f.numerator||'...');
     const denominator=String(f.denominator||'...');
-    const multiplier=f.multiplier?'x '+String(f.multiplier):'';
+    const multiplier=calcOperationText(f.multiplier).replace(/×/g,'x').replace(/÷/g,'/').replace(/−/g,'-');
     const gap=2.1;
     let fontSize=7.45;
     const measure=()=>{
@@ -14043,9 +14049,6 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
 function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
   const groups=calcFormulaGroups(calcData||[]);
   const cW=pageW-margin*2,colW=cW/2,startY=18,bottom=10,groupH=6.6;
-  const hemocytometerNote='* Hemocytometer: chamber depth is 0.1 mm. Square area: large = 1 mm^2; RBC group = 0.04 mm^2; smallest RBC square = 0.0025 mm^2. Only cells counted, dilution, and number of squares change.';
-  const groupNoteH=9.5;
-  const groupHasHemocytometer=groups.map(group=>group.items.some(item=>/hemocytometer/i.test(String(item.name||''))));
   const groupedRows=groups.map(group=>{
     const rows=[];
     for(let index=0;index<group.items.length;index+=2){
@@ -14056,8 +14059,7 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
     return rows;
   });
   const rowUnits=groupedRows.flat().reduce((sum,row)=>sum+row.weight,0)||1;
-  const totalGroupNoteH=groupHasHemocytometer.filter(Boolean).length*groupNoteH;
-  const baseRowH=(pageH-startY-bottom-groups.length*groupH-totalGroupNoteH)/rowUnits;
+  const baseRowH=(pageH-startY-bottom-groups.length*groupH)/rowUnits;
   doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
   doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.7);doc.rect(margin,10,cW,8,'FD');
   doc.setFont('times','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(blank?'ASCP Formula Sheet - Blank Practice':'ASCP Formula Sheet',pageW/2,15.4,{align:'center'});
@@ -14079,23 +14081,15 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
         const displayName=calcDisplayName(f);
         doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,displayName,cellW-7,7.25,5.2);doc.text(displayName,x+cellW/2,y+3.9,{align:'center'});
         const cellNote=String(f.notes||'').trim();
-        const showCellNote=!blank&&cellNote.startsWith('*');
+        const showCellNote=!blank&&!!cellNote;
         if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+4.7,cellW-6,rowH-5.15-(showCellNote?3.2:0),[0,0,0]);
         if(showCellNote){
           doc.setFont('times','bold');doc.setFontSize(5.2);doc.setTextColor(193,18,31);
+          fitPdfText(doc,cellNote,cellW-5,5.2,3.6);
           doc.text(cellNote,x+cellW/2,y+rowH-1.4,{align:'center'});
         }
       });
       y+=rowH;
-    }
-    if(groupHasHemocytometer[groupIndex]){
-      doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(margin,y,cW,groupNoteH,'FD');
-      doc.setFont('times','bold');doc.setFontSize(5.5);doc.setTextColor(193,18,31);
-      const noteLines=doc.splitTextToSize(hemocytometerNote,cW-8).slice(0,2);
-      const lineH=2.4;
-      const firstY=y+(groupNoteH-(noteLines.length-1)*lineH)/2+.7;
-      noteLines.forEach((line,index)=>doc.text(line,pageW/2,firstY+index*lineH,{align:'center'}));
-      y+=groupNoteH;
     }
   });
 }
