@@ -4785,7 +4785,8 @@ async function resetQuizBackground(){
 const contentReads=new Map(),pendingReads=new Map();
 async function boundedContentFetch(input,init={}){
   const url=String(input),method=(init.method||'GET').toUpperCase();
-  const canCache=method==='GET'&&url.includes('/rest/v1/');
+  // Quiz edits must never be hidden by a cached REST response.
+  const canCache=method==='GET'&&url.includes('/rest/v1/')&&!url.includes('/mlsboc_questions?');
   if(!['GET','HEAD'].includes(method)){contentReads.clear();questionBankCache.clear();}
   const key=url+'|'+JSON.stringify(init.headers||{});
   const cached=contentReads.get(key);
@@ -7071,6 +7072,13 @@ function quizBankKeys(subjectKey){
 
 const questionBankLoads=new Map(),questionBankCache=new Map();
 async function readQuestionBank(subject){
+  // The live bank is authoritative for subjects whose corrections are being
+  // edited. The bundled JSON is an older snapshot, not a safe quiz fallback.
+  if(subject==='blood_bank'||subject==='microbiology'){
+    const result=await sb.from('mlsboc_questions').select('*').eq('subject',subject);
+    if(result.error)throw result.error;
+    return result.data||[];
+  }
   const cached=questionBankCache.get(subject);
   if(cached&&cached.until>Date.now())return cached.rows;
   if(questionBankLoads.has(subject))return questionBankLoads.get(subject);
@@ -7786,11 +7794,18 @@ async function saveQuizQuestionEdit(){
   };
   const saveBtn=document.getElementById('edit-quiz-save');
   if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving...';}
-  const {error}=await sb.from('mlsboc_questions').update(payload).eq('id',window._quizQuestionEdit.id);
-  if(error){
-    if(errorEl)errorEl.textContent='Save failed: '+error.message;
+  const {data:saved,error}=await sb.from('mlsboc_questions').update(payload)
+    .eq('id',editState.id).eq('subject',editState.subject)
+    .select('id,subject,question,option_a,option_b,option_c,option_d,correct_answer,explanation').single();
+  const verified=!!saved&&Object.keys(payload).every(field=>saved[field]===payload[field]);
+  if(error||!verified){
+    if(errorEl)errorEl.textContent='Save failed: '+(error?.message||'The saved question could not be verified. Please try again.');
     if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save Changes';}
     return;
+  }
+  questionBankCache.delete(editState.subject);
+  for(const list of [appState.quizQ,appState.quizPool,appState.quizMasteryQ,appState.allQ,appState.allPool]){
+    for(const item of list||[])if(item.id===saved.id)Object.assign(item,saved);
   }
   closeQuizQuestionEditor();
   renderTab();
