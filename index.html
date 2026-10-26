@@ -4787,7 +4787,7 @@ async function boundedContentFetch(input,init={}){
   const url=String(input),method=(init.method||'GET').toUpperCase();
   // Quiz edits must never be hidden by a cached REST response.
   const canCache=method==='GET'&&url.includes('/rest/v1/')&&!url.includes('/mlsboc_questions?');
-  if(!['GET','HEAD'].includes(method)){contentReads.clear();questionBankCache.clear();}
+  if(!['GET','HEAD'].includes(method))contentReads.clear();
   const key=url+'|'+JSON.stringify(init.headers||{});
   const cached=contentReads.get(key);
   if(canCache&&cached&&cached.until>Date.now())return new Response(cached.body,{status:cached.status,headers:cached.headers});
@@ -7070,29 +7070,15 @@ function quizBankKeys(subjectKey){
   return subjectKey==='para_myco'?['parasitology','mycology']:[subjectKey];
 }
 
-const questionBankLoads=new Map(),questionBankCache=new Map();
 async function readQuestionBank(subject){
-  // The live bank is authoritative for subjects whose corrections are being
-  // edited. The bundled JSON is an older snapshot, not a safe quiz fallback.
-  if(subject==='blood_bank'||subject==='microbiology'){
-    const result=await sb.from('mlsboc_questions').select('*').eq('subject',subject);
-    if(result.error)throw result.error;
-    return result.data||[];
+  const rows=[];
+  for(let start=0;;start+=1000){
+    const {data,error}=await sb.from('mlsboc_questions').select('*').eq('subject',subject)
+      .order('created_at').order('id').range(start,start+999);
+    if(error)throw error;
+    rows.push(...(data||[]));
+    if(!data||data.length<1000)return rows;
   }
-  const cached=questionBankCache.get(subject);
-  if(cached&&cached.until>Date.now())return cached.rows;
-  if(questionBankLoads.has(subject))return questionBankLoads.get(subject);
-  let timer;
-  const live=(async()=>{const result=await sb.from('mlsboc_questions').select('*').eq('subject',subject);if(result.error)throw result.error;return result.data||[];})();
-  const backup=new Promise((resolve,reject)=>{
-    timer=setTimeout(async()=>{try{
-      const response=await boundedContentFetch('assets/questions/'+encodeURIComponent(subject)+'.json?v=20261005');
-      if(!response.ok)throw Error('Backup question bank unavailable');
-      const rows=await response.json();if(!Array.isArray(rows)||rows.some(row=>row.subject!==subject))throw Error('Invalid backup question bank');resolve(rows);
-    }catch(error){reject(error);}},2000);
-  });
-  const task=Promise.any([live,backup]).then(rows=>{questionBankCache.set(subject,{rows,until:Date.now()+60000});return rows;}).finally(()=>{clearTimeout(timer);questionBankLoads.delete(subject);});
-  questionBankLoads.set(subject,task);return task;
 }
 
 async function fetchQuizSubjectPool(subjectKey){
@@ -7463,7 +7449,6 @@ async function toggleQuestionNeedsCorrection(id,needsCorrection,button){
   const {data,error}=await sb.from('mlsboc_questions').update({needs_correction:needsCorrection}).eq('id',id).select('id,subject,needs_correction').single();
   if(button)button.disabled=false;
   if(error||!data){alert('Could not update this question. Please try again.');return;}
-  questionBankCache.delete(data.subject);
   for(const list of [appState.quizQ,appState.quizPool,appState.quizMasteryQ,appState.allQ,appState.allPool]){
     for(const question of list||[])if(question.id===id)question.needs_correction=data.needs_correction;
   }
@@ -7794,16 +7779,18 @@ async function saveQuizQuestionEdit(){
   };
   const saveBtn=document.getElementById('edit-quiz-save');
   if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving...';}
-  const {data:saved,error}=await sb.from('mlsboc_questions').update(payload)
-    .eq('id',editState.id).eq('subject',editState.subject)
-    .select('id,subject,question,option_a,option_b,option_c,option_d,correct_answer,explanation').single();
+  let saved,error;
+  try{
+    ({data:saved,error}=await sb.from('mlsboc_questions').update(payload)
+      .eq('id',editState.id).eq('subject',editState.subject)
+      .select('id,subject,question,option_a,option_b,option_c,option_d,correct_answer,explanation').single());
+  }catch(cause){error=cause;}
   const verified=!!saved&&Object.keys(payload).every(field=>saved[field]===payload[field]);
   if(error||!verified){
     if(errorEl)errorEl.textContent='Save failed: '+(error?.message||'The saved question could not be verified. Please try again.');
     if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save Changes';}
     return;
   }
-  questionBankCache.delete(editState.subject);
   for(const list of [appState.quizQ,appState.quizPool,appState.quizMasteryQ,appState.allQ,appState.allPool]){
     for(const item of list||[])if(item.id===saved.id)Object.assign(item,saved);
   }
