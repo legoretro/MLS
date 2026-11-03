@@ -1321,6 +1321,16 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .subject-flash-sub{font-size:12px;color:var(--text2);margin-top:2px}
 .subject-flash-count{flex-shrink:0;border-radius:999px;background:color-mix(in srgb,var(--flash-accent) 11%,var(--bg3));color:var(--flash-accent);padding:5px 9px;font-size:11px;font-weight:800}
 .subject-flash-body{padding:22px}
+.subject-flash-modes{display:flex;gap:7px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--border)}
+.subject-flash-mode{border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text2);padding:9px 14px;font-size:13px;font-weight:800;cursor:pointer}
+.subject-flash-mode.is-active{border-color:var(--flash-accent);background:color-mix(in srgb,var(--flash-accent) 12%,var(--bg2));color:var(--flash-accent)}
+.subject-flash-mode:focus-visible{outline:2px solid var(--flash-accent);outline-offset:2px}
+.subject-flash-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:1100px;margin:0 auto}
+.subject-flash-panel{min-width:0;min-height:320px;padding:24px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;border:1px solid color-mix(in srgb,var(--flash-accent) 30%,var(--border));border-radius:18px;background:var(--bg2);box-shadow:0 12px 28px rgba(18,35,74,.07);overflow-wrap:anywhere}
+.subject-flash-panel .subject-flash-label{align-self:flex-start}
+.subject-flash-panel .subject-flash-question,.subject-flash-panel .subject-flash-answer{text-align:left}
+.subject-flash-panel .subject-flash-media{justify-content:flex-start}
+.subject-flash-pair+.subject-flash-controls{max-width:1100px}
 .subject-flash-scene{perspective:1200px;width:100%;max-width:680px;margin:0 auto}
 .subject-flash-card{position:relative;width:100%;aspect-ratio:5/3;min-height:320px;border:0;border-radius:18px;background:transparent;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.4,0,.2,1);cursor:pointer;text-align:center}
 .subject-flash-card.is-flipped{transform:rotateY(180deg)}
@@ -1328,12 +1338,12 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .subject-flash-front{background:linear-gradient(145deg,var(--bg2),color-mix(in srgb,var(--flash-accent) 5%,var(--bg3)))}
 .subject-flash-back{transform:rotateY(180deg);background:linear-gradient(145deg,color-mix(in srgb,var(--flash-accent) 10%,var(--bg2)),var(--bg2))}
 .subject-flash-label{font-size:10px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;color:var(--flash-accent);margin-bottom:12px}
-.subject-flash-question{font-size:20px;font-weight:750;line-height:1.45;color:var(--text);overflow-wrap:anywhere}
-.subject-flash-answer{font-size:23px;font-weight:800;line-height:1.4;color:var(--text);overflow-wrap:anywhere}
-.subject-flash-question.is-long{font-size:17px;line-height:1.38}
-.subject-flash-question.is-xlong{font-size:14px;line-height:1.34}
-.subject-flash-answer.is-long{font-size:19px;line-height:1.36}
-.subject-flash-answer.is-xlong{font-size:15px;line-height:1.32}
+.subject-flash-question{font-size:26px;font-weight:750;line-height:1.38;color:var(--text);overflow-wrap:anywhere}
+.subject-flash-answer{font-size:29px;font-weight:800;line-height:1.36;color:var(--text);overflow-wrap:anywhere}
+.subject-flash-question.is-long{font-size:22px;line-height:1.36}
+.subject-flash-question.is-xlong{font-size:18px;line-height:1.32}
+.subject-flash-answer.is-long{font-size:23px;line-height:1.34}
+.subject-flash-answer.is-xlong{font-size:19px;line-height:1.3}
 .subject-flash-media{display:flex;align-items:center;justify-content:center;gap:8px;max-width:100%;margin:0 0 14px;flex-wrap:wrap}
 .subject-flash-media-button{border:1px solid color-mix(in srgb,var(--flash-accent) 34%,var(--border));border-radius:12px;background:var(--bg2);padding:5px;cursor:zoom-in;box-shadow:0 7px 16px rgba(18,35,74,.10)}
 .subject-flash-media-button img{display:block;max-width:210px;max-height:132px;width:auto;height:auto;object-fit:contain;border-radius:8px}
@@ -1344,6 +1354,14 @@ body.light-mode [style*="var(--bg3)"][style*="var(--border2)"][style*="padding:1
 .subject-flash-tools{display:flex;justify-content:center;margin-top:10px}
 @media(max-width:520px){.quiz-count-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.quiz-start-shell{margin-top:4px}.quiz-start-head,.quiz-start-body{padding:17px}.quiz-start-source{padding:10px 17px}.quiz-start-title{font-size:22px}.quiz-start-body .quiz-count-grid{grid-template-columns:1fr}.subject-flash-head{align-items:flex-start;padding:14px 15px}.subject-flash-title{font-size:19px}.subject-flash-sub{font-size:11px}.subject-flash-body{padding:14px}.subject-flash-card{aspect-ratio:4/3;min-height:270px}.subject-flash-face{padding:20px 16px}.subject-flash-question{font-size:18px}.subject-flash-answer{font-size:20px}.subject-flash-question.is-long{font-size:15px}.subject-flash-question.is-xlong{font-size:10.75px;line-height:1.25}.subject-flash-answer.is-long{font-size:16px}.subject-flash-answer.is-xlong{font-size:11.5px;line-height:1.26}.subject-flash-media-button img{max-width:150px;max-height:96px}.subject-flash-front:has(.is-xlong){padding:12px}.subject-flash-front:has(.is-xlong) .subject-flash-label{margin-bottom:6px}.subject-flash-front:has(.is-xlong) .subject-flash-media{margin-bottom:7px}.subject-flash-front:has(.is-xlong) .subject-flash-media-button img{max-height:72px;max-width:126px}.subject-flash-front:has(.is-xlong) .subject-flash-hint{margin-top:8px}.subject-flash-controls{grid-template-columns:1fr 1fr}.subject-flash-progress{grid-column:1/-1;grid-row:1}.subject-flash-controls .btn{grid-row:2}.subject-flash-count{font-size:10px}}
+@media(max-width:620px){
+  .subject-flash-question{font-size:22px}.subject-flash-answer{font-size:24px}
+  .subject-flash-question.is-long{font-size:18px}.subject-flash-question.is-xlong{font-size:14px;line-height:1.3}
+  .subject-flash-answer.is-long{font-size:19px}.subject-flash-answer.is-xlong{font-size:14px;line-height:1.3}
+  .subject-flash-modes{padding:10px 14px}.subject-flash-mode{flex:1;min-width:0;text-align:center;font-size:12px;padding:9px 8px}
+  .subject-flash-pair{grid-template-columns:1fr;gap:10px}.subject-flash-panel{min-height:0;padding:18px;align-items:flex-start}
+  .subject-flash-panel .subject-flash-question,.subject-flash-panel .subject-flash-answer{font-size:clamp(17px,5vw,22px)}
+}
 @media(max-width:620px){.monster-mix-subjects{grid-template-columns:1fr}.monster-mix-toolbar{align-items:flex-start}.monster-mix-selection-actions{width:100%}}
 @media(max-width:900px){.study-outline-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){
@@ -4084,7 +4102,7 @@ let appState = {
   uaImgMode:'browse',
   uaQuizItems:[], uaQuizIdx:0, uaQuizAns:[], uaQuizDone:false,
   imgFlashItems:[], imgFlashIdx:0, imgFlashFlipped:false, imgFlashMode:false,
-  subjectFlashItems:[], subjectFlashIdx:0, subjectFlashFlipped:false, subjectFlashSubject:null, subjectFlashSignature:'',
+  subjectFlashItems:[], subjectFlashIdx:0, subjectFlashFlipped:false, subjectFlashMode:'flip', subjectFlashSubject:null, subjectFlashSignature:'',
   // class material
   classView:null, // null=subject list, 'subject', 'set', 'quiz', 'flashcard'
   classSubject:null, classSet:null,
@@ -7007,13 +7025,21 @@ function renderSubjectFlashcards(){
   const flipped=!!appState.subjectFlashFlipped;
   const questionText=questionPlainText(q);
   const answerText=subjectFlashAnswer(q);
+  const sideBySide=appState.subjectFlashMode==='side-by-side';
   return `<section id="subject-flashcards" class="subject-flash-section" style="--flash-accent:${homeSubjectColor(appState.subject)}">
     <header class="subject-flash-head">
-      <div><h3 class="subject-flash-title">Question Flashcards</h3><div class="subject-flash-sub">Tap the card to reveal the correct answer.</div></div>
+      <div><h3 class="subject-flash-title">Question Flashcards</h3><div class="subject-flash-sub">${sideBySide?'Read the question and answer together.':'Tap the card to reveal the correct answer.'}</div></div>
       <span class="subject-flash-count">${items.length} cards</span>
     </header>
+    <nav class="subject-flash-modes" aria-label="Flashcard views">
+      <button type="button" class="subject-flash-mode${sideBySide?'':' is-active'}" aria-pressed="${!sideBySide}" onclick="subjectFlashSetMode('flip')">Flip Cards</button>
+      <button type="button" class="subject-flash-mode${sideBySide?' is-active':''}" aria-pressed="${sideBySide}" onclick="subjectFlashSetMode('side-by-side')">Q &amp; A Side by Side</button>
+    </nav>
     <div class="subject-flash-body">
-      <div class="subject-flash-scene">
+      ${sideBySide?`<div class="subject-flash-pair">
+        <div class="subject-flash-panel"><span class="subject-flash-label">Question</span>${subjectFlashMedia(q)}<div class="subject-flash-question${subjectFlashLengthClass(questionText)}">${escNL(questionText)}</div></div>
+        <div class="subject-flash-panel"><span class="subject-flash-label">Answer</span><div class="subject-flash-answer${subjectFlashLengthClass(answerText)}">${escNL(answerText)}</div></div>
+      </div>`:`<div class="subject-flash-scene">
         <div id="subject-flash-card" class="subject-flash-card${flipped?' is-flipped':''}" role="button" tabindex="0" onclick="subjectFlashFlip()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();subjectFlashFlip()}" aria-label="Flip question flashcard">
           <span class="subject-flash-face subject-flash-front">
             <span class="subject-flash-label">Question</span>
@@ -7027,7 +7053,7 @@ function renderSubjectFlashcards(){
             <span class="subject-flash-hint">Tap to see the question</span>
           </span>
         </div>
-      </div>
+      </div>`}
       <div class="subject-flash-controls">
         <button type="button" class="btn btn-ghost" onclick="subjectFlashGo(-1)" ${idx===0?'disabled':''}>← Previous</button>
         <div class="subject-flash-progress">${idx+1} of ${items.length}</div>
@@ -7050,6 +7076,12 @@ function refreshSubjectFlashcards(){
 function subjectFlashFlip(){
   appState.subjectFlashFlipped=!appState.subjectFlashFlipped;
   document.getElementById('subject-flash-card')?.classList.toggle('is-flipped',appState.subjectFlashFlipped);
+}
+
+function subjectFlashSetMode(mode){
+  appState.subjectFlashMode=mode==='side-by-side'?'side-by-side':'flip';
+  appState.subjectFlashFlipped=false;
+  refreshSubjectFlashcards();
 }
 
 function subjectFlashGo(delta){
