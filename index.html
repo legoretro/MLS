@@ -438,6 +438,7 @@ button.calc-example-cell{appearance:none;cursor:pointer}
 .calc-example-copy{font-size:15px;line-height:1.65;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .calc-example-video{margin-top:16px}
 .calc-example-video .study-video-slot{margin:0}
+.calc-inline-video{margin-top:14px}.calc-inline-video:empty{display:none}.calc-inline-video video{display:block;width:100%;max-height:320px;border-radius:10px;background:#101923}.calc-video-preview video{display:block;width:100%;max-height:220px;margin-top:8px;border-radius:9px;background:#101923}
 .calc-example-upload-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
 .calc-example-upload-item{position:relative;border:1px solid var(--border2);border-radius:9px;background:var(--bg3);overflow:hidden}
 .calc-example-upload-item img{display:block;width:100%;height:110px;object-fit:contain;background:#fff}
@@ -13237,6 +13238,40 @@ function formulaBuiltinBase(formula){
   const origin=formulaBuiltinOrigin(formula);
   return origin?[...CALC_PLACEHOLDERS,...RR_PLACEHOLDERS].find(item=>item.id===origin)||null:null;
 }
+function parseFormulaVideoEmbed(value){
+  const code=String(value||'').trim();
+  if(!code)return '';
+  const doc=new DOMParser().parseFromString(code,'text/html');
+  let video=doc.querySelector('video');
+  if(!video){
+    const frame=doc.querySelector('iframe[srcdoc]');
+    if(frame)video=new DOMParser().parseFromString(frame.getAttribute('srcdoc')||'','text/html').querySelector('video');
+  }
+  if(!video)return null;
+  const source=video.querySelector('source[src]')?.getAttribute('src')||video.getAttribute('src')||'';
+  try{
+    const url=new URL(source);
+    const github=url.hostname==='raw.githubusercontent.com'&&url.pathname.startsWith('/legoretro/VideoCenter/main/videos/');
+    const pages=url.hostname==='legoretro.github.io'&&url.pathname.startsWith('/VideoCenter/videos/');
+    if(url.protocol!=='https:'||!(github||pages)||!/\.(mp4|m4v|mov|webm|ogv|ogg)$/i.test(url.pathname))return null;
+    return url.href;
+  }catch{return null;}
+}
+function formulaVideoHtml(value){
+  if(!value)return '';
+  const source=parseFormulaVideoEmbed('<video src="'+esc(value)+'"></video>');
+  return source?'<div class="calc-inline-video"><video controls playsinline preload="metadata" src="'+esc(source)+'" aria-label="Equation video"></video></div>':'';
+}
+function previewFormulaVideoEmbed(){
+  const input=document.getElementById('fm-video-embed'),target=document.getElementById('fm-video-preview');
+  if(!input||!target)return;
+  const source=parseFormulaVideoEmbed(input.value);
+  target.innerHTML=source===null?'<div class="text-xs" style="color:var(--danger)">Paste the Embed code or Copy iframe code from VideoCenter.</div>':source?'<div class="text-xs text-muted">Video preview</div>'+formulaVideoHtml(source):'';
+}
+function removeFormulaVideoDraft(){
+  const input=document.getElementById('fm-video-embed');if(input)input.value='';
+  previewFormulaVideoEmbed();
+}
 function mergeFormulaPlaceholders(rows,placeholders){
   const seen=new Set((rows||[]).map(f=>`${String(f.category||'General').toLowerCase()}::${String(f.name||'').toLowerCase()}`));
   const overridden=new Set((rows||[]).map(formulaBuiltinOrigin).filter(Boolean));
@@ -13480,7 +13515,7 @@ function renderCalcTab(cats,all){
     return `<article class="calc-template-cell${wide?' calc-template-cell-wide':''}${isAdmin?' is-admin':''}"${adminDrag}>
     ${isAdmin?`<span class="calc-template-admin"><span class="calc-order-grip" title="Drag to reorder" aria-label="Drag to reorder">↕</span><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move up" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',-1)">↑</button><button class="btn btn-ghost btn-xs calc-move-button" type="button" title="Move down" onclick="calcMoveFormula('${jsAttr(key)}','${jsAttr(groupName)}',1)">↓</button><button class="btn btn-ghost btn-xs" type="button" onclick="openFormulaEditor('${f.id}','calc')">Edit</button>${!f._placeholder?`<button class="btn btn-danger btn-xs" type="button" onclick="deleteFormula('${f.id}')">Delete</button>`:''}</span>`:''}
     <div class="calc-template-name">${esc(calcDisplayName(f))}</div>
-    <div class="calc-template-equation">${renderCalcEquationCell(f)}</div>
+    <div class="calc-template-equation">${renderCalcEquationCell(f)}</div>${formulaVideoHtml(f.video_url)}
     ${String(f.notes||'').trim()?`<div class="calc-template-note">${esc(String(f.notes).trim())}</div>`:''}
   </article>`;};
   return `<section class="study-template-sheet calc-template-sheet">
@@ -13882,6 +13917,7 @@ async function openFormulaEditor(id,type){
         ${steps.map((s,i)=>`<input type="text" id="fm-step-${i}" value="${esc(s||'')}" placeholder="Step ${i+1} (leave blank to skip)" style="margin-bottom:6px;font-family:var(--mono)">`).join('')}
       </div>
       <div class="form-group"><label>Notes (optional — displayed in red)</label><textarea id="fm-notes" style="min-height:60px">${esc(f.notes||'')}</textarea></div>
+      <div class="form-group"><label for="fm-video-embed">VideoCenter embed code (optional)</label><textarea id="fm-video-embed" rows="3" placeholder="Paste Embed code or Copy iframe code from VideoCenter" oninput="previewFormulaVideoEmbed()">${f.video_url?esc(`<video src="${f.video_url}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Use Embed code in VideoCenter. The video plays here and is saved with this equation across devices.</div><div id="fm-video-preview" class="calc-video-preview"></div><button class="btn btn-ghost btn-xs" type="button" onclick="removeFormulaVideoDraft()">Remove video</button></div>
     `}
     <div class="flex gap-8">
       <button class="btn btn-ghost" onclick="document.getElementById('condition-modal').classList.add('hidden')">Cancel</button>
@@ -13889,6 +13925,7 @@ async function openFormulaEditor(id,type){
     </div>
   `;
   document.getElementById('condition-modal').classList.remove('hidden');
+  if(!isRR)previewFormulaVideoEmbed();
 }
 
 async function saveFormula(id,type,originId=''){
@@ -13916,6 +13953,11 @@ async function saveFormula(id,type,originId=''){
     payload.formula=[payload.numerator,payload.denominator].filter(Boolean).join(' / ')||payload.result_label||payload.name||'';
   }
   payload.example=originId?FORMULA_BUILTIN_MARKER+originId:(payload.example||'');
+  if(type==='calc'){
+    const source=parseFormulaVideoEmbed(document.getElementById('fm-video-embed')?.value||'');
+    if(source===null){alert('Paste the Embed code or Copy iframe code from VideoCenter.');return;}
+    payload.video_url=source||null;
+  }
   let error;
   if(id){({error}=await sb.from('mlsboc_formulas').update(payload).eq('id',id));}
   else{({error}=await sb.from('mlsboc_formulas').insert(payload));}
@@ -13926,7 +13968,8 @@ async function saveFormula(id,type,originId=''){
 
 async function deleteFormula(id){
   if(!confirm('Delete this?'))return;
-  await sb.from('mlsboc_formulas').delete().eq('id',id);
+  const {error}=await sb.from('mlsboc_formulas').delete().eq('id',id);
+  if(error){alert('Delete failed: '+error.message);return;}
   renderView();
 }
 
