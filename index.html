@@ -442,6 +442,14 @@ button.calc-example-cell{appearance:none;cursor:pointer}
 .calc-example-section.is-given .calc-example-copy{font-size:23px;font-weight:700}
 .calc-example-section-label{padding:15px 12px;background:var(--bg3);border-right:1px solid var(--border2);color:var(--text2);font:800 13px/1.4 var(--sans);letter-spacing:.06em;text-transform:uppercase}
 .calc-example-copy{padding:14px 18px;color:var(--text);font-family:'Chalkboard SE','Comic Sans MS','Trebuchet MS',sans-serif;font-size:21px;line-height:1.55;white-space:normal;overflow-wrap:anywhere}
+.calc-example-ink-red{color:#ff7d88}.calc-example-ink-green{color:#62d494}.calc-example-ink-blue{color:#79adff}
+body.light-mode .calc-example-ink-red{color:#b91f30}body.light-mode .calc-example-ink-green{color:#157543}body.light-mode .calc-example-ink-blue{color:#2056ac}
+.calc-example-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;max-width:100%;margin:0 .16em;line-height:1.2;text-align:center;font-size:.94em}
+.calc-example-frac-top,.calc-example-frac-bottom{display:block;max-width:100%;overflow-wrap:anywhere;padding:0 .2em}
+.calc-example-frac-top{border-bottom:2px solid currentColor;padding-bottom:.12em}.calc-example-frac-bottom{padding-top:.12em}
+.calc-example-formatbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 13px}
+.calc-example-formatbar .btn{font-weight:800}.calc-example-formatbar .ink-red{color:#ff7d88}.calc-example-formatbar .ink-green{color:#62d494}.calc-example-formatbar .ink-blue{color:#79adff}
+body.light-mode .calc-example-formatbar .ink-red{color:#b91f30}body.light-mode .calc-example-formatbar .ink-green{color:#157543}body.light-mode .calc-example-formatbar .ink-blue{color:#2056ac}
 .calc-example-editor{padding:16px;border:1px solid var(--border2);border-radius:12px;background:var(--bg3);margin-bottom:16px}
 .calc-example-editor-title{font:800 15px/1.4 var(--sans);color:var(--text);margin-bottom:12px}
 .calc-example-editor textarea{min-height:82px;font-family:'Chalkboard SE','Comic Sans MS','Trebuchet MS',sans-serif;font-size:18px;line-height:1.45}
@@ -13637,10 +13645,40 @@ function clearCalculationExampleEmbed(){
   previewCalculationExampleEmbed();
 }
 
+function renderCalculationExampleText(value){
+  const source=String(value||'');
+  const token=/\[\[(red|green|blue|frac):([^\]\n]+)\]\]/g;
+  let html='',position=0,match;
+  while((match=token.exec(source))){
+    html+=escNL(source.slice(position,match.index));
+    const kind=match[1],body=match[2];
+    if(kind==='frac'){
+      const separator=body.indexOf('|');
+      html+=separator<0?esc(match[0]):`<span class="calc-example-frac" role="math" aria-label="${esc(body.slice(0,separator))} over ${esc(body.slice(separator+1))}"><span class="calc-example-frac-top">${esc(body.slice(0,separator))}</span><span class="calc-example-frac-bottom">${esc(body.slice(separator+1))}</span></span>`;
+    }else html+=`<span class="calc-example-ink-${kind}">${esc(body)}</span>`;
+    position=token.lastIndex;
+  }
+  return html+escNL(source.slice(position));
+}
+
+function insertCalculationExampleMarkup(kind){
+  const id=window._calcExampleActiveField||'calc-example-work';
+  const field=document.getElementById(id)||document.getElementById('calc-example-work');
+  if(!field)return;
+  const start=field.selectionStart,end=field.selectionEnd,selected=field.value.slice(start,end);
+  const numerator=selected||'numerator';
+  const markup=kind==='frac'?`[[frac:${numerator}|denominator]]`:`[[${kind}:${selected||'text'}]]`;
+  field.setRangeText(markup,start,end,'end');
+  field.focus();
+  const placeholder=kind==='frac'?'denominator':selected?'':'text';
+  if(placeholder){const offset=markup.indexOf(placeholder);field.setSelectionRange(start+offset,start+offset+placeholder.length);}
+  field.dispatchEvent(new Event('input',{bubbles:true}));
+}
+
 function calculationExampleSectionsHtml(row){
   const sections=calcExampleSections(row);
   const labels={given:'Given',work:'Work / Steps',result:'Answer',notes:'Notes'};
-  const content=Object.entries(labels).filter(([key])=>sections[key].trim()).map(([key,label])=>`<section class="calc-example-section is-${key}"><div class="calc-example-section-label">${label}</div><div class="calc-example-copy">${escNL(sections[key])}</div></section>`).join('');
+  const content=Object.entries(labels).filter(([key])=>sections[key].trim()).map(([key,label])=>`<section class="calc-example-section is-${key}"><div class="calc-example-section-label">${label}</div><div class="calc-example-copy">${renderCalculationExampleText(sections[key])}</div></section>`).join('');
   return content?`<div class="calc-example-sections">${content}</div>`:'';
 }
 
@@ -13723,10 +13761,11 @@ function openCalculationExampleEditor(key){
     </div>
     <div class="calc-example-editor">
       <div class="calc-example-editor-title">Your example</div>
-      <div class="form-group"><label for="calc-example-given">Given</label><textarea id="calc-example-given" rows="3">${esc(sections.given)}</textarea></div>
-      <div class="form-group"><label for="calc-example-work">Work / Steps</label><textarea id="calc-example-work" rows="4">${esc(sections.work)}</textarea></div>
-      <div class="form-group"><label for="calc-example-result">Answer</label><textarea id="calc-example-result" rows="2">${esc(sections.result)}</textarea></div>
-      <div class="form-group" style="margin-bottom:0"><label for="calc-example-notes">Notes (optional)</label><textarea id="calc-example-notes" rows="2">${esc(sections.notes)}</textarea></div>
+      <div class="calc-example-formatbar" aria-label="Text formatting"><span class="text-xs text-muted">Select text, then choose:</span><button class="btn btn-ghost btn-sm ink-red" type="button" onclick="insertCalculationExampleMarkup('red')">Red</button><button class="btn btn-ghost btn-sm ink-green" type="button" onclick="insertCalculationExampleMarkup('green')">Green</button><button class="btn btn-ghost btn-sm ink-blue" type="button" onclick="insertCalculationExampleMarkup('blue')">Blue</button><button class="btn btn-ghost btn-sm" type="button" onclick="insertCalculationExampleMarkup('frac')">Fraction</button></div>
+      <div class="form-group"><label for="calc-example-given">Given</label><textarea id="calc-example-given" rows="3" onfocus="window._calcExampleActiveField=this.id">${esc(sections.given)}</textarea></div>
+      <div class="form-group"><label for="calc-example-work">Work / Steps</label><textarea id="calc-example-work" rows="4" onfocus="window._calcExampleActiveField=this.id">${esc(sections.work)}</textarea></div>
+      <div class="form-group"><label for="calc-example-result">Answer</label><textarea id="calc-example-result" rows="2" onfocus="window._calcExampleActiveField=this.id">${esc(sections.result)}</textarea></div>
+      <div class="form-group" style="margin-bottom:0"><label for="calc-example-notes">Notes (optional)</label><textarea id="calc-example-notes" rows="2" onfocus="window._calcExampleActiveField=this.id">${esc(sections.notes)}</textarea></div>
     </div>
     <div class="form-group"><label for="calc-example-video">VideoCenter embed code (optional)</label><textarea id="calc-example-video" rows="3" placeholder="Paste Embed code from VideoCenter" oninput="previewCalculationExampleEmbed()">${row.answer?esc(`<video src="${row.answer}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Copy Embed code in VideoCenter, then paste it here.</div><div id="calc-example-embed-preview" class="calc-example-embed-preview"></div><button class="btn btn-danger btn-sm" type="button" onclick="clearCalculationExampleEmbed()">Remove video</button></div>
     <div class="form-group"><label>Upload example images (optional, up to 6)</label><input type="file" accept="image/*" multiple onchange="handleCalculationExampleUpload(event)"><div id="calc-example-upload-preview" class="calc-example-upload-preview"></div></div>
