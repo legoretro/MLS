@@ -435,18 +435,28 @@ button.calc-example-cell{appearance:none;cursor:pointer}
 .calc-example-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}
 .calc-example-media button{display:block;width:100%;padding:0;border:1px solid var(--border2);border-radius:10px;background:var(--bg3);overflow:hidden;cursor:zoom-in}
 .calc-example-media img{display:block;width:100%;height:180px;object-fit:contain;background:#fff}
-.calc-example-copy{font-size:15px;line-height:1.65;color:var(--text);white-space:normal;overflow-wrap:anywhere}
+.calc-example-sections{display:grid;gap:12px;margin-top:16px}
+.calc-example-section{display:grid;grid-template-columns:112px minmax(0,1fr);border:1px solid var(--border2);border-radius:12px;overflow:hidden;background:var(--bg2)}
+.calc-example-section-label{padding:15px 12px;background:var(--bg3);border-right:1px solid var(--border2);color:var(--text2);font:800 13px/1.4 var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.calc-example-copy{padding:14px 18px;color:var(--text);font-family:'Chalkboard SE','Comic Sans MS','Trebuchet MS',sans-serif;font-size:21px;line-height:1.55;white-space:normal;overflow-wrap:anywhere}
+.calc-example-editor{padding:16px;border:1px solid var(--border2);border-radius:12px;background:var(--bg3);margin-bottom:16px}
+.calc-example-editor-title{font:800 15px/1.4 var(--sans);color:var(--text);margin-bottom:12px}
+.calc-example-editor textarea{min-height:82px;font-family:'Chalkboard SE','Comic Sans MS','Trebuchet MS',sans-serif;font-size:18px;line-height:1.45}
+.calc-example-media-item{min-width:0;border:1px solid var(--border2);border-radius:10px;overflow:hidden;background:var(--bg3)}
+.calc-example-media-item .calc-example-zoom{border:0;border-radius:0}
+.calc-example-media-item .calc-example-media-remove{width:100%;border:0;border-top:1px solid var(--border2);border-radius:0;padding:8px;font-size:12px;color:var(--danger);background:var(--bg2);cursor:pointer}
+.calc-example-video-remove{margin-top:9px}
 .calc-example-video{width:100%;margin:16px auto 0}
 .calc-example-video video{display:block;width:100%;aspect-ratio:16/9;max-height:min(55vh,520px);object-fit:contain;border-radius:12px;background:#101923}
 .calc-example-embed-preview{margin-top:10px}
 .calc-example-embed-preview:empty{display:none}
 .calc-example-embed-preview .calc-example-video{margin-top:6px}
-@media(max-width:620px){.modal-overlay.calculation-example-window{padding:8px}.modal-overlay.calculation-example-window .modal{padding:16px;max-height:calc(100dvh - 16px)}.calc-example-video video{max-height:45dvh}.calc-example-media{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.calc-example-media img{height:140px}}
+@media(max-width:620px){.modal-overlay.calculation-example-window{padding:8px}.modal-overlay.calculation-example-window .modal{padding:16px;max-height:calc(100dvh - 16px)}.calc-example-section{grid-template-columns:1fr}.calc-example-section-label{border-right:0;border-bottom:1px solid var(--border2);padding:8px 12px}.calc-example-copy{padding:12px 14px;font-size:19px}.calc-example-video video{max-height:45dvh}.calc-example-media{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.calc-example-media img{height:140px}}
 .calc-inline-video{margin-top:14px}.calc-inline-video:empty{display:none}.calc-inline-video video{display:block;width:100%;max-height:320px;border-radius:10px;background:#101923}.calc-video-preview video{display:block;width:100%;max-height:220px;margin-top:8px;border-radius:9px;background:#101923}
 .calc-example-upload-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
-.calc-example-upload-item{position:relative;border:1px solid var(--border2);border-radius:9px;background:var(--bg3);overflow:hidden}
+.calc-example-upload-item{border:1px solid var(--border2);border-radius:9px;background:var(--bg3);overflow:hidden}
 .calc-example-upload-item img{display:block;width:100%;height:110px;object-fit:contain;background:#fff}
-.calc-example-upload-item button{position:absolute;right:5px;top:5px}
+.calc-example-upload-item button{display:block;width:100%;border-radius:0}
 .modal-overlay.calculation-example-window .modal{max-width:880px!important}
 .rr-template-block{display:grid;grid-template-columns:minmax(180px,28%) minmax(0,1fr);border-bottom:2px solid #111;background:#fff}
 .rr-template-block:last-child{border-bottom:0}
@@ -13546,8 +13556,21 @@ function calcExampleImages(row){
   return (Array.isArray(images)?images:[]).map(String).filter(Boolean);
 }
 
+function calcExampleSections(row){
+  let saved=row?.steps;
+  if(typeof saved==='string'){try{saved=JSON.parse(saved);}catch{saved=null;}}
+  const fields=saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:{};
+  return {
+    given:String(fields.given||''),
+    work:String(fields.work||row?.scenario||''),
+    result:String(fields.result||''),
+    notes:String(fields.notes||'')
+  };
+}
+
 function calcExampleHasContent(row){
-  return !!(String(row?.scenario||'').trim()||String(row?.answer||'').trim()||calcExampleImages(row).length);
+  const sections=calcExampleSections(row);
+  return !!(Object.values(sections).some(value=>value.trim())||String(row?.answer||'').trim()||calcExampleImages(row).length);
 }
 
 async function loadCalculationExamples(calcData){
@@ -13555,7 +13578,7 @@ async function loadCalculationExamples(calcData){
   (calcData||[]).forEach(formula=>{window._calcExampleFormulaMap[calcExampleKey(formula)]=formula;});
   const map={};
   try{
-    const {data,error}=await sb.from('mlsboc_cases').select('id,title,scenario,answer,images,group_label,case_data').eq('subject','calculation_example');
+    const {data,error}=await sb.from('mlsboc_cases').select('id,title,scenario,steps,answer,images,group_label,case_data').eq('subject','calculation_example');
     if(error)throw error;
     (data||[]).forEach(row=>{map[String(row.group_label||'').trim().toLowerCase()]=row;});
   }catch(error){console.warn('Calculation examples fetch failed:',error);}
@@ -13605,6 +13628,30 @@ function previewCalculationExampleEmbed(){
   target.innerHTML=source===null?'<div class="text-xs" style="color:var(--danger)">Paste Embed code or Copy iframe code from VideoCenter.</div>':source?'<div class="text-xs text-muted">Video preview</div>'+calculationExampleVideoHtml(source):'';
 }
 
+function clearCalculationExampleEmbed(){
+  const input=document.getElementById('calc-example-video');
+  if(input)input.value='';
+  previewCalculationExampleEmbed();
+}
+
+function calculationExampleSectionsHtml(row){
+  const sections=calcExampleSections(row);
+  const labels={given:'Given',work:'Work / Steps',result:'Answer',notes:'Notes'};
+  const content=Object.entries(labels).filter(([key])=>sections[key].trim()).map(([key,label])=>`<section class="calc-example-section"><div class="calc-example-section-label">${label}</div><div class="calc-example-copy">${escNL(sections[key])}</div></section>`).join('');
+  return content?`<div class="calc-example-sections">${content}</div>`:'';
+}
+
+async function removeCalculationExampleMedia(key,type,index){
+  const row=window._calcExampleMap?.[String(key||'').toLowerCase()];
+  if(!isAdmin||!row?.id||!confirm(`Remove this ${type==='video'?'video':'image'} from the example?`))return;
+  const changes=type==='video'?{answer:''}:{images:calcExampleImages(row).filter((_,i)=>i!==index)};
+  const {error}=await sb.from('mlsboc_cases').update(changes).eq('id',row.id);
+  if(error){alert('Remove failed: '+error.message);return;}
+  Object.assign(row,changes);
+  if(calcExampleHasContent(row))openCalculationExample(key);
+  else{closeCalculationExampleWindow();renderView();}
+}
+
 function openCalculationExample(key){
   key=String(key||'').toLowerCase();
   const row=window._calcExampleMap?.[key];
@@ -13619,9 +13666,10 @@ function openCalculationExample(key){
       ${isAdmin?`<button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="openCalculationExampleEditor('${jsAttr(key)}')">Edit</button>`:'<span class="ml-auto"></span>'}
       <button class="btn btn-ghost btn-sm" type="button" onclick="closeCalculationExampleWindow()">✕</button>
     </div>
-    ${String(row.scenario||'').trim()?`<div class="calc-example-copy">${escNL(row.scenario)}</div>`:''}
-    ${images.length?`<div class="calc-example-media">${images.map((url,index)=>`<button type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" aria-label="Open example image ${index+1} full size"><img src="${esc(url)}" alt="${esc(formula?.name||'Calculation')} example ${index+1}" loading="lazy"></button>`).join('')}</div>`:''}
+    ${calculationExampleSectionsHtml(row)}
+    ${images.length?`<div class="calc-example-media">${images.map((url,index)=>`<div class="calc-example-media-item"><button class="calc-example-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" aria-label="Open example image ${index+1} full size"><img src="${esc(url)}" alt="${esc(formula?.name||'Calculation')} example ${index+1}" loading="lazy"></button>${isAdmin?`<button class="calc-example-media-remove" type="button" onclick="removeCalculationExampleMedia('${jsAttr(key)}','image',${index})">Remove image</button>`:''}</div>`).join('')}</div>`:''}
     ${calculationExampleVideoHtml(row.answer)}
+    ${isAdmin&&row.answer?`<button class="btn btn-danger btn-sm calc-example-video-remove" type="button" onclick="removeCalculationExampleMedia('${jsAttr(key)}','video')">Remove video</button>`:''}
   `;
   modal.classList.remove('hidden');
 }
@@ -13630,7 +13678,7 @@ function renderCalculationExampleUploadPreview(){
   const target=document.getElementById('calc-example-upload-preview');
   if(!target)return;
   const images=window._calcExampleDraftImages||[];
-  target.innerHTML=images.length?images.map((url,index)=>`<div class="calc-example-upload-item"><img src="${esc(url)}" alt="Uploaded example ${index+1}"><button class="btn btn-danger btn-xs" type="button" onclick="removeCalculationExampleUpload(${index})">Remove</button></div>`).join(''):'<div class="text-xs text-muted">No images uploaded.</div>';
+  target.innerHTML=images.length?images.map((url,index)=>`<div class="calc-example-upload-item"><img src="${esc(url)}" alt="Uploaded example ${index+1}"><button class="btn btn-danger btn-xs" type="button" onclick="removeCalculationExampleUpload(${index})">Remove image ${index+1}</button></div>`).join(''):'<div class="text-xs text-muted">No images uploaded.</div>';
 }
 
 function removeCalculationExampleUpload(index){
@@ -13660,6 +13708,7 @@ function openCalculationExampleEditor(key){
   const formula=window._calcExampleFormulaMap?.[key];
   if(!formula)return;
   const row=window._calcExampleMap?.[key]||{};
+  const sections=calcExampleSections(row);
   window._calcExampleEditingKey=key;
   window._calcExampleDraftImages=calcExampleImages(row);
   const modal=document.getElementById('condition-modal');
@@ -13669,8 +13718,14 @@ function openCalculationExampleEditor(key){
       <div><div class="text-xs text-muted" style="font-weight:800;letter-spacing:.08em;text-transform:uppercase">Admin - Calculation Example</div><div class="modal-title" style="margin:3px 0 0">${esc(calcDisplayName(formula))}</div></div>
       <button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="closeCalculationExampleWindow()">✕</button>
     </div>
-    <div class="form-group"><label>Typed example or explanation</label><textarea id="calc-example-text" style="min-height:150px" placeholder="Type a worked example, explanation, or practice prompt...">${esc(row.scenario||'')}</textarea></div>
-    <div class="form-group"><label for="calc-example-video">VideoCenter embed code (optional)</label><textarea id="calc-example-video" rows="3" placeholder="Paste Embed code from VideoCenter" oninput="previewCalculationExampleEmbed()">${row.answer?esc(`<video src="${row.answer}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Copy Embed code in VideoCenter, then paste it here. The video will play in this example on desktop and mobile.</div><div id="calc-example-embed-preview" class="calc-example-embed-preview"></div></div>
+    <div class="calc-example-editor">
+      <div class="calc-example-editor-title">Your example</div>
+      <div class="form-group"><label for="calc-example-given">Given</label><textarea id="calc-example-given" rows="3">${esc(sections.given)}</textarea></div>
+      <div class="form-group"><label for="calc-example-work">Work / Steps</label><textarea id="calc-example-work" rows="4">${esc(sections.work)}</textarea></div>
+      <div class="form-group"><label for="calc-example-result">Answer</label><textarea id="calc-example-result" rows="2">${esc(sections.result)}</textarea></div>
+      <div class="form-group" style="margin-bottom:0"><label for="calc-example-notes">Notes (optional)</label><textarea id="calc-example-notes" rows="2">${esc(sections.notes)}</textarea></div>
+    </div>
+    <div class="form-group"><label for="calc-example-video">VideoCenter embed code (optional)</label><textarea id="calc-example-video" rows="3" placeholder="Paste Embed code from VideoCenter" oninput="previewCalculationExampleEmbed()">${row.answer?esc(`<video src="${row.answer}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Copy Embed code in VideoCenter, then paste it here.</div><div id="calc-example-embed-preview" class="calc-example-embed-preview"></div><button class="btn btn-danger btn-sm" type="button" onclick="clearCalculationExampleEmbed()">Remove video</button></div>
     <div class="form-group"><label>Upload example images (optional, up to 6)</label><input type="file" accept="image/*" multiple onchange="handleCalculationExampleUpload(event)"><div id="calc-example-upload-preview" class="calc-example-upload-preview"></div></div>
     <div class="flex gap-8 flex-wrap">
       <button class="btn btn-ghost" type="button" onclick="closeCalculationExampleWindow()">Cancel</button>
@@ -13686,12 +13741,17 @@ async function saveCalculationExample(key){
   key=String(key||'').toLowerCase();
   const formula=window._calcExampleFormulaMap?.[key];
   if(!formula)return;
-  const scenario=document.getElementById('calc-example-text')?.value.trim()||'';
+  const sections={
+    given:document.getElementById('calc-example-given')?.value.trim()||'',
+    work:document.getElementById('calc-example-work')?.value.trim()||'',
+    result:document.getElementById('calc-example-result')?.value.trim()||'',
+    notes:document.getElementById('calc-example-notes')?.value.trim()||''
+  };
   const answer=parseFormulaVideoEmbed(document.getElementById('calc-example-video')?.value||'');
   const images=window._calcExampleDraftImages||[];
   if(answer===null){alert('Paste Embed code or Copy iframe code from VideoCenter.');return;}
-  if(!scenario&&!answer&&!images.length){alert('Add typed content, an image, or VideoCenter embed code first.');return;}
-  const payload={subject:'calculation_example',title:formula.name,scenario,answer,images,group_label:key,case_data:formula.category||'',steps:'[]',is_draft:false};
+  if(!Object.values(sections).some(Boolean)&&!answer&&!images.length){alert('Add typed content, an image, or VideoCenter embed code first.');return;}
+  const payload={subject:'calculation_example',title:formula.name,scenario:'',answer,images,group_label:key,case_data:formula.category||'',steps:sections,is_draft:false};
   const current=window._calcExampleMap?.[key];
   const result=current?.id?await sb.from('mlsboc_cases').update(payload).eq('id',current.id):await sb.from('mlsboc_cases').insert(payload);
   if(result.error){alert('Save failed: '+result.error.message);return;}
