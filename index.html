@@ -337,7 +337,7 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .resource-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .resource-meta{font-size:12px;color:var(--text2);line-height:1.45}
 .resource-note{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:8px}
-.formula-view-shell{position:relative;left:50%;width:min(1260px,calc(100vw - 80px));margin:0;transform:translateX(-50%)}
+.formula-view-shell{position:relative;left:50%;width:min(960px,calc(100vw - 48px));margin:0;transform:translateX(-50%)}
 .formula-sheet{display:block;column-count:2;column-gap:14px;min-width:0;padding:2px 0 12px}
 .formula-category{--category-color:#2f7dd1;position:relative;display:inline-block;width:100%;height:auto;min-width:0;min-height:0;margin:0 0 14px;padding:0;border:1px solid var(--border2);border-radius:12px;background:var(--bg2);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
 .formula-category-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:color-mix(in srgb,var(--category-color) 3.5%,var(--bg2));border-bottom:2px solid var(--category-color);color:var(--text);font-size:13px;font-weight:850;line-height:1.2;text-transform:uppercase;letter-spacing:.04em}
@@ -394,7 +394,7 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .rr-table .rr-value{text-align:right;font-family:var(--sans);font-size:13px;font-weight:850;color:var(--text);white-space:normal;overflow-wrap:anywhere}
 .rr-table .rr-unit{font-size:10px;color:var(--text3);margin-left:3px;font-weight:650}
 .rr-row-actions{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle}
-.study-template-sheet{width:100%;max-width:1160px;margin:0 auto 18px;border:2px solid #111;background:#fff;color:#111;box-shadow:0 10px 26px rgba(25,32,52,.08);overflow:hidden}
+.study-template-sheet{width:100%;max-width:920px;margin:0 auto 18px;border:2px solid #111;background:#fff;color:#111;box-shadow:0 10px 26px rgba(25,32,52,.08);overflow:hidden}
 .study-template-title{padding:9px 14px;border-bottom:2px solid #111;background:#dedcc7;color:#111;font-family:var(--serif);font-size:23px;font-weight:800;line-height:1.15;text-align:center}
 .study-template-section-title{padding:7px 12px;border-bottom:2px solid #111;background:#dedcc7;color:#111;font-family:var(--serif);font-size:19px;font-weight:800;line-height:1.1;text-align:center}
 .calc-template-group:not(:first-child) .study-template-section-title{border-top:2px solid #111}
@@ -424,14 +424,15 @@ body:not(.light-mode) .home-recall-card{background:linear-gradient(135deg,#b8d97
 .calc-order-toolbar .btn{margin-left:auto}
 .calc-order-grip{display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:3px 6px;border:1px solid #b9a765;border-radius:6px;background:#fffdf2;color:#332800;font-size:12px;font-weight:900;cursor:grab}
 .calc-move-button{min-width:27px!important;padding:3px 6px!important}
-.calc-example-cell{width:100%;min-height:82px;justify-content:center;border-top:0;border-right:0;border-left:0;font:inherit;text-align:center}
+.calc-example-cell{width:100%;min-height:58px;padding:8px 10px;gap:3px;justify-content:center;border-top:0;border-right:0;border-left:0;font:inherit;text-align:center}
 button.calc-example-cell{appearance:none;cursor:pointer}
-.calc-example-cell.has-example{background:#fffdf5}
-.calc-example-cell.has-example:hover,.calc-example-cell.has-example:focus-visible{background:#f7f3df;outline:3px solid rgba(47,125,209,.2);outline-offset:-3px}
+.calc-example-cell.has-example{background:#f1edda}
+.calc-example-cell.has-example:hover,.calc-example-cell.has-example:focus-visible{background:#e6dfbd;outline:3px solid #8f8455;outline-offset:-3px}
 .calc-example-cell.is-empty{cursor:default}
-.calc-example-cell.is-admin-empty{cursor:pointer}
-.calc-example-status{margin-top:8px;color:#59627e;font-family:var(--sans);font-size:11px;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
-.calc-example-cell.has-example .calc-example-status{color:#256d4d}
+.calc-example-cell.is-admin-empty{cursor:pointer;background:#f6f2e3}
+.calc-example-cell.is-admin-empty:hover,.calc-example-cell.is-admin-empty:focus-visible{background:#eae2c7;outline:3px solid #8f8455;outline-offset:-3px}
+.calc-example-status{margin-top:2px;color:#493f2a;font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.calc-example-cell.has-example .calc-example-status{color:#294b38}
 .calc-example-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}
 .calc-example-media button{display:block;width:100%;padding:0;border:1px solid var(--border2);border-radius:10px;background:var(--bg3);overflow:hidden;cursor:zoom-in}
 .calc-example-media img{display:block;width:100%;height:180px;object-fit:contain;background:#fff}
@@ -469,9 +470,11 @@ body.light-mode .calc-example-formatbar .ink-red{color:#b91f30}body.light-mode .
 .calc-example-upload-item img{display:block;width:100%;height:110px;object-fit:contain;background:#fff}
 .calc-example-upload-item button{display:block;width:100%;border-radius:0}
 .modal-overlay.calculation-example-window .modal{max-width:880px!important}
-.rr-template-block{display:grid;grid-template-columns:minmax(180px,28%) minmax(0,1fr);border-bottom:2px solid #111;background:#fff}
+.rr-template-sheet{max-width:880px}
+.rr-template-body{background:#fff}
+.rr-template-block{border-bottom:2px solid #111;background:#fff}
 .rr-template-block:last-child{border-bottom:0}
-.rr-template-category{display:flex;align-items:center;padding:12px 14px;border-right:2px solid #111;color:#111;font-family:var(--serif);font-size:17px;line-height:1.25;overflow-wrap:anywhere}
+.rr-template-category{display:flex;align-items:center;justify-content:center;min-height:35px;padding:5px 10px;border-bottom:2px solid #111;background:#dedcc7;color:#111;font-family:var(--serif);font-size:19px;font-weight:800;line-height:1.15;text-align:center;overflow-wrap:anywhere}
 .rr-template-items{min-width:0}
 .rr-template-row{display:grid;grid-template-columns:minmax(0,44%) minmax(0,56%);min-height:39px;border-bottom:1.5px solid #111;color:#111;font-family:var(--serif)}
 .rr-template-row:last-child{border-bottom:0}
@@ -479,13 +482,16 @@ body.light-mode .calc-example-formatbar .ink-red{color:#b91f30}body.light-mode .
 .rr-template-analyte{font-weight:750}
 .rr-template-value{border-left:1.5px solid #111;font-weight:500}
 .rr-template-value .rr-unit{margin-left:5px;color:#111;font-family:var(--serif);font-size:13px;font-weight:500}
-.rr-template-row{grid-template-columns:minmax(0,30%) minmax(0,35%) minmax(0,35%)}
+.rr-template-row{grid-template-columns:minmax(0,40%) minmax(0,30%) minmax(0,30%)}
 .rr-template-row>div,.rr-template-row>span{min-width:0;overflow-wrap:anywhere}
-.rr-template-columns{font:600 12px/1.3 var(--sans);color:var(--text2);background:var(--bg3)}
-.rr-template-columns span{padding:7px 10px}
+.rr-template-columns{font:800 15px/1.25 var(--sans);color:#1e1e19;background:#eeeada;border-bottom:2px solid #111}
+.rr-template-columns span{display:flex;min-height:43px;align-items:center;justify-content:center;padding:7px 10px;text-align:center}
 .rr-template-columns span+span{border-left:1.5px solid #111}
 .rr-template-analyte,.rr-template-value,.rr-template-category{font-family:var(--sans)}
 .rr-template-value{font-variant-numeric:tabular-nums}
+.rr-template-analyte{justify-content:center;background:#e9e4d2;text-align:center;font-size:15px;font-weight:800}
+.rr-template-value{background:#fff}
+.rr-template-columns span:first-child{text-align:center}
 @media(max-width:1100px){.formula-sheet{column-count:1}}
 @media(max-width:900px){.rr-category-grid,.calc-rr-grid{column-count:1}}
 @media(max-width:700px){
@@ -513,9 +519,8 @@ body.light-mode .calc-example-formatbar .ink-red{color:#b91f30}body.light-mode .
   .calc-example-cell{min-height:72px;padding:10px 9px}
   .calc-example-media{grid-template-columns:1fr}
   .calc-example-media img{height:auto;max-height:62vh}
-  .rr-template-block{grid-template-columns:minmax(92px,31%) minmax(0,69%)}
-  .rr-template-category{padding:9px 8px;font-size:13px}
-  .rr-template-row{grid-template-columns:minmax(0,48%) minmax(0,52%);min-height:38px}
+  .rr-template-category{padding:7px 8px;font-size:17px}
+  .rr-template-row{grid-template-columns:minmax(0,40%) minmax(0,30%) minmax(0,30%);min-height:38px}
   .rr-template-analyte,.rr-template-value{padding:6px;font-size:12px}
   .rr-template-value .rr-unit{display:inline;margin-left:3px;font-size:10px}
 }
@@ -1961,7 +1966,31 @@ body:not(.light-mode) .subject-notebook{--paper:#202b3b;--ink:#eaf0fa;--rule:#b6
 .study-revision-note{font-family:var(--sans);font-size:13px!important;line-height:1.5;color:var(--text2);margin:10px 0}
 
 .subject-notebook,.subject-notebook h1,.subject-notebook h2,.subject-notebook h3{color:var(--text)}
-@media(max-width:700px){.rr-template-block{display:block}.rr-template-category{border-right:0;border-bottom:2px solid #111;padding:9px 10px}.rr-template-row{grid-template-columns:minmax(0,30%) minmax(0,35%) minmax(0,35%)}.rr-template-analyte,.rr-template-value,.rr-template-columns span{font-size:11px;padding:6px 5px;line-height:1.3}}
+@media(max-width:700px){.rr-template-block{display:block}.rr-template-category{border-right:0;border-bottom:2px solid #111;padding:9px 10px}.rr-template-row{grid-template-columns:minmax(0,40%) minmax(0,30%) minmax(0,30%)}.rr-template-analyte,.rr-template-value{font-size:11px;padding:6px 5px;line-height:1.3}.rr-template-columns span{font-size:12px;padding:6px 4px;line-height:1.2}}
+
+/* Keep every MLS table and equation inside the available screen and print width. */
+html,body,#app,#main-app{max-width:100%;overflow-x:clip}
+.formula-view-shell,.study-template-sheet,.calc-template-cell,.rr-template-sheet{max-width:100%}
+.calc-category-grid,.calc-table-wrap,.rr-table-wrap,.quiz-question-table-scroll,.quiz-table-editor-scroll,.notebook-table-scroll,.ascp-guideline-viewer,[style*="overflow-x:auto"]{overflow-x:visible!important;max-width:100%}
+.subject-tabs,.tabs{flex-wrap:wrap!important;overflow-x:visible!important}
+.subject-tabs .tab,.tabs .tab{flex:0 1 auto!important;white-space:normal!important}
+table,.calc-table,.rr-table,.quiz-question-table,.quiz-table-editor table,.tbl-editor table,.subject-notebook table{width:100%!important;min-width:0!important;max-width:100%;table-layout:fixed!important}
+table th,table td,.quiz-question-table th,.quiz-question-table td,.tbl-editor th,.tbl-editor td{min-width:0!important;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:normal}
+table input,.quiz-table-editor input,.tbl-editor input{width:100%!important;min-width:0!important;max-width:100%;box-sizing:border-box}
+.calc-table-head,.calc-card{min-width:0;grid-template-columns:28px minmax(0,28%) minmax(0,1fr)}
+.calc-formula-board,.calc-template-equation .calc-formula-board,.calc-table-equation .calc-formula-board{flex-wrap:wrap;overflow-x:visible!important;white-space:normal;justify-content:center}
+.calc-equation-text,.calc-equation-label,.calc-expression,.calc-expression-line,.calc-inline-fraction,.calc-inline-fraction-top,.calc-inline-fraction-bottom,.calc-fraction,.calc-fraction-top,.calc-fraction-bottom{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.calc-expression-line{flex-wrap:wrap;justify-content:center}
+.calc-inline-fraction,.calc-fraction{width:auto;max-width:100%}
+.calc-template-equation .calc-equation-text{overflow-wrap:anywhere}
+@media(max-width:700px){
+  .formula-view-shell{width:100%;max-width:100%}
+  .calc-table-head,.calc-card{grid-template-columns:22px minmax(0,32%) minmax(0,1fr);padding-left:4px;padding-right:4px}
+  .calc-template-equation .calc-formula-board{gap:4px}
+  .calc-template-equation .calc-equation-label,.calc-template-equation .calc-equation-text,.calc-template-equation .calc-expression,.calc-template-equation .calc-inline-fraction-top,.calc-template-equation .calc-inline-fraction-bottom,.calc-template-equation .calc-fraction-top,.calc-template-equation .calc-fraction-bottom{font-size:11px;line-height:1.2}
+  table th,table td{padding:5px 3px!important;font-size:clamp(9px,2.5vw,13px)!important}
+  .tbl-editor input,.quiz-table-editor input{padding:4px 2px!important;font-size:11px!important}
+}
 </style>
 </head>
 <body class="light-mode">
@@ -13965,11 +13994,11 @@ function renderCalcCard(f,index=0){
 function renderRRTab(cats,all){
   return `<section class="study-template-sheet rr-template-sheet">
     <div class="study-template-title">ASCP BOC reference ranges · June 9, 2026</div>
+    <div class="rr-template-row rr-template-columns"><span>Analyte</span><span>Conventional units</span><span>SI units</span></div>
     <div class="rr-template-body">${Object.entries(cats).map(([cat,items])=>`
       <section class="rr-template-block">
         <div class="rr-template-category">${esc(cat)}</div>
         <div class="rr-template-items">
-          <div class="rr-template-row rr-template-columns"><span>Analyte</span><span>Conventional units</span><span>SI units</span></div>
           ${items.map(f=>`<div class="rr-template-row"><div class="rr-template-analyte">${esc(f.name)}</div><div class="rr-template-value">${esc(rrConventionalText(f))}</div><div class="rr-template-value">${esc((f.si_value||'--')+(f.si_unit?' '+f.si_unit:''))}</div></div>`).join('')}
         </div>
       </section>`).join('')}</div>
@@ -14141,12 +14170,12 @@ function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
   if(!spec?.length)return false;
   spec.forEach((line,lineIndex)=>{
     const isMultiLine=spec.length>1;
-    let fontSize=isMultiLine?5.15:6.7;
+    let fontSize=isMultiLine?5.05:6.15;
     const gap=isMultiLine?.75:1;
-    const lineGap=isMultiLine?2.75:2.8;
-    const topOffset=isMultiLine?-.45:-.6;
-    const bottomOffset=isMultiLine?.95:1.15;
-    const textOffset=isMultiLine?.25:.45;
+    const lineGap=isMultiLine?4.15:2.8;
+    const topOffset=isMultiLine?-.85:-.9;
+    const bottomOffset=isMultiLine?1.3:1.4;
+    const textOffset=isMultiLine?.35:.55;
     const pdfText=value=>String(value||'').replace(/−/g,'-').replace(/×/g,'x').replace(/√/g,'sqrt');
     const measure=()=>{
       doc.setFont('times','bold');doc.setFontSize(fontSize);
@@ -14155,7 +14184,7 @@ function drawCalcDisplaySpec(doc,spec,x,y,maxWidth,color){
         :doc.getTextWidth(pdfText(part.text))).reduce((sum,width)=>sum+width,0)+gap*Math.max(0,line.length-1);
     };
     let total=measure();
-    if(total>maxWidth){fontSize=Math.max(4.15,fontSize*(maxWidth/total));total=measure();}
+    if(total>maxWidth){fontSize=Math.max(3.7,fontSize*(maxWidth/total));total=measure();}
     let cursor=x+Math.max(0,(maxWidth-total)/2);
     const midY=y+(lineIndex-(spec.length-1)/2)*lineGap;
     line.forEach((part,index)=>{
@@ -14189,7 +14218,7 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
     const denominator=String(f.denominator||'...');
     const multiplier=calcOperationText(f.multiplier).replace(/×/g,'x').replace(/÷/g,'/').replace(/−/g,'-');
     const gap=2.1;
-    let fontSize=7.45;
+    let fontSize=6.75;
     const measure=()=>{
       doc.setFont('times','bold');doc.setFontSize(fontSize);
       const labelW=doc.getTextWidth(label);
@@ -14200,18 +14229,18 @@ function drawCalcPdfFormulaCell(doc,f,x,y,w,h,color){
       return {labelW,equalsW,fracW,multiplierW,total:labelW+equalsW+fracW+multiplierW+gap*(count-1)};
     };
     let sizes=measure();
-    if(sizes.total>w-4){fontSize=Math.max(5.7,fontSize*((w-4)/sizes.total));sizes=measure();}
+    if(sizes.total>w-4){fontSize=Math.max(4.3,fontSize*((w-4)/sizes.total));sizes=measure();}
     let cursor=x+Math.max(2,(w-sizes.total)/2);
     doc.setFont('times','bold');doc.setFontSize(fontSize);doc.setTextColor(0,0,0);
-    doc.text(label,cursor,formulaY+.45);cursor+=sizes.labelW+gap;
-    doc.text('=',cursor,formulaY+.45);cursor+=sizes.equalsW+gap;
+    doc.text(label,cursor,formulaY+.55);cursor+=sizes.labelW+gap;
+    doc.text('=',cursor,formulaY+.55);cursor+=sizes.equalsW+gap;
     const fracMid=cursor+sizes.fracW/2;
     doc.setTextColor(0,0,0);
-    doc.text(numerator,fracMid,formulaY-.95,{align:'center'});
+    doc.text(numerator,fracMid,formulaY-1.05,{align:'center'});
     doc.text(denominator,fracMid,formulaY+1.75,{align:'center'});
     doc.setDrawColor(...color);doc.setLineWidth(.42);doc.line(cursor,formulaY,cursor+sizes.fracW,formulaY);
     cursor+=sizes.fracW;
-    if(multiplier){cursor+=gap;doc.text(multiplier,cursor,formulaY+.45);}
+    if(multiplier){cursor+=gap;doc.text(multiplier,cursor,formulaY+.55);}
     return;
   }
   const formula=calcFormulaText(f);
@@ -14260,10 +14289,10 @@ function drawCalcTemplatePage(doc,calcData,pageW,pageH,margin,blank=false){
         doc.setFillColor(255,255,255);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(x,y,cellW,rowH,'FD');
         if(!f)return;
         const displayName=calcDisplayName(f);
-        doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,displayName,cellW-7,7.25,5.2);doc.text(displayName,x+cellW/2,y+3.9,{align:'center'});
+        doc.setFont('times','bold');doc.setTextColor(0,0,0);fitPdfText(doc,displayName,cellW-7,6.8,4.6);doc.text(displayName,x+cellW/2,y+3.05,{align:'center'});
         const cellNote=String(f.notes||'').trim();
         const showCellNote=!blank&&!!cellNote;
-        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+4.7,cellW-6,rowH-5.15-(showCellNote?3.2:0),[0,0,0]);
+        if(!blank)drawCalcPdfFormulaCell(doc,f,x+3,y+5.65,cellW-6,rowH-5.75-(showCellNote?3.2:0),[0,0,0]);
         if(showCellNote){
           doc.setFont('times','bold');doc.setFontSize(5.2);doc.setTextColor(193,18,31);
           fitPdfText(doc,cellNote,cellW-5,5.2,3.6);
@@ -14286,31 +14315,66 @@ function rrPdfText(value){
   return String(value||'').replace(/[–—]/g,'-').replace(/µ/g,'u').replace(/×/g,'x').replace(/≤/g,'<=').replace(/⁻/g,'-').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g,c=>'0123456789'['⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c)]).replace(/[₀₁₂₃₄₅₆₇₈₉]/g,c=>'0123456789'['₀₁₂₃₄₅₆₇₈₉'.indexOf(c)]);
 }
 function drawRROnePage(doc,rrData,pageW,pageH,margin,blank=false){
-  const cW=pageW-margin*2,widths=[cW*.37,cW*.315,cW*.315],rowH=6.8,categoryH=7;
-  const categories=[];const grouped={};
-  (rrData||[]).forEach(f=>{const name=f.category||'General';if(!grouped[name]){grouped[name]=[];categories.push(name)}grouped[name].push(f)});
-  let y=0;
-  function startPage(){
-    doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
-    doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.setFontSize(11);
-    doc.text(blank?'ASCP BOC Reference Ranges - Blank Practice':'ASCP BOC Reference Ranges - June 9, 2026',pageW/2,13,{align:'center'});
-    doc.setFontSize(7);doc.text('Analyte',margin+2,20);doc.text('Conventional units',margin+widths[0]+2,20);doc.text('SI units',margin+widths[0]+widths[1]+2,20);y=22;
-  }
-  startPage();
-  for(const category of categories){
-    if(y+categoryH+rowH>pageH-12){doc.addPage('a4','portrait');startPage()}
-    doc.setFillColor(225,231,240);doc.rect(margin,y,cW,categoryH,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text(rrPdfText(category),margin+2,y+4.8);y+=categoryH;
-    for(const f of grouped[category]){
-      if(y+rowH>pageH-12){doc.addPage('a4','portrait');startPage()}
-      doc.setDrawColor(200,206,215);doc.setLineWidth(.25);
-      let x=margin;for(const w of widths){doc.rect(x,y,w,rowH);x+=w}
-      const cells=[f.name,blank?'':rrConventionalText(f),blank?'':(f.si_value||'--')+(f.si_unit?' '+f.si_unit:'')];
-      x=margin;cells.forEach((cell,i)=>{const value=rrPdfText(cell);doc.setFont('helvetica',i===0?'bold':'normal');fitPdfText(doc,value,widths[i]-4,8,5.3);doc.text(value,x+2,y+4.7);x+=widths[i]});
+  const totalW=pageW-margin*2,gutter=3,panelW=(totalW-gutter)/2;
+  const widths=[panelW*.39,panelW*.305,panelW*.305];
+  const entries=[];
+  let previousCategory='';
+  (rrData||[]).forEach(f=>{
+    const category=f.category||'General';
+    if(category!==previousCategory){entries.push({category});previousCategory=category;}
+    entries.push({item:f,category});
+  });
+  let split=Math.ceil(entries.length/2);
+  if(entries[split-1]?.category&&!entries[split-1]?.item)split--;
+  const panels=[entries.slice(0,split),entries.slice(split)];
+  if(panels[1][0]?.item)panels[1].unshift({category:panels[1][0].category});
+  const panelTop=25,bottom=pageH-11;
+  const rowH=Math.min(7.2,(bottom-panelTop)/Math.max(1,...panels.map(panel=>panel.length)));
+  doc.setFillColor(255,255,255);doc.rect(0,0,pageW,pageH,'F');
+  doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.55);doc.rect(margin,9,totalW,8,'FD');
+  doc.setTextColor(0,0,0);doc.setFont('times','bold');doc.setFontSize(10.5);
+  doc.text(blank?'ASCP BOC Reference Ranges - Blank Practice':'ASCP BOC Reference Ranges - June 9, 2026',pageW/2,14.4,{align:'center'});
+  panels.forEach((panel,panelIndex)=>{
+    const left=margin+panelIndex*(panelW+gutter);
+    let x=left;
+    ['Analyte','Conventional units','SI units'].forEach((heading,i)=>{
+      doc.setFillColor(238,234,218);doc.setDrawColor(0,0,0);doc.rect(x,18,widths[i],7,'FD');
+      doc.setFont('helvetica','bold');doc.setTextColor(35,35,27);fitPdfText(doc,heading,widths[i]-2,7.6,6);
+      doc.text(heading,x+widths[i]/2,22.6,{align:'center'});x+=widths[i];
+    });
+    let y=panelTop;
+    panel.forEach((entry,index)=>{
+      if(entry.item){
+        const cells=[entry.item.name,blank?'':rrConventionalText(entry.item),blank?'':(entry.item.si_value||'--')+(entry.item.si_unit?' '+entry.item.si_unit:'')];
+        let cellX=left;
+        cells.forEach((cell,i)=>{
+          const value=rrPdfText(cell);
+          if(i===0)doc.setFillColor(233,228,210);
+          else doc.setFillColor(255,255,255);
+          doc.setDrawColor(65,65,55);doc.setLineWidth(.22);doc.rect(cellX,y,widths[i],rowH,'FD');
+          doc.setFont('helvetica',i===0?'bold':'normal');doc.setTextColor(20,20,20);
+          doc.setFontSize(6.6);
+          const lines=doc.splitTextToSize(value,widths[i]-3);
+          if(lines.length===2){
+            doc.setFontSize(5.7);
+            lines.forEach((line,lineIndex)=>doc.text(line,cellX+widths[i]/2,y+rowH/2+(lineIndex?1.9:-.25),{align:'center'}));
+          }else{
+            fitPdfText(doc,value,widths[i]-2,6.6,3.2);
+            doc.text(value,cellX+widths[i]/2,y+rowH/2+1,{align:'center'});
+          }
+          cellX+=widths[i];
+        });
+      }else{
+        const name=rrPdfText(entry.category);
+        doc.setFillColor(222,220,199);doc.setDrawColor(0,0,0);doc.setLineWidth(.45);doc.rect(left,y,panelW,rowH,'FD');
+        doc.setTextColor(0,0,0);doc.setFont('times','bold');fitPdfText(doc,name,panelW-4,8,5.5);
+        doc.text(name,left+panelW/2,y+rowH/2+1.1,{align:'center'});
+      }
       y+=rowH;
-    }
-  }
-  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.text('Exam preparation only. Source: ASCP BOC MLS/MLS(ASCPi) Content Guideline, revised June 9, 2026, pp. 14-17.',margin,pageH-5);
+    });
+  });
+  doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(60,60,60);
+  doc.text('Exam preparation only. Source: ASCP BOC MLS/MLS(ASCPi) Content Guideline, revised June 9, 2026, pp. 14-17.',margin,pageH-5);
 }
 
 function generateFormulasPDF(){
