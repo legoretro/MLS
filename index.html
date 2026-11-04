@@ -454,6 +454,11 @@ body.light-mode .calc-example-formatbar .ink-red{color:#b91f30}body.light-mode .
 .calc-example-editor{padding:16px;border:1px solid var(--border2);border-radius:12px;background:var(--bg3);margin-bottom:16px}
 .calc-example-editor-title{font:800 15px/1.4 var(--sans);color:var(--text);margin-bottom:12px}
 .calc-example-editor textarea{min-height:82px;font-family:'Chalkboard SE','Comic Sans MS','Trebuchet MS',sans-serif;font-size:18px;line-height:1.45}
+.calc-example-rich-editor{min-height:82px;padding:12px 14px;border:1px solid var(--border2);border-radius:10px;background:var(--bg2);color:var(--text);font-family:'Chalkboard SE','Comic Sans MS','Trebuchet MS',sans-serif;font-size:18px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;outline:none}
+.calc-example-rich-editor:focus{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
+.calc-example-rich-editor .calc-example-ink-red{color:#ff7d88}.calc-example-rich-editor .calc-example-ink-green{color:#62d494}.calc-example-rich-editor .calc-example-ink-blue{color:#79adff}
+body.light-mode .calc-example-rich-editor .calc-example-ink-red{color:#b91f30}body.light-mode .calc-example-rich-editor .calc-example-ink-green{color:#157543}body.light-mode .calc-example-rich-editor .calc-example-ink-blue{color:#2056ac}
+.calc-example-format-hint{min-height:1.2em;margin:-5px 0 10px;color:var(--text2);font-size:12px}
 .calc-example-media-item{min-width:0;border:1px solid var(--border2);border-radius:10px;overflow:hidden;background:var(--bg3)}
 .calc-example-media-item .calc-example-zoom{border:0;border-radius:0}
 .calc-example-media-item .calc-example-media-remove{width:100%;border:0;border-top:1px solid var(--border2);border-radius:0;padding:8px;font-size:12px;color:var(--danger);background:var(--bg2);cursor:pointer}
@@ -13311,10 +13316,41 @@ function parseFormulaVideoEmbed(value){
     return url.href;
   }catch{return null;}
 }
+function formulaVideoPoster(source){
+  try{
+    const filename=decodeURIComponent(new URL(source).pathname.split('/').pop()||'').toLowerCase();
+    if(filename==='rhogam video.mp4')return 'assets/formulas/video-posters/rhogam-final-frame.jpg';
+  }catch(error){}
+  return '';
+}
+function prepareVideoFinalFramePoster(video){
+  if(!video||video.dataset.finalFrameReady||video.dataset.posterLoading)return;
+  video.dataset.posterLoading='true';
+  const probe=document.createElement('video');
+  probe.crossOrigin='anonymous';probe.preload='auto';probe.muted=true;
+  const cleanup=()=>{probe.removeAttribute('src');probe.load();delete video.dataset.posterLoading;};
+  probe.addEventListener('loadedmetadata',()=>{
+    if(!Number.isFinite(probe.duration)||probe.duration<=0){cleanup();return;}
+    probe.currentTime=Math.max(0,probe.duration-.12);
+  },{once:true});
+  probe.addEventListener('seeked',()=>{
+    try{
+      const canvas=document.createElement('canvas');
+      canvas.width=probe.videoWidth;canvas.height=probe.videoHeight;
+      canvas.getContext('2d').drawImage(probe,0,0);
+      video.poster=canvas.toDataURL('image/jpeg',.86);
+      video.dataset.finalFrameReady='true';
+    }catch(error){console.warn('Video poster capture failed:',error);}
+    cleanup();
+  },{once:true});
+  probe.addEventListener('error',cleanup,{once:true});
+  probe.src=video.currentSrc||video.src;
+}
 function formulaVideoHtml(value){
   if(!value)return '';
   const source=parseFormulaVideoEmbed('<video src="'+esc(value)+'"></video>');
-  return source?'<div class="calc-inline-video"><video controls playsinline preload="metadata" src="'+esc(source)+'" aria-label="Equation video"></video></div>':'';
+  const poster=source?formulaVideoPoster(source):'';
+  return source?'<div class="calc-inline-video"><video controls playsinline preload="metadata" src="'+esc(source)+'" poster="'+esc(poster||'assets/formulas/video-posters/video-preview.svg')+'"'+(poster?' data-final-frame-ready="true"':' onloadedmetadata="prepareVideoFinalFramePoster(this)"')+' aria-label="Equation video"></video></div>':'';
 }
 function previewFormulaVideoEmbed(){
   const input=document.getElementById('fm-video-embed'),target=document.getElementById('fm-video-preview');
@@ -13658,7 +13694,8 @@ function closeCalculationExampleWindow(){
 function calculationExampleVideoHtml(value){
   if(!value)return '';
   const source=parseFormulaVideoEmbed('<video src="'+esc(value)+'"></video>');
-  return source?`<div class="calc-example-video"><video controls playsinline preload="metadata" src="${esc(source)}" aria-label="Calculation example video"></video></div>`:'';
+  const poster=source?formulaVideoPoster(source):'';
+  return source?`<div class="calc-example-video"><video controls playsinline preload="metadata" src="${esc(source)}" poster="${esc(poster||'assets/formulas/video-posters/video-preview.svg')}" ${poster?'data-final-frame-ready="true"':'onloadedmetadata="prepareVideoFinalFramePoster(this)"'} aria-label="Calculation example video"></video></div>`:'';
 }
 
 function previewCalculationExampleEmbed(){
@@ -13674,34 +13711,97 @@ function clearCalculationExampleEmbed(){
   previewCalculationExampleEmbed();
 }
 
+const CALC_EXAMPLE_RICH_PREFIX='__mls_calc_rich_v1__:';
+function calcExampleEscapeText(value){return String(value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function calcExampleFractionHtml(top,bottom){
+  const numerator=calcExampleEscapeText(top),denominator=calcExampleEscapeText(bottom);
+  return `<span class="calc-example-frac" role="math" aria-label="${numerator} over ${denominator}"><span class="calc-example-frac-top">${numerator}</span><span class="calc-example-frac-bottom">${denominator}</span></span>`;
+}
+function sanitizeCalculationExampleHtml(html){
+  const doc=new DOMParser().parseFromString(`<div>${html}</div>`,'text/html');
+  const walk=node=>{
+    if(node.nodeType===Node.TEXT_NODE)return calcExampleEscapeText(node.textContent).replace(/\n/g,'<br>');
+    if(node.nodeType!==Node.ELEMENT_NODE)return '';
+    const tag=node.tagName.toLowerCase();
+    if(tag==='br')return '<br>';
+    if(tag==='span'&&node.classList.contains('calc-example-frac')){
+      return calcExampleFractionHtml(node.querySelector('.calc-example-frac-top')?.textContent||'',node.querySelector('.calc-example-frac-bottom')?.textContent||'');
+    }
+    const children=Array.from(node.childNodes).map(walk).join('');
+    const color=['red','green','blue'].find(kind=>node.classList?.contains(`calc-example-ink-${kind}`));
+    if(color)return `<span class="calc-example-ink-${color}">${children}</span>`;
+    return tag==='div'||tag==='p'?children+'<br>':children;
+  };
+  return Array.from(doc.body.firstElementChild.childNodes).map(walk).join('').replace(/(?:<br>)+$/,'');
+}
+function renderLegacyCalculationExampleText(value){
+  const source=String(value||'');
+  let index=0;
+  const read=segment=>{
+    let html='';
+    for(let i=0;i<segment.length;){
+      const match=segment.slice(i).match(/^\[(\[)?(red|green|blue|frac):/i);
+      if(match){
+        const kind=match[2].toLowerCase(),start=i+match[0].length;
+        if(kind==='frac'){
+          const end=segment.indexOf(']]',start);
+          if(end>=0){
+            const body=segment.slice(start,end),separator=body.indexOf('|');
+            if(separator>=0){html+=calcExampleFractionHtml(body.slice(0,separator),body.slice(separator+1));i=end+2;continue;}
+          }
+        }else{
+          const opening=match[1]?2:1;
+          let depth=opening,end=-1;
+          for(let at=start;at<segment.length;at++){
+            if(segment[at]==='[')depth++;
+            else if(segment[at]===']'&&!--depth){end=at-opening+1; i=at+1;break;}
+          }
+          if(end>=start){html+=`<span class="calc-example-ink-${kind}">${read(segment.slice(start,end))}</span>`;continue;}
+        }
+      }
+      const char=segment[i++];
+      html+=char==='\n'?'<br>':calcExampleEscapeText(char);
+    }
+    return html;
+  };
+  return read(source);
+}
 function renderCalculationExampleText(value){
   const source=String(value||'');
-  const token=/\[\[(red|green|blue|frac):([^\]\n]+)\]\]/g;
-  let html='',position=0,match;
-  while((match=token.exec(source))){
-    html+=escNL(source.slice(position,match.index));
-    const kind=match[1],body=match[2];
-    if(kind==='frac'){
-      const separator=body.indexOf('|');
-      html+=separator<0?esc(match[0]):`<span class="calc-example-frac" role="math" aria-label="${esc(body.slice(0,separator))} over ${esc(body.slice(separator+1))}"><span class="calc-example-frac-top">${esc(body.slice(0,separator))}</span><span class="calc-example-frac-bottom">${esc(body.slice(separator+1))}</span></span>`;
-    }else html+=`<span class="calc-example-ink-${kind}">${esc(body)}</span>`;
-    position=token.lastIndex;
-  }
-  return html+escNL(source.slice(position));
+  return source.startsWith(CALC_EXAMPLE_RICH_PREFIX)
+    ?sanitizeCalculationExampleHtml(source.slice(CALC_EXAMPLE_RICH_PREFIX.length))
+    :renderLegacyCalculationExampleText(source);
 }
-
-function insertCalculationExampleMarkup(kind){
-  const id=window._calcExampleActiveField||'calc-example-work';
-  const field=document.getElementById(id)||document.getElementById('calc-example-work');
-  if(!field)return;
-  const start=field.selectionStart,end=field.selectionEnd,selected=field.value.slice(start,end);
-  const numerator=selected||'numerator';
-  const markup=kind==='frac'?`[[frac:${numerator}|denominator]]`:`[[${kind}:${selected||'text'}]]`;
-  field.setRangeText(markup,start,end,'end');
+function formatCalculationExampleSelection(kind){
+  const selection=window.getSelection();
+  const range=selection?.rangeCount?selection.getRangeAt(0):null;
+  const editor=range?.commonAncestorContainer?.nodeType===Node.ELEMENT_NODE?range.commonAncestorContainer:range?.commonAncestorContainer?.parentElement;
+  const field=editor?.closest?.('.calc-example-rich-editor');
+  const hint=document.getElementById('calc-example-format-hint');
+  if(!field||range.collapsed){if(hint)hint.textContent='Select text in one example box first.';return;}
+  const selected=selection.toString();
+  let wrapper=document.createElement('span');
+  if(kind==='frac'){
+    const denominator=prompt('Denominator for the selected numerator:');
+    if(denominator===null)return;
+    wrapper.className='calc-example-frac';wrapper.setAttribute('role','math');
+    wrapper.setAttribute('aria-label',`${selected} over ${denominator}`);
+    wrapper.innerHTML=`<span class="calc-example-frac-top">${calcExampleEscapeText(selected)}</span><span class="calc-example-frac-bottom">${calcExampleEscapeText(denominator)}</span>`;
+    range.deleteContents();
+  }else{
+    wrapper.className=`calc-example-ink-${kind}`;
+    wrapper.appendChild(range.extractContents());
+  }
+  range.insertNode(wrapper);
+  selection.removeAllRanges();
   field.focus();
-  const placeholder=kind==='frac'?'denominator':selected?'':'text';
-  if(placeholder){const offset=markup.indexOf(placeholder);field.setSelectionRange(start+offset,start+offset+placeholder.length);}
-  field.dispatchEvent(new Event('input',{bubbles:true}));
+  if(hint)hint.textContent=kind==='frac'?'Fraction added. Save the example when ready.':'Color applied. Save the example when ready.';
+}
+function serializeCalculationExampleEditor(id){
+  const field=document.getElementById(id);
+  if(!field)return '';
+  const html=sanitizeCalculationExampleHtml(field.innerHTML).trim();
+  return html?CALC_EXAMPLE_RICH_PREFIX+html:'';
 }
 
 function calculationExampleSectionsHtml(row){
@@ -13790,11 +13890,12 @@ function openCalculationExampleEditor(key){
     </div>
     <div class="calc-example-editor">
       <div class="calc-example-editor-title">Your example</div>
-      <div class="calc-example-formatbar" aria-label="Text formatting"><span class="text-xs text-muted">Select text, then choose:</span><button class="btn btn-ghost btn-sm ink-red" type="button" onclick="insertCalculationExampleMarkup('red')">Red</button><button class="btn btn-ghost btn-sm ink-green" type="button" onclick="insertCalculationExampleMarkup('green')">Green</button><button class="btn btn-ghost btn-sm ink-blue" type="button" onclick="insertCalculationExampleMarkup('blue')">Blue</button><button class="btn btn-ghost btn-sm" type="button" onclick="insertCalculationExampleMarkup('frac')">Fraction</button></div>
-      <div class="form-group"><label for="calc-example-given">Given</label><textarea id="calc-example-given" rows="3" onfocus="window._calcExampleActiveField=this.id">${esc(sections.given)}</textarea></div>
-      <div class="form-group"><label for="calc-example-work">Work / Steps</label><textarea id="calc-example-work" rows="4" onfocus="window._calcExampleActiveField=this.id">${esc(sections.work)}</textarea></div>
-      <div class="form-group"><label for="calc-example-result">Answer</label><textarea id="calc-example-result" rows="2" onfocus="window._calcExampleActiveField=this.id">${esc(sections.result)}</textarea></div>
-      <div class="form-group" style="margin-bottom:0"><label for="calc-example-notes">Notes (optional)</label><textarea id="calc-example-notes" rows="2" onfocus="window._calcExampleActiveField=this.id">${esc(sections.notes)}</textarea></div>
+      <div class="calc-example-formatbar" aria-label="Text formatting"><span class="text-xs text-muted">Highlight text, then choose:</span><button class="btn btn-ghost btn-sm ink-red" type="button" onpointerdown="event.preventDefault()" onclick="formatCalculationExampleSelection('red')">Red</button><button class="btn btn-ghost btn-sm ink-green" type="button" onpointerdown="event.preventDefault()" onclick="formatCalculationExampleSelection('green')">Green</button><button class="btn btn-ghost btn-sm ink-blue" type="button" onpointerdown="event.preventDefault()" onclick="formatCalculationExampleSelection('blue')">Blue</button><button class="btn btn-ghost btn-sm" type="button" onpointerdown="event.preventDefault()" onclick="formatCalculationExampleSelection('frac')">Fraction</button></div>
+      <div id="calc-example-format-hint" class="calc-example-format-hint" aria-live="polite"></div>
+      <div class="form-group"><label id="calc-example-given-label">Given</label><div id="calc-example-given" class="calc-example-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="calc-example-given-label">${renderCalculationExampleText(sections.given)}</div></div>
+      <div class="form-group"><label id="calc-example-work-label">Work / Steps</label><div id="calc-example-work" class="calc-example-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="calc-example-work-label">${renderCalculationExampleText(sections.work)}</div></div>
+      <div class="form-group"><label id="calc-example-result-label">Answer</label><div id="calc-example-result" class="calc-example-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="calc-example-result-label">${renderCalculationExampleText(sections.result)}</div></div>
+      <div class="form-group" style="margin-bottom:0"><label id="calc-example-notes-label">Notes (optional)</label><div id="calc-example-notes" class="calc-example-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="calc-example-notes-label">${renderCalculationExampleText(sections.notes)}</div></div>
     </div>
     <div class="form-group"><label for="calc-example-video">VideoCenter embed code (optional)</label><textarea id="calc-example-video" rows="3" placeholder="Paste Embed code from VideoCenter" oninput="previewCalculationExampleEmbed()">${row.answer?esc(`<video src="${row.answer}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Copy Embed code in VideoCenter, then paste it here.</div><div id="calc-example-embed-preview" class="calc-example-embed-preview"></div><button class="btn btn-danger btn-sm" type="button" onclick="clearCalculationExampleEmbed()">Remove video</button></div>
     <div class="form-group"><label>Upload example images (optional, up to 6)</label><input type="file" accept="image/*" multiple onchange="handleCalculationExampleUpload(event)"><div id="calc-example-upload-preview" class="calc-example-upload-preview"></div></div>
@@ -13813,10 +13914,10 @@ async function saveCalculationExample(key){
   const formula=window._calcExampleFormulaMap?.[key];
   if(!formula)return;
   const sections={
-    given:document.getElementById('calc-example-given')?.value.trim()||'',
-    work:document.getElementById('calc-example-work')?.value.trim()||'',
-    result:document.getElementById('calc-example-result')?.value.trim()||'',
-    notes:document.getElementById('calc-example-notes')?.value.trim()||''
+    given:serializeCalculationExampleEditor('calc-example-given'),
+    work:serializeCalculationExampleEditor('calc-example-work'),
+    result:serializeCalculationExampleEditor('calc-example-result'),
+    notes:serializeCalculationExampleEditor('calc-example-notes')
   };
   const answer=parseFormulaVideoEmbed(document.getElementById('calc-example-video')?.value||'');
   const images=window._calcExampleDraftImages||[];

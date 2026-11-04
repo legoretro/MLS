@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 934" role="img" aria-label="Preparing video thumbnail">
+  <rect width="720" height="934" fill="#dedcc7"/>
+  <rect x="34" y="34" width="652" height="866" rx="22" fill="#f8f7ef" stroke="#32352c" stroke-width="5"/>
+  <circle cx="360" cy="435" r="90" fill="#333c35"/>
+  <path d="M338 383v104l88-52z" fill="#fff"/>
+  <text x="360" y="590" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#292c28" text-anchor="middle">Preparing final frame</text>
+</svg>
