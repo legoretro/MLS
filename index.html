@@ -436,8 +436,12 @@ button.calc-example-cell{appearance:none;cursor:pointer}
 .calc-example-media button{display:block;width:100%;padding:0;border:1px solid var(--border2);border-radius:10px;background:var(--bg3);overflow:hidden;cursor:zoom-in}
 .calc-example-media img{display:block;width:100%;height:180px;object-fit:contain;background:#fff}
 .calc-example-copy{font-size:15px;line-height:1.65;color:var(--text);white-space:normal;overflow-wrap:anywhere}
-.calc-example-video{margin-top:16px}
-.calc-example-video .study-video-slot{margin:0}
+.calc-example-video{width:100%;margin:16px auto 0}
+.calc-example-video video{display:block;width:100%;aspect-ratio:16/9;max-height:min(55vh,520px);object-fit:contain;border-radius:12px;background:#101923}
+.calc-example-embed-preview{margin-top:10px}
+.calc-example-embed-preview:empty{display:none}
+.calc-example-embed-preview .calc-example-video{margin-top:6px}
+@media(max-width:620px){.modal-overlay.calculation-example-window{padding:8px}.modal-overlay.calculation-example-window .modal{padding:16px;max-height:calc(100dvh - 16px)}.calc-example-video video{max-height:45dvh}.calc-example-media{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.calc-example-media img{height:140px}}
 .calc-inline-video{margin-top:14px}.calc-inline-video:empty{display:none}.calc-inline-video video{display:block;width:100%;max-height:320px;border-radius:10px;background:#101923}.calc-video-preview video{display:block;width:100%;max-height:220px;margin-top:8px;border-radius:9px;background:#101923}
 .calc-example-upload-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
 .calc-example-upload-item{position:relative;border:1px solid var(--border2);border-radius:9px;background:var(--bg3);overflow:hidden}
@@ -13588,20 +13592,17 @@ function closeCalculationExampleWindow(){
   modal.classList.remove('calculation-example-window');
 }
 
-function safeCalculationExampleUrl(value){
-  try{
-    const url=new URL(String(value||'').trim());
-    return ['http:','https:'].includes(url.protocol)?url.href:'';
-  }catch(e){return '';}
+function calculationExampleVideoHtml(value){
+  if(!value)return '';
+  const source=parseFormulaVideoEmbed('<video src="'+esc(value)+'"></video>');
+  return source?`<div class="calc-example-video"><video controls playsinline preload="metadata" src="${esc(source)}" aria-label="Calculation example video"></video></div>`:'';
 }
 
-function calculationExampleVideoHtml(value){
-  const url=safeCalculationExampleUrl(value);
-  if(!url)return '';
-  const embed=studyVideoEmbedHtml(url);
-  if(embed)return `<div class="calc-example-video">${embed}</div>`;
-  if(/\.(?:mp4|webm|ogg)(?:[?#].*)?$/i.test(url))return `<div class="calc-example-video"><video controls preload="metadata" style="display:block;width:100%;max-height:480px;border-radius:12px;background:#000"><source src="${esc(url)}"></video></div>`;
-  return `<div class="calc-example-video"><a class="btn btn-ghost" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open example video ↗</a></div>`;
+function previewCalculationExampleEmbed(){
+  const input=document.getElementById('calc-example-video'),target=document.getElementById('calc-example-embed-preview');
+  if(!input||!target)return;
+  const source=parseFormulaVideoEmbed(input.value);
+  target.innerHTML=source===null?'<div class="text-xs" style="color:var(--danger)">Paste Embed code or Copy iframe code from VideoCenter.</div>':source?'<div class="text-xs text-muted">Video preview</div>'+calculationExampleVideoHtml(source):'';
 }
 
 function openCalculationExample(key){
@@ -13669,7 +13670,7 @@ function openCalculationExampleEditor(key){
       <button class="btn btn-ghost btn-sm ml-auto" type="button" onclick="closeCalculationExampleWindow()">✕</button>
     </div>
     <div class="form-group"><label>Typed example or explanation</label><textarea id="calc-example-text" style="min-height:150px" placeholder="Type a worked example, explanation, or practice prompt...">${esc(row.scenario||'')}</textarea></div>
-    <div class="form-group"><label>Video link (optional)</label><input type="url" id="calc-example-video" value="${esc(row.answer||'')}" placeholder="YouTube, Vimeo, or direct video URL"></div>
+    <div class="form-group"><label for="calc-example-video">VideoCenter embed code (optional)</label><textarea id="calc-example-video" rows="3" placeholder="Paste Embed code from VideoCenter" oninput="previewCalculationExampleEmbed()">${row.answer?esc(`<video src="${row.answer}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Copy Embed code in VideoCenter, then paste it here. The video will play in this example on desktop and mobile.</div><div id="calc-example-embed-preview" class="calc-example-embed-preview"></div></div>
     <div class="form-group"><label>Upload example images (optional, up to 6)</label><input type="file" accept="image/*" multiple onchange="handleCalculationExampleUpload(event)"><div id="calc-example-upload-preview" class="calc-example-upload-preview"></div></div>
     <div class="flex gap-8 flex-wrap">
       <button class="btn btn-ghost" type="button" onclick="closeCalculationExampleWindow()">Cancel</button>
@@ -13677,6 +13678,7 @@ function openCalculationExampleEditor(key){
       <button class="btn btn-primary ml-auto" type="button" onclick="saveCalculationExample('${jsAttr(key)}')">Save Example</button>
     </div>`;
   renderCalculationExampleUploadPreview();
+  previewCalculationExampleEmbed();
   modal.classList.remove('hidden');
 }
 
@@ -13685,10 +13687,10 @@ async function saveCalculationExample(key){
   const formula=window._calcExampleFormulaMap?.[key];
   if(!formula)return;
   const scenario=document.getElementById('calc-example-text')?.value.trim()||'';
-  const answer=document.getElementById('calc-example-video')?.value.trim()||'';
+  const answer=parseFormulaVideoEmbed(document.getElementById('calc-example-video')?.value||'');
   const images=window._calcExampleDraftImages||[];
-  if(answer&&!safeCalculationExampleUrl(answer)){alert('Enter a full http:// or https:// video link.');return;}
-  if(!scenario&&!answer&&!images.length){alert('Add typed content, an image, or a video link first.');return;}
+  if(answer===null){alert('Paste Embed code or Copy iframe code from VideoCenter.');return;}
+  if(!scenario&&!answer&&!images.length){alert('Add typed content, an image, or VideoCenter embed code first.');return;}
   const payload={subject:'calculation_example',title:formula.name,scenario,answer,images,group_label:key,case_data:formula.category||'',steps:'[]',is_draft:false};
   const current=window._calcExampleMap?.[key];
   const result=current?.id?await sb.from('mlsboc_cases').update(payload).eq('id',current.id):await sb.from('mlsboc_cases').insert(payload);
