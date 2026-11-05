@@ -433,9 +433,9 @@ button.calc-example-cell{appearance:none;cursor:pointer}
 .calc-example-cell.is-admin-empty:hover,.calc-example-cell.is-admin-empty:focus-visible{background:#eae2c7;outline:3px solid #8f8455;outline-offset:-3px}
 .calc-example-status{margin-top:2px;color:#493f2a;font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
 .calc-example-cell.has-example .calc-example-status{color:#294b38}
-.calc-example-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}
+.calc-example-media{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin-top:0}
 .calc-example-media button{display:block;width:100%;padding:0;border:1px solid var(--border2);border-radius:10px;background:var(--bg3);overflow:hidden;cursor:zoom-in}
-.calc-example-media img{display:block;width:100%;height:180px;object-fit:contain;background:#fff}
+.calc-example-media img{display:block;width:100%;aspect-ratio:1;height:auto;object-fit:contain;background:#fff}
 .calc-example-sections{display:grid;gap:12px;margin-top:16px}
 .calc-example-section{display:grid;grid-template-columns:112px minmax(0,1fr);border:1px solid var(--border2);border-radius:12px;overflow:hidden;background:var(--bg2)}
 .calc-example-section.is-given{border:2px solid var(--accent);border-left:7px solid var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--bg2))}
@@ -459,20 +459,24 @@ body.light-mode .calc-example-formatbar .ink-red{color:#b91f30}body.light-mode .
 .calc-example-rich-editor .calc-example-ink-red{color:#ff7d88}.calc-example-rich-editor .calc-example-ink-green{color:#62d494}.calc-example-rich-editor .calc-example-ink-blue{color:#79adff}
 body.light-mode .calc-example-rich-editor .calc-example-ink-red{color:#b91f30}body.light-mode .calc-example-rich-editor .calc-example-ink-green{color:#157543}body.light-mode .calc-example-rich-editor .calc-example-ink-blue{color:#2056ac}
 .calc-example-format-hint{min-height:1.2em;margin:-5px 0 10px;color:var(--text2);font-size:12px}
-.calc-example-media-item{min-width:0;border:1px solid var(--border2);border-radius:10px;overflow:hidden;background:var(--bg3)}
+.calc-example-media-item{width:var(--calc-image-width,100%);min-width:0;margin:var(--calc-image-gap,14px) auto 0;border:1px solid var(--border2);border-radius:10px;overflow:hidden;background:var(--bg3)}
 .calc-example-media-item .calc-example-zoom{border:0;border-radius:0}
 .calc-example-media-item .calc-example-media-remove{width:100%;border:0;border-top:1px solid var(--border2);border-radius:0;padding:8px;font-size:12px;color:var(--danger);background:var(--bg2);cursor:pointer}
+.calc-example-image-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.calc-example-image-controls label{display:grid;gap:5px;color:var(--text2);font-size:12px;font-weight:700}
+.calc-example-image-controls input[type=range]{width:100%;accent-color:var(--accent)}
+.calc-example-image-controls select{width:100%;padding:7px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text)}
 .calc-example-video-remove{margin-top:9px}
 .calc-example-video{display:flex;justify-content:center;width:100%;margin:16px auto 0;border-radius:12px;background:#101923;overflow:hidden}
 .calc-example-video video{display:block;width:auto;max-width:100%;height:min(55vh,520px);aspect-ratio:auto;object-fit:contain;background:#101923}
 .calc-example-embed-preview{margin-top:10px}
 .calc-example-embed-preview:empty{display:none}
 .calc-example-embed-preview .calc-example-video{margin-top:6px}
-@media(max-width:620px){.modal-overlay.calculation-example-window{padding:8px}.modal-overlay.calculation-example-window .modal{padding:16px;max-height:calc(100dvh - 16px)}.calc-example-section{grid-template-columns:1fr}.calc-example-section-label{border-right:0;border-bottom:1px solid var(--border2);padding:8px 12px}.calc-example-copy{padding:12px 14px;font-size:19px}.calc-example-video video{height:45dvh}.calc-example-media{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.calc-example-media img{height:140px}}
+@media(max-width:620px){.modal-overlay.calculation-example-window{padding:8px}.modal-overlay.calculation-example-window .modal{padding:16px;max-height:calc(100dvh - 16px)}.calc-example-section{grid-template-columns:1fr}.calc-example-section-label{border-right:0;border-bottom:1px solid var(--border2)}.calc-example-copy{padding:12px 14px;font-size:19px}.calc-example-video video{height:45dvh}.calc-example-image-controls{grid-template-columns:1fr}}
 .calc-inline-video{display:flex;justify-content:center;margin-top:14px;border-radius:10px;background:#101923;overflow:hidden}.calc-inline-video:empty{display:none}.calc-inline-video video{display:block;width:auto;max-width:100%;height:min(45vh,320px);object-fit:contain;background:#101923}.calc-video-preview video{display:block;width:auto;max-width:100%;height:min(35vh,220px);margin:8px auto 0;border-radius:9px;background:#101923}
-.calc-example-upload-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
-.calc-example-upload-item{border:1px solid var(--border2);border-radius:9px;background:var(--bg3);overflow:hidden}
-.calc-example-upload-item img{display:block;width:100%;height:110px;object-fit:contain;background:#fff}
+.calc-example-upload-preview{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:10px}
+.calc-example-upload-item{width:var(--calc-image-width,100%);margin:var(--calc-image-gap,14px) auto 0;padding:10px;border:1px solid var(--border2);border-radius:9px;background:var(--bg3);overflow:hidden}
+.calc-example-upload-item img{display:block;width:100%;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:7px}
 .calc-example-upload-item button{display:block;width:100%;border-radius:0}
 .modal-overlay.calculation-example-window .modal{max-width:880px!important}
 .rr-template-sheet{max-width:880px}
@@ -523,7 +527,6 @@ body.light-mode .calc-example-rich-editor .calc-example-ink-red{color:#b91f30}bo
   .calc-order-toolbar{align-items:flex-start;flex-wrap:wrap}
   .calc-example-cell{min-height:72px;padding:10px 9px}
   .calc-example-media{grid-template-columns:1fr}
-  .calc-example-media img{height:auto;max-height:62vh}
   .rr-template-category{padding:7px 8px;font-size:17px}
   .rr-template-row{grid-template-columns:minmax(0,40%) minmax(0,30%) minmax(0,30%);min-height:38px}
   .rr-template-analyte,.rr-template-value{padding:6px;font-size:12px}
@@ -13644,6 +13647,31 @@ function calcExampleSections(row){
   };
 }
 
+function calcExampleImageLayouts(row){
+  let saved=row?.steps;
+  if(typeof saved==='string'){try{saved=JSON.parse(saved);}catch{saved=null;}}
+  const layouts=Array.isArray(saved?.imageLayout)?saved.imageLayout:[];
+  return calcExampleImages(row).map((_,index)=>normalizeCalcExampleImageLayout(layouts[index]));
+}
+function normalizeCalcExampleImageLayout(layout){
+  const clamp=(value,min,max,fallback)=>Number.isFinite(Number(value))?Math.min(max,Math.max(min,Math.round(Number(value)))):fallback;
+  return {
+    width:clamp(layout?.width,50,100,100),
+    gap:clamp(layout?.gap,0,48,14),
+    fit:layout?.fit==='cover'?'cover':'contain',
+    x:clamp(layout?.x,0,100,50),
+    y:clamp(layout?.y,0,100,50)
+  };
+}
+function calcExampleImageBoxStyle(layout){
+  const view=normalizeCalcExampleImageLayout(layout);
+  return `--calc-image-width:${view.width}%;--calc-image-gap:${view.gap}px`;
+}
+function calcExampleImageViewStyle(layout){
+  const view=normalizeCalcExampleImageLayout(layout);
+  return `object-fit:${view.fit};object-position:${view.x}% ${view.y}%`;
+}
+
 function calcExampleHasContent(row){
   const sections=calcExampleSections(row);
   return !!(Object.values(sections).some(value=>value.trim())||String(row?.answer||'').trim()||calcExampleImages(row).length);
@@ -13814,7 +13842,12 @@ function calculationExampleSectionsHtml(row){
 async function removeCalculationExampleMedia(key,type,index){
   const row=window._calcExampleMap?.[String(key||'').toLowerCase()];
   if(!isAdmin||!row?.id||!confirm(`Remove this ${type==='video'?'video':'image'} from the example?`))return;
-  const changes=type==='video'?{answer:''}:{images:calcExampleImages(row).filter((_,i)=>i!==index)};
+  let savedSteps=row.steps;
+  if(typeof savedSteps==='string'){try{savedSteps=JSON.parse(savedSteps);}catch{savedSteps={};}}
+  const changes=type==='video'?{answer:''}:{
+    images:calcExampleImages(row).filter((_,i)=>i!==index),
+    steps:{...(savedSteps&&typeof savedSteps==='object'&&!Array.isArray(savedSteps)?savedSteps:{}),imageLayout:calcExampleImageLayouts(row).filter((_,i)=>i!==index)}
+  };
   const {error}=await sb.from('mlsboc_cases').update(changes).eq('id',row.id);
   if(error){alert('Remove failed: '+error.message);return;}
   Object.assign(row,changes);
@@ -13828,6 +13861,7 @@ function openCalculationExample(key){
   if(!calcExampleHasContent(row)){if(isAdmin)openCalculationExampleEditor(key);return;}
   const formula=window._calcExampleFormulaMap?.[key];
   const images=calcExampleImages(row);
+  const imageLayouts=calcExampleImageLayouts(row);
   const modal=document.getElementById('condition-modal');
   modal.classList.add('calculation-example-window');
   document.getElementById('condition-modal-body').innerHTML=`
@@ -13837,7 +13871,7 @@ function openCalculationExample(key){
       <button class="btn btn-ghost btn-sm" type="button" onclick="closeCalculationExampleWindow()">✕</button>
     </div>
     ${calculationExampleSectionsHtml(row)}
-    ${images.length?`<div class="calc-example-media">${images.map((url,index)=>`<div class="calc-example-media-item"><button class="calc-example-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" aria-label="Open example image ${index+1} full size"><img src="${esc(url)}" alt="${esc(formula?.name||'Calculation')} example ${index+1}" loading="lazy"></button>${isAdmin?`<button class="calc-example-media-remove" type="button" onclick="removeCalculationExampleMedia('${jsAttr(key)}','image',${index})">Remove image</button>`:''}</div>`).join('')}</div>`:''}
+    ${images.length?`<div class="calc-example-media">${images.map((url,index)=>`<div class="calc-example-media-item" style="${calcExampleImageBoxStyle(imageLayouts[index])}"><button class="calc-example-zoom" type="button" onclick="openQuestionMediaZoom('${jsAttr(url)}')" aria-label="Open example image ${index+1} full size"><img src="${esc(url)}" style="${calcExampleImageViewStyle(imageLayouts[index])}" alt="${esc(formula?.name||'Calculation')} example ${index+1}" loading="lazy"></button>${isAdmin?`<button class="calc-example-media-remove" type="button" onclick="removeCalculationExampleMedia('${jsAttr(key)}','image',${index})">Remove image</button>`:''}</div>`).join('')}</div>`:''}
     ${calculationExampleVideoHtml(row.answer)}
     ${isAdmin&&row.answer?`<button class="btn btn-danger btn-sm calc-example-video-remove" type="button" onclick="removeCalculationExampleMedia('${jsAttr(key)}','video')">Remove video</button>`:''}
   `;
@@ -13848,11 +13882,30 @@ function renderCalculationExampleUploadPreview(){
   const target=document.getElementById('calc-example-upload-preview');
   if(!target)return;
   const images=window._calcExampleDraftImages||[];
-  target.innerHTML=images.length?images.map((url,index)=>`<div class="calc-example-upload-item"><img src="${esc(url)}" alt="Uploaded example ${index+1}"><button class="btn btn-danger btn-xs" type="button" onclick="removeCalculationExampleUpload(${index})">Remove image ${index+1}</button></div>`).join(''):'<div class="text-xs text-muted">No images uploaded.</div>';
+  const layouts=window._calcExampleDraftImageLayouts||[];
+  target.innerHTML=images.length?images.map((url,index)=>{
+    const view=normalizeCalcExampleImageLayout(layouts[index]);
+    return `<div class="calc-example-upload-item" data-calc-example-upload-index="${index}" style="${calcExampleImageBoxStyle(view)}"><img src="${esc(url)}" style="${calcExampleImageViewStyle(view)}" alt="Example image ${index+1} layout preview"><div class="calc-example-image-controls"><label>Image width <span data-image-value="width">${view.width}%</span><input type="range" min="50" max="100" value="${view.width}" oninput="updateCalculationExampleImageLayout(${index},'width',this.value)"></label><label>Space above image <span data-image-value="gap">${view.gap}px</span><input type="range" min="0" max="48" value="${view.gap}" oninput="updateCalculationExampleImageLayout(${index},'gap',this.value)"></label><label>Image view<select onchange="updateCalculationExampleImageLayout(${index},'fit',this.value)"><option value="contain" ${view.fit==='contain'?'selected':''}>Fit whole image</option><option value="cover" ${view.fit==='cover'?'selected':''}>Fill square (crop)</option></select></label><label>Horizontal position <span data-image-value="x">${view.x}%</span><input type="range" min="0" max="100" value="${view.x}" oninput="updateCalculationExampleImageLayout(${index},'x',this.value)"></label><label>Vertical position <span data-image-value="y">${view.y}%</span><input type="range" min="0" max="100" value="${view.y}" oninput="updateCalculationExampleImageLayout(${index},'y',this.value)"></label></div><button class="btn btn-danger btn-xs" type="button" onclick="removeCalculationExampleUpload(${index})">Remove image ${index+1}</button></div>`;
+  }).join(''):'<div class="text-xs text-muted">No images uploaded.</div>';
+}
+
+function updateCalculationExampleImageLayout(index,field,value){
+  if(!['width','gap','fit','x','y'].includes(field))return;
+  const layouts=window._calcExampleDraftImageLayouts||[];
+  layouts[index]=normalizeCalcExampleImageLayout({...layouts[index],[field]:value});
+  window._calcExampleDraftImageLayouts=layouts;
+  const item=Array.from(document.querySelectorAll('[data-calc-example-upload-index]')).find(element=>Number(element.dataset.calcExampleUploadIndex)===index);
+  if(!item)return;
+  item.style.cssText=calcExampleImageBoxStyle(layouts[index]);
+  const image=item.querySelector('img');
+  if(image)image.style.cssText=calcExampleImageViewStyle(layouts[index]);
+  const readout=item.querySelector(`[data-image-value="${field}"]`);
+  if(readout)readout.textContent=`${layouts[index][field]}${field==='gap'?'px':'%'}`;
 }
 
 function removeCalculationExampleUpload(index){
   window._calcExampleDraftImages=(window._calcExampleDraftImages||[]).filter((_,itemIndex)=>itemIndex!==index);
+  window._calcExampleDraftImageLayouts=(window._calcExampleDraftImageLayouts||[]).filter((_,itemIndex)=>itemIndex!==index);
   renderCalculationExampleUploadPreview();
 }
 
@@ -13866,7 +13919,9 @@ function handleCalculationExampleUpload(event){
     reader.onerror=()=>resolve('');
     reader.readAsDataURL(file);
   }))).then(urls=>{
-    window._calcExampleDraftImages=[...(window._calcExampleDraftImages||[]),...urls.filter(Boolean)];
+    const added=urls.filter(Boolean);
+    window._calcExampleDraftImages=[...(window._calcExampleDraftImages||[]),...added];
+    window._calcExampleDraftImageLayouts=[...(window._calcExampleDraftImageLayouts||[]),...added.map(()=>normalizeCalcExampleImageLayout())];
     renderCalculationExampleUploadPreview();
     event.target.value='';
   });
@@ -13881,6 +13936,7 @@ function openCalculationExampleEditor(key){
   const sections=calcExampleSections(row);
   window._calcExampleEditingKey=key;
   window._calcExampleDraftImages=calcExampleImages(row);
+  window._calcExampleDraftImageLayouts=calcExampleImageLayouts(row);
   const modal=document.getElementById('condition-modal');
   modal.classList.add('calculation-example-window');
   document.getElementById('condition-modal-body').innerHTML=`
@@ -13898,7 +13954,7 @@ function openCalculationExampleEditor(key){
       <div class="form-group" style="margin-bottom:0"><label id="calc-example-notes-label">Notes (optional)</label><div id="calc-example-notes" class="calc-example-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="calc-example-notes-label">${renderCalculationExampleText(sections.notes)}</div></div>
     </div>
     <div class="form-group"><label for="calc-example-video">VideoCenter embed code (optional)</label><textarea id="calc-example-video" rows="3" placeholder="Paste Embed code from VideoCenter" oninput="previewCalculationExampleEmbed()">${row.answer?esc(`<video src="${row.answer}"></video>`):''}</textarea><div class="text-xs text-muted" style="margin-top:6px">Copy Embed code in VideoCenter, then paste it here.</div><div id="calc-example-embed-preview" class="calc-example-embed-preview"></div><button class="btn btn-danger btn-sm" type="button" onclick="clearCalculationExampleEmbed()">Remove video</button></div>
-    <div class="form-group"><label>Upload example images (optional, up to 6)</label><input type="file" accept="image/*" multiple onchange="handleCalculationExampleUpload(event)"><div id="calc-example-upload-preview" class="calc-example-upload-preview"></div></div>
+    <div class="form-group"><label>Example images (optional, up to 6)</label><input type="file" accept="image/*" multiple onchange="handleCalculationExampleUpload(event)"><div class="text-xs text-muted" style="margin-top:6px">Adjust each square image's size, spacing, and crop below. Changes appear in the preview and save with the example.</div><div id="calc-example-upload-preview" class="calc-example-upload-preview"></div></div>
     <div class="flex gap-8 flex-wrap">
       <button class="btn btn-ghost" type="button" onclick="closeCalculationExampleWindow()">Cancel</button>
       ${row.id?`<button class="btn btn-danger" type="button" onclick="deleteCalculationExample('${jsAttr(key)}')">Remove Example</button>`:''}
@@ -13923,7 +13979,8 @@ async function saveCalculationExample(key){
   const images=window._calcExampleDraftImages||[];
   if(answer===null){alert('Paste Embed code or Copy iframe code from VideoCenter.');return;}
   if(!Object.values(sections).some(Boolean)&&!answer&&!images.length){alert('Add typed content, an image, or VideoCenter embed code first.');return;}
-  const payload={subject:'calculation_example',title:formula.name,scenario:'',answer,images,group_label:key,case_data:formula.category||'',steps:sections,is_draft:false};
+  const imageLayout=images.map((_,index)=>normalizeCalcExampleImageLayout((window._calcExampleDraftImageLayouts||[])[index]));
+  const payload={subject:'calculation_example',title:formula.name,scenario:'',answer,images,group_label:key,case_data:formula.category||'',steps:{...sections,imageLayout},is_draft:false};
   const current=window._calcExampleMap?.[key];
   const result=current?.id?await sb.from('mlsboc_cases').update(payload).eq('id',current.id):await sb.from('mlsboc_cases').insert(payload);
   if(result.error){alert('Save failed: '+result.error.message);return;}
