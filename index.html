@@ -5898,7 +5898,7 @@ async function renderHome(v){
     + '<section class="home-hero">'
     + '<div><div class="home-kicker-row"><div class="home-kicker">Student Created • For Studying Purposes Only</div><div class="home-action-links"><button class="home-resource-link" onclick="goResources()">📚 Resources</button><button type="button" class="home-resource-link home-ascp-link" onclick="openASCPGuideline()">ASCP PDF</button></div></div>'
     + '<h1 class="home-title">Welcome to the MLS BOC Study Hub</h1>'
-    + '<div class="home-subtitle">Practice exams, image review, flashcards, calculations, and interactive lab tools</div></div>'
+    + '</div>'
     + homeMascotScene()
     + '</section>'
     + '<section class="home-section" style="margin-top:14px">'
@@ -5910,13 +5910,13 @@ async function renderHome(v){
     + '</section>'
     + '<section class="home-section">'
     + '<div '+hubsCardAttrs+'>'
-    + '<div><div class="home-hubs-label">Hands-on review</div><div class="home-hubs-title">Lab Simulators &amp; Study Hubs</div><div class="home-hubs-copy">ABO typing, urinalysis, microscopy, organism ID, and guided lab workflows.</div><div class="home-hubs-button">'+hubsButtonText+'</div></div>'
+    + '<div><div class="home-hubs-label">Hands-on review</div><div class="home-hubs-title">Lab Simulators &amp; Study Hubs</div><div class="home-hubs-button">'+hubsButtonText+'</div></div>'
     + '<div class="home-hubs-preview" aria-hidden="true"><div class="home-hubs-preview-track">'
     + HOME_HUB_PREVIEWS.concat(HOME_HUB_PREVIEWS).map(item=>'<div class="home-hub-tile" style="--hub-color:'+item.color+'"><img class="home-hub-shot" src="'+item.img+'" alt=""><div class="home-hub-tile-dot">'+item.code+'</div><div class="home-hub-tile-caption"><div class="home-hub-tile-title">'+item.title+'</div><div class="home-hub-tile-sub">'+item.sub+'</div><div class="home-hub-feature-list">'+item.features.map(feature=>'<span>'+feature+'</span>').join('')+'</div></div></div>').join('')
     + '</div></div></div></section>'
     + '<section class="home-section">'
     + '<button class="home-recall-card" onclick="goInteractive()">'
-    + '<div><div class="home-recall-label">Recall Interactive Learning</div><div class="home-recall-title">Drag, match, label, and practice quick recall</div><div class="home-recall-sub">Separate interactive tools for active learning outside the subject quiz cards.</div></div>'
+    + '<div><div class="home-recall-label">Recall Interactive Learning</div><div class="home-recall-title">Drag, match, label, and practice quick recall</div></div>'
     + '<div class="home-recall-pill">Open Recall Tools ›</div>'
     + '</button></section>'
     + classMaterialSection
@@ -6207,7 +6207,7 @@ async function loadInteractiveLinks(){
 
   if(grid){
     if(!allLinks.length){
-      grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.' + (isAdmin?' Use the form below to add one.':'') + '</div>';
+      grid.innerHTML = '<div class="card-sm" style="color:var(--text3);font-size:13px">No tools linked yet.</div>';
     } else {
       grid.innerHTML = renderInteractiveTopicGroups(allLinks);
     }
@@ -6531,7 +6531,7 @@ async function renderSubjectView(v){
         <div class="subject-page-copy">
           
           <h1 class="subject-page-title">${appState.subject==='urinalysis'?'Urinalysis /<br><span style="white-space:nowrap">Body Fluids</span>':esc(s.name).replace('/', '/<wbr>')}</h1>
-          <p class="subject-page-caption">${key==='para_myco'?'Microbiology includes mycobacteriology, virology, parasitology, and mycology.':'Study, recall, and apply your knowledge.'}</p>
+          ${key==='para_myco'?'<p class="subject-page-caption">Microbiology includes mycobacteriology, virology, parasitology, and mycology.</p>':''}
         </div>
         ${key==='para_myco'&&isAdmin?`<label style="margin-left:auto;cursor:pointer" aria-label="Update subject icon">📷<input type="file" accept="image/*" style="display:none" onchange="handleSubjectIconFile(event,'para_myco');setTimeout(()=>renderView(),600)"></label>`:''}
       </div>
@@ -6626,9 +6626,9 @@ async function renderMicroVisualAidsTab(el){
     return `<figure><img src="${esc(url)}" alt="${esc(entry.caption||'Specimen image')}" loading="lazy"><figcaption>${esc(entry.caption||'')}</figcaption></figure>`;
   }).join('');
   el.innerHTML=`<section class="micro-visual-shell">
-    <header><div><span class="micro-visual-kicker">Microbiology</span><h2>Visual Aids</h2><p>A portrait specimen booklet. Add your own pages, images, and notes.</p></div></header>
+    <header><div><h2>Visual Aids</h2></div></header>
     <div class="micro-visual-controls"><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(-1)" ${index?'':'disabled'}>← Previous</button><strong>${pages.length?'Page '+(index+1)+' of '+pages.length:'No pages yet'}</strong><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(1)" ${index<pages.length-1?'':'disabled'}>Next →</button></div>
-    <article class="micro-visual-sheet">${page?`<h3>${esc(page.title||'Untitled specimen')}</h3>${page.case_data?`<h4>${esc(page.case_data)}</h4>`:''}<div class="micro-visual-images">${figures}</div><p class="micro-visual-notes">${esc(page.scenario||'')}</p><span class="micro-visual-number">${index+1}</span>`:`<p class="micro-visual-empty">Add your first specimen page in Admin mode.</p>`}</article>
+    <article class="micro-visual-sheet">${page?`<h3>${esc(page.title||'Untitled specimen')}</h3>${page.case_data?`<h4>${esc(page.case_data)}</h4>`:''}<div class="micro-visual-images">${figures}</div><p class="micro-visual-notes">${esc(page.scenario||'')}</p><span class="micro-visual-number">${index+1}</span>`:''}</article>
     ${isAdmin?`<div class="micro-visual-editor">${page?`<label>Specimen name<input id="micro-visual-specimen" value="${esc(page.title||'')}" oninput="captureMicroVisualPage()"></label><label>Page title<input id="micro-visual-title" value="${esc(page.case_data||'')}" oninput="captureMicroVisualPage()"></label><label>Notes<textarea id="micro-visual-notes" rows="5" oninput="captureMicroVisualPage()">${esc(page.scenario||'')}</textarea></label><label>Add images<input type="file" accept="image/*" multiple onchange="uploadMicroVisualImages(this)"></label><div class="micro-visual-image-editors">${images.map((entry,i)=>`<div><img src="${esc(imageEntrySrc(entry))}" alt=""><input aria-label="Image ${i+1} caption" placeholder="Image caption" value="${esc(entry.caption||'')}" oninput="setMicroVisualCaption(${i},this.value)"><button class="btn btn-danger btn-xs" onclick="removeMicroVisualImage(${i})">Remove</button></div>`).join('')}</div><div class="micro-visual-actions"><button class="btn btn-primary btn-sm" id="micro-visual-save" onclick="saveMicroVisualPage()">Save page</button><button class="btn btn-danger btn-sm" onclick="deleteMicroVisualPage()">Delete page</button></div>`:''}<button class="btn btn-ghost btn-sm" onclick="addMicroVisualPage()">+ Add portrait page</button><p id="micro-visual-status" role="status"></p></div>`:''}
   </section>`;
 }
@@ -6776,7 +6776,7 @@ async function renderStudyOutlineTab(el){
     return `<section class="study-nav-section"><button class="outline-section-card study-nav-heading ${selected?.key===section.key?'active':''}" onclick="openStudySection('${sk}','${jsAttr(section.key)}')" aria-expanded="${selected?.key===section.key}">${esc(section.title)} <small>${children.length}</small></button>${selected?.key===section.key?groups.map(group=>`${group?`<h4>${esc(group)}</h4>`:''}${children.filter(t=>studyTopicSubsection(t)===group).map(t=>`<button class="study-nav-topic ${active?.id===t.id?'active':''}" onclick="selectStudyTopic('${sk}','${jsAttr(section.key)}','${jsAttr(t.id)}')" ${active?.id===t.id?'aria-current="page"':''}>${esc(t.title)}</button>`).join('')}`).join(''):''}</section>`;
   }).join('');
   const video=active?externalStudyVideoEmbedUrl(active.answer):'';
-  el.innerHTML=`<div class="study-outline-shell" style="--study-accent:${homeSubjectColor(subjectKey)}"><section class="study-outline-hero"><div><div class="study-outline-kicker">Study Outline</div><h2>${esc(outline.title)}</h2><p>Choose a section and topic to read the study notes.</p>${subjectKey==='blood_bank'?`<p class="study-revision-note">${esc(ASCP_DONOR_ELIGIBILITY_NOTE)}</p>`:''}</div><button class="btn btn-ghost btn-sm study-guideline-button" onclick="openSubjectGuideline('${sk}')">ASCP subject sheet<br><small>Updated ${esc(ASCP_GUIDELINE_DATE)}</small></button></section>
+  el.innerHTML=`<div class="study-outline-shell" style="--study-accent:${homeSubjectColor(subjectKey)}"><section class="study-outline-hero"><div><div class="study-outline-kicker">Study Outline</div><h2>${esc(outline.title)}</h2>${subjectKey==='blood_bank'?`<p class="study-revision-note">${esc(ASCP_DONOR_ELIGIBILITY_NOTE)}</p>`:''}</div><button class="btn btn-ghost btn-sm study-guideline-button" onclick="openSubjectGuideline('${sk}')">ASCP subject sheet<br><small>Updated ${esc(ASCP_GUIDELINE_DATE)}</small></button></section>
   <div class="study-mobile-navigation" aria-label="Choose study section"><label for="study-mobile-section">Section</label><select id="study-mobile-section" onchange="openStudySection('${sk}',this.value)">${sections.map(section=>`<option value="${esc(section.key)}" ${section.key===selected?.key?'selected':''}>${esc(section.title)}</option>`).join('')}</select>${shown.length?`<label for="study-mobile-topic">Subsection</label><select id="study-mobile-topic" onchange="selectStudyTopic('${sk}','${key}',this.value)">${shown.map(t=>`<option value="${esc(t.id)}" ${active?.id===t.id?'selected':''}>${esc(studyTopicSubsection(t)?studyTopicSubsection(t)+' / ':'')}${esc(t.title)}</option>`).join('')}</select>`:''}${isAdmin?`<button class="btn btn-ghost btn-sm" onclick="openStudySectionEditor('${sk}','')">+ Major section</button>`:''}</div>
   <div class="study-reader-layout"><nav class="study-reader-nav" aria-label="Study sections and topics">${isAdmin?`<button class="btn btn-ghost btn-sm" onclick="openStudySectionEditor('${sk}','')">+ Add major section</button>`:''}${tree}</nav>
   <article class="study-reader-content"><header class="study-reader-header"><div><h2 class="study-reader-section-title">${esc(selected?.title||'Study notes')}</h2>${active?`<h3 class="study-reader-subsection-title">${esc(active.title)}</h3>`:''}</div><button class="btn btn-ghost btn-sm" onclick="exportStudySection('${sk}','${key}')" ${shown.length?'':'disabled'}>Export section</button></header>
@@ -7383,7 +7383,6 @@ async function renderMonsterMixView(v){
           <div class="quiz-start-head">
             <div class="quiz-start-kicker">Mixed subject practice</div>
             <h2 class="quiz-start-title">Build your Monster Mix</h2>
-            <p class="quiz-start-summary">Select two or more existing subject banks, then choose a custom question count or use every available question.</p>
           </div>
           <div class="quiz-start-source">Questions stay in their existing subject banks and are randomly mixed only for this quiz session.</div>
           <div class="quiz-start-body">
@@ -7465,7 +7464,7 @@ async function renderQuizTab(el){
             <div class="quiz-start-head">
               <div class="quiz-start-kicker">Subject practice</div>
               <h2 class="quiz-start-title">Build your ${esc(subjectLabel(appState.subject))} quiz</h2>
-              <p class="quiz-start-summary"><strong>${count||0} questions ready.</strong> Choose a focused set or practice the complete subject bank.</p>
+              <p class="quiz-start-summary"><strong>${count||0} questions ready.</strong></p>
             </div>
             <div class="quiz-start-source">Based on <em>Medical Laboratory Science Review, Fifth Edition</em> by Robert R. Harr and the sources listed on the Resources page.</div>
             <div class="quiz-start-body">
@@ -7756,7 +7755,7 @@ function renderQuizQuestionRow(q,i,showSubject=false){
       ${isAdmin?`
         <div class="admin-quiz-explanation${hasExplanation?'':' missing'}">
           <div class="admin-quiz-explanation-label">Explanation</div>
-          <div class="admin-quiz-explanation-text">${hasExplanation?escNL(explanation):'No explanation added yet. Use Edit to add one.'}</div>
+          <div class="admin-quiz-explanation-text">${hasExplanation?escNL(explanation):'No explanation added yet.'}</div>
         </div>
       `:''}
     </div>
@@ -10620,7 +10619,7 @@ async function renderHematologyCases(el){
       <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal('hc')">📄 Export</button>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
-    ${!data||!data.length?'<div class="empty">No Hematology cases yet. Use Admin mode to add one.</div>':''}
+    ${!data||!data.length?'<div class="empty">No Hematology cases yet.</div>':''}
     ${(data||[]).map((c,i)=>renderHemeCase(c,i)).join('')}
   `;
 }
@@ -11219,7 +11218,7 @@ async function renderSubjectCases(el, cfg){
       </div>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
-    ${!cases.length?`<div class="empty">No ${cfg.label} yet. Use Admin mode to add one.</div>`:''}
+    ${!cases.length?`<div class="empty">No ${cfg.label} yet.</div>`:''}
     ${cases.map((c,i)=>renderSubjectCase(c,i,cfg)).join('')}
   `;
 }
@@ -12444,7 +12443,7 @@ async function renderMicroCases(el){
       <button class="btn btn-ghost btn-sm ml-auto" onclick="openExportModal('mc')">📄 Export</button>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
-    ${!data||!data.length?'<div class="empty">No Microbiology cases yet. Use Admin mode to add one.</div>':''}
+    ${!data||!data.length?'<div class="empty">No Microbiology cases yet.</div>':''}
     ${(data||[]).map((c,i)=>renderMicroCase(c,i)).join('')}
   `;
 }
@@ -12824,7 +12823,7 @@ async function renderBloodBankCases(el){
       </div>
     </div>
     ${!caseAnswersAvailable()?caseAnswerNoticeHTML():''}
-    ${!data||!data.length?'<div class="empty">No Blood Bank cases yet. Use Admin mode to add one.</div>':''}
+    ${!data||!data.length?'<div class="empty">No Blood Bank cases yet.</div>':''}
     ${(data||[]).map((c,i)=>renderBBCase(c,i)).join('')}
   `;
 }
@@ -13730,7 +13729,7 @@ async function calcResetOrder(){
 }
 
 function renderCalcTab(cats,all){
-  if(!all.length)return '<div class="empty">No calculations yet. Use Admin mode to add some.</div>';
+  if(!all.length)return '<div class="empty">No calculations yet.</div>';
   window._calcOrderItems=all;
   const cell=(f,wide=false,groupName='')=>{
     if(!f)return '';
@@ -15710,7 +15709,7 @@ async function renderClassSubjectView(v){
       <div class="section-title">${subj?.name||''}</div>
       ${isAdmin?`<button class="btn btn-primary btn-sm ml-auto" onclick="openClassSetEditor(null)">+ New Set</button>`:''}
     </div>
-    ${!sets||!sets.length?`<div class="empty">No sets yet.${isAdmin?' Click "+ New Set" to create one.':''}</div>`:''}
+    ${!sets||!sets.length?'<div class="empty">No sets yet.</div>':''}
     <div style="display:flex;flex-direction:column;gap:10px">
       ${(sets||[]).map(s=>`
         <div class="card" style="cursor:pointer" onclick="openClassSet('${s.id}')">
