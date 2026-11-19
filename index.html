@@ -6083,6 +6083,7 @@ async function renderInteractiveView(v){
   loadInteractiveLinks();
 }
 function renderResourcesView(v){
+  const outlineSources=[...new Set(Object.values(STUDY_OUTLINES).flatMap(outline=>outline.bibliography||[]))];
   v.innerHTML=`
     <div class="flex-center gap-12 mb-16 flex-wrap">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Home</button>
@@ -6099,6 +6100,10 @@ function renderResourcesView(v){
           <div class="resource-note">${esc(r.note)}</div>
         </div>
       `).join('')}
+    </div>
+    <h2 class="section-title mt-16">Study outline sources</h2>
+    <div class="resource-list">
+      ${outlineSources.map(citation=>`<div class="resource-card"><div class="resource-meta">${esc(citation)}</div></div>`).join('')}
     </div>
     <div class="card-sm mt-16" style="font-size:12px;color:var(--text2);line-height:1.6">
       Book explanations are added to loaded question banks section by section and appear after each answered question when available.
@@ -6651,7 +6656,7 @@ async function renderStudyOutlineTab(el){
   <article class="study-reader-content"><header class="study-reader-header"><div><h2 class="study-reader-section-title">${esc(selected?.title||'Study notes')}</h2>${active?`<h3 class="study-reader-subsection-title">${esc(active.title)}</h3>`:''}</div><button class="btn btn-ghost btn-sm" onclick="exportStudySection('${sk}','${key}')" ${shown.length?'':'disabled'}>Export section</button></header>
   ${isAdmin?`<div class="study-reader-tools"><button class="btn btn-primary btn-sm" onclick="openStudyTopicEditor('${sk}','','${selected?.key==='unfiled'?'':key}')">+ Add subsection</button>${selected&&selected.key!=='unfiled'?`<button class="btn btn-ghost btn-sm" onclick="openStudySectionEditor('${sk}','${key}')">Edit major section</button>`:''}${active?`<button class="btn btn-ghost btn-sm" onclick="openStudyTopicEditor('${sk}','${jsAttr(active.id)}')">Edit subsection / visuals</button><button class="btn btn-danger btn-sm" onclick="deleteStudyTopic('${sk}','${jsAttr(active.id)}')">Delete subsection</button>`:''}</div>`:''}
   ${active?`<div class="study-authored-notes">${studyNotesHTML(active.scenario)}</div><div class="study-authored-visuals">${studyVisualsHTML(active)}</div>${active.case_data?`<p class="study-topic-citation">Source: ${esc(active.case_data)}</p>`:''}${video?`<iframe class="study-topic-video" src="${esc(video)}" title="${esc(active.title)} video" allowfullscreen loading="lazy"></iframe>`:''}`:`<div class="outline-section-empty">No subsections have been added to this section yet.${isAdmin?' Use Add subsection to write your notes and include visuals.':''}</div>`}
-  </article></div><details class="study-bibliography"><summary>Source bibliography (${outline.bibliography.length} sources)</summary><ol>${outline.bibliography.map(item=>`<li>${esc(item)}</li>`).join('')}</ol></details></div>`;
+  </article></div></div>`;
 }
 function renderStudyVisualDraft(){
   const el=document.getElementById('study-topic-visuals');if(!el)return;
