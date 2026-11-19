@@ -34,31 +34,8 @@
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
- .micro-visual-shell{max-width:1000px;margin:28px auto;color:var(--text)}
- .micro-visual-shell>header{margin-bottom:18px}
- .micro-visual-shell h2{font-size:32px;margin:4px 0}
- .micro-visual-shell>header p{color:var(--text3);margin:0}
- .micro-visual-kicker{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#237b65}
- .micro-visual-controls{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:18px 0}
- .micro-visual-sheet{box-sizing:border-box;width:min(100%,680px);min-height:880px;aspect-ratio:8.5/11;margin:auto;padding:42px 48px;background:white;border:1px solid #cdd9d5;border-radius:4px;box-shadow:0 16px 36px #173b3022;display:flex;flex-direction:column;gap:16px}
- .micro-visual-sheet h3{font-size:28px;line-height:1.2;color:#123e34;border-bottom:2px solid #288673;margin:0;padding-bottom:10px}
- .micro-visual-sheet h4{font-size:18px;margin:0;color:#385750}
- .micro-visual-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
- .micro-visual-images figure{margin:0;padding:8px;border:1px solid #d8e3df;border-radius:10px;text-align:center}
- .micro-visual-images img{display:block;width:100%;height:220px;object-fit:contain}
- .micro-visual-images figcaption{font-size:12px;color:#5b6d66;margin-top:6px}
- .micro-visual-notes{white-space:pre-wrap;line-height:1.6}
- .micro-visual-number{margin-top:auto;text-align:center;font-size:12px;color:#72827d}
- .micro-visual-empty{margin:auto;color:#72827d;font-style:italic}
- .micro-visual-editor{box-sizing:border-box;width:min(100%,680px);margin:22px auto;display:grid;gap:12px}
- .micro-visual-editor label{display:grid;gap:5px;font-weight:700}
- .micro-visual-editor input,.micro-visual-editor textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid #c9d5d1;border-radius:8px;font:inherit}
- .micro-visual-image-editors{display:grid;gap:8px}
- .micro-visual-image-editors>div{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center}
- .micro-visual-image-editors img{width:70px;height:56px;object-fit:contain}
- .micro-visual-actions{display:flex;gap:8px}
- @media(max-width:760px){.micro-visual-sheet{min-height:620px;padding:24px 20px}.micro-visual-images{grid-template-columns:1fr}.micro-visual-images img{height:180px}}
 </style>
+<link rel="stylesheet" href="micro-visual-aids.css">
 </head>
 <style>
 :root {
@@ -6588,106 +6565,6 @@ async function renderTab(){
   else if(appState.subjectTab==='cases')await renderCasesTab(el);
   }catch(error){if(el.isConnected&&appState.subject===subject&&appState.subjectTab===tab)el.innerHTML='<div class="empty">Content could not load. <button class="btn btn-primary" onclick="renderTab()">Try again</button></div>';console.warn('Content load failed',error);}
   requestAnimationFrame(syncQuizShell);
-}
-
-async function loadMicroVisualPages(force=false){
-  if(!force&&window._microVisualPages)return window._microVisualPages;
-  const {data,error}=await sb.from('mlsboc_cases')
-    .select('id,title,scenario,case_data,images,created_at')
-    .eq('subject','micro_visual_aid').eq('group_label','microbiology')
-    .order('created_at',{ascending:true});
-  if(error)throw error;
-  window._microVisualPages=(data||[]).map(row=>({...row,images:imageEntryList(row.images).map(entry=>typeof entry==='string'?{url:entry,caption:''}:{...entry})}));
-  return window._microVisualPages;
-}
-function microVisualPage(){
-  const pages=window._microVisualPages||[];
-  appState.microVisualPage=Math.max(0,Math.min(appState.microVisualPage||0,pages.length-1));
-  return pages[appState.microVisualPage];
-}
-function captureMicroVisualPage(){
-  if(!isAdmin)return;
-  const page=microVisualPage();
-  if(!page)return;
-  for(const [field,id] of [['title','micro-visual-specimen'],['case_data','micro-visual-title'],['scenario','micro-visual-notes']]){
-    const input=document.getElementById(id);
-    if(input)page[field]=input.value;
-  }
-}
-async function renderMicroVisualAidsTab(el){
-  el.innerHTML='<div class="empty">Loading Visual Aids…</div>';
-  const pages=await loadMicroVisualPages();
-  if(!el.isConnected||appState.subject!=='microbiology'||appState.subjectTab!=='visualAids')return;
-  const page=microVisualPage(),index=appState.microVisualPage||0;
-  const images=page?imageEntryList(page.images):[];
-  const figures=images.map(entry=>{
-    const url=imageEntrySrc(entry);
-    if(!/^(https?:\/\/|data:image\/(?:png|jpeg|webp|gif);base64,)/i.test(url))return '';
-    return `<figure><img src="${esc(url)}" alt="${esc(entry.caption||'Specimen image')}" loading="lazy"><figcaption>${esc(entry.caption||'')}</figcaption></figure>`;
-  }).join('');
-  el.innerHTML=`<section class="micro-visual-shell">
-    <header><div><h2>Visual Aids</h2></div></header>
-    <div class="micro-visual-controls"><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(-1)" ${index?'':'disabled'}>← Previous</button><strong>${pages.length?'Page '+(index+1)+' of '+pages.length:'No pages yet'}</strong><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(1)" ${index<pages.length-1?'':'disabled'}>Next →</button></div>
-    <article class="micro-visual-sheet">${page?`<h3>${esc(page.title||'Untitled specimen')}</h3>${page.case_data?`<h4>${esc(page.case_data)}</h4>`:''}<div class="micro-visual-images">${figures}</div><p class="micro-visual-notes">${esc(page.scenario||'')}</p><span class="micro-visual-number">${index+1}</span>`:''}</article>
-    ${isAdmin?`<div class="micro-visual-editor">${page?`<label>Specimen name<input id="micro-visual-specimen" value="${esc(page.title||'')}" oninput="captureMicroVisualPage()"></label><label>Page title<input id="micro-visual-title" value="${esc(page.case_data||'')}" oninput="captureMicroVisualPage()"></label><label>Notes<textarea id="micro-visual-notes" rows="5" oninput="captureMicroVisualPage()">${esc(page.scenario||'')}</textarea></label><label>Add images<input type="file" accept="image/*" multiple onchange="uploadMicroVisualImages(this)"></label><div class="micro-visual-image-editors">${images.map((entry,i)=>`<div><img src="${esc(imageEntrySrc(entry))}" alt=""><input aria-label="Image ${i+1} caption" placeholder="Image caption" value="${esc(entry.caption||'')}" oninput="setMicroVisualCaption(${i},this.value)"><button class="btn btn-danger btn-xs" onclick="removeMicroVisualImage(${i})">Remove</button></div>`).join('')}</div><div class="micro-visual-actions"><button class="btn btn-primary btn-sm" id="micro-visual-save" onclick="saveMicroVisualPage()">Save page</button><button class="btn btn-danger btn-sm" onclick="deleteMicroVisualPage()">Delete page</button></div>`:''}<button class="btn btn-ghost btn-sm" onclick="addMicroVisualPage()">+ Add portrait page</button><p id="micro-visual-status" role="status"></p></div>`:''}
-  </section>`;
-}
-function microVisualTurn(step){
-  captureMicroVisualPage();
-  appState.microVisualPage=Math.max(0,Math.min((appState.microVisualPage||0)+step,(window._microVisualPages||[]).length-1));
-  renderTab();
-}
-function addMicroVisualPage(){
-  if(!isAdmin)return;
-  captureMicroVisualPage();
-  window._microVisualPages=window._microVisualPages||[];
-  window._microVisualPages.push({title:'',case_data:'',scenario:'',images:[],created_at:new Date().toISOString()});
-  appState.microVisualPage=window._microVisualPages.length-1;
-  renderTab();
-}
-function setMicroVisualCaption(index,value){
-  if(!isAdmin)return;
-  const page=microVisualPage();if(page?.images?.[index])page.images[index].caption=value;
-}
-function removeMicroVisualImage(index){
-  if(!isAdmin)return;
-  captureMicroVisualPage();
-  const page=microVisualPage();if(!page)return;
-  page.images.splice(index,1);renderTab();
-}
-async function uploadMicroVisualImages(input){
-  if(!isAdmin)return;
-  captureMicroVisualPage();
-  const page=microVisualPage(),status=document.getElementById('micro-visual-status');
-  if(!page)return;
-  if(status)status.textContent='Preparing images…';
-  try{
-    for(const file of input.files||[])page.images.push({url:await compressQuestionImageFile(file),caption:''});
-    renderTab();
-  }catch(error){if(status)status.textContent='Image could not be added: '+error.message;}
-  finally{input.value='';}
-}
-async function saveMicroVisualPage(){
-  if(!isAdmin)return;
-  captureMicroVisualPage();
-  const page=microVisualPage(),button=document.getElementById('micro-visual-save'),status=document.getElementById('micro-visual-status');
-  if(!page)return;
-  if(button)button.disabled=true;
-  const payload={subject:'micro_visual_aid',group_label:'microbiology',title:page.title.trim()||'Untitled specimen',scenario:page.scenario||'',case_data:page.case_data||'',answer:'',steps:[],images:page.images||[],is_draft:false};
-  const result=page.id?await sb.from('mlsboc_cases').update(payload).eq('id',page.id).select('id').single():await sb.from('mlsboc_cases').insert(payload).select('id').single();
-  if(result.error){if(status)status.textContent='Save failed: '+result.error.message;if(button)button.disabled=false;return;}
-  page.id=result.data.id;page.title=payload.title;
-  if(status)status.textContent='Page saved.';
-  if(button)button.disabled=false;
-  renderTab();
-}
-async function deleteMicroVisualPage(){
-  if(!isAdmin)return;
-  const page=microVisualPage();if(!page||!confirm('Delete this specimen page?'))return;
-  if(page.id){const {error}=await sb.from('mlsboc_cases').delete().eq('id',page.id);if(error){alert('Delete failed: '+error.message);return;}}
-  window._microVisualPages.splice(appState.microVisualPage,1);
-  appState.microVisualPage=Math.max(0,appState.microVisualPage-1);
-  renderTab();
 }
 
 async function loadCustomStudyTopics(subjectKey,force=false){
@@ -17058,6 +16935,7 @@ function closeImgViewer(){
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgViewer();closeQuestionMediaZoom();}});
 </script>
+<script src="micro-visual-aids.js"></script>
 <div id="img-viewer" style="display:none" onclick="closeImgViewer()">
   <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
   <img id="img-viewer-img" src="" alt="">
