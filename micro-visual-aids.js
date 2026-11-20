@@ -9,14 +9,14 @@ function microVisualId(){
 }
 function microVisualDefaultBlocks(page){
   var blocks=[
-    {id:microVisualId(),type:'image',label:'Gram stain',url:'',x:7,y:19,w:41,h:32},
-    {id:microVisualId(),type:'image',label:'Agar',url:'',x:52,y:19,w:41,h:32},
-    {id:microVisualId(),type:'text',text:page.scenario||'',x:7,y:56,w:86,h:17,fontSize:16,color:'#243b35',background:'#ffffff'}
+    {id:microVisualId(),type:'image',label:'Gram stain',shape:'square',url:'',x:7,y:14,w:41,h:32},
+    {id:microVisualId(),type:'image',label:'Agar',shape:'circle',url:'',x:52,y:14,w:41,h:32},
+    {id:microVisualId(),type:'text',text:page.scenario||'',x:7,y:51,w:86,h:17,fontSize:16,color:'#243b35',background:'#ffffff'}
   ];
   imageEntryList(page.images).forEach(function(entry,index){
     var url=imageEntrySrc(entry);
     if(index<2){blocks[index].url=url;blocks[index].label=entry.caption||blocks[index].label;}
-    else blocks.push({id:microVisualId(),type:'image',label:entry.caption||'Image',url:url,x:7+(index%2)*45,y:58,w:41,h:28});
+    else blocks.push({id:microVisualId(),type:'image',shape:'square',label:entry.caption||'Image',url:url,x:7+(index%2)*45,y:58,w:41,h:28});
   });
   return blocks;
 }
@@ -24,7 +24,12 @@ function microVisualNormalizePage(page){
   var steps=page.steps;
   if(typeof steps==='string'){try{steps=JSON.parse(steps);}catch(e){steps=[];}}
   page.blocks=Array.isArray(steps)&&steps.length?steps.map(function(block){
-    return Object.assign({id:microVisualId(),type:'text',x:7,y:20,w:40,h:25,text:'',label:'Image',url:'',fontSize:16,color:'#243b35',background:'#ffffff'},block);
+    var clean=Object.assign({id:microVisualId(),type:'text',x:7,y:20,w:40,h:25,text:'',label:'Image',url:'',fontSize:16,color:'#243b35',background:'#ffffff'},block);
+    if(clean.type==='image'){
+      clean.shape=clean.shape==='circle'?'circle':(/^agar|plate$/i.test(clean.label||'')?'circle':'square');
+      if(Number(clean.y)===19&&(/^(Gram stain|Agar)$/i.test(clean.label||'')))clean.y=14;
+    }
+    return clean;
   }):microVisualDefaultBlocks(page);
   return page;
 }
@@ -58,6 +63,7 @@ function microVisualBlockHTML(block){
     body=url?'<img src="'+microVisualEscape(url)+'" alt="'+microVisualEscape(block.label||'Visual')+'">':
       (isAdmin?'<label class="mv-image-placeholder"><span>'+microVisualEscape(block.label||'Image')+'</span><span class="mv-slot-upload">Add image</span><input type="file" accept="image/*" onchange="microVisualImageUpload(this,\''+id+'\')"></label>':
       '<div class="mv-image-placeholder">'+microVisualEscape(block.label||'Image')+'</div>');
+    body='<div class="mv-image-media '+(block.shape==='circle'?'is-circle':'is-square')+'">'+body+'</div>';
     body+='<div class="mv-image-label">'+microVisualEscape(block.label||'')+'</div>';
     if(url&&isAdmin)body+='<button type="button" class="mv-clear-image" title="Remove image" aria-label="Remove image" onclick="event.stopPropagation();microVisualClearImage(\''+id+'\')">×</button>';
   }else{
@@ -92,6 +98,7 @@ function microVisualRenderInspector(){
   if(!block){box.innerHTML='';return;}
   var field=block.type==='image'?
     '<label>Image label<input value="'+microVisualEscape(block.label||'')+'" oninput="microVisualSetField(\'label\',this.value)"></label>'+
+    '<label>Image shape<select onchange="microVisualSetField(\'shape\',this.value)"><option value="square"'+(block.shape!=='circle'?' selected':'')+'>Square</option><option value="circle"'+(block.shape==='circle'?' selected':'')+'>Circle</option></select></label>'+
     '<label>Image<input type="file" accept="image/*" onchange="microVisualImageUpload(this,\''+microVisualEscape(block.id)+'\')"></label>'+
     (block.url?'<button class="btn btn-ghost btn-sm" type="button" onclick="microVisualClearImage(\''+microVisualEscape(block.id)+'\')">Remove image</button>':''):
     '<label>Text<textarea rows="5" oninput="microVisualSetField(\'text\',this.value)">'+microVisualEscape(block.text||'')+'</textarea></label>'+
@@ -105,10 +112,21 @@ async function renderMicroVisualAidsTab(el){
   el.innerHTML='<div class="empty">Loading Visual Aids…</div>';
   var pages=await loadMicroVisualPages();
   if(!el.isConnected||appState.subject!=='microbiology'||appState.subjectTab!=='visualAids')return;
+  if(appState.microVisualView!=='page'){
+    var sorted=pages.map(function(page,index){return {page:page,index:index};}).sort(function(a,b){return (a.page.title||'Untitled specimen').localeCompare(b.page.title||'Untitled specimen',undefined,{sensitivity:'base'});});
+    el.innerHTML='<section class="micro-visual-shell"><header><h2>Visual Aids</h2></header><div class="mv-gallery-toolbar">'+
+      (isAdmin?'<button class="btn btn-primary btn-sm" type="button" onclick="addMicroVisualPage()">+ Add page</button>':'')+
+      (pages.length?'<button class="btn btn-ghost btn-sm" type="button" onclick="exportMicroVisualPdf()">Export PDF</button>':'')+'</div>'+
+      '<div class="mv-gallery">'+sorted.map(function(item){
+        var page=item.page,images=(page.blocks||[]).filter(function(block){return block.type==='image'&&microVisualSafeUrl(block.url);}).slice(0,2);
+        return '<button class="mv-gallery-card" type="button" onclick="openMicroVisualPage('+item.index+')"><span class="mv-gallery-preview"><strong>'+microVisualEscape(page.title||'Untitled specimen')+'</strong><small>'+microVisualEscape(page.case_data||'')+'</small><span class="mv-gallery-line"></span><span class="mv-gallery-images">'+images.map(function(block){return '<img class="'+(block.shape==='circle'?'is-circle':'')+'" src="'+microVisualEscape(block.url)+'" alt="">';}).join('')+'</span></span><span class="mv-gallery-name">'+microVisualEscape(page.title||'Untitled specimen')+'</span></button>';
+      }).join('')+'</div></section>';
+    return;
+  }
   var page=microVisualPage(),index=appState.microVisualPage||0;
   var html=[];
   html.push('<section class="micro-visual-shell"><header><h2>Visual Aids</h2></header>');
-  html.push('<div class="micro-visual-controls"><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(-1)" '+(index?'':'disabled')+'>← Previous</button><strong>'+(pages.length?'Page '+(index+1)+' of '+pages.length:'No pages yet')+'</strong><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(1)" '+(index<pages.length-1?'':'disabled')+'>Next →</button>'+(pages.length?'<button class="btn btn-ghost btn-sm" type="button" onclick="exportMicroVisualPdf()">Export PDF</button>':'')+'</div>');
+  html.push('<div class="micro-visual-controls"><button class="btn btn-ghost btn-sm" onclick="microVisualBack()">← All pages</button><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(-1)" '+(index?'':'disabled')+'>← Previous</button><strong>'+(pages.length?'Page '+(index+1)+' of '+pages.length:'No pages yet')+'</strong><button class="btn btn-ghost btn-sm" onclick="microVisualTurn(1)" '+(index<pages.length-1?'':'disabled')+'>Next →</button>'+(pages.length?'<button class="btn btn-primary btn-sm" type="button" onclick="exportMicroVisualPdf()">Export PDF</button>':'')+'</div>');
   html.push('<div class="micro-visual-workspace'+(isAdmin?'':' is-readonly')+'"><article class="micro-visual-sheet" id="micro-visual-sheet">');
   if(page){
     html.push('<div class="mv-page-heading"><h3>'+microVisualEscape(page.title||'Untitled specimen')+'</h3><h4>'+microVisualEscape(page.case_data||'')+'</h4></div>');
@@ -150,6 +168,7 @@ function microVisualSetField(field,value){
     if(field==='color')node.style.color=value;
     if(field==='background')node.style.background=value;
     if(field==='label'){var label=node.querySelector('.mv-image-label');if(label)label.textContent=value;var placeholder=node.querySelector('.mv-image-placeholder > span:first-child');if(placeholder)placeholder.textContent=value||'Image';}
+    if(field==='shape'){var media=node.querySelector('.mv-image-media');if(media){media.classList.toggle('is-circle',value==='circle');media.classList.toggle('is-square',value!=='circle');}}
   }
   microVisualDirty();
 }
@@ -168,7 +187,7 @@ function microVisualAddBlock(type){
   var page=microVisualPage();if(!page)return;
   var offset=page.blocks.length%4;
   var block=type==='image'?
-    {id:microVisualId(),type:'image',label:'Image',url:'',x:10+offset*5,y:72,w:38,h:23}:
+    {id:microVisualId(),type:'image',shape:'square',label:'Image',url:'',x:10+offset*5,y:72,w:38,h:23}:
     {id:microVisualId(),type:'text',text:'',x:10+offset*5,y:76,w:55,h:16,fontSize:16,color:'#243b35',background:'#ffffff'};
   page.blocks.push(block);appState.microVisualSelected=block.id;renderTab();
 }
@@ -276,11 +295,13 @@ function microVisualEndPointer(){
   microVisualSelect(appState.microVisualSelected);
   microVisualDirty();
 }
-function microVisualTurn(step){
-  captureMicroVisualPage();
+async function microVisualTurn(step){
+  if(isAdmin&&await saveMicroVisualPage()===false)return;
   appState.microVisualPage=Math.max(0,Math.min((appState.microVisualPage||0)+step,(window._microVisualPages||[]).length-1));
   appState.microVisualSelected=null;renderTab();
 }
+function openMicroVisualPage(index){appState.microVisualPage=index;appState.microVisualSelected=null;appState.microVisualView='page';renderTab();}
+async function microVisualBack(){if(isAdmin&&await saveMicroVisualPage()===false)return;appState.microVisualView='library';renderTab();}
 function addMicroVisualPage(){
   if(!isAdmin)return;
   captureMicroVisualPage();
@@ -288,7 +309,7 @@ function addMicroVisualPage(){
   var page=microVisualNormalizePage({title:'',case_data:'',scenario:'',steps:[],images:[],created_at:new Date().toISOString()});
   window._microVisualPages.push(page);
   appState.microVisualPage=window._microVisualPages.length-1;
-  appState.microVisualSelected=null;renderTab();
+  appState.microVisualSelected=null;appState.microVisualView='page';renderTab();
 }
 async function saveMicroVisualPage(){
   if(!isAdmin)return;
@@ -313,32 +334,43 @@ function microVisualPdfRgb(value){
   if(!hex)return [255,255,255];
   return [0,2,4].map(function(offset){return parseInt(hex[1].slice(offset,offset+2),16);});
 }
-function exportMicroVisualPdf(){
+async function exportMicroVisualPdf(){
   captureMicroVisualPage();
   var pages=window._microVisualPages||[];
   if(!pages.length)return;
   if(!window.jspdf?.jsPDF){alert('PDF export is unavailable. Reload the page and try again.');return;}
   var doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'pt',format:'letter'});
   var warnings=0;
-  pages.forEach(function(page,pageIndex){
+  for(var pageIndex=0;pageIndex<pages.length;pageIndex++){
+    var page=pages[pageIndex];
     if(pageIndex)doc.addPage();
     doc.setFillColor(255,255,255);doc.rect(0,0,612,792,'F');
-    doc.setDrawColor(55,139,120);doc.setLineWidth(1.5);doc.line(43,120,569,120);
+    doc.setDrawColor(55,139,120);doc.setLineWidth(1.5);doc.line(43,105,569,105);
     doc.setTextColor(23,61,52);doc.setFont('helvetica','bold');doc.setFontSize(22);
     doc.text(doc.splitTextToSize(page.title||'Untitled specimen',520).slice(0,2),43,70);
-    if(page.case_data){doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(82,112,104);doc.text(doc.splitTextToSize(page.case_data,520).slice(0,2),43,104);}
-    (page.blocks||[]).forEach(function(block){
+    if(page.case_data){doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(82,112,104);doc.text(doc.splitTextToSize(page.case_data,520).slice(0,1),43,92);}
+    for(var block of (page.blocks||[])){
       var x=612*Number(block.x||0)/100,y=792*Number(block.y||0)/100;
       var w=612*Number(block.w||30)/100,h=792*Number(block.h||20)/100;
       if(block.type==='image'){
-        doc.setDrawColor(190,211,203);doc.setLineWidth(.7);doc.rect(x,y,w,h);
+        doc.setDrawColor(190,211,203);doc.setLineWidth(.7);
+        if(block.shape==='circle')doc.circle(x+w/2,y+(h-20)/2,Math.min(w,h-20)/2);
+        else doc.rect(x,y,w,h);
         var url=microVisualSafeUrl(block.url);
         if(url){
           try{
             var info=doc.getImageProperties(url),availableW=Math.max(1,w-12),availableH=Math.max(1,h-24);
             var scale=Math.min(availableW/info.width,availableH/info.height);
             var iw=info.width*scale,ih=info.height*scale;
-            doc.addImage(url,info.fileType||'JPEG',x+(w-iw)/2,y+5+(availableH-ih)/2,iw,ih);
+            if(block.shape==='circle'){
+              var imageCanvas=document.createElement('canvas'),side=400;
+              imageCanvas.width=side;imageCanvas.height=side;
+              var imageContext=imageCanvas.getContext('2d'),source=await new Promise(function(resolve,reject){var img=new Image();img.onload=function(){resolve(img);};img.onerror=reject;img.src=url;});
+              imageContext.beginPath();imageContext.arc(side/2,side/2,side/2,0,Math.PI*2);imageContext.clip();
+              var crop=Math.min(info.width,info.height),sx=(info.width-crop)/2,sy=(info.height-crop)/2;
+              imageContext.drawImage(source,sx,sy,crop,crop,0,0,side,side);
+              var diameter=Math.min(w-12,h-26);doc.addImage(imageCanvas.toDataURL('image/png'),'PNG',x+(w-diameter)/2,y+3,diameter,diameter);
+            }else doc.addImage(url,info.fileType||'JPEG',x+(w-iw)/2,y+5+(availableH-ih)/2,iw,ih);
           }catch(error){warnings++;}
         }
         doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(64,92,82);
@@ -353,9 +385,9 @@ function exportMicroVisualPdf(){
         var lines=doc.splitTextToSize(String(block.text||''),Math.max(1,w-12));
         doc.text(lines.slice(0,Math.floor(Math.max(1,h-10)/(fontSize*1.2))),x+6,y+fontSize+3);
       }
-    });
+    }
     doc.setFontSize(9);doc.setTextColor(120,137,130);doc.text(String(pageIndex+1),306,777,{align:'center'});
-  });
+  }
   doc.save('microbiology-visual-aids.pdf');
   if(warnings)alert(warnings+' image(s) could not be embedded in the PDF.');
 }
@@ -365,5 +397,5 @@ async function deleteMicroVisualPage(){
   if(page.id){var result=await sb.from('mlsboc_cases').delete().eq('id',page.id);if(result.error){alert('Delete failed: '+result.error.message);return;}}
   window._microVisualPages.splice(appState.microVisualPage,1);
   appState.microVisualPage=Math.max(0,appState.microVisualPage-1);
-  appState.microVisualSelected=null;renderTab();
+  appState.microVisualSelected=null;appState.microVisualView='library';renderTab();
 }

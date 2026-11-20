@@ -1932,6 +1932,15 @@ body:not(.light-mode) .subject-notebook{--paper:#202b3b;--ink:#eaf0fa;--rule:#b6
 .study-reader-header>div{min-width:0;flex:1 1 240px;overflow-wrap:anywhere}
 .study-reader-header .study-reader-section-title{font-family:var(--serif);font-size:30px;line-height:1.3;margin:0;color:var(--text);letter-spacing:0;text-transform:none}
 .study-reader-header .study-reader-subsection-title{font-family:var(--serif);font-size:27px;line-height:1.35;margin:12px 0 0 18px;color:var(--text2);font-weight:650}
+.ascp-hero-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ascp-node{box-sizing:border-box;overflow-wrap:anywhere}
+.ascp-node.ascp-depth-2{padding-left:24px;font-size:14px;font-weight:550}
+.ascp-node.ascp-depth-3{padding-left:38px;font-size:13px;font-weight:500}
+.ascp-node.ascp-depth-4{padding-left:50px;font-size:12px;font-weight:500}
+.ascp-child-list{display:grid;gap:8px;margin:18px 0}
+.ascp-child-list button{display:block;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font:inherit;line-height:1.4;cursor:pointer}
+.ascp-child-list button:hover{border-color:var(--study-accent)}
+@media(max-width:600px){.ascp-hero-actions{justify-content:flex-end}.ascp-hero-actions .study-guideline-button{margin-left:0}.ascp-child-list button{font-size:14px}}
 .study-nav-heading.outline-section-card{font-size:18px;line-height:1.4;padding:14px 12px;font-weight:800}
 .study-nav-heading.active{background:color-mix(in srgb,var(--study-accent) 16%,var(--bg2))}
 .study-nav-topic{width:calc(100% - 24px);margin:6px 0 6px 24px;padding:11px 12px;font-size:16px;line-height:1.5;font-weight:600}
@@ -6523,6 +6532,7 @@ async function renderSubjectView(v){
 
 function switchTab(tab){
   stopQuizMusic(false);
+  if(tab==='visualAids')appState.microVisualView='library';
   // Update tab buttons immediately — no re-render wait
   document.querySelectorAll('.tab').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.tab===tab);
@@ -6635,6 +6645,7 @@ function studyVisualsHTML(topic){
 }
 function selectStudyTopic(subject,key,id){appState.studySection={subject,key};appState.studyTopicId=id;renderTab();}
 async function renderStudyOutlineTab(el){
+  return renderAscpStudyOutlineTab(el);
   const subjectKey=appState.subject,outline=STUDY_OUTLINES[subjectKey];
   if(!outline){el.innerHTML='<div class="empty">No outline available.</div>';return;}
   el.innerHTML='<div class="empty">Loading study sections…</div>';
@@ -6739,7 +6750,7 @@ function openSubjectGuideline(subjectKey){
   const dialog=modal.querySelector('.modal');
   dialog.classList.remove('study-chapter-modal','ascp-study-modal','ascp-guideline-modal');
   dialog.classList.add('study-outline-modal','subject-sheet-modal');
-  document.getElementById('condition-modal-body').innerHTML=`<div class="subject-sheet-shell"><div class="subject-sheet-toolbar"><span>${esc(STUDY_OUTLINES[subjectKey].title)} · ASCP subject sheet</span><button class="btn btn-ghost btn-sm" onclick="closeStudyOutlineWindow()" aria-label="Close subject guideline">✕ Close</button></div><div class="subject-sheet-scroll">${subjectGuidelineHTML(subjectKey)}</div></div>`;
+  document.getElementById('condition-modal-body').innerHTML=`<div class="subject-sheet-shell"><div class="subject-sheet-toolbar"><span>${esc(STUDY_OUTLINES[subjectKey].title)} · ASCP subject sheet</span><button class="btn btn-primary btn-sm" onclick="exportAscpStudyPdf('${jsAttr(subjectKey)}')">Export PDF</button><button class="btn btn-ghost btn-sm" onclick="closeStudyOutlineWindow()" aria-label="Close subject guideline">✕ Close</button></div><div class="subject-sheet-scroll">${subjectGuidelineHTML(subjectKey)}</div></div>`;
   modal.onclick=event=>{if(event.target===modal)closeStudyOutlineWindow();};
   modal.classList.remove('hidden');
 }
@@ -16936,6 +16947,7 @@ function closeImgViewer(){
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgViewer();closeQuestionMediaZoom();}});
 </script>
 <script src="micro-visual-aids.js"></script>
+<script src="ascp-study-outline.js"></script>
 <div id="img-viewer" style="display:none" onclick="closeImgViewer()">
   <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
   <img id="img-viewer-img" src="" alt="">
