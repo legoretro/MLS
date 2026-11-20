@@ -27,8 +27,12 @@ function microVisualNormalizePage(page){
     var clean=Object.assign({id:microVisualId(),type:'text',x:7,y:20,w:40,h:25,text:'',label:'Image',url:'',fontSize:16,color:'#243b35',background:'#ffffff'},block);
     if(clean.type==='image'){
       clean.shape=clean.shape==='circle'?'circle':(/^agar|plate$/i.test(clean.label||'')?'circle':'square');
+      clean.focusX=Math.max(0,Math.min(100,Number(clean.focusX??50)));
+      clean.focusY=Math.max(0,Math.min(100,Number(clean.focusY??50)));
+      clean.zoom=Math.max(1,Math.min(3,Number(clean.zoom)||1));
       if(Number(clean.y)===19&&(/^(Gram stain|Agar)$/i.test(clean.label||'')))clean.y=14;
     }
+    if(clean.type==='tests')clean.rows=Array.isArray(clean.rows)?clean.rows:[{test:'',result:''}];
     return clean;
   }):microVisualDefaultBlocks(page);
   return page;
@@ -54,18 +58,24 @@ function microVisualSelectedBlock(){
 function microVisualSafeUrl(url){
   return /^(https?:\/\/|data:image\/(?:png|jpeg|webp|gif);base64,)/i.test(String(url||''))?url:'';
 }
+function microVisualImageStyle(block){
+  var x=Math.max(0,Math.min(100,Number(block.focusX??50))),y=Math.max(0,Math.min(100,Number(block.focusY??50))),zoom=Math.max(1,Math.min(3,Number(block.zoom)||1));
+  return 'object-position:'+x+'% '+y+'%;transform:translate('+((50-x)*(zoom-1))+'%,'+((50-y)*(zoom-1))+'%) scale('+zoom+')';
+}
 function microVisualBlockHTML(block){
   var id=microVisualEscape(block.id),selected=block.id===appState.microVisualSelected?' is-selected':'';
   var style='left:'+Number(block.x||0)+'%;top:'+Number(block.y||0)+'%;width:'+Number(block.w||30)+'%;height:'+Number(block.h||20)+'%;';
   var body;
   if(block.type==='image'){
     var url=microVisualSafeUrl(block.url);
-    body=url?'<img src="'+microVisualEscape(url)+'" alt="'+microVisualEscape(block.label||'Visual')+'">':
+    body=url?'<img src="'+microVisualEscape(url)+'" alt="'+microVisualEscape(block.label||'Visual')+'" style="'+microVisualImageStyle(block)+'">':
       (isAdmin?'<label class="mv-image-placeholder"><span>'+microVisualEscape(block.label||'Image')+'</span><span class="mv-slot-upload">Add image</span><input type="file" accept="image/*" onchange="microVisualImageUpload(this,\''+id+'\')"></label>':
       '<div class="mv-image-placeholder">'+microVisualEscape(block.label||'Image')+'</div>');
     body='<div class="mv-image-media '+(block.shape==='circle'?'is-circle':'is-square')+'">'+body+'</div>';
     body+='<div class="mv-image-label">'+microVisualEscape(block.label||'')+'</div>';
     if(url&&isAdmin)body+='<button type="button" class="mv-clear-image" title="Remove image" aria-label="Remove image" onclick="event.stopPropagation();microVisualClearImage(\''+id+'\')">×</button>';
+  }else if(block.type==='tests'){
+    body='<div class="mv-tests-content"><strong>'+microVisualEscape(block.title||'Tests & results')+'</strong><table><thead><tr><th>Test</th><th>Result</th></tr></thead><tbody>'+(block.rows||[]).map(function(row,index){return '<tr><td data-mv-test="'+index+'">'+microVisualEscape(row.test||'')+'</td><td data-mv-result="'+index+'">'+microVisualEscape(row.result||'')+'</td></tr>';}).join('')+'</tbody></table></div>';
   }else{
     style+='color:'+microVisualEscape(block.color||'#243b35')+';background:'+microVisualEscape(block.background||'#ffffff')+';';
     var editable=isAdmin?' contenteditable="true" spellcheck="true" oninput="microVisualTextInput(event,\''+id+'\')"':'';
@@ -96,17 +106,25 @@ function microVisualRenderInspector(){
   var box=document.getElementById('micro-visual-element-editor'),block=microVisualSelectedBlock();
   if(!box)return;
   if(!block){box.innerHTML='';return;}
-  var field=block.type==='image'?
+  var field;
+  if(block.type==='image')field=
     '<label>Image label<input value="'+microVisualEscape(block.label||'')+'" oninput="microVisualSetField(\'label\',this.value)"></label>'+
     '<label>Image shape<select onchange="microVisualSetField(\'shape\',this.value)"><option value="square"'+(block.shape!=='circle'?' selected':'')+'>Square</option><option value="circle"'+(block.shape==='circle'?' selected':'')+'>Circle</option></select></label>'+
+    '<label>Focus left / right<input type="range" min="0" max="100" value="'+Number(block.focusX??50)+'" oninput="microVisualSetField(\'focusX\',this.value)"></label>'+
+    '<label>Focus up / down<input type="range" min="0" max="100" value="'+Number(block.focusY??50)+'" oninput="microVisualSetField(\'focusY\',this.value)"></label>'+
+    '<label>Zoom<input type="range" min="1" max="3" step="0.05" value="'+Number(block.zoom||1)+'" oninput="microVisualSetField(\'zoom\',this.value)"></label>'+
+    '<button class="btn btn-ghost btn-sm" type="button" onclick="microVisualCenterImage()">Center image</button>'+
     '<label>Image<input type="file" accept="image/*" onchange="microVisualImageUpload(this,\''+microVisualEscape(block.id)+'\')"></label>'+
-    (block.url?'<button class="btn btn-ghost btn-sm" type="button" onclick="microVisualClearImage(\''+microVisualEscape(block.id)+'\')">Remove image</button>':''):
-    '<label>Text<textarea rows="5" oninput="microVisualSetField(\'text\',this.value)">'+microVisualEscape(block.text||'')+'</textarea></label>'+
+    (block.url?'<button class="btn btn-ghost btn-sm" type="button" onclick="microVisualClearImage(\''+microVisualEscape(block.id)+'\')">Remove image</button>':'');
+  else if(block.type==='tests')field=
+    '<label>Section title<input value="'+microVisualEscape(block.title||'Tests & results')+'" oninput="microVisualSetField(\'title\',this.value)"></label>'+
+    '<div class="mv-test-editor">'+(block.rows||[]).map(function(row,index){return '<div class="mv-test-editor-row"><label>Test<input value="'+microVisualEscape(row.test||'')+'" oninput="microVisualSetTestField('+index+',\'test\',this.value)"></label><label>Result<input value="'+microVisualEscape(row.result||'')+'" oninput="microVisualSetTestField('+index+',\'result\',this.value)"></label><button class="btn btn-danger btn-xs" type="button" onclick="microVisualRemoveTestRow('+index+')">Remove</button></div>';}).join('')+'</div><button class="btn btn-ghost btn-sm" type="button" onclick="microVisualAddTestRow()">+ Add test</button>';
+  else field='<label>Text<textarea rows="5" oninput="microVisualSetField(\'text\',this.value)">'+microVisualEscape(block.text||'')+'</textarea></label>'+
     '<div class="mv-style-row"><label>Size<input type="number" min="10" max="42" value="'+Math.max(10,Math.min(42,Number(block.fontSize)||16))+'" oninput="microVisualSetField(\'fontSize\',this.value)"></label>'+
     '<label>Text color<input type="color" value="'+microVisualEscape(block.color||'#243b35')+'" oninput="microVisualSetField(\'color\',this.value)"></label>'+
     '<label>Background<input type="color" value="'+microVisualEscape(block.background||'#ffffff')+'" oninput="microVisualSetField(\'background\',this.value)"></label></div>';
-  box.innerHTML='<div class="mv-inspector-title">'+(block.type==='image'?'Image':'Text')+'</div>'+field+
-    '<button class="btn btn-danger btn-sm" type="button" onclick="microVisualRemoveBlock()">'+(block.type==='image'?'Delete image block':'Remove text block')+'</button>';
+  box.innerHTML='<div class="mv-inspector-title">'+(block.type==='image'?'Image':block.type==='tests'?'Tests & results':'Text')+'</div>'+field+
+    '<button class="btn btn-danger btn-sm" type="button" onclick="microVisualRemoveBlock()">Remove block</button>';
 }
 async function renderMicroVisualAidsTab(el){
   el.innerHTML='<div class="empty">Loading Visual Aids…</div>';
@@ -139,8 +157,8 @@ async function renderMicroVisualAidsTab(el){
     if(page){
       html.push('<label>Specimen name<input id="micro-visual-specimen" value="'+microVisualEscape(page.title||'')+'" oninput="captureMicroVisualPage()"></label>');
       html.push('<label>Page title<input id="micro-visual-title" value="'+microVisualEscape(page.case_data||'')+'" oninput="captureMicroVisualPage()"></label>');
-      html.push('<div class="mv-add-tools"><button class="btn btn-ghost btn-sm" type="button" onclick="microVisualAddBlock(\'text\')">+ Text</button><button class="btn btn-ghost btn-sm" type="button" onclick="microVisualAddBlock(\'image\')">+ Image</button></div>');
-      html.push('<div class="mv-element-list">'+page.blocks.map(function(block){return '<button type="button" data-mv-id="'+microVisualEscape(block.id)+'" class="mv-element-chip'+(block.id===appState.microVisualSelected?' active':'')+'" onclick="microVisualSelect(\''+microVisualEscape(block.id)+'\')">'+microVisualEscape(block.type==='image'?(block.label||'Image'):(block.text||'Text').slice(0,28))+'</button>';}).join('')+'</div>');
+      html.push('<div class="mv-add-tools"><button class="btn btn-ghost btn-sm" type="button" onclick="microVisualAddBlock(\'text\')">+ Text</button><button class="btn btn-ghost btn-sm" type="button" onclick="microVisualAddBlock(\'image\')">+ Image</button><button class="btn btn-ghost btn-sm" type="button" onclick="microVisualAddBlock(\'tests\')">+ Tests & results</button></div>');
+      html.push('<div class="mv-element-list">'+page.blocks.map(function(block){return '<button type="button" data-mv-id="'+microVisualEscape(block.id)+'" class="mv-element-chip'+(block.id===appState.microVisualSelected?' active':'')+'" onclick="microVisualSelect(\''+microVisualEscape(block.id)+'\')">'+microVisualEscape(block.type==='image'?(block.label||'Image'):block.type==='tests'?(block.title||'Tests & results'):(block.text||'Text').slice(0,28))+'</button>';}).join('')+'</div>');
       html.push('<div id="micro-visual-element-editor"></div>');
       html.push('<div class="micro-visual-actions"><button class="btn btn-primary btn-sm" id="micro-visual-save" type="button" onclick="saveMicroVisualPage()">Save page</button><button class="btn btn-danger btn-sm" type="button" onclick="deleteMicroVisualPage()">Delete page</button></div>');
     }
@@ -160,7 +178,7 @@ function microVisualSelect(id){
 function microVisualSetField(field,value){
   if(!isAdmin)return;
   var block=microVisualSelectedBlock();if(!block)return;
-  block[field]=field==='fontSize'?Math.max(10,Math.min(42,Number(value)||16)):value;
+  block[field]=field==='fontSize'?Math.max(10,Math.min(42,Number(value)||16)):['focusX','focusY','zoom'].includes(field)?Number(value):value;
   var node=document.querySelector('.mv-block[data-mv-block="'+block.id+'"]');
   if(node){
     if(field==='text'){var content=node.querySelector('.mv-text-content');if(content&&content!==document.activeElement)content.textContent=value;}
@@ -169,8 +187,30 @@ function microVisualSetField(field,value){
     if(field==='background')node.style.background=value;
     if(field==='label'){var label=node.querySelector('.mv-image-label');if(label)label.textContent=value;var placeholder=node.querySelector('.mv-image-placeholder > span:first-child');if(placeholder)placeholder.textContent=value||'Image';}
     if(field==='shape'){var media=node.querySelector('.mv-image-media');if(media){media.classList.toggle('is-circle',value==='circle');media.classList.toggle('is-square',value!=='circle');}}
+    if(['focusX','focusY','zoom'].includes(field)){var image=node.querySelector('.mv-image-media img');if(image){image.style.cssText=microVisualImageStyle(block);}}
+    if(field==='title'){var heading=node.querySelector('.mv-tests-content strong');if(heading)heading.textContent=value||'Tests & results';}
   }
   microVisualDirty();
+}
+function microVisualCenterImage(){
+  var block=microVisualSelectedBlock();if(!block||block.type!=='image')return;
+  microVisualSetField('focusX',50);microVisualSetField('focusY',50);microVisualSetField('zoom',1);
+  microVisualRenderInspector();
+}
+function microVisualSetTestField(index,field,value){
+  var block=microVisualSelectedBlock();if(!isAdmin||block?.type!=='tests'||!block.rows[index])return;
+  block.rows[index][field]=value;
+  var cell=document.querySelector('.mv-block[data-mv-block="'+block.id+'"] [data-mv-'+(field==='test'?'test':'result')+'="'+index+'"]');
+  if(cell)cell.textContent=value;
+  microVisualDirty();
+}
+function microVisualAddTestRow(){
+  var block=microVisualSelectedBlock();if(!isAdmin||block?.type!=='tests')return;
+  block.rows.push({test:'',result:''});renderTab();
+}
+function microVisualRemoveTestRow(index){
+  var block=microVisualSelectedBlock();if(!isAdmin||block?.type!=='tests')return;
+  block.rows.splice(index,1);renderTab();
 }
 function microVisualTextInput(event,id){
   var block=microVisualPage()?.blocks.find(function(item){return item.id===id;});
@@ -187,7 +227,8 @@ function microVisualAddBlock(type){
   var page=microVisualPage();if(!page)return;
   var offset=page.blocks.length%4;
   var block=type==='image'?
-    {id:microVisualId(),type:'image',shape:'square',label:'Image',url:'',x:10+offset*5,y:72,w:38,h:23}:
+    {id:microVisualId(),type:'image',shape:'square',label:'Image',url:'',focusX:50,focusY:50,zoom:1,x:10+offset*5,y:72,w:38,h:23}:
+    type==='tests'?{id:microVisualId(),type:'tests',title:'Tests & results',rows:[{test:'',result:''}],x:7,y:70,w:86,h:20}:
     {id:microVisualId(),type:'text',text:'',x:10+offset*5,y:76,w:55,h:16,fontSize:16,color:'#243b35',background:'#ffffff'};
   page.blocks.push(block);appState.microVisualSelected=block.id;renderTab();
 }
@@ -359,22 +400,34 @@ async function exportMicroVisualPdf(){
         var url=microVisualSafeUrl(block.url);
         if(url){
           try{
-            var info=doc.getImageProperties(url),availableW=Math.max(1,w-12),availableH=Math.max(1,h-24);
-            var scale=Math.min(availableW/info.width,availableH/info.height);
-            var iw=info.width*scale,ih=info.height*scale;
-            if(block.shape==='circle'){
-              var imageCanvas=document.createElement('canvas'),side=400;
-              imageCanvas.width=side;imageCanvas.height=side;
-              var imageContext=imageCanvas.getContext('2d'),source=await new Promise(function(resolve,reject){var img=new Image();img.onload=function(){resolve(img);};img.onerror=reject;img.src=url;});
-              imageContext.beginPath();imageContext.arc(side/2,side/2,side/2,0,Math.PI*2);imageContext.clip();
-              var crop=Math.min(info.width,info.height),sx=(info.width-crop)/2,sy=(info.height-crop)/2;
-              imageContext.drawImage(source,sx,sy,crop,crop,0,0,side,side);
-              var diameter=Math.min(w-12,h-26);doc.addImage(imageCanvas.toDataURL('image/png'),'PNG',x+(w-diameter)/2,y+3,diameter,diameter);
-            }else doc.addImage(url,info.fileType||'JPEG',x+(w-iw)/2,y+5+(availableH-ih)/2,iw,ih);
+            var source=await new Promise(function(resolve,reject){var img=new Image();img.crossOrigin='anonymous';img.onload=function(){resolve(img);};img.onerror=reject;img.src=url;});
+            var imageCanvas=document.createElement('canvas'),side=400;
+            imageCanvas.width=side;imageCanvas.height=side;
+            var imageContext=imageCanvas.getContext('2d');
+            if(block.shape==='circle'){imageContext.beginPath();imageContext.arc(side/2,side/2,side/2,0,Math.PI*2);imageContext.clip();}
+            var crop=Math.min(source.naturalWidth,source.naturalHeight)/Math.max(1,Number(block.zoom)||1);
+            var sx=(source.naturalWidth-crop)*Math.max(0,Math.min(100,Number(block.focusX??50)))/100;
+            var sy=(source.naturalHeight-crop)*Math.max(0,Math.min(100,Number(block.focusY??50)))/100;
+            imageContext.drawImage(source,sx,sy,crop,crop,0,0,side,side);
+            var diameter=Math.min(w-12,h-26);
+            doc.addImage(imageCanvas.toDataURL('image/png'),'PNG',x+(w-diameter)/2,y+3,diameter,diameter);
           }catch(error){warnings++;}
         }
         doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(64,92,82);
         doc.text(String(block.label||'Image').slice(0,90),x+w/2,y+h-7,{align:'center',maxWidth:w-10});
+      }else if(block.type==='tests'){
+        doc.setDrawColor(190,211,203);doc.setLineWidth(.7);doc.rect(x,y,w,h);
+        doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(36,59,53);
+        doc.text(String(block.title||'Tests & results').slice(0,100),x+8,y+16,{maxWidth:w-16});
+        doc.setFillColor(232,242,238);doc.rect(x+5,y+22,w-10,19,'F');
+        doc.setFontSize(9);doc.text('Test',x+10,y+35);doc.text('Result',x+w/2+5,y+35);
+        (block.rows||[]).forEach(function(row,index){
+          var rowY=y+53+index*24;if(rowY+17>y+h)return;
+          doc.setDrawColor(210,224,218);doc.line(x+5,rowY+7,x+w-5,rowY+7);
+          doc.setFont('helvetica','normal');doc.setFontSize(9);
+          doc.text(doc.splitTextToSize(String(row.test||''),w/2-18).slice(0,2),x+10,rowY-3);
+          doc.text(doc.splitTextToSize(String(row.result||''),w/2-18).slice(0,2),x+w/2+5,rowY-3);
+        });
       }else{
         var background=microVisualPdfRgb(block.background||'#ffffff');
         doc.setFillColor(background[0],background[1],background[2]);doc.rect(x,y,w,h,'F');

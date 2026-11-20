@@ -1940,6 +1940,7 @@ body:not(.light-mode) .subject-notebook{--paper:#202b3b;--ink:#eaf0fa;--rule:#b6
 .ascp-child-list{display:grid;gap:8px;margin:18px 0}
 .ascp-child-list button{display:block;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font:inherit;line-height:1.4;cursor:pointer}
 .ascp-child-list button:hover{border-color:var(--study-accent)}
+.resource-link{display:inline-block;margin-top:9px;font-weight:700;color:var(--accent)}
 @media(max-width:600px){.ascp-hero-actions{justify-content:flex-end}.ascp-hero-actions .study-guideline-button{margin-left:0}.ascp-child-list button{font-size:14px}}
 .study-nav-heading.outline-section-card{font-size:18px;line-height:1.4;padding:14px 12px;font-weight:800}
 .study-nav-heading.active{background:color-mix(in srgb,var(--study-accent) 16%,var(--bg2))}
@@ -4017,7 +4018,8 @@ const RESOURCES=[
   {title:'ASCP BOC Study Guide / Content Outline',meta:'American Society for Clinical Pathology Board of Certification (ASCP BOC). Medical Laboratory Scientist certification study guide, reading list, and content-outline materials.',note:'Certification outline and study-planning reference.'},
   {title:'Medical Laboratory Science Review, Fifth Edition',meta:'Robert R. Harr. F.A. Davis textbook review source.',note:'Textbook question source. Explanations are referenced to the assigned book, not reproduced.'},
   {title:'Course Textbooks and Lab Manuals',meta:'Assigned MLS program textbooks, laboratory manuals, procedure notes, and instructor handouts.',note:'Definitions, tables, algorithms, images, and interpretive-rule references.'},
-  {title:'Calculations and Reference Ranges Sources',meta:'Assigned MLS program formula sheets, course reference-range tables, lecture notes, and laboratory calculation references.',note:'Conventional-unit reference range and formula source group.'}
+  {title:'Calculations and Reference Ranges Sources',meta:'Assigned MLS program formula sheets, course reference-range tables, lecture notes, and laboratory calculation references.',note:'Conventional-unit reference range and formula source group.'},
+  {title:'World of Bacteria',meta:'Visual atlas of medically important bacteria.',note:'Laboratory photographs of colonies, Gram stains, and other diagnostic appearances.',url:'https://worldofbacteria.org/'}
 ];
 
 const CALC_PLACEHOLDERS=[
@@ -6108,6 +6110,7 @@ function renderResourcesView(v){
           <div class="resource-title">${esc(r.title)}</div>
           <div class="resource-meta">${esc(r.meta)}</div>
           <div class="resource-note">${esc(r.note)}</div>
+          ${r.url?`<a class="resource-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Visit website ↗</a>`:''}
         </div>
       `).join('')}
     </div>
